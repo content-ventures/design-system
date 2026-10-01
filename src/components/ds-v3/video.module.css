@@ -1,0 +1,315 @@
+/* ——— VideoPlayer ———
+ * Faixa de controles chapada (rgb 16 19 26 / 55%), sem degradê. Play central em papel 92%. */
+.player {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  border-radius: var(--r-lg);
+  isolation: isolate;
+  color: #fff;
+}
+.frame {
+  display: block;
+}
+.frame video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.blank {
+  position: absolute;
+  inset: 0;
+  background: var(--g-50);
+}
+/* Tocando (simulado): o pôster se aproxima devagar, sinal discreto de movimento. */
+.player[data-phase='playing'] .frame img {
+  transform: scale(1.035);
+  transition: transform 15s linear;
+}
+.player:not([data-phase='playing']) .frame img {
+  transition: transform var(--dur-3) var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .player[data-phase='playing'] .frame img {
+    transform: none;
+  }
+}
+.surface {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  cursor: pointer;
+}
+.player[data-phase='poster'] .surface {
+  cursor: default;
+}
+.player[data-phase='playing']:not([data-controls]) .surface {
+  cursor: none;
+}
+
+/* Play central: 52, papel 92%, ícone 20 ink. Hover 1.05 em 120 ms. */
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: -26px 0 0 -26px;
+  border-radius: 50%;
+  color: var(--ink);
+  background: rgb(255 255 255 / 0.92);
+  box-shadow: 0 0 0 1px rgb(16 24 40 / 0.06);
+  transition:
+    transform var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+  animation: centerIn var(--dur-2) var(--ease-out);
+}
+@keyframes centerIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+.center svg {
+  width: 20px;
+  height: 20px;
+}
+.playGlyph {
+  margin-left: 2px;
+  fill: currentColor;
+}
+button.center:hover {
+  transform: scale(1.05);
+  background: #fff;
+}
+button.center:active {
+  transform: scale(0.98);
+}
+button.center:focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+}
+.center[data-spinner] {
+  pointer-events: none;
+  animation-delay: 0ms;
+}
+.center[data-spinner] svg {
+  color: var(--b-600);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .center[data-spinner] svg {
+    animation: spin 2.4s linear infinite !important;
+  }
+}
+
+.duration {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 4;
+  padding: 2px 6px;
+  border-radius: var(--r-xs);
+  font: var(--t-caption-strong);
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  background: rgb(16 19 26 / 0.55);
+  pointer-events: none;
+}
+
+.cue {
+  position: absolute;
+  left: 50%;
+  bottom: 60px;
+  z-index: 4;
+  max-width: calc(100% - 48px);
+  padding: 3px 8px;
+  border-radius: var(--r-sm);
+  font: var(--t-body-strong);
+  color: #fff;
+  text-align: center;
+  background: rgb(16 19 26 / 0.72);
+  translate: -50% 0;
+  pointer-events: none;
+  transition: bottom var(--dur-2) var(--ease-out);
+}
+.player:not([data-controls]) .cue {
+  bottom: 16px;
+}
+
+/* Barra: aparece no hover, foco e pausa; some 2 s depois de parado tocando (180 ms). */
+.bar {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 48px;
+  padding: 0 8px;
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  background: rgb(16 19 26 / 0.55);
+  opacity: 0;
+  translate: 0 4px;
+  transition:
+    opacity var(--dur-2) var(--ease-out),
+    translate var(--dur-2) var(--ease-out);
+}
+.player[data-controls] .bar {
+  opacity: 1;
+  translate: 0 0;
+}
+.player[data-full] .bar {
+  border-radius: 0;
+}
+.ctrl {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  color: rgb(255 255 255 / 0.92);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+.ctrl svg {
+  width: 18px;
+  height: 18px;
+}
+.ctrl:hover {
+  color: #fff;
+  background: rgb(255 255 255 / 0.14);
+}
+.ctrl:active {
+  background: rgb(255 255 255 / 0.2);
+  transform: scale(var(--press-scale));
+}
+.ctrl:focus-visible {
+  outline: 2px solid var(--b-300);
+  outline-offset: 0;
+}
+.ctrl[aria-pressed='true'] {
+  color: #fff;
+  background: rgb(255 255 255 / 0.18);
+}
+.clock {
+  flex-shrink: 0;
+  padding: 0 6px;
+  font: 500 12px/16px var(--font);
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* Trilho: 4 px branco 30%, preenchimento b-400, polegar 12 px. */
+.scrub {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 48px;
+  height: 32px;
+  margin: 0 6px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  touch-action: none;
+}
+.scrub:focus-visible {
+  outline: 2px solid var(--b-300);
+  outline-offset: 0;
+}
+.rail {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  border-radius: var(--r-full);
+  background: rgb(255 255 255 / 0.3);
+}
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--b-400);
+}
+.knob {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(16 19 26 / 0.3);
+  transform: scale(0);
+  transition: transform var(--dur-1) var(--ease-out);
+}
+.scrub:is(:hover, :focus-visible, [data-dragging]) .knob {
+  transform: scale(1);
+}
+
+/* Erro: ícone 20 g-400 + legenda, sobre g-50. */
+.error {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.error svg {
+  width: 20px;
+  height: 20px;
+  color: var(--g-400);
+}
+
+/* Tela cheia: a moldura cabe inteira no centro. */
+.player:fullscreen {
+  display: grid;
+  place-items: center;
+  border-radius: 0;
+  background: var(--g-950);
+}
+.player:fullscreen .frame {
+  width: min(100vw, calc(100vh * 16 / 9));
+  border-radius: 0;
+}
+
+@media (max-width: 640px) {
+  .bar {
+    gap: 0;
+    padding: 0 4px;
+  }
+  .clock {
+    padding: 0 4px;
+  }
+  .scrub {
+    margin: 0 4px;
+  }
+}
+@media (pointer: coarse) {
+  .ctrl {
+    width: 36px;
+    height: 36px;
+  }
+  .knob {
+    transform: scale(1);
+  }
+}

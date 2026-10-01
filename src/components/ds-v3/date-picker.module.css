@@ -1,0 +1,616 @@
+/*
+ * Seletores de data. O gatilho reaproveita `.control` de fields.module.css (mesma altura, raio,
+ * borda, foco e erro do Input); aqui ficam só os acréscimos. O calendário flutua num portal.
+ */
+
+/* ——— Gatilho de data única ——— */
+.trigger {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+.trigger:disabled {
+  cursor: not-allowed;
+}
+.text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: var(--t-body);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.trigger[data-size='sm'] .text {
+  font: var(--t-small);
+}
+.text[data-empty='true'] {
+  color: var(--subtle);
+}
+.trigger:disabled .text {
+  color: var(--muted);
+}
+
+/*
+ * Aberto: o controle mantém o anel de foco azul enquanto o foco está no calendário, mesmo com erro —
+ * diz onde o próximo clique cai. O vermelho volta ao fechar. Uma regra para todo seletor.
+ */
+.trigger.trigger[data-open='true'],
+.range.range[data-open='true'] {
+  border-color: var(--b-500);
+  box-shadow: 0 0 0 3px rgb(8 117 219 / 0.12);
+}
+.trigger[data-open='true'] > svg,
+.range[data-open='true'] > svg {
+  color: var(--g-600);
+}
+/* Pranchas: estados parados */
+.trigger[data-force~='hover']:not(:disabled),
+.editable[data-force~='hover'] {
+  border-color: var(--line-hover);
+}
+.trigger.trigger[data-force~='focus'],
+.editable.editable[data-force~='focus'] {
+  outline: none;
+  border-color: var(--b-500);
+  box-shadow: var(--ring-field);
+}
+
+/* ——— Data digitável: ícone que abre o calendário + texto dd/mm/aaaa ——— */
+.editable.editable[data-size] {
+  gap: 4px;
+  padding-left: 4px;
+}
+.editable input {
+  font-variant-numeric: tabular-nums;
+}
+.calButton {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: calc(var(--ctl-h) - 10px);
+  height: calc(var(--ctl-h) - 10px);
+  border-radius: var(--r-sm);
+  color: var(--g-400);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.calButton:hover:not(:disabled),
+.editable[data-open='true'] .calButton {
+  color: var(--g-700);
+  background: var(--g-75);
+}
+.calButton:disabled {
+  cursor: not-allowed;
+  color: var(--disabled-icon);
+}
+.calButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ——— Gatilho de período: um controle, dois segmentos ——— */
+.range.range[data-size] {
+  gap: 2px;
+  padding: 0 4px 0 12px;
+  cursor: pointer;
+}
+.range.range[data-size='sm'] {
+  padding-left: 10px;
+}
+.range {
+  /* A duração some quando o controle fica estreito; sem largura imposta, mede como um campo. */
+  container-type: inline-size;
+  contain-intrinsic-inline-size: 320px;
+}
+.range[data-disabled='true'] {
+  cursor: not-allowed;
+}
+.segment {
+  /* Cada data mede o próprio texto: "05/10/2026 – 12/10/2026" lê como um intervalo, sem vão. */
+  flex: 0 1 auto;
+  min-width: 0;
+  height: calc(var(--ctl-h) - 10px);
+  padding: 0 8px;
+  border-radius: var(--r-xs);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: left;
+  font: var(--t-body);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.range[data-size='sm'] .segment {
+  height: calc(var(--ctl-h) - 8px);
+  padding: 0 6px;
+  font: var(--t-small);
+}
+.segment:hover:not(:disabled) {
+  background: var(--g-50);
+}
+.segment:focus-visible {
+  background: var(--g-75);
+}
+.segment[data-empty='true'] {
+  color: var(--subtle);
+}
+.segment[data-placeholder='true'] {
+  flex: 1 1 auto;
+  color: var(--ink);
+}
+/* O término empurra duração e limpar para a borda direita. */
+.range > .arrow + .segment {
+  margin-right: auto;
+}
+.segment[data-empty='true'][data-invalid='true'] {
+  color: var(--red-ink);
+}
+.segment[data-active='true'],
+.segment[data-active='true']:hover:not(:disabled) {
+  color: var(--b-800);
+  background: var(--b-50);
+}
+.segment[data-active='true'][data-empty='true'] {
+  color: var(--b-700);
+}
+.segment:disabled {
+  cursor: not-allowed;
+  color: var(--muted);
+}
+.range > .arrow {
+  flex-shrink: 0;
+  font: var(--t-body);
+  color: var(--muted);
+}
+.range[data-size='sm'] > .arrow {
+  font: var(--t-small);
+}
+.span {
+  flex-shrink: 0;
+  margin: 0 2px 0 4px;
+  padding: 1px 6px;
+  border-radius: var(--r-xs);
+  font: var(--t-caption-strong);
+  color: var(--g-600);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  background: var(--g-75);
+}
+
+/* Limpar (filtros): o mesmo "×" da busca, rente à borda direita. */
+.range > .clear {
+  flex-shrink: 0;
+  margin: 0 2px 0 4px;
+}
+
+/* Formulário (`labels`): duas caixas com rótulo, como dois campos lado a lado da grade. */
+.split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--date-split-gap, 16px);
+  min-width: 0;
+}
+.splitField {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+}
+
+@container (max-width: 289px) {
+  .range[data-size='md'] .span {
+    display: none;
+  }
+}
+@container (max-width: 259px) {
+  .span {
+    display: none;
+  }
+}
+@container (max-width: 239px) {
+  .range > svg:first-child {
+    display: none;
+  }
+  .range .segment {
+    padding: 0 4px;
+  }
+}
+
+/* ——— Painel ——— */
+/* Casa de 34 px (40 no toque), como nos seletores aprovados do dashboard; o calendário em linha usa 36. */
+.pop {
+  --cell: 34px;
+  position: fixed;
+  z-index: 1000;
+  max-width: calc(100vw - 16px);
+  padding: 12px 12px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: var(--text);
+  font: var(--t-body);
+  background: var(--paper);
+  box-shadow: var(--shadow-lg);
+  animation: popIn var(--dur-1) var(--ease-out);
+}
+.pop[data-side='above'] {
+  animation-name: popInAbove;
+}
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@keyframes popInAbove {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pop {
+    animation: none;
+  }
+}
+@media (pointer: coarse) {
+  .pop {
+    --cell: 40px;
+  }
+  .calendar {
+    --cell: 44px;
+  }
+}
+.panel {
+  display: grid;
+}
+/* Atalhos, legenda e rodapé acompanham a largura dos meses: quebram linha, não alargam o painel. */
+.top,
+.foot {
+  width: 0;
+  min-width: calc(100% + 24px);
+}
+
+/* Atalhos e legenda da janela */
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin: -2px -12px 10px;
+  padding: 0 12px 10px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-left: -6px;
+}
+.preset {
+  height: 26px;
+  padding: 0 8px;
+  border-radius: var(--r-sm);
+  font: var(--t-small-strong);
+  color: var(--b-700);
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.preset:hover:not(:disabled),
+.preset[aria-pressed='true'] {
+  color: var(--b-800);
+  background: var(--b-50);
+}
+.preset:disabled {
+  cursor: not-allowed;
+  color: var(--subtle);
+}
+/* As datas do atalho, mais quietas: o atalho diz o que aplica. */
+.presetDates {
+  margin-left: 6px;
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.preset:disabled .presetDates {
+  color: inherit;
+}
+.legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.legend:only-child {
+  margin-left: 0;
+}
+.legend b {
+  font-weight: 500;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.swatch {
+  width: 12px;
+  border-bottom: 2px dotted var(--b-300);
+}
+
+/* Meses */
+.months {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 16px;
+}
+.month + .month {
+  padding-left: 16px;
+  border-left: 1px solid var(--line-soft);
+}
+.head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  margin-bottom: 4px;
+}
+.title {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font: var(--t-title-3);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.head .nav.nav[data-size] {
+  --btn-h: 28px;
+  --btn-radius: var(--r-sm);
+}
+/* Toque: mês anterior/próximo com 40 px de alvo, sem mudar o desenho de 28 px. */
+@media (pointer: coarse) {
+  .head .nav.nav[data-size] {
+    z-index: 1;
+  }
+  .head .nav.nav[data-size]::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+  }
+}
+.navGap {
+  width: 28px;
+  flex-shrink: 0;
+}
+.grid {
+  border-collapse: separate;
+  border-spacing: 0 2px;
+  table-layout: fixed;
+  margin: -2px 0;
+}
+.weekday {
+  width: var(--cell);
+  height: 26px;
+  padding: 0;
+  font: var(--t-caption-strong);
+  color: var(--muted);
+  text-align: center;
+}
+.cell {
+  position: relative;
+  width: var(--cell);
+  height: var(--cell);
+  padding: 0;
+}
+
+/* Faixa do período: tira contínua, cortada ao meio nas pontas e arredondada no fim da semana/mês. */
+.cell[data-band]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--b-50);
+}
+.cell[data-band='start']::before {
+  left: 50%;
+}
+.cell[data-band='end']::before {
+  right: 50%;
+}
+.cell[data-cap-l='true']:not([data-band='start'])::before {
+  border-top-left-radius: var(--r-sm);
+  border-bottom-left-radius: var(--r-sm);
+}
+.cell[data-cap-r='true']:not([data-band='end'])::before {
+  border-top-right-radius: var(--r-sm);
+  border-bottom-right-radius: var(--r-sm);
+}
+
+/* Troca de mês: a grade entra 8 px do lado da navegação */
+.weeks[data-dir='next'] {
+  animation: weeksNext var(--dur-2) var(--ease-out);
+}
+.weeks[data-dir='prev'] {
+  animation: weeksPrev var(--dur-2) var(--ease-out);
+}
+@keyframes weeksNext {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+}
+@keyframes weeksPrev {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+
+/* Dia */
+.day {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  font: var(--t-body);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.day:is(:hover, [data-force~='hover']) {
+  background: var(--g-75);
+}
+.cell[data-band] .day:not([data-filled]):not([aria-disabled='true']):hover {
+  background: var(--b-100);
+}
+.day:is(:focus-visible, [data-force~='focus']) {
+  z-index: 2;
+  outline: 2px solid var(--b-500);
+  outline-offset: 1px;
+}
+/* Fora do mês: apagado, mas escolhível (leva ao mês dele) */
+.day[data-outside='true'] {
+  color: var(--subtle);
+}
+/* Eventos: até três pontos de 4 px sob o número */
+.dots {
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  display: flex;
+  gap: 2px;
+  translate: -50% 0;
+}
+.dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--dot);
+}
+.day[data-filled='true'] .dots i {
+  background: rgb(255 255 255 / 0.85);
+}
+.day[data-outside='true'] .dots {
+  opacity: 0.5;
+}
+.day[data-today='true'] {
+  border-color: var(--b-300);
+  color: var(--b-700);
+  font-weight: 500;
+}
+.day[data-ghost='true'] {
+  border-color: var(--b-300);
+  color: var(--b-800);
+  background: var(--b-100);
+}
+.day[data-filled='true'],
+.day[data-filled='true']:hover {
+  border-color: var(--b-600);
+  color: var(--on-accent);
+  font-weight: 500;
+  background: var(--b-600);
+}
+/* Selecionado é sempre azul sólido com número branco, dentro ou fora da faixa. */
+.cell .day[data-filled='true']:hover {
+  border-color: var(--b-700);
+  background: var(--b-700);
+}
+.day[aria-disabled='true'] {
+  cursor: not-allowed;
+  color: var(--g-300);
+}
+.day[aria-disabled='true']:is(:hover, [data-force~='hover']) {
+  background: none;
+}
+.day[aria-disabled='true'][data-today='true'] {
+  border-color: var(--g-200);
+}
+/* Data já gravada fora dos limites (ex.: herdada de outro ativo): continua visível, mas apagada. */
+.day[aria-disabled='true'][data-filled='true'],
+.cell .day[aria-disabled='true'][data-filled='true']:hover {
+  border-color: var(--g-400);
+  color: var(--on-accent);
+  background: var(--g-400);
+}
+
+/* Janela: tracejado curto sob o número. */
+.day[data-window='true']::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 12px;
+  translate: -50% 0;
+  border-bottom: 2px dotted var(--b-300);
+}
+.day[data-window='true'][data-filled='true']::after {
+  border-bottom-color: rgb(255 255 255 / 0.7);
+}
+.day[data-window='true'][aria-disabled='true']::after {
+  border-bottom-color: var(--g-200);
+}
+
+/* Rodapé */
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 32px;
+  margin: 8px -12px 0;
+  padding: 8px 6px 0 12px;
+  border-top: 1px solid var(--line-soft);
+}
+.foot > .footButton:first-child {
+  margin-left: -6px;
+}
+.summary {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.summary b {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* ——— Calendário em linha ——— */
+.calendar {
+  --cell: 36px;
+  display: grid;
+  gap: 2px;
+  width: max-content;
+  max-width: 100%;
+}
+.calendar .head {
+  margin-bottom: 2px;
+}
+.dayPreview {
+  --cell: 36px;
+  margin: 0;
+}
+.dayPreview .day {
+  cursor: default;
+}

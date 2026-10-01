@@ -1,0 +1,217 @@
+.list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  column-gap: 12px;
+  padding-bottom: 16px;
+}
+.item:last-child {
+  padding-bottom: 0;
+}
+.body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.title {
+  flex: 1;
+  min-width: 0;
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.desc {
+  font: var(--t-small);
+  color: var(--muted);
+}
+.meta {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.date {
+  flex: none;
+  margin-left: auto;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.extra {
+  margin-top: 8px;
+}
+
+/* ——— Pontos (Histórico do detalhe): sem trilho, o mais recente em azul ——— */
+.list[data-variant='dots'] .item {
+  grid-template-columns: 6px minmax(0, 1fr);
+  column-gap: 10px;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  margin-top: 7px;
+  border-radius: 50%;
+  background: var(--g-300);
+}
+.list[data-variant='dots'] .item[data-state='current'] .dot {
+  background: var(--b-600);
+}
+
+/* ——— Etapas: marcador de 20 px do Stepper, fio de 1 px entre eles ——— */
+.marker {
+  position: relative;
+  z-index: 1;
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+}
+.list[data-variant='steps'] .item:not(:last-child)::before,
+.list[data-variant='activity'] .item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 24px;
+  bottom: 4px;
+  left: 9.5px;
+  width: 1px;
+  background: var(--line);
+}
+.list[data-variant='steps'] .item[data-state='done']:not(:last-child)::before {
+  background: var(--b-200);
+}
+.list[data-variant='steps'] .body {
+  padding-top: 0;
+}
+.list[data-variant='steps'] .item[data-state='upcoming'] .title {
+  color: var(--text);
+}
+.list[data-variant='steps'] .item[data-state='blocked'] .title {
+  color: var(--muted);
+}
+
+/* ——— Atividade: marcador da pessoa ou da marca, fio suave ——— */
+.list[data-variant='activity'] .item {
+  padding-bottom: 20px;
+}
+.list[data-variant='activity'] .item:last-child {
+  padding-bottom: 0;
+}
+.list[data-variant='activity'] .item:not(:last-child)::before {
+  background: var(--line-soft);
+}
+.list[data-variant='activity'] .marker .dot {
+  margin: 0;
+}
+.list[data-variant='activity'] .title {
+  font: var(--t-body);
+  color: var(--text);
+}
+.list[data-variant='activity'] .title b {
+  font-weight: 500;
+  color: var(--ink);
+}
+.quote {
+  margin-top: 6px;
+  padding: 8px 10px 9px;
+  border-radius: var(--r-md);
+  font: var(--t-body);
+  color: var(--text);
+  background: var(--g-50);
+}
+
+/* ——— Ícones (compatibilidade) ——— */
+.list[data-variant='icons'] .item {
+  grid-template-columns: 28px minmax(0, 1fr);
+}
+.bubble {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--g-600);
+  background: var(--g-50);
+  border: 1px solid var(--line);
+}
+.bubble svg {
+  width: 14px;
+  height: 14px;
+}
+.list[data-variant='icons'] .item[data-state='current'] .bubble {
+  color: var(--b-600);
+  background: var(--b-50);
+  border-color: var(--b-100);
+}
+.list[data-variant='icons'] .item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 32px;
+  bottom: 4px;
+  left: 13.5px;
+  width: 1px;
+  background: var(--line);
+}
+.list[data-variant='icons'] .body {
+  padding-top: 4px;
+}
+
+/* ——— Grupos ——— */
+.groups {
+  display: grid;
+}
+.groupHead {
+  padding: 0 0 10px;
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+.groups > .list + .groupHead {
+  margin-top: 20px;
+}
+
+/* ——— Chegada em cascata ——— */
+.item[data-enter] {
+  animation: enter var(--dur-3) var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * var(--stagger));
+}
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* ——— Texto recolhível ——— */
+.expandable {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+}
+.clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--lines, 3);
+  line-clamp: var(--lines, 3);
+  overflow: hidden;
+}
+.clamp[data-open] {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item[data-enter] {
+    animation: none;
+  }
+}

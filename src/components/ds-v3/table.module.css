@@ -1,0 +1,662 @@
+.frame {
+  min-width: 0;
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+/* Simples (Analytics): sem moldura; a linha em hover sangra 12 px para os lados do texto. */
+.frame[data-variant='plain'] {
+  margin-inline: -12px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+/* Posicionado: rótulos ocultos e outros absolutos ficam dentro da rolagem, não alargam a página. */
+.scroll {
+  position: relative;
+  overflow-x: auto;
+  padding: 6px 6px 2px;
+  scrollbar-width: thin;
+}
+.frame[data-variant='plain'] .scroll {
+  padding: 0;
+}
+.table {
+  --cell-px: 14px;
+  --row-h: 60px;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font: var(--t-body);
+  color: var(--text);
+}
+.table[data-density='compact'] {
+  --cell-px: 12px;
+  --row-h: 46px;
+}
+.caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.table th {
+  height: 38px;
+  padding: 0 var(--cell-px);
+  font: var(--t-caption-strong);
+  color: var(--muted);
+  text-align: left;
+  white-space: nowrap;
+  background: var(--g-50);
+}
+.table thead th:first-child {
+  border-radius: var(--r-md) 0 0 var(--r-md);
+}
+.table thead th:last-child {
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+}
+/* Cabeçalho simples: legenda em papel com fio embaixo. */
+.table[data-variant='plain'] thead th {
+  height: 34px;
+  padding-top: 2px;
+  background: none;
+  border-radius: 0;
+  box-shadow: inset 0 -1px 0 var(--line);
+}
+.table th[data-align='end'],
+.table td[data-align='end'] {
+  text-align: right;
+}
+.table th[data-align='center'],
+.table td[data-align='center'] {
+  text-align: center;
+}
+
+/* ——— Cabeçalho ordenável ——— */
+.sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 -4px;
+  padding: 3px 4px;
+  border-radius: var(--r-sm);
+  font: inherit;
+  color: inherit;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.sort:is(:hover, [data-force~='hover']) {
+  color: var(--ink);
+  background: var(--g-100);
+}
+.sort:is(:active, [data-force~='active']) {
+  background: var(--g-150);
+}
+.sort:focus-visible {
+  outline-offset: 0;
+}
+.table[data-variant='plain'] .sort:is(:hover, [data-force~='hover']) {
+  background: var(--g-75);
+}
+.sort svg {
+  width: 13px;
+  height: 13px;
+  color: var(--g-400);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.sort[data-active='true'] {
+  color: var(--ink);
+}
+.sort[data-active='true'] svg {
+  color: var(--b-600);
+}
+/* Termo com definição na dica: sublinhado pontilhado discreto. */
+.term {
+  border-radius: 2px;
+  text-decoration: underline dotted var(--g-400);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+.term:focus-visible {
+  outline-offset: 2px;
+}
+
+/* ——— Células ——— */
+.table td {
+  height: var(--row-h);
+  padding: 0 var(--cell-px);
+  vertical-align: middle;
+  background: var(--paper);
+  box-shadow: inset 0 -1px 0 var(--line-soft);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    height var(--dur-2) var(--ease-out),
+    padding var(--dur-2) var(--ease-out),
+    opacity var(--dur-2) var(--ease-out);
+}
+.table tbody tr:last-child td {
+  box-shadow: none;
+}
+.table[data-variant='plain'] td {
+  padding-block: 8px;
+}
+.table tbody tr:is(:hover, [data-force~='hover']) td {
+  background: var(--g-25);
+}
+.table tbody tr[data-selected='true'] td {
+  background: var(--b-25);
+  box-shadow: inset 0 -1px 0 var(--b-50);
+}
+.table tbody tr[data-selected='true'] td:first-child {
+  border-radius: var(--r-md) 0 0 var(--r-md);
+}
+.table tbody tr[data-selected='true'] td:last-child {
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+}
+.table tbody tr[data-clickable='true'] {
+  cursor: pointer;
+}
+.table tbody tr:focus-visible {
+  outline-offset: -2px;
+}
+.table tbody tr[data-pending] td {
+  opacity: 0.5;
+}
+.check {
+  width: 44px;
+  padding-right: 0 !important;
+}
+/* Checkbox sem rótulo: bloco do tamanho da caixa, centrado na altura da linha (46/60). */
+.check label {
+  display: flex;
+  width: max-content;
+}
+.num {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  font-weight: 500;
+}
+/* Valor ausente: informação, não placeholder. */
+.none {
+  color: var(--muted);
+  font-weight: 400;
+}
+/* Texto longo: uma linha, reticências, valor inteiro no title. */
+.table td[data-truncate] {
+  max-width: 0;
+}
+.truncate {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.emptyCell {
+  height: auto !important;
+  padding: 40px 16px !important;
+  box-shadow: none !important;
+}
+/* Simples: total com fio acima, peso 500. */
+.table tfoot :is(th, td) {
+  height: var(--row-h);
+  padding: 0 var(--cell-px);
+  font: var(--t-body-strong);
+  color: var(--ink);
+  text-align: left;
+  background: none;
+  box-shadow: inset 0 1px 0 var(--line);
+  font-variant-numeric: tabular-nums;
+}
+.table tfoot :is(th, td)[data-align='end'] {
+  text-align: right;
+}
+.table[data-variant='data'] tfoot th:first-child {
+  border-radius: 0;
+}
+
+/* Troca de conteúdo (carregar, filtrar, recorte): crossfade de 180 ms. */
+.body {
+  animation: bodyIn var(--dur-2) var(--ease-out);
+}
+@keyframes bodyIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ——— Faixa acima das linhas (selecionar todas) ——— */
+.bannerRow td {
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+.banner {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: bandOpen var(--dur-3) var(--ease-out);
+}
+.banner > div {
+  min-height: 0;
+  overflow: hidden;
+}
+@keyframes bandOpen {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+/* ——— Esqueleto: blocos chapados com a geometria das colunas ——— */
+.skeletonRow td {
+  pointer-events: none;
+}
+.skel {
+  display: inline-block;
+  height: 12px;
+  max-width: 100%;
+  border-radius: var(--r-xs);
+  vertical-align: middle;
+  background: var(--skeleton);
+  animation: pulse var(--skeleton-pulse) ease-in-out infinite;
+}
+.skel[data-kind='short'] {
+  width: 64px;
+}
+.skel[data-kind='control'] {
+  width: 18px;
+  height: 18px;
+  border-radius: 4.5px;
+}
+.skel[data-kind='sub'] {
+  height: 9px;
+}
+.skelLines {
+  display: grid;
+  gap: 7px;
+}
+.skelLines .skel {
+  display: block;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* ——— Movimento de coluna e de linha ——— */
+.colMotion {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.table tr[data-exiting] td {
+  height: 0;
+  padding-block: 0;
+  opacity: 0;
+  box-shadow: none;
+  transition:
+    height var(--dur-2) var(--ease-in),
+    opacity var(--dur-1) var(--ease-in);
+}
+.rowExit {
+  display: grid;
+  grid-template-rows: 0fr;
+  animation: rowCollapse var(--dur-2) var(--ease-in);
+}
+.rowExit > div {
+  min-height: 0;
+  overflow: hidden;
+}
+@keyframes rowCollapse {
+  from {
+    grid-template-rows: 1fr;
+  }
+}
+
+/* ——— Menu “Colunas” ——— */
+.colsAnchor {
+  position: relative;
+  display: inline-flex;
+}
+.colsMenu {
+  position: absolute;
+  z-index: var(--z-popover);
+  top: calc(100% + 6px);
+  left: 0;
+  display: grid;
+  min-width: 200px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  box-shadow: var(--shadow-lg);
+  transform-origin: top left;
+  animation: pop var(--dur-2) var(--ease-out);
+}
+.colsMenu[data-align='end'] {
+  left: auto;
+  right: 0;
+  transform-origin: top right;
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+.colsItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: var(--r-sm);
+  font: var(--t-small-strong);
+  color: var(--text);
+  text-align: left;
+  white-space: nowrap;
+  outline: none;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.colsItem:is(:hover, :focus-visible) {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.colsItem[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.colsBox {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--r-xs);
+  color: #fff;
+  background: var(--paper);
+  border: 1px solid #cdd2da;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out);
+}
+.colsBox svg {
+  width: 11px;
+  height: 11px;
+  stroke-width: 3;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity var(--dur-1),
+    transform var(--dur-2) var(--ease-spring);
+}
+.colsItem[aria-checked='true'] .colsBox {
+  background: var(--b-600);
+  border-color: var(--b-600);
+}
+.colsItem[aria-checked='true'] .colsBox svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ——— Rodapé com paginação ——— desenho em pagination.module.css (dono: navegação). */
+
+/* ——— Barra de ações em lote ——— */
+.bulkDock {
+  position: sticky;
+  bottom: 16px;
+  z-index: var(--z-dock);
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  pointer-events: none;
+}
+.bulkDock > * {
+  pointer-events: auto;
+}
+.bulk {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 6px 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--shadow-lg);
+  animation: bulkIn var(--dur-3) var(--ease-out);
+}
+.bulk[data-exiting] {
+  animation: bulkOut var(--dur-exit) var(--ease-in) forwards;
+  pointer-events: none;
+}
+@keyframes bulkIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes bulkOut {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.bulkCount {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex: none;
+  padding-right: 12px;
+  margin-right: 4px;
+  font: var(--t-small);
+  color: var(--muted);
+  white-space: nowrap;
+  box-shadow: 1px 0 0 var(--line);
+}
+.bulkCount b {
+  display: inline-block;
+  min-width: 1ch;
+  font: 600 13px/20px var(--font);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  animation: numIn var(--dur-1) var(--ease-out);
+}
+@keyframes numIn {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+}
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  /* Não encolhe: quando falta espaço a barra transborda e o ajuste de compactação percebe. */
+  flex: none;
+}
+.bulkAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: var(--r-sm);
+  font: var(--t-small-strong);
+  color: var(--text);
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+.bulkAction:is(:hover, [data-force~='hover']):not(:disabled) {
+  color: var(--ink);
+  background: var(--g-50);
+}
+.bulkAction:is(:active, [data-force~='active']):not(:disabled) {
+  background: var(--g-100);
+  transform: scale(var(--press-scale));
+}
+.bulkAction:is(:focus-visible, [data-force~='focus']) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: 0;
+}
+.bulkAction svg {
+  width: 15px;
+  height: 15px;
+  color: var(--g-500);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.bulkAction:is(:hover, [data-force~='hover']):not(:disabled) svg {
+  color: var(--ink);
+}
+.bulkAction[data-danger='true'] {
+  color: var(--red-ink);
+}
+.bulkAction[data-danger='true'] svg {
+  color: var(--red-dot);
+}
+.bulkAction[data-danger='true']:is(:hover, [data-force~='hover']):not(:disabled) {
+  color: var(--red-ink);
+  background: var(--red-bg);
+}
+.bulkAction[data-danger='true']:is(:hover, [data-force~='hover']):not(:disabled) svg {
+  color: var(--red-ink);
+}
+/* Indisponível: apagada e sem eventos, para a dica do invólucro aparecer no hover. */
+.bulkAction:disabled {
+  pointer-events: none;
+  color: var(--subtle);
+}
+.bulkAction:disabled svg {
+  color: var(--g-300);
+}
+.bulkAction[data-running] {
+  color: var(--ink);
+}
+.bulkAction[data-running] svg {
+  color: var(--b-600);
+}
+.bulkSpin {
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.bulkClear {
+  width: 32px;
+  padding: 0;
+  justify-content: center;
+}
+
+/* ——— Selecionar todas (faixa b-25 acima das linhas) ——— */
+.selectAll {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px 8px;
+  min-height: 38px;
+  margin: 2px 0 2px;
+  padding: 6px 12px;
+  border-radius: var(--r-md);
+  font: var(--t-small);
+  color: var(--text);
+  background: var(--b-25);
+  box-shadow: inset 0 0 0 1px var(--b-50);
+  font-variant-numeric: tabular-nums;
+}
+.selectAll b {
+  font-weight: 500;
+  color: var(--ink);
+}
+.selectAllDot {
+  color: var(--g-300);
+}
+.selectAllLink {
+  padding: 0;
+  border-radius: var(--r-xs);
+  font: var(--t-small-strong);
+  color: var(--b-600);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.selectAllLink:is(:hover, [data-force~='hover']) {
+  color: var(--b-800);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Sem espaço (medido pela própria barra, então só compacta quando de fato não cabe):
+   1 = sem o substantivo e com respiro menor; 2 = só os verbos, sem ícone; 3 = só ícones (o rótulo
+   fica para leitor de tela). O giro da ação em andamento aparece em qualquer nível. */
+.bulk:is([data-compact='1'], [data-compact='2'], [data-compact='3']) {
+  padding-left: 14px;
+}
+.bulk:is([data-compact='1'], [data-compact='2'], [data-compact='3']) .bulkNoun,
+.bulk[data-compact='3'] .bulkLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.bulk:is([data-compact='1'], [data-compact='2'], [data-compact='3']) .bulkCount {
+  padding-right: 10px;
+}
+.bulk:is([data-compact='1'], [data-compact='2']) .bulkAction {
+  gap: 6px;
+  padding: 0 8px;
+}
+.bulk[data-compact='2'] .bulkAction:not([data-running], .bulkClear) svg {
+  display: none;
+}
+.bulk[data-compact='3'] .bulkAction {
+  width: 36px;
+  padding: 0;
+  justify-content: center;
+}
+
+.table[data-fixed='true'] {
+  table-layout: fixed;
+  min-width: 940px;
+}
+.table[data-fixed='true'] td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Célula com controle não recorta anel de foco nem painel, e não pinta reticências soltas. */
+.table[data-fixed='true'] td:has(button, input, [role='switch'], [role='dialog']) {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bulk,
+  .bulk[data-exiting],
+  .bulkCount b,
+  .body,
+  .banner,
+  .rowExit,
+  .colsMenu,
+  .skel {
+    animation: none;
+  }
+}
+
+/* Paginação no celular: ver pagination.module.css. */

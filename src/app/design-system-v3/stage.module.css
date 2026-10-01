@@ -1,0 +1,244 @@
+/* Pranchas do catálogo V3: superfícies chapadas, fio de 1px. Palco (Shot) = --r-xl 12; Stage = --r-lg 10.
+   Sem sombra. */
+
+/* ——— Stage ——— */
+.surface {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.surface[data-tone='tray'] {
+  background: var(--g-50);
+}
+.surface[data-pad='none'] {
+  padding: 0;
+  overflow: clip;
+}
+.surface[data-pad='sm'] {
+  padding: var(--s-4);
+}
+.surface[data-pad='md'] {
+  padding: var(--s-6);
+}
+.surface[data-pad='lg'] {
+  padding: var(--s-10);
+}
+.surface[data-align='center'] {
+  place-items: center;
+}
+.surface[data-align='start'] {
+  justify-items: start;
+  align-content: start;
+}
+
+/* ——— States ——— */
+.states {
+  display: grid;
+  align-items: start;
+  gap: var(--s-6) var(--s-5);
+  min-width: 0;
+}
+/* A legenda fica 10 px sob o próprio componente (não no pé da célula mais alta da linha). */
+.state {
+  display: grid;
+  grid-template-rows: auto auto;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+}
+/* Opt-in: legendas alinhadas pelo pé quando a linha mistura alturas e a leitura é horizontal. */
+.states[data-captions='end'] {
+  align-items: stretch;
+}
+.states[data-captions='end'] .state {
+  grid-template-rows: 1fr auto;
+}
+/* Padrão: topo alinhado (cartões e campos de alturas diferentes começam na mesma linha). */
+.stateBody {
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  min-height: 40px;
+}
+.stateBody > * {
+  min-width: 0;
+}
+.stateLabel {
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.states[data-align='center'] .stateBody {
+  align-items: center;
+  justify-content: center;
+}
+.states[data-align='center'] .stateLabel {
+  text-align: center;
+}
+
+/* ——— Row / Col ——— */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3);
+  min-width: 0;
+}
+.col {
+  display: grid;
+  gap: var(--s-3);
+  min-width: 0;
+}
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-6);
+}
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-5);
+}
+
+/* ——— Legado: Shot / Shots ——— */
+.shots {
+  display: grid;
+  gap: var(--s-10);
+  min-width: 0;
+}
+.shot {
+  display: grid;
+  gap: var(--s-3);
+  margin: 0;
+  min-width: 0;
+}
+.shotHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  min-height: 24px;
+}
+.shotTitle {
+  font: var(--t-title-3);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+.shotAside {
+  flex-shrink: 0;
+}
+.stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 200px;
+  padding: var(--s-10);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  background: var(--g-50);
+  overflow: clip;
+}
+/* Composição em papel: o conteúdo define a altura (sem faixa morta em pranchas de uma linha). */
+.stage[data-tone='paper'] {
+  min-height: 0;
+  background: var(--paper);
+}
+.stage[data-align='start'] {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.stage[data-align='stretch'] > * {
+  flex: 1;
+  min-width: 0;
+}
+.stage[data-pad='sm'] {
+  padding: var(--s-6);
+}
+.stage[data-pad='lg'] {
+  padding: var(--s-14);
+}
+.stage[data-pad='none'] {
+  padding: 0;
+}
+
+/* ——— Phone: a única moldura de celular do catálogo ——— */
+.phone {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-content: start;
+  width: min(390px, 100%);
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  background: var(--paper);
+  overflow: clip;
+}
+
+/* ——— Legado: SpecRows / Note ——— */
+.specRows {
+  display: grid;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.specRow {
+  display: grid;
+  grid-template-columns: 176px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--s-6);
+  padding: var(--s-4) var(--s-5);
+}
+.specRow + .specRow {
+  border-top: 1px solid var(--line-soft);
+}
+.specLabel {
+  display: grid;
+  gap: 2px;
+}
+.specLabel strong {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.specLabel span {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.note {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .grid2,
+  .grid3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .specRow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-3);
+  }
+}
+@media (max-width: 640px) {
+  .surface[data-pad='md'],
+  .surface[data-pad='lg'],
+  .stage:not([data-pad='none']) {
+    padding: var(--s-4);
+  }
+  .shots {
+    gap: var(--s-8);
+  }
+  .states[data-fixed] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}

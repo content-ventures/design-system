@@ -1,0 +1,91 @@
+/*
+ * Seleção com busca. A caixa é o `.control` dos campos (altura, raio, fio, foco, erro); aqui ficam a
+ * marca à esquerda, o limpar e o chevron. O painel usa as classes de select.module.css.
+ */
+.box.box[data-size] {
+  gap: 8px;
+  padding: 0 4px 0 10px;
+  cursor: text;
+}
+.box[data-size='sm'] {
+  padding-left: 8px;
+}
+.box[data-disabled='true'] {
+  cursor: not-allowed;
+}
+.box input {
+  text-overflow: ellipsis;
+}
+.box[data-force~='hover']:not([data-disabled]) {
+  border-color: var(--line-hover);
+}
+.box.box[data-force~='focus'],
+.box.box[data-open='true'] {
+  outline: none;
+  border-color: var(--b-500);
+  box-shadow: var(--ring-field);
+}
+
+/* Lupa enquanto busca; a marca da opção quando há escolha. Troca com um esmaecer curto. */
+.lead {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--g-400);
+}
+.lead > * {
+  animation: leadIn var(--dur-2) var(--ease-out);
+}
+.lead svg {
+  width: 16px;
+  height: 16px;
+}
+.lead[data-kind='mark'] svg {
+  width: 58%;
+  height: 58%;
+}
+.box:focus-within .lead[data-kind='search'] {
+  color: var(--g-600);
+}
+.box[data-disabled='true'] .lead {
+  opacity: 0.5;
+}
+@keyframes leadIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+.toggle {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-sm);
+  color: var(--g-400);
+  transition:
+    color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+}
+.toggle svg {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--dur-2) var(--ease-out);
+}
+.toggle:hover:not(:disabled) {
+  color: var(--g-700);
+}
+.box[data-open='true'] .toggle {
+  color: var(--g-600);
+}
+.box[data-open='true'] .toggle svg {
+  transform: rotate(180deg);
+}
+.toggle:disabled {
+  cursor: not-allowed;
+  color: var(--disabled-icon);
+}

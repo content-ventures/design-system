@@ -1,0 +1,125 @@
+/* Detalhe do lead e registro de atividade — só layout; cor, tipo e raio por token. */
+
+.context {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--s-8);
+  width: 100%;
+}
+.listCol {
+  min-width: 0;
+  padding-top: var(--s-1);
+}
+.money {
+  font-variant-numeric: tabular-nums;
+}
+.frameWrap {
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+.frame {
+  flex-shrink: 0;
+}
+.phone {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+/* Corpo da gaveta: seções em sequência, título 13/600, sem caixas. */
+.body {
+  display: grid;
+  gap: var(--s-6);
+  padding-bottom: var(--s-2);
+}
+.section {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font: var(--t-group);
+  color: var(--ink);
+}
+.title {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 10px;
+}
+.outcome {
+  display: inline-flex;
+  animation: outcome-in var(--dur-3) var(--ease-out);
+}
+@keyframes outcome-in {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+}
+.toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+}
+.stageSelect {
+  display: inline-flex;
+  width: 132px;
+  border-radius: var(--r-sm);
+}
+.stageSelect[data-flash] {
+  animation: stage-flash 600ms var(--ease-out);
+}
+@keyframes stage-flash {
+  from {
+    box-shadow: 0 0 0 3px var(--b-100);
+  }
+  to {
+    box-shadow: 0 0 0 3px transparent;
+  }
+}
+.stageSelect > * {
+  width: 100%;
+}
+.reason {
+  display: grid;
+  gap: 6px;
+}
+.reasonLabel {
+  font: var(--t-small-strong);
+  color: var(--text);
+}
+
+/* Registro de atividade */
+.activity {
+  display: grid;
+  gap: var(--s-5);
+  min-width: 0;
+}
+.logColumn {
+  display: grid;
+  gap: var(--s-3);
+  width: min(640px, 100%);
+}
+.cell {
+  width: 100%;
+}
+.cell[data-paper] {
+  padding: var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+
+@media (max-width: 1180px) {
+  .context {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .listCol {
+    display: none;
+  }
+}

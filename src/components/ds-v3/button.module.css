@@ -1,0 +1,534 @@
+/*
+ * Botões chapados: cor sólida, fio real de 1px, nenhuma sombra fora do secundário (--shadow-xs).
+ * Nada de degradê, brilho no topo ou chanfro embaixo.
+ *
+ * Estados: cada :hover / :active / :focus-visible tem o gêmeo [data-force] das pranchas.
+ * Os estados ficam dentro de :where() — a especificidade é a da variante e a ordem decide.
+ * Assim um consumidor ajusta a cor do ícone (ex.: linha da tabela) sem brigar com o hover.
+ */
+.button {
+  --btn-h: var(--h-md);
+  --btn-px: 14px;
+  --btn-radius: var(--r-md);
+  --btn-icon: var(--icon-md);
+  --btn-gap: 7px;
+  /* Contrato §8: o spinner só aparece depois de 300 ms de espera. */
+  --spin-delay: 300ms;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap);
+  height: var(--btn-h);
+  padding: 0 var(--btn-px);
+  border: 1px solid transparent;
+  border-radius: var(--btn-radius);
+  font: var(--t-body-strong);
+  letter-spacing: var(--track-tight);
+  white-space: nowrap;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+.button svg {
+  width: var(--btn-icon);
+  height: var(--btn-icon);
+  stroke-width: var(--icon-stroke);
+  transition:
+    color var(--dur-1) var(--ease-out),
+    fill var(--dur-1) var(--ease-out);
+}
+/* Pressionar encolhe 1,5% — só o que está vivo. */
+.button:where(:active, [data-force~='active']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  transform: scale(var(--press-scale));
+}
+
+/* ——— Tamanhos: 32 · 36 · 40 ——— */
+.button[data-size='sm'] {
+  --btn-h: var(--h-sm);
+  --btn-px: 10px;
+  --btn-radius: var(--r-sm);
+  --btn-icon: 15px;
+  --btn-gap: 6px;
+  font: var(--t-small-strong);
+}
+.button[data-size='lg'] {
+  --btn-h: var(--h-lg);
+  --btn-px: 16px;
+  --btn-gap: 8px;
+  font: 500 14px/20px var(--font);
+}
+.button[data-shape='pill'] {
+  --btn-radius: var(--r-full);
+}
+
+/* ——— Principal: azul sólido, peso 600. Uma por área. ——— */
+.button[data-variant='primary'] {
+  color: var(--on-accent);
+  font-weight: 600;
+  background: var(--b-600);
+  border-color: var(--b-600);
+}
+.button[data-variant='primary']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--b-700);
+  border-color: var(--b-700);
+}
+.button[data-variant='primary']:where(:active, [data-force~='active']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--accent-pressed);
+  border-color: var(--accent-pressed);
+}
+
+/* ——— Secundário: papel com fio ——— */
+.button[data-variant='secondary'] {
+  color: var(--ink);
+  background: var(--paper);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-xs);
+}
+.button[data-variant='secondary'] svg {
+  color: var(--icon-rest);
+}
+.button[data-variant='secondary']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--g-25);
+  border-color: var(--line-hover);
+}
+.button[data-variant='secondary']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  )
+  svg {
+  color: var(--g-600);
+}
+.button[data-variant='secondary']:where(:active, [data-force~='active']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--g-75);
+  border-color: var(--line-hover);
+}
+
+/* ——— Contraste: grafite sólido (suportado, fora das telas do produto) ——— */
+.button[data-variant='contrast'] {
+  color: var(--on-accent);
+  background: var(--g-900);
+  border-color: var(--g-900);
+}
+.button[data-variant='contrast']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--g-800);
+  border-color: var(--g-800);
+}
+.button[data-variant='contrast']:where(:active, [data-force~='active']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--g-700);
+  border-color: var(--g-700);
+}
+
+/* ——— Suave: afirmação discreta em contexto ——— */
+.button[data-variant='soft'] {
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+}
+.button[data-variant='soft'] svg {
+  color: var(--b-600);
+}
+.button[data-variant='soft']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--accent-soft-hover);
+}
+.button[data-variant='soft']:where(:active, [data-force~='active']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  color: var(--b-800);
+  background: var(--b-200);
+}
+
+/* ——— Fantasma: terciárias e navegação ——— */
+.button[data-variant='ghost'] {
+  color: var(--text);
+}
+.button[data-variant='ghost'] svg {
+  color: var(--icon-rest);
+}
+.button[data-variant='ghost']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  color: var(--ink);
+  background: var(--paper-hover);
+}
+.button[data-variant='ghost']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  )
+  svg {
+  color: var(--icon-hover);
+}
+.button[data-variant='ghost']:where(:active, [data-force~='active']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  color: var(--ink);
+  background: var(--paper-pressed);
+}
+
+/* Fantasma destrutivo (tone="danger"): neutro em repouso; vermelho só quando a mão chega. */
+.button[data-tone='danger']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  color: var(--red-ink);
+  background: var(--red-bg);
+}
+.button[data-tone='danger']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  )
+  svg {
+  color: var(--red-ink);
+}
+.button[data-tone='danger']:where(:active, [data-force~='active']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  color: var(--red-ink);
+  background: var(--danger-soft-hover);
+}
+
+/* ——— Destrutivas ——— */
+.button[data-variant='danger'] {
+  color: var(--on-accent);
+  font-weight: 600;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+.button[data-variant='danger']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
+}
+.button[data-variant='danger']:where(:active, [data-force~='active']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--danger-pressed);
+  border-color: var(--danger-pressed);
+}
+.button[data-variant='danger-soft'] {
+  color: var(--red-ink);
+  background: var(--red-bg);
+}
+.button[data-variant='danger-soft'] svg {
+  color: var(--red-ink);
+}
+.button[data-variant='danger-soft']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--danger-soft-hover);
+}
+.button[data-variant='danger-soft']:where(:active, [data-force~='active']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--red-line);
+}
+
+/* ——— Alternável (aria-pressed): ligado = azul suave, ícone b-600 ——— */
+.button[aria-pressed='true'] {
+  color: var(--b-700);
+  background: var(--b-50);
+  border-color: transparent;
+  box-shadow: none;
+}
+.button[aria-pressed='true'] svg {
+  color: var(--b-600);
+}
+.button[aria-pressed='true']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  color: var(--b-700);
+  background: var(--b-100);
+  border-color: transparent;
+}
+.button[aria-pressed='true']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  )
+  svg {
+  color: var(--b-600);
+}
+/* Fantasma alternável: só o ícone acende (sem bloco azul), preenchido quando pedido. */
+.button[data-variant='ghost'][aria-pressed='true'] {
+  background: none;
+}
+.button[data-variant='ghost'][aria-pressed='true']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--b-50);
+}
+.button[data-fill][aria-pressed='true'] svg {
+  fill: currentColor;
+}
+
+/* Gatilho de menu (aria-haspopup) fica pressionado enquanto o menu existe. */
+.button[data-variant='secondary'][aria-haspopup][aria-expanded='true'] {
+  background: var(--g-75);
+  border-color: var(--line-hover);
+}
+.button[data-variant='ghost'][aria-haspopup][aria-expanded='true'] {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.button:is([data-variant='secondary'], [data-variant='ghost'])[aria-haspopup][aria-expanded='true']
+  svg {
+  color: var(--ink);
+}
+
+/* ——— Indisponível: perde cor e sombra, nunca some ——— */
+.button:is(:disabled, [aria-disabled='true']):not([aria-busy='true']) {
+  cursor: not-allowed;
+  color: var(--disabled-ink);
+  background: var(--disabled-bg);
+  border-color: var(--disabled-line);
+  box-shadow: none;
+}
+.button:is(:disabled, [aria-disabled='true']):not([aria-busy='true']) svg {
+  color: var(--disabled-icon);
+  fill: none;
+}
+/*
+ * Fantasma indisponível esmaece a 45% — o conteúdo, não o botão: o anel de foco (aria-disabled
+ * continua focável, ex.: Excluir de uma campanha no ar) fica com a cor cheia.
+ */
+.button[data-variant='ghost']:is(:disabled, [aria-disabled='true']):not([aria-busy='true']) {
+  color: color-mix(in srgb, var(--text) 45%, transparent);
+  background: none;
+  border-color: transparent;
+}
+.button[data-variant='ghost']:is(:disabled, [aria-disabled='true']):not([aria-busy='true']) svg {
+  color: var(--g-400);
+  opacity: 0.45;
+}
+
+/* Dentro de tabela o anel é recuado (§9): não invade a linha vizinha nem é cortado pela célula. */
+:where(td, th) .button:is(:focus-visible, [data-force~='focus']) {
+  outline-offset: -2px;
+}
+
+/*
+ * ——— Carregando: a cor da variante e o rótulo ficam ———
+ * Até --spin-delay nada muda (ação rápida não pisca). Depois o ícone sai e o spinner entra na
+ * mesma caixa; sem ícone, a caixa abre de 0 até o tamanho do ícone (o rótulo desliza junto).
+ */
+.button[aria-busy='true'] {
+  cursor: progress;
+}
+.spinSlot {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+}
+.spinSlot > svg {
+  grid-area: 1 / 1;
+}
+.spinGlyph {
+  animation: glyphOut var(--dur-1) var(--ease-in) var(--spin-delay) forwards;
+}
+.spinner {
+  animation:
+    spin 0.8s linear infinite,
+    spinIn var(--dur-2) var(--ease-out) var(--spin-delay) backwards;
+}
+.spinSlot:not([data-glyph]) {
+  width: 0;
+  margin-inline-end: calc(var(--btn-gap) * -1);
+  overflow: clip;
+  animation: slotOpen var(--dur-2) var(--ease-out) var(--spin-delay) forwards;
+}
+@keyframes slotOpen {
+  to {
+    width: var(--btn-icon);
+    margin-inline-end: 0;
+  }
+}
+@keyframes glyphOut {
+  to {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes spinIn {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+/* Movimento reduzido: o tema zera as durações (a espera fica); o spinner gira devagar. */
+@media (prefers-reduced-motion: reduce) {
+  .button .spinner {
+    animation:
+      spin 2.4s linear infinite,
+      spinIn 0.01ms linear var(--spin-delay) backwards !important;
+  }
+}
+
+.button.icon {
+  padding: 0;
+  width: var(--btn-h);
+}
+.trailing {
+  margin-right: -3px;
+}
+.trailing:not(.spinSlot),
+.spinSlot.trailing > .spinGlyph {
+  opacity: 0.72;
+}
+/* Toque: o ícone pequeno ganha alvo de 40 px sem mudar o desenho. */
+@media (pointer: coarse) {
+  .button.icon[data-size='sm']::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+  }
+}
+
+/*
+ * ——— Grupo: botões colados com um contorno só ———
+ * O fio entre segmentos é do grupo (fica parado no hover). Os cantos externos seguem o grupo e
+ * os internos são retos. Foco dentro do grupo é recuado (-2px) para não ser cortado nem invadir
+ * o vizinho. Filhos podem vir envoltos em Tooltip ou Menu.
+ */
+.group {
+  --group-r: var(--r-md);
+  --seg-r: calc(var(--group-r) - 1px);
+  --seg-divider: var(--line);
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  vertical-align: middle;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--group-r);
+  background: var(--paper);
+  box-shadow: var(--shadow-xs);
+}
+.group:is([data-size='sm'], :not([data-size]):has(.button[data-size='sm'])) {
+  --group-r: var(--r-sm);
+}
+.group .button {
+  height: calc(var(--btn-h) - 2px);
+  border-width: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.group .button.icon {
+  width: calc(var(--btn-h) - 2px);
+}
+.group > .button:first-child,
+.group > :first-child > .button {
+  border-start-start-radius: var(--seg-r);
+  border-end-start-radius: var(--seg-r);
+}
+.group > .button:last-child,
+.group > :last-child > .button {
+  border-start-end-radius: var(--seg-r);
+  border-end-end-radius: var(--seg-r);
+}
+.group > * + *::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: var(--seg-divider);
+  pointer-events: none;
+}
+/* Segmento não encolhe ao pressionar: o contorno é um só. */
+.group .button:where(:active, [data-force~='active']) {
+  transform: none;
+}
+.group .button:is(:focus-visible, [data-force~='focus']) {
+  z-index: 2;
+  outline-offset: -2px;
+}
+.group .button::after {
+  display: none;
+}
+/* Indisponível dentro do grupo: só perde a cor; o papel e o contorno são do grupo. */
+.group .button:is(:disabled, [aria-disabled='true']):not([aria-busy='true']) {
+  background: none;
+}
+/* Segmento não tem fio próprio para acusar o hover: o fundo sobe um degrau a mais (g-50). */
+.group
+  .button[data-variant='secondary']:where(:hover, [data-force~='hover']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--g-50);
+}
+.group
+  .button[data-variant='secondary']:where(:active, [data-force~='active']):where(
+    :not(:disabled, [aria-disabled='true'], [aria-busy='true'])
+  ) {
+  background: var(--g-75);
+}
+
+/* Grupo principal (botão dividido azul): sem contorno próprio, cada segmento tem o seu fio. */
+.group[data-variant='primary'] {
+  --seg-r: var(--group-r);
+  --seg-divider: rgb(255 255 255 / 0.26);
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+.group[data-variant='primary'] .button {
+  height: var(--btn-h);
+  border-width: 1px;
+}
+.group[data-variant='primary'] .button.icon {
+  width: var(--btn-h);
+}
+/* Anel recuado sobre azul: branco, para não sumir no b-600. */
+.group[data-variant='primary'] .button:is(:focus-visible, [data-force~='focus']) {
+  outline-color: var(--on-accent);
+  outline-offset: -3px;
+}
+
+/* ——— Botão dividido: a seta é estreita, gira enquanto o menu está aberto ——— */
+.split .button.splitToggle {
+  width: calc(var(--btn-h) - 6px);
+}
+.group[data-variant='primary'] .button.splitToggle {
+  width: calc(var(--btn-h) - 4px);
+}
+.splitToggle svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  transition:
+    color var(--dur-1) var(--ease-out),
+    rotate var(--dur-2) var(--ease-out);
+}
+.splitToggle:is([aria-expanded='true'], [data-force~='open']) svg {
+  rotate: 180deg;
+}
+.splitToggle[data-variant='secondary']:is([aria-expanded='true'], [data-force~='open']) {
+  background: var(--g-75);
+}
+.splitToggle[data-variant='secondary']:is([aria-expanded='true'], [data-force~='open']) svg {
+  color: var(--ink);
+}
+.splitToggle[data-variant='primary']:is([aria-expanded='true'], [data-force~='open']) {
+  background: var(--b-700);
+  border-color: var(--b-700);
+}

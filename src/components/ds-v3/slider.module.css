@@ -1,0 +1,385 @@
+.slider {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding-top: 6px;
+}
+/*
+ * Trilho: 22 px de alvo (40 no toque). O centro do polegar vai de --inset até 100% − --inset; o
+ * --inset é o mesmo das marcas rotuladas do construtor (10 / 13 px).
+ */
+.track {
+  --inset: 10px;
+  --thumb: 20px;
+  --f: 0;
+  --move: 0ms;
+  position: relative;
+  height: 22px;
+  cursor: pointer;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+.slider[data-animate] .track {
+  --move: var(--dur-3);
+}
+.slider[data-dragging] .track {
+  --move: 0ms;
+  cursor: grabbing;
+}
+.slider[data-disabled] .track {
+  cursor: not-allowed;
+}
+.rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: var(--r-full);
+  background: var(--g-150);
+}
+.fill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 6px;
+  margin-top: -3px;
+  width: calc(var(--inset) + (100% - 2 * var(--inset)) * var(--f));
+  border-radius: var(--r-full);
+  background: var(--b-600);
+  transition:
+    width var(--move) var(--ease-move),
+    background-color var(--dur-1);
+}
+.slider[data-empty] .fill {
+  opacity: 0;
+}
+.slider[data-disabled] .fill {
+  background: var(--g-300);
+}
+
+/* Referências sobre o trilho: traço de 2 px (recomendado em verde, uma só) */
+.mark {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 12px;
+  margin: -6px 0 0 -1px;
+  border-radius: 1px;
+  background: var(--g-300);
+  pointer-events: none;
+}
+.mark[data-kind='recommended'] {
+  background: var(--green-dot);
+}
+/* Pontos de passo: entalhes de 4 px, brancos sobre o preenchimento */
+.dot {
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: var(--g-400);
+  pointer-events: none;
+  transition: background-color var(--dur-1);
+}
+.dot[data-on] {
+  background: rgb(255 255 255 / 0.85);
+}
+.slider[data-disabled] .dot {
+  background: var(--g-300);
+}
+.slider[data-disabled] .dot[data-on] {
+  background: var(--g-100);
+}
+
+/* Polegar desenhado: 20 px em papel, fio forte, sombra curta (trilho de 6 px, como na verba aprovada) */
+.thumb {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--inset) + (100% - 2 * var(--inset)) * var(--f));
+  z-index: 1;
+  width: var(--thumb);
+  height: var(--thumb);
+  margin: calc(var(--thumb) / -2) 0 0 calc(var(--thumb) / -2);
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow:
+    0 0 0 0 var(--b-100),
+    var(--shadow-xs),
+    0 1px 3px rgb(16 24 40 / 0.08);
+  transition:
+    left var(--move) var(--ease-move),
+    box-shadow var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out);
+}
+/* Hover: halo b-100 de 4 px */
+.slider:not([data-disabled]) .track:hover .thumb,
+.thumb[data-force~='hover'] {
+  border-color: var(--line-hover);
+  box-shadow:
+    0 0 0 4px var(--b-100),
+    var(--shadow-xs),
+    0 1px 3px rgb(16 24 40 / 0.08);
+}
+/* Arrastando: halo de 6 px e a bolha com o valor */
+.slider[data-dragging]:not(.range) .thumb,
+.thumb[data-dragging],
+.thumb[data-force~='active'] {
+  border-color: var(--b-300);
+  box-shadow:
+    0 0 0 6px var(--b-100),
+    var(--shadow-xs),
+    0 1px 3px rgb(16 24 40 / 0.08);
+}
+.range[data-dragging] .thumb:not([data-dragging]) {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-xs);
+}
+/* Foco por teclado: anel de 2 px no polegar */
+.track:has(> .input:focus-visible) .thumb,
+.track:has(.inputs > .input:first-child:focus-visible) .thumb[data-which='lo'],
+.track:has(.inputs > .input:last-child:focus-visible) .thumb[data-which='hi'],
+.thumb[data-force~='focus'] {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+/* Sem valor: polegar liso em papel, sem sombra, parado no início; o trilho sem preenchimento diz
+   que ainda não há valor. */
+.slider[data-empty] .thumb {
+  border-color: var(--line-strong);
+  box-shadow: none;
+}
+.slider[data-empty]:not([data-disabled]) .track:hover .thumb,
+.slider[data-empty] .thumb[data-force~='hover'] {
+  border-color: var(--line-hover);
+  box-shadow: 0 0 0 4px var(--b-100);
+}
+.slider[data-disabled] .thumb {
+  border-color: var(--line);
+  background: var(--g-50);
+  box-shadow: none;
+}
+
+/* Bolha do valor: só durante o arrasto, no estilo da dica (clara: papel, fio e sombra média) */
+.bubble {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  font: var(--t-small-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  background: var(--paper);
+  box-shadow: var(--shadow-md);
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: bubbleIn var(--dur-1) var(--ease-out);
+}
+/* Bico: quadrado girado com o mesmo fio, colado na borda de baixo */
+.bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+  transform: rotate(45deg);
+}
+@keyframes bubbleIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 3px) scale(0.96);
+  }
+}
+
+/* O input nativo fica por baixo do desenho: teclado e leitor de tela, sem ponteiro. */
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  appearance: none;
+}
+
+/* ——— Intervalo: dois polegares e o trecho entre eles ——— */
+.range .fill {
+  left: calc(var(--inset) + (100% - 2 * var(--inset)) * var(--a));
+  width: calc((100% - 2 * var(--inset)) * (var(--b) - var(--a)));
+  border-radius: 0;
+  transition:
+    left var(--move) var(--ease-move),
+    width var(--move) var(--ease-move),
+    background-color var(--dur-1);
+}
+.range .thumb[data-top] {
+  z-index: 2;
+}
+.inputs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Escala das pontas */
+.scale {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ——— Atalhos rotulados sob o trilho (mesmo desenho do bloco de verba) ——— */
+.ticks {
+  --inset: 10px;
+  position: relative;
+  height: 36px;
+  margin-top: -2px;
+}
+.tick {
+  --x: calc(var(--inset) + (100% - 2 * var(--inset)) * var(--f, 0));
+  position: absolute;
+  top: 0;
+  left: calc(var(--x) - 7px);
+  display: grid;
+  justify-items: start;
+  padding: 2px 7px;
+  border-radius: var(--r-sm);
+  text-align: left;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-1) var(--ease-out);
+}
+.tick::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 6px;
+  width: 1px;
+  height: 5px;
+  background: var(--g-300);
+}
+.tick[data-flip],
+.tick[data-edge='end'] {
+  left: auto;
+  right: calc(var(--inset) + (100% - 2 * var(--inset)) * (1 - var(--f, 0)) - 7px);
+  justify-items: end;
+  text-align: right;
+}
+.tick[data-flip]::before,
+.tick[data-edge='end']::before {
+  left: auto;
+  right: 6px;
+}
+.tick[data-edge='start'] {
+  left: -7px;
+}
+.tick[data-edge='start']::before {
+  left: calc(var(--inset) + 6px);
+}
+.tick[data-edge='end'] {
+  right: -7px;
+}
+.tick[data-edge='end']::before {
+  right: calc(var(--inset) + 6px);
+}
+.tick > span {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.tick > b {
+  font: var(--t-caption-strong);
+  color: var(--b-600);
+  transition: color var(--dur-1);
+}
+.tick[data-kind='recommended'] > span::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 5px 1px 0;
+  border-radius: 50%;
+  background: var(--green-dot);
+}
+.tick[data-kind='recommended']::before {
+  background: var(--green-dot);
+}
+.tick:hover:not(:disabled) {
+  background: var(--g-75);
+}
+.tick:hover:not(:disabled) > b {
+  color: var(--b-700);
+}
+.tick[aria-pressed='true'] {
+  background: var(--b-25);
+  box-shadow: inset 0 0 0 1px var(--b-300);
+}
+.tick[aria-pressed='true'] > span,
+.tick[aria-pressed='true'] > b {
+  color: var(--b-700);
+}
+.tick[aria-pressed='true']::before {
+  background: var(--b-500);
+}
+.tick:disabled {
+  cursor: not-allowed;
+}
+.tick:disabled > b {
+  color: var(--muted);
+}
+
+/* Estreito: os atalhos colidiriam sobre o trilho; viram uma linha comum, das pontas para o meio. */
+.slider:has(> .ticks) {
+  container-type: inline-size;
+}
+@container (max-width: 520px) {
+  .ticks {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-2);
+    height: auto;
+    margin: 2px -7px 0;
+  }
+  .tick,
+  .tick[data-flip],
+  .tick[data-edge] {
+    position: static;
+  }
+  .tick::before {
+    display: none;
+  }
+  .tick:not([data-edge]) {
+    justify-items: center;
+    text-align: center;
+  }
+}
+
+/* Toque: trilho com 40 px de alvo e polegar de 26 px (A-52, verba aprovada). */
+@media (pointer: coarse) {
+  .track,
+  .ticks {
+    --inset: 13px;
+  }
+  .track {
+    --thumb: 26px;
+    height: 40px;
+  }
+}

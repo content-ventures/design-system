@@ -1,0 +1,616 @@
+/* Painel lateral da criação: inspetor claro, blocos separados por fio, dados desenhados. */
+.panel {
+  display: grid;
+  padding: 4px 20px 24px;
+}
+.lead {
+  padding: 4px 20px 0;
+}
+
+/* Resumo recolhível abaixo de 1021px (no desktop a cabeça some e o painel fica sempre aberto) */
+.disclosureHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 48px;
+  padding: 0 16px;
+  font: var(--t-small-strong);
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+  font-variant-numeric: tabular-nums;
+}
+.disclosureHead::-webkit-details-marker {
+  display: none;
+}
+.disclosureHead > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.disclosureHead svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  transition: transform var(--dur-2) var(--ease-out);
+}
+.disclosure[open] .disclosureHead svg {
+  transform: rotate(180deg);
+}
+.disclosure[open] .disclosureHead {
+  border-bottom: 1px solid var(--line-soft);
+}
+@media (min-width: 1021px) {
+  .disclosureHead {
+    display: none;
+  }
+}
+
+/* Ajustes solicitados pelo comercial: texto corrido, sem caixa tingida */
+.reason {
+  display: grid;
+  justify-items: start;
+  gap: 3px;
+  padding: 16px 0 14px;
+  border-bottom: 1px solid var(--line);
+}
+.reasonLabel {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font: var(--t-caption-strong);
+  color: var(--ink);
+}
+.reasonLabel i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--orange-dot);
+}
+.reasonText {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font: var(--t-small);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.reasonText[data-lines='2'] {
+  -webkit-line-clamp: 2;
+}
+.reasonText[data-open] {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+.reasonMeta {
+  margin-top: 2px;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+/* Ação em texto: a mesma do .linkButton das etapas (12/500, azul 600, sublinhado no hover). */
+.textButton {
+  padding: 0;
+  font: var(--t-small-strong);
+  color: var(--b-600);
+  border-radius: var(--r-xs);
+}
+.textButton:hover {
+  color: var(--b-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 18px 0 16px;
+  border-bottom: 1px solid var(--line);
+}
+.identity > div {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+.identity strong {
+  font: var(--t-body-strong);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.identity strong[data-empty] {
+  color: var(--muted);
+}
+.identity > div > span {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+
+.block {
+  display: grid;
+  gap: 3px;
+  padding: 10px 0;
+}
+.block + .block {
+  border-top: 1px solid var(--line-soft);
+}
+.blockHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+.label {
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+.block[data-current] .label {
+  color: var(--b-700);
+}
+.meta {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.empty {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.placeholder {
+  font: var(--t-small-strong);
+  color: var(--muted);
+}
+.amount {
+  font: var(--t-figure-lg, 600 18px/26px var(--font));
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.value {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.value[data-empty] {
+  color: var(--muted);
+  font-weight: 400;
+}
+.estimate {
+  font: var(--t-small-strong);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.sub {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Janela do ativo com o período marcado */
+.window {
+  display: grid;
+  gap: 5px;
+  margin-top: 8px;
+}
+.track {
+  position: relative;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--g-100);
+}
+.track i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--l);
+  width: var(--w);
+  border-radius: 99px;
+  background: var(--b-600);
+  transition:
+    left var(--dur-3) var(--ease-out),
+    width var(--dur-3) var(--ease-out);
+}
+.trackLegend {
+  display: flex;
+  justify-content: space-between;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Distribuição em barras finas */
+.group {
+  display: grid;
+  gap: 6px;
+}
+.group + .group {
+  margin-top: 8px;
+}
+.groupLabel {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.bars {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.bars li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 3px 10px;
+}
+.barName {
+  font: var(--t-small);
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bars b {
+  font: var(--t-caption-strong);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.bars li > i {
+  grid-column: 1 / -1;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--g-100);
+  overflow: hidden;
+}
+.bars li > i > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--b-600);
+  transition: width var(--dur-3) var(--ease-out);
+}
+.bars small {
+  grid-column: 1 / -1;
+  font: var(--t-caption);
+  color: var(--muted);
+}
+/* Lateral: uma linha por item (nome e %), com o traço de 2 px colado embaixo, no lugar da barra cheia. */
+.bars[data-layout='compact'] {
+  gap: 5px;
+}
+.bars[data-layout='compact'] li {
+  row-gap: 2px;
+}
+.bars[data-layout='compact'] li > i {
+  height: 2px;
+}
+/* Revisão: nome, nota e % na mesma linha; a nota cede espaço antes do nome. */
+.bars[data-layout='inline'] li {
+  grid-template-columns: minmax(0, max-content) minmax(0, 1fr) auto;
+}
+.bars[data-layout='inline'] small {
+  order: 1;
+  grid-column: auto;
+  min-width: 0;
+  overflow: hidden;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.bars[data-layout='inline'] b {
+  order: 2;
+}
+.bars[data-layout='inline'] li > i {
+  order: 3;
+}
+
+/* Bônus como estados em linha: liberado verde, incluído azul, bloqueado só o contorno */
+.bonus {
+  display: grid;
+  gap: 7px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.bonus li {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  font: var(--t-small);
+  color: var(--text);
+}
+.bonus li > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* "Faltam R$ …" é longo: desce para baixo do nome, que fica inteiro. */
+.bonus li[data-long] {
+  grid-template-columns: 8px minmax(0, 1fr);
+  align-items: start;
+  row-gap: 0;
+}
+.bonus li[data-long] i {
+  margin-top: 6px;
+}
+.bonus li[data-long] small {
+  grid-column: 2;
+}
+.bonus i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green-dot);
+}
+.bonus li[data-state='incluido'] i {
+  background: var(--blue-dot);
+}
+.bonus li[data-state='bloqueado'] {
+  color: var(--muted);
+}
+.bonus li[data-state='bloqueado'] i {
+  background: none;
+  box-shadow: inset 0 0 0 1.5px var(--g-300);
+}
+.bonus small {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ——— Envio (revisão) ——— */
+.sendHead {
+  display: grid;
+  gap: 2px;
+  padding: 18px 0 12px;
+}
+.sendHead strong {
+  font: var(--t-title-3);
+  color: var(--ink);
+}
+.decision {
+  display: grid;
+  gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.options {
+  display: grid;
+  gap: 8px;
+}
+.option {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  text-align: left;
+  transition:
+    border-color var(--dur-1),
+    background var(--dur-1);
+}
+.option:hover {
+  border-color: var(--line-hover);
+}
+.option[aria-checked='true'] {
+  border-color: var(--b-300);
+  background: var(--b-25);
+}
+.optionText {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.option strong {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.optionText > span {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.radio {
+  position: relative;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--g-300);
+  border-radius: 50%;
+  background: var(--paper);
+}
+.option[aria-checked='true'] .radio {
+  border-color: var(--b-600);
+}
+.option[aria-checked='true'] .radio::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: var(--b-600);
+}
+
+/* O que impede o envio: rodapé da opção "Enviar para aprovação", com o atalho para resolver. */
+.options[data-blocked] .option[aria-checked='true'] {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.blocker {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: -10px;
+  padding: 8px 12px;
+  border: 1px solid var(--b-300);
+  border-top: 0;
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  background: var(--b-25);
+  font: var(--t-small-strong);
+  color: var(--red-ink);
+}
+.blocker svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+.blocker .textButton {
+  margin-left: auto;
+  font: var(--t-small-strong);
+}
+
+/* Linha do tempo depois do envio: marcadores de etapa futura, como a jornada no detalhe */
+.next {
+  display: grid;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: next;
+}
+.next li {
+  position: relative;
+  display: grid;
+  min-height: 20px;
+  padding: 1px 0 10px 30px;
+  counter-increment: next;
+}
+.next li:last-child {
+  padding-bottom: 0;
+}
+.next li::before {
+  content: counter(next);
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--g-200);
+  border-radius: 50%;
+  font: 600 11px/18px var(--font);
+  color: var(--muted);
+  background: var(--paper);
+  font-variant-numeric: tabular-nums;
+}
+.next li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 9.5px;
+  top: 21px;
+  bottom: 1px;
+  width: 1px;
+  background: var(--line);
+}
+.next b {
+  font: var(--t-small-strong);
+  color: var(--text);
+}
+
+.checks {
+  display: grid;
+  gap: 0;
+  margin: 0 -8px;
+  padding: 0;
+  list-style: none;
+}
+.checks button {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  width: 100%;
+  padding: 5px 8px;
+  border-radius: var(--r-sm);
+  text-align: left;
+}
+.checks button:hover {
+  background: var(--g-50);
+}
+.checkIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--b-700);
+  background: var(--b-50);
+}
+.checkIcon svg {
+  width: 11px;
+  height: 11px;
+  stroke-width: 2.75;
+}
+.checks button[data-state='warn'] .checkIcon {
+  color: var(--amber-ink);
+  background: var(--amber-bg);
+}
+.checks button[data-state='error'] .checkIcon {
+  color: var(--red-ink);
+  background: var(--red-bg);
+}
+.checkText {
+  min-width: 0;
+  display: grid;
+  gap: 0;
+}
+.checkText b {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.checkText span {
+  font: var(--t-caption);
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.checks button[data-state='warn'] .checkText span {
+  color: var(--amber-ink);
+}
+.checks button[data-state='error'] .checkText span {
+  color: var(--red-ink);
+}
+
+/* Toque: linhas da Checagem e atalhos em texto com alvo de 40 px. */
+@media (pointer: coarse) {
+  .checks button {
+    min-height: 40px;
+    align-items: center;
+  }
+  .textButton {
+    min-height: 40px;
+    padding-inline: 6px;
+  }
+  .blocker {
+    padding-block: 0;
+  }
+}
+
+/* Coluna única (tablet e celular): o painel alinha com o miolo do formulário */
+@media (max-width: 1020px) {
+  .panel,
+  .lead {
+    padding-inline: 32px;
+  }
+  .disclosureHead {
+    padding-inline: 32px;
+  }
+}
+@media (max-width: 640px) {
+  .panel,
+  .lead {
+    padding-inline: 16px;
+  }
+  .disclosureHead {
+    padding-inline: 16px;
+  }
+}

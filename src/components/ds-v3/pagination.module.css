@@ -1,0 +1,179 @@
+/*
+ * Paginação: resumo à esquerda, páginas no meio do espaço livre (margem automática, como no
+ * dashboard aprovado), “Por página” à direita.
+ * A página atual é papel com fio e sombra mínima; as outras são fantasmas.
+ */
+.root {
+  container: pagination / inline-size;
+  min-width: 0;
+}
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 56px;
+  padding: 10px 16px 10px 20px;
+  box-shadow: inset 0 1px 0 var(--line-soft);
+}
+/*
+ * Uma linha só. O substantivo é um item à parte: quando não cabe, quebra para a segunda linha,
+ * que fica recortada — “11–20 de 120” em vez de “11–20 de 120 campanh…”. Leitor de tela lê tudo.
+ */
+.summary {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  column-gap: 0.27em; /* a largura do espaço da Inter */
+  min-width: 0;
+  height: 18px;
+  overflow: hidden;
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.summary > span {
+  white-space: nowrap;
+}
+.summary strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+.pages {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2px;
+  margin: 0 auto;
+}
+.numbers {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.page,
+.arrow {
+  display: inline-grid;
+  place-items: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  font: var(--t-body);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.page:is(:hover, [data-force~='hover']):not([aria-current='page']),
+.arrow:is(:hover, [data-force~='hover']):not(:disabled) {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.page:is(:active, [data-force~='active']):not([aria-current='page']),
+.arrow:is(:active, [data-force~='active']):not(:disabled) {
+  background: var(--g-100);
+}
+.page[aria-current='page'] {
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--paper);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-xs);
+  cursor: default;
+}
+.arrow svg {
+  width: 16px;
+  height: 16px;
+  color: var(--g-500);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.arrow:is(:hover, [data-force~='hover']):not(:disabled) svg {
+  color: var(--ink);
+}
+.arrow:disabled {
+  cursor: not-allowed;
+}
+.arrow:disabled svg {
+  color: var(--g-300);
+}
+.gap {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 32px;
+  font: var(--t-body);
+  color: var(--muted);
+  user-select: none;
+}
+
+.compactLabel {
+  display: none;
+  min-width: 64px;
+  padding: 0 4px;
+  font: var(--t-body);
+  color: var(--muted);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.compactLabel b {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.perPage {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  font: var(--t-small);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.perPageButton {
+  min-width: 0;
+  justify-content: flex-start;
+  gap: 6px;
+  padding-inline: 11px 9px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Compacto: ‹ 2 de 12 ›, encostado à direita; “Por página” sai. */
+.root[data-variant='compact'] .pages {
+  margin-right: 0;
+}
+.root[data-variant='compact'] .numbers,
+.root[data-variant='compact'] .perPage {
+  display: none;
+}
+.root[data-variant='compact'] .compactLabel {
+  display: inline-block;
+}
+@container pagination (max-width: 640px) {
+  .root[data-variant='auto'] .bar {
+    padding: 8px 8px 8px 16px;
+  }
+  .root[data-variant='auto'] .pages {
+    margin-right: 0;
+  }
+  .root[data-variant='auto'] .numbers,
+  .root[data-variant='auto'] .perPage {
+    display: none;
+  }
+  .root[data-variant='auto'] .compactLabel {
+    display: inline-block;
+  }
+}
+@media (pointer: coarse) {
+  .page,
+  .arrow {
+    min-width: 40px;
+    height: 40px;
+  }
+}

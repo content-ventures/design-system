@@ -1,0 +1,90 @@
+.theme {
+  --canvas: #e9eaee;
+  --paper: #ffffff;
+  --sidebar: #fafafa;
+  --ink: #151719;
+  --text: #41474f;
+  --muted: #686f78;
+  --action: #0875db;
+  --font-ui: var(--font-dashboard), Inter, sans-serif;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  /* Papéis de leitura compartilhados por páginas, tabelas e formulários. */
+  --type-page: var(--weight-semibold) 24px/32px var(--font-ui);
+  --type-heading: var(--weight-semibold) 18px/26px var(--font-ui);
+  --type-section: var(--weight-semibold) 14px/20px var(--font-ui);
+  --type-body: var(--weight-regular) 13px/20px var(--font-ui);
+  --type-entity: var(--weight-medium) 13px/20px var(--font-ui);
+  --type-label: var(--weight-medium) 12px/18px var(--font-ui);
+  --type-caption: var(--weight-regular) 11px/16px var(--font-ui);
+  --type-overline: var(--weight-medium) 11px/16px var(--font-ui);
+  --type-button: var(--weight-medium) 12px/18px var(--font-ui);
+  --type-primary: var(--weight-semibold) 12px/18px var(--font-ui);
+  --type-stat: var(--weight-semibold) 24px/30px var(--font-ui);
+  --line: #ededf0;
+  --accent: #0783f8;
+  --accent-ink: #087bcc;
+  --success: #0783f8;
+  --ease: ease;
+  --selected: #dfeeff;
+  --ds-focus: #0783f8;
+  --radius-control: 7px;
+  --radius-surface: 9px;
+  --radius-toast: 10px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --control-height: 38px;
+  --button-height: 36px;
+  --motion-fast: 120ms;
+  --status-blue: #1686cf;
+  --status-green: #399369;
+  --status-amber: #ba8324;
+  --status-pink: #d84785;
+  --status-red: #c95059;
+  --status-violet: #735bd3;
+  color: var(--ink);
+  background: var(--paper);
+  font: var(--type-body);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
+.theme,
+.theme * {
+  box-sizing: border-box;
+}
+:where(.theme) :where(button, input, select, textarea) {
+  font: inherit;
+}
+:where(.theme) :where(button) {
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+:where(.theme) :where(a) {
+  color: inherit;
+}
+.theme svg {
+  stroke-width: 1.5;
+  flex-shrink: 0;
+}
+:where(.theme :focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.theme ::selection {
+  background: var(--selected);
+  color: var(--ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme *,
+  .theme *::before,
+  .theme *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

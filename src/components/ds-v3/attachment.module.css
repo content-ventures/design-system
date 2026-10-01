@@ -1,0 +1,256 @@
+/* ——— AttachmentRow ———
+ * 52 px, sem bloco colorido no tipo: glifo 20 g-500 (ou miniatura 40 × 40). Hover g-25 na linha toda. */
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  min-width: 0;
+  padding: 6px 6px 6px 12px;
+  border-radius: var(--r-md);
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.row:is(:hover, [data-force~='hover']):not([data-status='missing']) {
+  background: var(--g-25);
+}
+.row:has(.hit:active):not([data-status='missing']) {
+  background: var(--g-50);
+}
+/* Foco do nome desenha o anel na linha inteira (por dentro, como em lista). */
+.row:has(.hit:focus-visible),
+.row[data-force~='focus'] {
+  outline: 2px solid var(--focus-color);
+  outline-offset: -2px;
+}
+.glyph {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0 10px;
+  color: var(--g-500);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.row:is(:hover, [data-force~='hover']) .glyph {
+  color: var(--g-600);
+}
+.thumb {
+  flex-shrink: 0;
+  width: 40px !important;
+}
+.body {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+.name {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  text-align: left;
+}
+/* A área de clique do nome cobre a linha; as ações ficam por cima. */
+.hit {
+  outline: none;
+}
+.hit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.meta {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.actions {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+/* Baixado: o check entra com mola e fica verde por 1,2 s. */
+.download[data-done] {
+  color: var(--green-ink);
+}
+.download[data-done] svg {
+  color: var(--green-ink);
+  stroke-width: var(--icon-stroke-mark);
+  animation: doneIn var(--dur-2) var(--ease-spring);
+}
+@keyframes doneIn {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+.row[data-status='missing'] .glyph {
+  color: var(--g-300);
+}
+.row[data-status='missing'] .name {
+  color: var(--muted);
+  font-weight: 400;
+}
+.row[data-status='missing'] .meta {
+  color: var(--subtle);
+}
+
+/* ——— AttachmentChip ——— */
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  max-width: 100%;
+  padding: 0 3px 0 8px;
+  overflow: clip;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  font: var(--t-small-strong);
+  color: var(--ink);
+  vertical-align: middle;
+  transition: border-color var(--dur-1) var(--ease-out);
+  animation: chipIn var(--dur-2) var(--ease-out);
+}
+@keyframes chipIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+.chip:is(:hover, [data-force~='hover']) {
+  border-color: var(--line-hover);
+}
+.chipGlyph,
+.chipSpin {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--g-500);
+}
+.chipSpin {
+  color: var(--b-600);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chipSpin {
+    animation: spin 2.4s linear infinite !important;
+  }
+}
+.chipName {
+  display: flex;
+  min-width: 0;
+  max-width: 180px;
+}
+.chipSize {
+  flex-shrink: 0;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.chipRemove {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-xs);
+  color: var(--g-400);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.chipRemove svg {
+  width: 13px;
+  height: 13px;
+}
+.chipRemove:hover {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.chipRemove:active {
+  background: var(--g-100);
+}
+.chipRemove:focus-visible {
+  outline-offset: 0;
+}
+.chipTrack {
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  background: var(--g-100);
+}
+.chipTrack i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--b-600);
+  transition: width var(--dur-2) linear;
+}
+@media (pointer: coarse) {
+  .chipRemove {
+    position: relative;
+  }
+  .chipRemove::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
+}
+
+/* ——— Prévia ——— */
+.well {
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  border-radius: var(--r-lg);
+  background: var(--g-50);
+}
+.sheet {
+  width: min(100%, 360px);
+  aspect-ratio: 210 / 297;
+  padding: 28px 26px;
+  border-radius: 2px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--line);
+  animation: sheetIn var(--dur-2) var(--ease-out);
+  overflow: clip;
+}
+@keyframes sheetIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+.pager {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.pageCount {
+  min-width: 44px;
+  text-align: center;
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 640px) {
+  .well {
+    padding: 12px;
+  }
+  .sheet {
+    padding: 20px 18px;
+  }
+}

@@ -1,0 +1,125 @@
+/* Campo de etiquetas: o mesmo contorno, hover, foco e erro do Input; chips de 22 dentro. */
+.field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  min-height: var(--h-md);
+  padding: 6px 8px 6px 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  box-shadow: var(--shadow-xs);
+  cursor: text;
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+}
+.field:is(:hover, [data-force~='hover']) {
+  border-color: var(--line-hover);
+}
+.field:is(:focus-within, [data-force~='focus']) {
+  border-color: var(--b-500);
+  box-shadow: var(--ring-field);
+  outline: none;
+}
+.field[data-invalid] {
+  border-color: var(--red-dot);
+  box-shadow: var(--ring-invalid);
+}
+.field[data-disabled] {
+  background: var(--disabled-bg);
+  border-color: var(--disabled-line);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+/* O campo de texto nunca fica mais estreito que o próprio texto de ajuda (ou o que já foi digitado):
+   sem lugar, desce para a linha de baixo em vez de cortar “Adicionar interesse”. */
+.input {
+  flex: 1 0 auto;
+  field-sizing: content;
+  min-width: 48px;
+  max-width: 100%;
+  height: 22px;
+  margin-left: 4px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: var(--t-body);
+  color: var(--ink);
+}
+@supports not (field-sizing: content) {
+  .input {
+    flex-basis: 132px;
+  }
+}
+.input::placeholder {
+  color: var(--subtle);
+}
+.field[data-full] .input {
+  min-width: 48px;
+  cursor: default;
+}
+.field[data-full] .input::placeholder {
+  color: var(--muted);
+  font: var(--t-small);
+}
+
+/* Sugestões */
+.list {
+  position: fixed;
+  z-index: var(--z-popover);
+  display: grid;
+  max-height: 264px;
+  padding: 6px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  box-shadow: var(--shadow-lg);
+  animation: listIn var(--dur-2) var(--ease-out);
+}
+.list[data-up] {
+  animation-name: listInUp;
+}
+@keyframes listIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@keyframes listInUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+.option {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: var(--r-sm);
+  font: var(--t-small);
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.option[aria-selected='true'] {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.hl {
+  font-weight: 600;
+  color: var(--ink);
+  background: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list {
+    animation: none;
+  }
+}

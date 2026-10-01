@@ -1,0 +1,312 @@
+/* ——— Menu ——— desenho em menu.module.css (dono: navegação). */
+
+/* ——————————————————————————— Dialog ———————————————————————————
+ * Sem borda, raio 2xl, --shadow-xl, véu --overlay com desfoque. sm 400 · md 480 · lg 640.
+ * Cabeçalho 20/24 (título 16/600, descrição 13 --muted) · corpo 0 24 20 · rodapé em faixa g-25. */
+.dialog {
+  --dialog-w: 480px;
+  width: min(var(--dialog-w), calc(100vw - 32px));
+  max-width: none;
+  max-height: min(760px, calc(100dvh - 48px));
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-2xl);
+  color: var(--text);
+  background: var(--paper);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  outline: none;
+}
+.dialog[data-size='sm'] {
+  --dialog-w: 400px;
+}
+.dialog[data-size='lg'] {
+  --dialog-w: 640px;
+}
+dialog.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+dialog.dialog[data-state='open'] {
+  animation: rise var(--dur-3) var(--ease-out);
+}
+dialog.dialog[data-state='closing'] {
+  pointer-events: none;
+  animation: sink var(--dur-exit) var(--ease-in) forwards;
+}
+.dialog::backdrop {
+  background: var(--overlay);
+  backdrop-filter: blur(var(--overlay-blur));
+  animation: fade var(--dur-2) var(--ease-out);
+}
+.dialog[data-state='closing']::backdrop {
+  animation: fadeOut var(--dur-exit) var(--ease-in) forwards;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+}
+@keyframes sink {
+  to {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ——— Camada presa a um contêiner (palco, simulador de celular) ——— */
+.layerRoot {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border-radius: inherit;
+  overflow: hidden;
+}
+.layerRoot[hidden] {
+  display: none;
+}
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay);
+  backdrop-filter: blur(var(--overlay-blur));
+  animation: fade var(--dur-2) var(--ease-out);
+}
+.layerRoot[data-state='closing'] .scrim {
+  animation: fadeOut var(--dur-exit) var(--ease-in) forwards;
+}
+dialog.dialog[data-contained] {
+  position: relative;
+  inset: auto;
+  margin: 0;
+  width: min(var(--dialog-w), 100%);
+  max-height: 100%;
+}
+
+/* ——— Partes ——— */
+.dialogHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 20px 16px 20px 24px;
+}
+.dialogHead[data-divided='true'] {
+  box-shadow: inset 0 -1px 0 var(--line-soft);
+}
+.dialogTitles {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.dialogTitle {
+  font: var(--t-title-2);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.dialogDesc {
+  font: var(--t-body);
+  color: var(--muted);
+  text-wrap: pretty;
+}
+/* O desenho do X cai a 24 px da borda, alinhado ao rodapé; centro na linha do título. */
+.close {
+  margin-top: -4px;
+}
+.dialogBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 24px 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-200) transparent;
+}
+.dialogHead[data-divided='true'] + .dialogBody {
+  padding-top: 20px;
+}
+/* Enquanto a altura anima, o corpo não mostra barra de rolagem de passagem. */
+.dialog[data-resizing] .dialogBody {
+  overflow: hidden;
+}
+/* Rede de segurança: confirmação sem corpo não deixa uma faixa vazia entre cabeçalho e rodapé. */
+.dialogBody:has(> .dialogBodyInner:empty),
+.dialogBody:has(> .dialogBodyInner > :only-child:empty:not(input, textarea, select, img, svg, canvas, iframe)) {
+  display: none;
+}
+.dialogFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 16px 24px;
+  background: var(--g-25);
+  box-shadow: inset 0 1px 0 var(--line-soft);
+}
+.dialogFootStart {
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font: var(--t-small);
+  color: var(--muted);
+}
+.frame {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  max-height: none;
+}
+/* Corpo da confirmação: opção que acompanha a ação e/ou o campo de digitação. */
+.confirmBody {
+  display: grid;
+  gap: 16px;
+}
+
+/* Celular: 16 px de margem, botões do rodapé dividem a largura (o mais longo cresce se precisar). */
+@media (max-width: 640px) {
+  .dialogFoot > :not(.dialogFootStart) {
+    flex: 1 1 0;
+    min-width: max-content;
+  }
+  .dialogFoot > :not(.dialogFootStart) > button {
+    width: 100%;
+  }
+  .dialogFootStart {
+    flex-basis: 100%;
+  }
+}
+.dialog[data-compact] {
+  --dialog-w: 358px;
+}
+.dialog[data-compact] .dialogFoot > :not(.dialogFootStart) {
+  flex: 1 1 0;
+  min-width: max-content;
+}
+.dialog[data-compact] .dialogFootStart {
+  flex-basis: 100%;
+}
+
+/* ——————————————————————————— Tooltip ———————————————————————————
+ * Montada só quando aberta, num portal no escopo do tema, presa à janela: nenhuma célula, moldura
+ * ou rolagem a corta, e ela não ocupa espaço no layout. 11.5/500 branco sobre g-900, seta de 8 px. */
+.tipAnchor {
+  position: relative;
+  display: inline-flex;
+}
+/* Controle desabilitado não recebe ponteiro: o hover cai na âncora e o motivo aparece. */
+.tipAnchor :disabled {
+  pointer-events: none;
+}
+.tipAnchor:has(:disabled) {
+  cursor: not-allowed;
+}
+.tip {
+  position: fixed;
+  z-index: var(--z-tooltip);
+  width: max-content;
+  max-width: 240px;
+  padding: 6px 9px;
+  border-radius: var(--r-md);
+  font: var(--t-caption-strong);
+  color: #fff;
+  white-space: normal;
+  /* pretty, não balance: balance divide as linhas mas não encolhe a caixa, sobra vazio à direita. */
+  text-wrap: pretty;
+  background: var(--g-900);
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  animation: tipIn var(--dur-2) var(--ease-out);
+}
+.tip[data-below] {
+  animation-name: tipInBelow;
+}
+/* Segunda dica seguida (ponteiro passando por ícones vizinhos): já aparece no lugar. */
+.tip[data-instant] {
+  animation: none;
+}
+@keyframes tipIn {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+}
+@keyframes tipInBelow {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+.tip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: var(--arrow-x, 50%);
+  width: 8px;
+  height: 8px;
+  translate: -50% -50%;
+  rotate: 45deg;
+  border-radius: 0 0 2px 0;
+  background: var(--g-900);
+}
+.tip[data-below]::after {
+  top: auto;
+  bottom: 100%;
+  translate: -50% 50%;
+  border-radius: 2px 0 0 0;
+}
+.tip kbd {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font: 500 11px/14px var(--font);
+  letter-spacing: 0.02em;
+  color: rgb(255 255 255 / 0.76);
+  background: rgb(255 255 255 / 0.14);
+}
+
+/* Prancha: dica parada no fluxo, sobre (ou sob) o gatilho. */
+.tipPinned {
+  display: inline-flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 8px;
+}
+.tipPinned[data-side='bottom'] {
+  flex-direction: column;
+}
+.tip[data-static] {
+  position: relative;
+  z-index: auto;
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog.dialog[data-state],
+  .dialog::backdrop,
+  .scrim,
+  .tip {
+    animation: none !important;
+  }
+}

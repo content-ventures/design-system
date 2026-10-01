@@ -1,0 +1,46 @@
+/*
+ * Slots fixos de ação. Repouso calmo (g-400); a linha em hover ou com foco acende para g-600;
+ * o próprio ícone em hover vai a --ink sobre --paper-hover (vermelho no destrutivo).
+ * O gancho é [data-row-actions] dentro de `tr` ou de qualquer `[data-row]` (cartão, item).
+ */
+.slots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  vertical-align: middle;
+}
+.slot {
+  width: var(--h-sm);
+  height: var(--h-sm);
+  flex: none;
+}
+.slots button[data-variant] svg {
+  color: var(--icon-quiet);
+}
+:where(tr, [data-row]):where(:hover, :focus-within, [data-force~='hover'])
+  .slots
+  button[data-variant]:not(:disabled, [aria-disabled='true'])
+  svg {
+  color: var(--g-600);
+}
+.slots
+  button[data-variant]:is(:hover, [data-force~='hover'], [aria-expanded='true']):not(
+    :disabled,
+    [aria-disabled='true']
+  )
+  svg {
+  color: var(--ink);
+}
+.slots
+  button[data-tone='danger']:is(:hover, [data-force~='hover']):not(
+    :disabled,
+    [aria-disabled='true']
+  )
+  svg {
+  color: var(--red-ink);
+}
+/* Indisponível: o fantasma esmaece por inteiro (opacity), o ícone volta ao tom calmo. */
+.slots button[data-variant]:is(:disabled, [aria-disabled='true']) svg {
+  color: var(--g-400);
+}

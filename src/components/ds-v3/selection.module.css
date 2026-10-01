@@ -1,0 +1,641 @@
+/* ——— Checkbox e Radio: controle nativo, desenho próprio ———
+ * Estados por `data-force` vivem no input e são lidos no rótulo: `.choice:has(input[data-force~=…])`. */
+.choice {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.choice[data-disabled='true'] {
+  cursor: not-allowed;
+}
+.choice input {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.box {
+  pointer-events: none;
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: var(--r-xs);
+  color: var(--on-accent);
+  background: var(--paper);
+  border: 1px solid var(--g-300);
+  box-shadow: var(--shadow-xs);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+/* Sem rótulo visível (célula de tabela): a caixa alinha pelo topo do próprio controle. */
+.choice:not(:has(.text)) .box,
+.choice:not(:has(.text)) input {
+  margin-top: 0;
+}
+.box svg {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  stroke-width: 3;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity var(--dur-1) var(--ease-out),
+    transform var(--dur-2) var(--ease-spring);
+}
+
+/* Repouso → hover → pressionado (um degrau por estado) */
+.choice:is(:hover, :has(input[data-force~='hover'])):not([data-disabled]) .box {
+  border-color: var(--g-400);
+}
+.choice:is(:active, :has(input[data-force~='active'])):not([data-disabled]) .box {
+  transform: scale(0.92);
+}
+.choice:is(:active, :has(input[data-force~='active'])):not([data-disabled])
+  input:not(:checked):not([type='checkbox']:indeterminate)
+  + .box {
+  background: var(--g-75);
+}
+
+/* Marcado e parcial */
+.choice input[type='checkbox']:is(:checked, :indeterminate) + .box {
+  background: var(--b-600);
+  border-color: var(--b-600);
+  box-shadow: none;
+}
+.choice:is(:hover, :has(input[data-force~='hover'])):not([data-disabled])
+  input[type='checkbox']:is(:checked, :indeterminate)
+  + .box {
+  background: var(--b-700);
+  border-color: var(--b-700);
+}
+.choice:is(:active, :has(input[data-force~='active'])):not([data-disabled])
+  input[type='checkbox']:is(:checked, :indeterminate)
+  + .box {
+  background: var(--b-800);
+  border-color: var(--b-800);
+}
+.choice input:checked:not(:indeterminate) + .box svg[data-mark='check'],
+.choice input:indeterminate + .box svg[data-mark='dash'] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Foco: anel de 2 px na caixa, só por teclado */
+.choice input:is(:focus-visible, [data-force~='focus']) + .box {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+.choice input:focus-visible {
+  outline: none;
+}
+
+/* Inválido: fio vermelho enquanto vazio. Rádio de grupo sem escolha também é :indeterminate —
+   por isso só o checkbox parcial fica de fora. */
+.choice[data-invalid='true'] input:not(:checked):not([type='checkbox']:indeterminate) + .box {
+  border-color: var(--red-dot);
+}
+
+/* Indisponível: perde sombra e cor, nunca some */
+.choice input:disabled + .box {
+  background: var(--disabled-bg);
+  border-color: var(--disabled-line);
+  box-shadow: none;
+}
+.choice input[type='checkbox']:disabled:is(:checked, :indeterminate) + .box {
+  background: var(--b-200);
+  border-color: var(--b-200);
+}
+.choice[data-disabled='true'] .title,
+.choice[data-disabled='true'] .description {
+  color: var(--disabled-ink);
+}
+
+/* Só o desenho (opções de MultiSelect): mesmo visual, lido por atributos */
+.mark {
+  margin-top: 0;
+}
+.mark:is([data-checked], [data-mixed]) {
+  background: var(--b-600);
+  border-color: var(--b-600);
+  box-shadow: none;
+}
+.mark[data-checked] svg[data-mark='check'],
+.mark[data-mixed] svg[data-mark='dash'] {
+  opacity: 1;
+  transform: none;
+}
+.mark[data-disabled] {
+  background: var(--disabled-bg);
+  border-color: var(--disabled-line);
+  box-shadow: none;
+}
+.mark[data-disabled]:is([data-checked], [data-mixed]) {
+  background: var(--b-200);
+  border-color: var(--b-200);
+}
+
+/* Rádio: anel com ponto, como o marcador dos cartões do construtor */
+.radio .box {
+  border-radius: 50%;
+}
+.radio .box::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--b-600);
+  transform: scale(0);
+  transition:
+    transform var(--dur-2) var(--ease-spring),
+    background-color var(--dur-1) var(--ease-out);
+}
+.radio input:checked + .box {
+  border-color: var(--b-600);
+}
+.radio input:checked + .box::after {
+  transform: scale(1);
+}
+.radio:is(:hover, :has(input[data-force~='hover'])):not([data-disabled]) input:checked + .box {
+  border-color: var(--b-700);
+}
+.radio:is(:hover, :has(input[data-force~='hover'])):not([data-disabled])
+  input:checked
+  + .box::after {
+  background: var(--b-700);
+}
+.radio:is(:active, :has(input[data-force~='active'])):not([data-disabled]) input:checked + .box {
+  border-color: var(--accent-pressed);
+}
+.radio:is(:active, :has(input[data-force~='active'])):not([data-disabled])
+  input:checked
+  + .box::after {
+  background: var(--accent-pressed);
+}
+.radio input:disabled:checked + .box {
+  border-color: var(--b-200);
+}
+.radio input:disabled:checked + .box::after {
+  background: var(--b-200);
+}
+
+.text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.title {
+  font: var(--t-body-strong);
+  color: var(--ink);
+  transition: color var(--dur-1);
+}
+.description {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+
+/* ——— Grupo: legenda 13/600, itens, ajuda ou erro ——— */
+.group {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.legend {
+  float: left;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0;
+  font: 600 13px/20px var(--font);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+.required {
+  margin-left: 4px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.groupItems {
+  display: grid;
+  gap: 12px;
+}
+.groupItems[data-orientation='horizontal'] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+}
+.groupHint,
+.groupError {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.groupError {
+  font: var(--t-caption-strong);
+  color: var(--red-ink);
+}
+.groupError svg {
+  width: 14px;
+  height: 14px;
+  margin-top: 1px;
+}
+
+/* ——— Switch ——— */
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.switch[data-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.switch button {
+  position: relative;
+  display: inline-flex;
+  border-radius: var(--r-full);
+  -webkit-tap-highlight-color: transparent;
+}
+.switch button:disabled {
+  cursor: not-allowed;
+}
+.switch[data-loading='true'] button {
+  cursor: progress;
+}
+.track {
+  --w: 36px;
+  --h: 21px;
+  --thumb: 16px;
+  --pad: 2.5px;
+  --travel: calc(var(--w) - var(--thumb) - 2 * var(--pad));
+  --stretch: 4px;
+  position: relative;
+  flex-shrink: 0;
+  width: var(--w);
+  height: var(--h);
+  border-radius: var(--r-full);
+  background: var(--g-300);
+  transition: background-color var(--dur-2) var(--ease-out);
+}
+.switch[data-size='sm'] .track {
+  --w: 30px;
+  --h: 17px;
+  --thumb: 13px;
+  --pad: 2px;
+  --stretch: 3px;
+}
+.thumb {
+  position: absolute;
+  top: var(--pad);
+  left: var(--pad);
+  display: grid;
+  place-items: center;
+  width: var(--thumb);
+  height: var(--thumb);
+  border-radius: var(--r-full);
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgb(16 24 40 / 0.16);
+  transition:
+    transform var(--dur-3) var(--ease-spring),
+    width var(--dur-1) var(--ease-out);
+}
+.switch button[aria-checked='true'] .track {
+  background: var(--b-600);
+}
+.switch button[aria-checked='true'] .thumb {
+  transform: translateX(var(--travel));
+}
+/* Hover: um degrau na rampa do estado */
+.switch:not([data-disabled]) button:is(:hover, [data-force~='hover']) .track {
+  background: var(--g-400);
+}
+.switch:not([data-disabled]) button[aria-checked='true']:is(:hover, [data-force~='hover']) .track {
+  background: var(--b-700);
+}
+/* Pressionado: mais um degrau no trilho (g-500 / b-800) e o polegar estica na direção do percurso */
+.switch:not([data-disabled]):not([data-loading]) button:is(:active, [data-force~='active']) .track {
+  background: var(--g-500);
+}
+.switch:not([data-disabled]):not([data-loading])
+  button[aria-checked='true']:is(:active, [data-force~='active'])
+  .track {
+  background: var(--accent-pressed);
+}
+.switch:not([data-disabled]):not([data-loading]) button:is(:active, [data-force~='active']) .thumb {
+  width: calc(var(--thumb) + var(--stretch));
+}
+.switch:not([data-disabled]):not([data-loading])
+  button[aria-checked='true']:is(:active, [data-force~='active'])
+  .thumb {
+  transform: translateX(calc(var(--travel) - var(--stretch)));
+}
+.switch button:is(:focus-visible, [data-force~='focus']) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+/* Salvando: o trilho mantém a cor do estado; o polegar gira um spinner de 10 px */
+.thumbSpin {
+  width: 10px;
+  height: 10px;
+  color: var(--g-500);
+  stroke-width: 2.5;
+  animation: spin 0.8s linear infinite;
+}
+.switch button[aria-checked='true'] .thumbSpin {
+  color: var(--b-600);
+}
+.switch[data-size='sm'] .thumbSpin {
+  width: 9px;
+  height: 9px;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ——— Segmentado: trilho cinza, ativo em papel que desliza ——— */
+.segmented {
+  position: relative;
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--r-md);
+  background: var(--g-100);
+  isolation: isolate;
+}
+.segmented[data-full='true'] {
+  display: flex;
+}
+.segmented[data-full='true'] .segment {
+  flex: 1;
+}
+.indicator {
+  position: absolute;
+  z-index: -1;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgb(16 24 40 / 0.08);
+  transition:
+    transform var(--dur-3) var(--ease-out),
+    width var(--dur-3) var(--ease-out);
+}
+.segment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font: var(--t-small-strong);
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color var(--dur-2);
+}
+.segment:hover {
+  color: var(--text);
+}
+.segment[aria-checked='true'],
+.segment[aria-selected='true'] {
+  color: var(--ink);
+}
+.segment svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.75;
+}
+/* Pequeno: mesma altura de busca, filtros e botões sm (--h-sm), raio concêntrico ao trilho. */
+.segmented[data-size='sm'] {
+  border-radius: var(--r-sm);
+}
+.segmented[data-size='sm'] .segment {
+  height: calc(var(--h-sm) - 6px);
+  padding: 0 10px;
+  border-radius: var(--r-xs);
+  font: var(--t-caption-strong);
+}
+.segmented[data-size='sm'] .indicator {
+  border-radius: var(--r-xs);
+}
+.segmented[data-size='lg'] .segment {
+  height: 36px;
+  padding: 0 16px;
+  font: var(--t-body-strong);
+}
+
+/* ——— Cartão de escolha (cartão de ativo / envio do construtor) ——— */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+}
+.cardMain {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 10px 12px 11px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.card input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.cardBody {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 2px;
+}
+.cardTitle {
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.cardDesc {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.cardExtra {
+  margin-top: 6px;
+  font: var(--t-caption);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.radioDot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--g-300);
+  transition: border-color var(--dur-1) var(--ease-out);
+}
+.radioDot::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--b-600);
+  transform: scale(0);
+  transition:
+    transform var(--dur-2) var(--ease-spring),
+    background-color var(--dur-1) var(--ease-out);
+}
+/* Hover de algo escolhível: fio b-200 + g-25 (só a área clicável, não o rodapé) */
+.card:not([data-disabled]):not(:has(input:checked)):is(
+    :has(.cardMain:hover),
+    [data-force~='hover']
+  ) {
+  border-color: var(--choice-hover-line);
+  background: var(--g-25);
+}
+.card:not([data-disabled]):not(:has(input:checked)):is(:has(.cardMain:hover), [data-force~='hover'])
+  .radioDot {
+  border-color: var(--g-400);
+}
+.card:not([data-disabled]):not(:has(input:checked)):is(
+    :has(.cardMain:active),
+    [data-force~='active']
+  ) {
+  background: var(--g-50);
+}
+/* Selecionado: fio b-300 + fundo b-25, sem anel (A-67) */
+.card:has(input:checked) {
+  border-color: var(--select-line);
+  background: var(--select-bg);
+}
+.card:has(input:checked) .radioDot {
+  border-color: var(--b-600);
+}
+.card:has(input:checked) .radioDot::after {
+  transform: scale(1);
+}
+/* Selecionado + hover: um degrau acima, nunca abaixo do repouso selecionado */
+.card:not([data-disabled]):has(input:checked):is(:has(.cardMain:hover), [data-force~='hover']) {
+  border-color: var(--b-400);
+  background: var(--b-50);
+}
+.card:not([data-disabled]):has(input:checked):is(:has(.cardMain:hover), [data-force~='hover'])
+  .radioDot {
+  border-color: var(--b-700);
+}
+.card:not([data-disabled]):has(input:checked):is(:has(.cardMain:hover), [data-force~='hover'])
+  .radioDot::after {
+  background: var(--b-700);
+}
+.card:not([data-disabled]):has(input:checked):is(:has(.cardMain:active), [data-force~='active']) {
+  border-color: var(--b-400);
+  background: var(--b-100);
+}
+.card:has(input:focus-visible),
+.card[data-force~='focus'] {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+.card[data-invalid='true']:not(:has(input:checked)) {
+  border-color: var(--red-line);
+}
+.card[data-disabled='true'] {
+  background: var(--g-25);
+  border-color: var(--line);
+}
+.card[data-disabled='true'] .cardMain {
+  cursor: not-allowed;
+}
+.card[data-disabled='true'] .cardTitle {
+  color: var(--muted);
+}
+.card[data-disabled='true'] .cardDesc,
+.card[data-disabled='true'] .cardExtra {
+  color: var(--subtle);
+}
+.card[data-disabled='true'] .radioDot {
+  background: var(--disabled-bg);
+  border-color: var(--disabled-line);
+}
+/* Rodapé preso ao cartão: nota de uma linha, separada por fio, com ação em texto */
+.cardFoot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  min-height: 36px;
+  padding: 7px 12px;
+  border-top: 1px solid var(--line-soft);
+  font: var(--t-small-strong);
+  color: var(--text);
+  transition: border-color var(--dur-1) var(--ease-out);
+}
+.card:has(input:checked) .cardFoot {
+  border-top-color: var(--b-200);
+}
+.cardFoot > svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.card[data-layout='stacked'] .cardMain {
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+}
+.card[data-layout='stacked'] .radioDot {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+/* ——— Toque: área de acerto de 40 px em volta de caixa e chave, sem mudar o desenho ——— */
+@media (pointer: coarse) {
+  .box::before,
+  .switch button::after {
+    content: '';
+    position: absolute;
+    inset: -11px;
+  }
+  .box::before {
+    pointer-events: auto;
+  }
+}

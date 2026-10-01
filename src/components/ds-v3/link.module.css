@@ -1,0 +1,92 @@
+/*
+ * Link e ação em texto. Cor de ação, sublinhado só no hover (aparece, não cresce),
+ * visitado igual ao não visitado (a cor vem da classe, nunca de :visited). Estados com gêmeo [data-force] das pranchas.
+ */
+.link {
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-xs);
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: var(--b-600);
+  text-align: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color var(--dur-1) var(--ease-out),
+    text-decoration-color var(--dur-1) var(--ease-out);
+}
+.link[data-size='sm'] {
+  font: var(--t-small-strong);
+}
+
+/* Acento: b-600 → b-700 → b-800 */
+.link:where(:hover, [data-force~='hover']):where(:not(:disabled, [aria-disabled='true'])) {
+  color: var(--b-700);
+  text-decoration-color: currentColor;
+}
+.link:where(:active, [data-force~='active']):where(:not(:disabled, [aria-disabled='true'])) {
+  color: var(--accent-pressed);
+  text-decoration-color: currentColor;
+}
+
+/* Discreto: cinza de meta que acende em azul (ex.: “Editar” da revisão) */
+.link[data-tone='quiet'] {
+  color: var(--muted);
+}
+/* Texto: cor de corpo dentro de uma linha cinza (ex.: o anunciante na meta do detalhe) */
+.link[data-tone='text'] {
+  color: var(--text);
+}
+/* Herdado: a cor da frase ou do título ao redor */
+.link[data-tone='inherit'] {
+  color: inherit;
+}
+.link:is([data-tone='quiet'], [data-tone='text'], [data-tone='inherit']):where(
+    :hover,
+    [data-force~='hover']
+  ):where(:not(:disabled, [aria-disabled='true'])) {
+  color: var(--b-600);
+}
+.link:is([data-tone='quiet'], [data-tone='text'], [data-tone='inherit']):where(
+    :active,
+    [data-force~='active']
+  ):where(:not(:disabled, [aria-disabled='true'])) {
+  color: var(--b-700);
+}
+
+.link:is(:disabled, [aria-disabled='true']) {
+  color: var(--disabled-ink);
+  text-decoration-color: transparent;
+  cursor: not-allowed;
+}
+
+/* Externo: seta de 12 px colada ao texto; os dois nunca se separam na quebra */
+.link:has(.external) {
+  white-space: nowrap;
+}
+.external {
+  display: inline-block;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  margin-left: 2px;
+  vertical-align: -1px;
+  stroke-width: 2;
+}
+
+/* Toque: a ação em texto ganha alvo de 40 px sem mudar o desenho */
+@media (pointer: coarse) {
+  button.link {
+    position: relative;
+  }
+  button.link::after {
+    content: '';
+    position: absolute;
+    inset: -11px -6px;
+  }
+}

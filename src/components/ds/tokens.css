@@ -1,0 +1,111 @@
+/* V2: tokens exclusivos deste laboratório. Não importar nos apps de produto sem aprovação. */
+.ds-theme {
+  color-scheme: light;
+  --ds-canvas: #f0f2f6;
+  --ds-surface: #ffffff;
+  --ds-subtle: #f4f6fa;
+  --ds-hover: #e6ebf4;
+  --ds-ink: #1c2940;
+  --ds-muted: #606d82;
+  --ds-line: #e0e5ef;
+  --ds-control-line: #8691a3;
+  --ds-brand: #3458db;
+  --ds-brand-hover: #2544b7;
+  --ds-brand-soft: #e9efff;
+  --ds-on-brand: #ffffff;
+  --ds-focus: #3458db;
+  --ds-signature: #dce7fc;
+  --ds-signature-ink: #203b87;
+  --ds-signature-detail: #bfd0f7;
+  --ds-stage: #e9edf5;
+  --ds-success: #236849;
+  --ds-success-soft: #eaf5ee;
+  --ds-warning: #87580f;
+  --ds-warning-soft: #fff4dd;
+  --ds-danger: #ae373c;
+  --ds-danger-soft: #fceeee;
+  --ds-chart-2: #7083b4;
+  --ds-chart-3: #407e91;
+  --ds-scrim: #15213c66;
+  --ds-shadow-control: 0 2px 3px #1c294009, inset 0 1px 0 #ffffff24;
+  --ds-shadow-panel: 0 4px 8px #1c294003, 0 16px 40px #1c294006;
+  --ds-shadow-overlay: 0 24px 80px #15213c26, 0 4px 16px #15213c12;
+  --ds-radius-sm: 8px;
+  --ds-radius-md: 12px;
+  --ds-radius-lg: 20px;
+  --ds-radius-xl: 28px;
+  --ds-radius-pill: 999px;
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-6: 24px;
+  --ds-space-8: 32px;
+  --ds-space-12: 48px;
+  --ds-duration: 200ms;
+  --ds-duration-enter: 360ms;
+  --ds-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ds-font: var(--font-interface), sans-serif;
+  --ds-mono: var(--font-utility), monospace;
+  background: var(--ds-canvas);
+  color: var(--ds-ink);
+  font-size: 14px;
+  line-height: 1.5;
+  font-family: var(--ds-font);
+}
+.ds-theme[data-theme='dark'] {
+  color-scheme: dark;
+  --ds-canvas: #171b22;
+  --ds-surface: #1e232c;
+  --ds-subtle: #262d38;
+  --ds-hover: #30394a;
+  --ds-ink: #edf0f5;
+  --ds-muted: #a4aebf;
+  --ds-line: #353e4c;
+  --ds-control-line: #738097;
+  --ds-brand: #afc2ff;
+  --ds-brand-hover: #c5d2ff;
+  --ds-brand-soft: #2a3758;
+  --ds-on-brand: #1c2b52;
+  --ds-focus: #afc2ff;
+  --ds-success: #95d6ae;
+  --ds-success-soft: #223c30;
+  --ds-warning: #ebc57e;
+  --ds-warning-soft: #3e3422;
+  --ds-danger: #f0a0a4;
+  --ds-danger-soft: #452c32;
+  --ds-chart-2: #8395bf;
+  --ds-chart-3: #77b7ca;
+  --ds-scrim: #070c16a6;
+  --ds-signature: #273855;
+  --ds-signature-ink: #d3e2ff;
+  --ds-signature-detail: #3a527a;
+  --ds-stage: #242e40;
+  --ds-shadow-panel: 0 4px 16px #050a141a;
+}
+.ds-theme[data-portal='setorial'] {
+  --ds-brand: #246c63;
+  --ds-brand-hover: #19594f;
+  --ds-brand-soft: #eaf5f0;
+  --ds-focus: #246c63;
+}
+.ds-theme[data-portal='setorial'][data-theme='dark'] {
+  --ds-brand: #9ad9c9;
+  --ds-brand-hover: #b9ebdf;
+  --ds-brand-soft: #244139;
+  --ds-on-brand: #173e33;
+  --ds-focus: #9ad9c9;
+}
+.ds-theme[data-portal='negocios'] {
+  --ds-brand: #754da5;
+  --ds-brand-hover: #5e3c87;
+  --ds-brand-soft: #f4eefb;
+  --ds-focus: #754da5;
+}
+.ds-theme[data-portal='negocios'][data-theme='dark'] {
+  --ds-brand: #d3b4f5;
+  --ds-brand-hover: #e2ccfa;
+  --ds-brand-soft: #40314f;
+  --ds-on-brand: #3c2355;
+  --ds-focus: #d3b4f5;
+}

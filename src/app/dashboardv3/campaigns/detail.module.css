@@ -1,0 +1,618 @@
+/* Detalhe da campanha (base V2): texto e fio, sem cartões empilhados nem ícones em caixa. */
+.page {
+  display: grid;
+}
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 26px;
+}
+.headText {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+}
+.titleRow h1 {
+  font: var(--t-page, 600 24px/32px var(--font));
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+/* O "·" de cada item fica à esquerda dele. O parágrafo recorta e a linha interna recua 17 px:
+   o "·" de começo de linha cai fora do recorte. */
+.meta {
+  overflow: hidden;
+  font: var(--t-body);
+  color: var(--muted);
+}
+.meta > span {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -17px;
+}
+.meta > span > span {
+  white-space: nowrap;
+}
+.meta > span > span::before {
+  content: '·';
+  display: inline-block;
+  width: 17px;
+  text-align: center;
+  color: var(--g-300);
+}
+/* Ações à direita; o aviso de bloqueio fica embaixo, na linha do meta. */
+.headSide {
+  display: grid;
+  flex-shrink: 0;
+  justify-items: end;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.actionHint {
+  font: var(--t-caption);
+  line-height: 20px;
+  color: var(--muted);
+}
+
+/* Jornada: cinco marcos em linha, com o mesmo marcador e o mesmo conector da régua do construtor.
+   O conector é um item flexível depois do texto: todos têm o mesmo comprimento, seja qual for o rótulo. */
+/* Sem fio próprio: o trilho das abas, logo abaixo, é a divisória do cabeçalho. */
+.journey {
+  display: flex;
+  align-items: flex-start;
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
+}
+.phase {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: flex-start;
+  gap: 9px;
+  min-width: 0;
+}
+.phase:last-child {
+  flex: 0 1 auto;
+}
+.phase:not(:last-child)::after {
+  content: '';
+  flex: 1 1 0;
+  min-width: 24px;
+  height: 1px;
+  margin: 10px 12px 0 3px;
+  background: var(--line);
+}
+.phase[data-state='done']:not(:last-child)::after {
+  background: var(--b-200);
+}
+.phaseDot {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--g-200);
+  border-radius: 50%;
+  font: 600 11px/18px var(--font);
+  color: var(--muted);
+  background: var(--paper);
+  font-variant-numeric: tabular-nums;
+}
+.phaseDot svg {
+  width: 11px;
+  height: 11px;
+  stroke-width: 2.5;
+}
+.phase[data-state='done'] .phaseDot {
+  color: var(--b-600);
+  border-color: var(--b-200);
+  background: var(--b-50);
+}
+.phase[data-state='current'] .phaseDot {
+  color: #fff;
+  border-color: var(--b-600);
+  background: var(--b-600);
+}
+.phase[data-state='stopped'] .phaseDot {
+  color: var(--red-ink);
+  border-color: var(--red-line);
+  background: var(--red-bg);
+}
+.phaseText {
+  flex: 0 1 auto;
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  padding-top: 1px;
+}
+.phaseText strong {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.phase[data-state='upcoming'] .phaseText strong {
+  color: var(--muted);
+}
+.phaseText span {
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* A cor do status vive só no ponto do cabeçalho. */
+.phase[data-state='current'] .phaseText span {
+  color: var(--text);
+}
+.phase[data-state='stopped'] .phaseText span {
+  color: var(--red-ink);
+}
+
+/* Avisos */
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding: 11px 14px;
+  border: 1px solid var(--tone-line);
+  border-radius: var(--r-md);
+  background: var(--tone-bg);
+  --tone-bg: var(--blue-bg);
+  --tone-line: var(--blue-line);
+  --tone-ink: var(--blue-ink);
+}
+.notice[data-tone='amber'] {
+  --tone-bg: var(--amber-bg);
+  --tone-line: var(--amber-line);
+  --tone-ink: var(--amber-ink);
+}
+.notice[data-tone='orange'] {
+  --tone-bg: var(--orange-bg);
+  --tone-line: var(--orange-line);
+  --tone-ink: var(--orange-ink);
+}
+.notice[data-tone='red'] {
+  --tone-bg: var(--red-bg);
+  --tone-line: var(--red-line);
+  --tone-ink: var(--red-ink);
+}
+.notice > svg {
+  width: 15px;
+  height: 15px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  color: var(--tone-ink);
+}
+.notice > div {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.notice strong {
+  font: var(--t-small-strong);
+  color: var(--tone-ink);
+}
+.notice p {
+  font: var(--t-small);
+  color: var(--text);
+}
+.notice span {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.noticeEnd {
+  flex-shrink: 0;
+  align-self: center;
+  font: var(--t-small-strong) !important;
+  color: var(--tone-ink) !important;
+  font-variant-numeric: tabular-nums;
+}
+.noticeEnd[data-urgent] {
+  color: var(--orange-ink) !important;
+}
+.compact {
+  margin: 8px 0 0;
+}
+
+/* Abas (Visão geral · Analytics): o trilho fecha o cabeçalho; o conteúdo começa 24 px abaixo. */
+.tabs {
+  margin-bottom: 24px;
+  scroll-margin-top: 72px;
+}
+.panel {
+  min-width: 0;
+  animation: panelIn var(--dur-2) var(--ease-out);
+}
+@keyframes panelIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Números: uma faixa, divisórias finas */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 30px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+.stats > div {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  min-width: 0;
+  padding: 14px 18px 16px;
+}
+.stats > div + div {
+  border-left: 1px solid var(--line);
+}
+.stats > div > span {
+  font: var(--t-small);
+  color: var(--muted);
+}
+.stats b {
+  margin-top: 4px;
+  font: var(--t-kpi, 600 22px/28px var(--font));
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+/* Previsão: a mesma especificação das faixas do construtor (rótulo caption-strong, valor 16 tabular, legenda caption). */
+.stats[data-forecast] > div {
+  gap: 1px;
+  padding: 12px 16px 13px;
+}
+.stats[data-forecast] > div > span {
+  font: var(--t-caption-strong);
+}
+.stats[data-forecast] b {
+  margin-top: 2px;
+  font: var(--t-figure, 600 16px/24px var(--font));
+  letter-spacing: -0.012em;
+}
+.stats b[data-empty] {
+  color: var(--muted);
+}
+.stats b em {
+  margin-left: 2px;
+  font: 500 14px/20px var(--font);
+  font-style: normal;
+  color: var(--muted);
+}
+.stats small {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.stats[data-forecast] {
+  background: var(--paper);
+}
+
+/* Corpo */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 40px;
+  align-items: start;
+}
+.main {
+  min-width: 0;
+}
+.section + .section {
+  margin-top: 26px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+}
+.section h2 {
+  font: var(--t-title-3);
+  color: var(--ink);
+}
+.sectionHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Mesma caixa com ou sem o link "Preencher": as colunas lado a lado (≥1600) alinham fio a fio. */
+  min-height: 24px;
+}
+.sectionHead > .linkButton {
+  margin-left: auto;
+}
+.count {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.count[data-missing] {
+  color: var(--red-ink);
+}
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: var(--t-small-strong);
+  color: var(--b-600);
+}
+.linkButton:hover {
+  color: var(--b-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.rows {
+  margin: 14px 0 0;
+}
+.rows > div {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 16px;
+  padding: 8px 0;
+}
+.rows > div + div {
+  border-top: 1px solid var(--line-soft);
+}
+.rows dt {
+  padding-top: 1px;
+  font: var(--t-small);
+  color: var(--muted);
+}
+.rows dd {
+  margin: 0;
+  font: var(--t-body);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.rows dd[data-empty] {
+  color: var(--muted);
+}
+.rows dd[data-missing] {
+  font-weight: 400;
+  color: var(--red-ink);
+}
+.inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.empty {
+  margin-top: 10px;
+  font: var(--t-small);
+  color: var(--muted);
+}
+
+/* Lateral: um cartão claro com blocos separados por fio */
+.aside {
+  position: sticky;
+  top: 76px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.block {
+  min-width: 0;
+  padding: 14px 16px 16px;
+}
+.block + .block {
+  border-top: 1px solid var(--line);
+}
+/* Um degrau abaixo dos títulos de seção (14 px) do miolo. */
+.block h2 {
+  font: 600 13px/20px var(--font);
+  color: var(--ink);
+}
+.pi {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.pi > div {
+  flex: 1;
+  display: grid;
+  gap: 1px;
+}
+.pi strong {
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.pi span {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.history {
+  display: grid;
+  gap: 12px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.history li {
+  position: relative;
+  display: grid;
+  gap: 1px;
+  padding-left: 16px;
+}
+.history li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--g-300);
+}
+.history li[data-current]::before {
+  background: var(--b-500);
+}
+.history strong {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.history span {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.compact > div {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+}
+.compact dt {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.compact dd {
+  margin: 0;
+  font: var(--t-small-strong);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.missing {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  padding: 40px 0;
+}
+.missing h1 {
+  font: var(--t-title-2);
+  color: var(--ink);
+}
+.missing p {
+  margin-bottom: 8px;
+  font: var(--t-body);
+  color: var(--muted);
+}
+.reasonField {
+  padding-top: 4px;
+}
+
+/* Telas largas: configuração e briefing lado a lado, sem linhas de 1100 px. */
+@media (min-width: 1600px) {
+  .grid {
+    gap: 48px;
+  }
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 48px;
+    align-items: start;
+  }
+  .main .section + .section {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+}
+@media (max-width: 1180px) {
+  .phaseText span {
+    white-space: normal;
+  }
+}
+/* Tablet: rótulos em duas linhas não deixam conector visível; as fases ficam em colunas iguais, sem traço. */
+@media (max-width: 900px) {
+  .journey {
+    gap: 16px;
+  }
+  .phase,
+  .phase:last-child {
+    flex: 1 1 0;
+  }
+  .phase:not(:last-child)::after {
+    display: none;
+  }
+}
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .aside {
+    order: -1;
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .block + .block {
+    border-top: 0;
+    border-left: 1px solid var(--line);
+  }
+  /* Vínculos em duas colunas: o bloco fica com a altura dos vizinhos (P.I. e Histórico). */
+  .compact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16px;
+  }
+  .head {
+    flex-direction: column;
+  }
+  /* Sem ações no cabeçalho, o "⋯" fica na linha do título em vez de ganhar uma linha só para ele. */
+  .head[data-solo] {
+    flex-direction: row;
+  }
+  .headSide {
+    justify-items: start;
+  }
+}
+@media (max-width: 760px) {
+  .titleRow h1 {
+    font: 600 22px/30px var(--font);
+  }
+  .actions {
+    flex-wrap: wrap;
+  }
+  .journey {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .phase::after {
+    display: none;
+  }
+  /* O prazo desce para baixo do texto, alinhado à coluna do texto. */
+  .notice {
+    flex-wrap: wrap;
+  }
+  .noticeEnd {
+    flex-basis: 100%;
+    margin-left: 25px;
+    align-self: start;
+  }
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stats > div:nth-child(3) {
+    border-left: 0;
+  }
+  .stats > div:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+  .rows > div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .aside {
+    grid-template-columns: 1fr;
+  }
+  .block + .block {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .compact {
+    grid-template-columns: 1fr;
+  }
+}

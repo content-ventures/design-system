@@ -1,0 +1,626 @@
+/* Pranchas do grupo dados — só composição e diagramação; cor, raio, tipo e movimento vêm dos tokens. */
+
+/* ——— Composições ——— */
+.stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+}
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 20px;
+  align-items: start;
+}
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  padding: 16px 20px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.panelHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.panelTitle {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.panelTitle h4 {
+  font: var(--t-title-3);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+.panelTitle p {
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.listTitle {
+  font: var(--t-title-3);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+/* Tela de celular dentro da prancha: 390 px de largura, conteúdo branco com respiro de 16.
+   Raio de moldura do catálogo (12); 16 é só de modal, gaveta e bottom sheet. */
+.phone {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  width: 390px;
+  max-width: 100%;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  background: var(--paper);
+}
+
+/* Célula de estado que ocupa a largura toda. */
+.fill {
+  width: 100%;
+  min-width: 0;
+}
+.alignTable {
+  width: 100%;
+  min-width: 0;
+}
+
+/* ——— Texto de célula ——— */
+.strong {
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.caption {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.twoLine {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.twoLine > * {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.when {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.tabular {
+  color: var(--text);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.period {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.nameCell {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.name {
+  overflow: hidden;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.sub {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.sub > span {
+  flex: none;
+}
+.sub > .subAsset {
+  flex: 0 1 auto;
+  min-width: 24px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sub > span + span::before {
+  content: '·';
+  display: inline-block;
+  width: 13px;
+  text-align: center;
+  color: var(--g-300);
+}
+.advertiser {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--text);
+}
+.advertiser > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.switchCell {
+  display: inline-flex;
+  align-items: center;
+}
+.switchHit {
+  display: inline-flex;
+}
+
+/* ——— Lista de campanhas (barra, tabela, cartões) ——— */
+.listing {
+  container: listing / inline-size;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.toolbarSearch {
+  flex: 1;
+  max-width: 280px;
+}
+.afterBar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  margin-top: 14px;
+}
+.summary {
+  margin-bottom: 10px;
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.activeRow {
+  margin-bottom: 12px;
+}
+.phoneOnly {
+  display: none;
+}
+@container listing (max-width: 760px) {
+  .desktopOnly {
+    display: none;
+  }
+  .phoneOnly {
+    display: block;
+  }
+}
+.cardsFrame {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  overflow: clip;
+}
+.cards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* Seleção e veiculação com 48 px de trilho para a chave (centrada): no toque, os alvos de 40 px
+   mal se tocam, e onde se tocam ganha a seleção (inofensiva), nunca pausar uma campanha no ar. */
+.card {
+  display: grid;
+  grid-template-columns: 36px 48px minmax(0, 1fr) 36px;
+  align-items: center;
+  min-height: 64px;
+  padding: 10px 6px 10px 4px;
+  border-bottom: 1px solid var(--line-soft);
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.card:last-child {
+  border-bottom: 0;
+}
+.card[data-selected] {
+  background: var(--select-bg);
+}
+.cardCheck {
+  position: relative;
+  z-index: 1;
+  display: inline-grid;
+  place-items: center;
+}
+.card > .switchCell {
+  justify-content: center;
+}
+.cardMain {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding-right: 4px;
+}
+.cardName {
+  overflow: hidden;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.cardMeta {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  margin: -3px 0;
+  padding: 3px 0;
+  overflow: hidden;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.cardMeta > span {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cardMeta > span + span::before {
+  content: '·';
+  display: inline-block;
+  width: 13px;
+  text-align: center;
+  color: var(--g-300);
+}
+.cardMeta > .cardStatus {
+  flex: none;
+  overflow: visible;
+}
+.cardStatus > span {
+  gap: 5px;
+  font: var(--t-caption);
+  color: var(--text);
+}
+.cardMore {
+  color: var(--text);
+}
+.cardMenu {
+  display: inline-grid;
+  place-items: center;
+}
+
+/* ——— Estados da tabela: mesma altura em todos ——— */
+.fixedHeight {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.modeBar {
+  display: flex;
+  min-width: 0;
+  margin: -2px -2px 0;
+  padding: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+/* Sem lugar para todas as opções: o lado que ainda tem conteúdo esmaece 24 px (rolagem lateral). */
+.modeBar[data-fade-end='true'] {
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
+.modeBar[data-fade-start='true'] {
+  mask-image: linear-gradient(to right, transparent, #000 24px);
+}
+.modeBar[data-fade-start='true'][data-fade-end='true'] {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 24px,
+    #000 calc(100% - 24px),
+    transparent
+  );
+}
+.stateBox {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 12px;
+  min-height: 150px;
+  font: var(--t-small);
+  color: var(--muted);
+  text-align: center;
+}
+.stateBox strong {
+  font: var(--t-title-3);
+  color: var(--ink);
+}
+
+/* ——— Barra de filtros ——— */
+/* Blocos altos: mais ar entre um estado e o próximo, para a legenda ficar com o bloco de cima. */
+.looseStates > div {
+  row-gap: 40px;
+}
+.barStack {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+.narrowBand {
+  width: 100%;
+  max-width: 720px;
+}
+.choices {
+  display: grid;
+  min-width: 200px;
+}
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: var(--r-sm);
+  font: var(--t-small-strong);
+  color: var(--text);
+  text-align: left;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.choice:hover {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.choice:focus-visible {
+  outline-offset: -2px;
+}
+.choice[aria-pressed='true'] {
+  color: var(--ink);
+  background: var(--select-strong);
+}
+
+/* ——— Ações em lote ——— */
+.bandSample {
+  width: 100%;
+  max-width: 560px;
+}
+.phoneDock {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.phoneDock > :last-child {
+  position: static;
+  margin-top: 0;
+}
+
+/* ——— Lista ——— */
+.groupList {
+  width: 100%;
+  max-width: 440px;
+}
+
+/* ——— Badge ——— */
+.statusGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.props {
+  display: grid;
+  margin: 0;
+}
+.props > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 40px;
+  border-top: 1px solid var(--line-soft);
+}
+.props > div:first-child {
+  border-top: 0;
+}
+.props dt {
+  font: var(--t-body);
+  color: var(--ink);
+}
+.props dd {
+  margin: 0;
+  flex: none;
+}
+.counts {
+  display: grid;
+  gap: 16px;
+}
+/* O menu lateral direto no painel: sem caixa própria nem fundo de faixa, só os itens. */
+.sidebarSample {
+  width: 236px;
+  max-width: 100%;
+  margin: 0 -12px -8px;
+}
+.sidebarSample > * {
+  height: auto !important;
+  min-height: 0 !important;
+  border-right: 0 !important;
+  background: transparent !important;
+}
+
+/* ——— Tags ——— */
+.miniCard {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.miniHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.countHit {
+  display: inline-flex;
+  border-radius: var(--r-sm);
+  cursor: default;
+}
+.tagField {
+  width: 100%;
+  max-width: 280px;
+}
+
+/* ——— KPI ——— */
+.kpiBlock {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+}
+.kpiBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+.window {
+  font: var(--t-small-strong);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.formStrip {
+  max-width: 560px;
+}
+
+/* ——— Linha do tempo ——— */
+.timelineGrid {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.aside {
+  display: grid;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.asideBlock {
+  display: grid;
+  gap: 12px;
+  padding: 16px 16px 18px;
+}
+.asideBlock + .asideBlock {
+  border-top: 1px solid var(--line);
+}
+.asideTitle {
+  font: 600 13px/20px var(--font);
+  color: var(--ink);
+}
+.piRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.more {
+  display: inline-flex;
+  margin-top: 2px;
+}
+/* Histórico anterior: abre por altura (0fr → 1fr) e fecha mais curto. */
+.older {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--dur-exit) var(--ease-in),
+    visibility 0s linear var(--dur-exit);
+}
+.older[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--dur-3) var(--ease-out),
+    visibility 0s;
+}
+.olderClip {
+  min-height: 0;
+  overflow: clip;
+}
+.olderInner {
+  padding-top: 16px;
+  opacity: 0;
+  transition: opacity var(--dur-exit) var(--ease-in);
+}
+.older[data-open] .olderInner {
+  opacity: 1;
+  transition: opacity var(--dur-2) var(--ease-out) 60ms;
+}
+.nowrap {
+  white-space: nowrap;
+}
+
+/* ——— Responsivo ——— */
+@media (max-width: 1100px) {
+  .grid3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .timelineGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 760px) {
+  .grid2,
+  .grid3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .statusGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .panel {
+    padding: 14px 16px 16px;
+  }
+  .phone {
+    padding: 12px;
+  }
+}
+/* No celular de verdade a moldura de celular sobra: sem quadro dentro de quadro. */
+@media (max-width: 640px) {
+  .phone {
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+  }
+}

@@ -1,0 +1,470 @@
+/* ——— IconTile ——— */
+.tile {
+  --tile: 32px;
+  --tile-r: 7px;
+  --tile-icon: 16px;
+  --tone-bg: var(--g-75);
+  --tone-line: var(--g-150);
+  --tone-ink: var(--g-600);
+  --tone-dot: var(--g-500);
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--tile);
+  height: var(--tile);
+  border-radius: var(--tile-r);
+  color: var(--tone-ink);
+  background: var(--tone-bg);
+  border: 1px solid var(--tone-line);
+}
+.tile svg {
+  width: var(--tile-icon);
+  height: var(--tile-icon);
+  stroke-width: 1.75;
+}
+.tile[data-size='xs'] {
+  --tile: 24px;
+  --tile-r: 7px;
+  --tile-icon: 13px;
+}
+.tile[data-size='sm'] {
+  --tile: 28px;
+  --tile-r: 8px;
+  --tile-icon: 15px;
+}
+.tile[data-size='lg'] {
+  --tile: 40px;
+  --tile-r: 11px;
+  --tile-icon: 19px;
+}
+.tile[data-size='xl'] {
+  --tile: 48px;
+  --tile-r: 13px;
+  --tile-icon: 22px;
+}
+.tile[data-shape='circle'] {
+  --tile-r: 50%;
+}
+.tile[data-variant='paper'] {
+  color: var(--g-600);
+  background: var(--paper);
+  border-color: var(--line);
+  box-shadow: var(--shadow-xs);
+}
+.tile[data-variant='solid'] {
+  color: #fff;
+  background: var(--tone-dot);
+  border-color: var(--tone-dot);
+}
+.tile[data-variant='dashed'] {
+  color: var(--g-500);
+  background: var(--paper);
+  border: 1.5px dashed var(--g-300);
+}
+.tile[data-tone='blue'] {
+  --tone-bg: var(--blue-bg);
+  --tone-line: var(--blue-line);
+  --tone-ink: var(--b-600);
+  --tone-dot: var(--b-600);
+}
+.tile[data-tone='green'] {
+  --tone-bg: var(--green-bg);
+  --tone-line: var(--green-line);
+  --tone-ink: var(--green-ink);
+  --tone-dot: var(--green-dot);
+}
+.tile[data-tone='amber'] {
+  --tone-bg: var(--amber-bg);
+  --tone-line: var(--amber-line);
+  --tone-ink: var(--amber-ink);
+  --tone-dot: var(--amber-dot);
+}
+.tile[data-tone='orange'] {
+  --tone-bg: var(--orange-bg);
+  --tone-line: var(--orange-line);
+  --tone-ink: var(--orange-ink);
+  --tone-dot: var(--orange-dot);
+}
+.tile[data-tone='red'] {
+  --tone-bg: var(--red-bg);
+  --tone-line: var(--red-line);
+  --tone-ink: var(--red-ink);
+  --tone-dot: var(--red-dot);
+}
+.tile[data-tone='violet'] {
+  --tone-bg: var(--violet-bg);
+  --tone-line: var(--violet-line);
+  --tone-ink: var(--violet-ink);
+  --tone-dot: var(--violet-dot);
+}
+.tile[data-tone='teal'] {
+  --tone-bg: var(--teal-bg);
+  --tone-line: var(--teal-line);
+  --tone-ink: var(--teal-ink);
+  --tone-dot: var(--teal-dot);
+}
+.tile[data-tone='pink'] {
+  --tone-bg: var(--pink-bg);
+  --tone-line: var(--pink-line);
+  --tone-ink: var(--pink-ink);
+  --tone-dot: var(--pink-dot);
+}
+
+/* ——— Avatar em orbe (sem iniciais) ———
+ * O orbe é o fundo; a foto entra por cima (180 ms) e, se falhar, o orbe fica.
+ * Um fio interno de 1px `--line` contorna foto e orbe (o mesmo anel do menu lateral aprovado). */
+.avatar {
+  --size: 32px;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 78% 80%, var(--o3), transparent 60%),
+    linear-gradient(140deg, var(--o1) 10%, var(--o2) 95%);
+  isolation: isolate;
+}
+.avatar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--line);
+  pointer-events: none;
+}
+.avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transition: opacity var(--dur-2) var(--ease-out);
+}
+.avatar[data-image='loaded'] img {
+  opacity: 1;
+}
+/* Carregando: o orbe respira devagar enquanto a foto não chega. */
+.avatar[data-image='loading'] {
+  animation: orbWait var(--skeleton-pulse) ease-in-out infinite alternate;
+}
+@keyframes orbWait {
+  to {
+    opacity: 0.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .avatar[data-image='loading'] {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+.avatar[data-size='xs'] {
+  --size: 20px;
+}
+.avatar[data-size='sm'] {
+  --size: 24px;
+}
+.avatar[data-size='md'] {
+  --size: 32px;
+}
+.avatar[data-size='lg'] {
+  --size: 40px;
+}
+.avatar[data-size='xl'] {
+  --size: 56px;
+}
+/* Presença: ponto de 25% com anel de papel de 2px, na borda do círculo (45°). */
+.presence {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  width: max(6px, 25%);
+  height: max(6px, 25%);
+  border-radius: 50%;
+  background: var(--green-dot);
+  box-shadow: 0 0 0 2px var(--paper);
+}
+.avatar[data-size='xs'] .presence {
+  right: -1px;
+  bottom: -1px;
+}
+.avatar[data-size='xl'] .presence {
+  right: 1px;
+  bottom: 1px;
+}
+.presence[data-state='away'] {
+  background: var(--amber-dot);
+}
+.presence[data-state='offline'] {
+  background: var(--g-300);
+}
+
+/* ——— AvatarGroup ———
+ * Sobreposição de 6px com anel de papel; o membro em hover sobe 2px e passa à frente. */
+.group {
+  --size: 24px;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+.group[data-size='xs'] {
+  --size: 20px;
+}
+.group[data-size='md'] {
+  --size: 32px;
+}
+.group[data-size='lg'] {
+  --size: 40px;
+}
+.group[data-size='xl'] {
+  --size: 56px;
+}
+.group > * {
+  position: relative;
+}
+.group > * + * {
+  margin-left: -6px;
+}
+.group > :is(:hover, :focus-within, :has([data-force~='hover'])) {
+  z-index: 1;
+}
+.member {
+  display: inline-flex;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--paper);
+  transition: transform var(--dur-1) var(--ease-out);
+}
+.member:is(:hover, [data-force~='hover']) {
+  transform: translateY(-2px);
+}
+.more {
+  display: inline-grid;
+  place-items: center;
+  height: var(--size);
+  min-width: var(--size);
+  padding: 0 5px;
+  border-radius: var(--r-full);
+  font: var(--t-caption-strong);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  background: var(--g-75);
+  box-shadow: 0 0 0 2px var(--paper);
+  cursor: default;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+.group[data-size='xs'] .more {
+  padding: 0 4px;
+}
+.group[data-size='xs'] .more,
+.group[data-size='sm'] .more {
+  font-size: 11px;
+}
+.more:is(:hover, [data-force~='hover']) {
+  color: var(--text);
+  background: var(--g-100);
+  transform: translateY(-2px);
+}
+.more:focus-visible,
+.more[data-force~='focus'] {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+
+/* ——— BrandMark: marca desenhada para expositores e anunciantes ——— */
+.brand {
+  --size: 32px;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--size);
+  height: var(--size);
+  border-radius: calc(var(--size) * 0.28);
+  color: #fff;
+  background: var(--mark);
+}
+.brand svg {
+  width: 58%;
+  height: 58%;
+}
+.brand[data-variant='soft'] {
+  color: var(--mark);
+  background: color-mix(in srgb, var(--mark) 10%, white);
+}
+.brand[data-variant='paper'] {
+  color: var(--mark);
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px rgb(16 24 40 / 0.08);
+}
+.brand[data-size='xs'] {
+  --size: 20px;
+}
+.brand[data-size='sm'] {
+  --size: 24px;
+}
+.brand[data-size='lg'] {
+  --size: 40px;
+}
+.brand[data-size='xl'] {
+  --size: 52px;
+}
+
+/* ——— Assinatura MediaOn ——— */
+.product {
+  --glyph: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+  color: var(--ink);
+}
+.productGlyph {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--glyph);
+  height: var(--glyph);
+  border-radius: calc(var(--glyph) * 0.28);
+  color: #fff;
+  background: var(--g-900);
+}
+.productGlyph svg {
+  width: 62%;
+  height: 62%;
+}
+.product[data-tone='accent'] .productGlyph {
+  background: var(--b-600);
+}
+.product[data-tone='paper'] {
+  color: #fff;
+}
+.product[data-tone='paper'] .productGlyph {
+  color: var(--g-900);
+  background: #fff;
+}
+.wordmark {
+  font: 600 15px/20px var(--font);
+  letter-spacing: var(--track-title);
+  white-space: nowrap;
+}
+.product[data-size='xs'] {
+  --glyph: 14px;
+  gap: 5px;
+}
+.product[data-size='xs'] .productGlyph {
+  border-radius: var(--r-xs);
+}
+.product[data-size='xs'] .wordmark {
+  font: var(--t-small-strong);
+  letter-spacing: var(--track-tight);
+}
+.product[data-size='sm'] {
+  --glyph: 20px;
+  gap: 7px;
+}
+.product[data-size='sm'] .wordmark {
+  font: var(--t-body-strong);
+  letter-spacing: var(--track-tight);
+}
+.product[data-size='lg'] {
+  --glyph: 40px;
+  gap: 12px;
+}
+.product[data-size='lg'] .wordmark {
+  font: var(--t-figure-lg);
+  letter-spacing: var(--track-title);
+}
+
+/* “Feito com MediaOn”: legenda muted; o nome e o glifo acendem no hover. */
+.madeWith {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: var(--r-xs);
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color var(--dur-1) var(--ease-out);
+}
+.madeMark {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: var(--t-caption-strong);
+  color: var(--text);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.madeWith .productGlyph {
+  --glyph: 14px;
+  border-radius: var(--r-xs);
+  background: var(--g-400);
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.madeWith:is(:hover, [data-force~='hover']) {
+  color: var(--text);
+}
+.madeWith:is(:hover, [data-force~='hover']) .madeMark {
+  color: var(--ink);
+}
+.madeWith:is(:hover, [data-force~='hover']) .productGlyph {
+  background: var(--g-900);
+}
+
+/* ——— BrandLockup ——— */
+.lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.lockupText {
+  display: grid;
+  min-width: 0;
+}
+.lockupText strong {
+  font: var(--t-body-strong);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lockupText span {
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lockup[data-size='sm'] {
+  gap: 8px;
+}
+.lockup[data-size='lg'] {
+  gap: 12px;
+}
+.lockup[data-size='lg'] .lockupText strong {
+  font: var(--t-title-2);
+  letter-spacing: var(--track-title);
+}
+.lockupRule {
+  width: 1px;
+  height: 20px;
+  background: var(--line);
+}
+.cobrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+}

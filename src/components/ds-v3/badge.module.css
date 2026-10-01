@@ -1,0 +1,432 @@
+/* ——— Badge / Status ——— */
+.badge {
+  --tone-bg: var(--gray-bg);
+  --tone-line: var(--gray-line);
+  --tone-dot: var(--gray-dot);
+  --tone-ink: var(--gray-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  max-width: 100%;
+  padding: 0 8px;
+  border-radius: var(--r-sm);
+  font: var(--t-small-strong);
+  letter-spacing: 0;
+  white-space: nowrap;
+  color: var(--tone-ink);
+  background: var(--tone-bg);
+  font-variant-numeric: tabular-nums;
+}
+/* Rótulo encolhe com reticências quando falta espaço; com espaço, o desenho é o mesmo. */
+.badge > .label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.badge svg {
+  width: 13px;
+  height: 13px;
+  margin-left: -1px;
+}
+.badge[data-size='sm'] {
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 5px;
+  font: var(--t-caption-strong);
+}
+.badge[data-size='lg'] {
+  height: 26px;
+  padding: 0 10px;
+  font: var(--t-small-strong);
+}
+.badge[data-shape='pill'] {
+  border-radius: var(--r-full);
+}
+.badge .dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tone-dot);
+}
+/* Inativo (Bloqueado): anel cinza, sem preenchimento. */
+.badge .dot[data-hollow] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--g-300);
+}
+.badge[data-live='true'] .dot {
+  animation: pulse 2.2s var(--ease-out) infinite;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--tone-dot) 30%, transparent);
+  }
+  60% {
+    box-shadow: 0 0 0 3.5px color-mix(in srgb, var(--tone-dot) 0%, transparent);
+  }
+}
+/* Contorno: mantido por compatibilidade (fora do mostruário). */
+.badge[data-variant='outline'] {
+  height: 22px;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--tone-line);
+}
+/* Texto: ponto e rótulo no corpo de 13. Quebra em até duas linhas; o ponto acompanha a primeira. */
+.badge[data-variant='text'] {
+  align-items: flex-start;
+  height: auto;
+  padding: 0;
+  gap: 7px;
+  border-radius: 0;
+  font: var(--t-body);
+  color: var(--text);
+  background: none;
+  text-align: left;
+}
+.badge[data-variant='text'][data-wrap] {
+  white-space: normal;
+}
+.badge[data-variant='text'][data-wrap] > .label {
+  overflow: visible;
+  text-wrap: pretty;
+}
+.badge[data-variant='text'] .dot {
+  /* centro da primeira linha, qualquer que seja a altura de linha herdada */
+  margin-top: calc(0.5lh - 3px);
+}
+/* 12/18 com o mesmo vão de 7 px: o texto de apoio embaixo alinha em 13 px (ponto 6 + vão 7). */
+.badge[data-variant='text'][data-size='sm'] {
+  font: var(--t-small);
+}
+/* Sólido: só contador de novidade */
+.badge[data-variant='solid'] {
+  color: #fff;
+  background: var(--tone-dot);
+}
+.badge[data-variant='solid'][data-tone='blue'] {
+  background: var(--b-600);
+}
+
+.badge[data-tone='blue'] {
+  --tone-bg: var(--blue-bg);
+  --tone-line: var(--blue-line);
+  --tone-dot: var(--blue-dot);
+  --tone-ink: var(--blue-ink);
+}
+.badge[data-tone='green'] {
+  --tone-bg: var(--green-bg);
+  --tone-line: var(--green-line);
+  --tone-dot: var(--green-dot);
+  --tone-ink: var(--green-ink);
+}
+.badge[data-tone='amber'] {
+  --tone-bg: var(--amber-bg);
+  --tone-line: var(--amber-line);
+  --tone-dot: var(--amber-dot);
+  --tone-ink: var(--amber-ink);
+}
+.badge[data-tone='orange'] {
+  --tone-bg: var(--orange-bg);
+  --tone-line: var(--orange-line);
+  --tone-dot: var(--orange-dot);
+  --tone-ink: var(--orange-ink);
+}
+.badge[data-tone='red'] {
+  --tone-bg: var(--red-bg);
+  --tone-line: var(--red-line);
+  --tone-dot: var(--red-dot);
+  --tone-ink: var(--red-ink);
+}
+.badge[data-tone='violet'] {
+  --tone-bg: var(--violet-bg);
+  --tone-line: var(--violet-line);
+  --tone-dot: var(--violet-dot);
+  --tone-ink: var(--violet-ink);
+}
+.badge[data-tone='teal'] {
+  --tone-bg: var(--teal-bg);
+  --tone-line: var(--teal-line);
+  --tone-dot: var(--teal-dot);
+  --tone-ink: var(--teal-ink);
+}
+.badge[data-tone='pink'] {
+  --tone-bg: var(--pink-bg);
+  --tone-line: var(--pink-line);
+  --tone-dot: var(--pink-dot);
+  --tone-ink: var(--pink-ink);
+}
+
+/* ——— Chip: filtro aplicado (paper) e etiqueta (neutral, outline) ——— */
+.chip {
+  --chip-h: 30px;
+  --chip-px: 10px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  max-width: 100%;
+  height: var(--chip-h);
+  border-radius: var(--r-sm);
+  font: var(--t-small-strong);
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out),
+    opacity var(--dur-2) var(--ease-out);
+}
+.chip[data-kind='filter'][data-size='sm'] {
+  --chip-h: 26px;
+  --chip-px: 8px;
+}
+.chipBody {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 100%;
+  padding: 0 var(--chip-px);
+  border-radius: inherit;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  outline: none;
+}
+.chip[data-removable] .chipBody {
+  padding-right: 2px;
+}
+.chipBody > .value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chipBody > svg {
+  width: 14px;
+  height: 14px;
+  color: var(--g-500);
+}
+.chipLeading {
+  display: inline-flex;
+  margin-left: -2px;
+}
+.chip .label {
+  font-weight: 400;
+  color: var(--muted);
+}
+/* Corpo clicável (reabre o filtro): o chip inteiro reage, como um botão secundário. */
+.chip[data-interactive]:has(.chipBody:is(:hover, [data-force~='hover'])) {
+  background: var(--g-25);
+  border-color: var(--line-hover);
+}
+.chip[data-interactive]:has(.chipBody:is(:active, [data-force~='active'])) {
+  background: var(--g-50);
+}
+.chip[data-interactive]:has(.chipBody[aria-expanded='true']) {
+  background: var(--g-25);
+  border-color: var(--line-hover);
+}
+.chip:has(.chipBody:is(:focus-visible, [data-force~='focus'])) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+/* Foco no chip (sem corpo clicável, quando o X recebe foco o anel fica no próprio X). */
+.chip[data-force~='focus'] {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+
+.remove {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0 3px 0 0;
+  border-radius: var(--r-xs);
+  color: var(--g-400);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.remove:is(:hover, [data-force~='hover']) {
+  color: var(--ink);
+  background: var(--g-100);
+}
+.remove:is(:active, [data-force~='active']) {
+  background: var(--g-150);
+}
+.remove:is(:focus-visible, [data-force~='focus']) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: 0;
+}
+.remove svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+/* Alvo do X: 24 px com mouse (o desenho continua 20/18/16), 40 px no toque. */
+.remove::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+}
+
+/* Etiquetas: 24 / 26, sem prefixo; neutra em g-75 sem fio, contorno em papel com fio.
+ * A pequena mantém os 24 px dos vínculos aprovados na lista de campanhas. */
+.chip[data-kind='tag'] {
+  --chip-h: 26px;
+  --chip-px: 8px;
+  font: var(--t-small-strong);
+  color: var(--text);
+}
+.chip[data-kind='tag'][data-size='sm'] {
+  --chip-h: 24px;
+  --chip-px: 8px;
+  border-radius: var(--r-sm);
+  font: var(--t-caption-strong);
+}
+.chip[data-variant='neutral'] {
+  background: var(--g-75);
+  border-color: transparent;
+}
+.chip[data-variant='outline'] {
+  background: var(--paper);
+  border-color: var(--line);
+}
+.chip[data-kind='tag'] .remove {
+  width: 18px;
+  height: 18px;
+  margin-right: 3px;
+}
+.chip[data-kind='tag'][data-size='sm'] .remove {
+  width: 16px;
+  height: 16px;
+  margin-right: 2px;
+}
+.chip[data-kind='tag'] .remove svg {
+  width: 12px;
+  height: 12px;
+}
+.chip[data-kind='tag'] .remove::after {
+  inset: -3px;
+}
+.chip[data-kind='tag'][data-size='sm'] .remove::after {
+  inset: -4px;
+}
+/* Toque: o X ganha 40 px de alvo para fora do chip, e o corpo (que abre o filtro) recua 8 px para
+   os dois alvos não disputarem o mesmo dedo. */
+@media (pointer: coarse) {
+  .chip[data-removable]:not([data-leaving]) {
+    overflow: visible;
+  }
+  .chip[data-removable] .chipBody {
+    padding-right: 8px;
+  }
+  .chip[data-removable] .remove {
+    margin-right: 5px;
+  }
+  .chip[data-removable] .remove::after {
+    inset: -10px;
+  }
+  .chip[data-kind='tag'][data-removable] .remove::after {
+    inset: -11px;
+  }
+  .chip[data-kind='tag'][data-size='sm'][data-removable] .remove::after {
+    inset: -12px;
+  }
+}
+.chip[data-variant='neutral'] .remove:is(:hover, [data-force~='hover']) {
+  background: var(--g-150);
+}
+.chip[data-kind='tag'] .chipBody > svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* Marcado (Backspace) ou repetido: um degrau mais escuro. */
+.chip[data-highlighted] {
+  color: var(--ink);
+  background: var(--g-150);
+  border-color: transparent;
+}
+.chip[data-variant='outline'][data-highlighted],
+.chip[data-kind='filter'][data-highlighted] {
+  background: var(--g-75);
+  border-color: var(--line-hover);
+}
+
+/* Entrada e saída */
+.chip[data-appear] {
+  animation: chipIn var(--dur-1) var(--ease-out);
+}
+@keyframes chipIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+.chip[data-leaving] {
+  pointer-events: none;
+}
+.chip[data-removing] {
+  opacity: 0.4;
+}
+.chip[data-removing] .remove {
+  color: var(--ink);
+  background: var(--g-100);
+}
+
+/* ——— Kbd ——— */
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 5px;
+  font: 500 11px/1 var(--font);
+  color: var(--muted);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+}
+
+/* ——— Count ——— */
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--r-sm);
+  font: 500 11.5px/1 var(--font);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  background: var(--g-75);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.count[data-tone='accent'] {
+  color: var(--b-700);
+  background: var(--b-100);
+}
+.count[data-tone='solid'] {
+  color: #fff;
+  background: var(--b-600);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge[data-live='true'] .dot,
+  .chip[data-appear] {
+    animation: none;
+  }
+}

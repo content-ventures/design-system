@@ -1,0 +1,341 @@
+/* ——— Lista: fios dentro de um contorno; nada de cartão por linha ——— */
+.frame {
+  container: listframe / inline-size;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+.frame[data-framed] {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  overflow: clip;
+}
+.list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.list[data-dividers] > .item + .item,
+.list[data-dividers] > .group + .group {
+  box-shadow: inset 0 1px 0 var(--line-soft);
+}
+
+/* ——— Linha ——— */
+.item {
+  --row-min: 44px;
+  position: relative;
+  display: flex;
+  min-width: 0;
+  background: var(--paper);
+}
+.item[data-lines='2'] {
+  --row-min: 56px;
+}
+.item[data-density='sm'] {
+  --row-min: 36px;
+}
+.item[data-density='sm'][data-lines='2'] {
+  --row-min: 48px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  min-height: var(--row-min);
+  padding: 8px 16px;
+  border-radius: 0;
+  font: var(--t-body);
+  color: var(--text);
+  text-align: left;
+  outline: none;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.item[data-density='sm'] .row {
+  gap: 10px;
+  padding: 6px 12px;
+}
+.item[data-interactive] .row {
+  cursor: pointer;
+}
+.item[data-interactive] .row:is(:hover, [data-force~='hover']) {
+  background: var(--g-25);
+}
+.item[data-interactive] .row:is(:active, [data-force~='active']) {
+  background: var(--g-50);
+}
+.row:is(:focus-visible, [data-force~='focus']) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: -2px;
+  border-radius: var(--r-sm);
+}
+.item[data-selected] .row {
+  background: var(--select-bg);
+}
+.item[data-selected][data-interactive] .row:is(:hover, [data-force~='hover']) {
+  background: var(--b-50);
+}
+.item[data-disabled] .row {
+  cursor: not-allowed;
+}
+.item[data-disabled] :is(.title, .desc, .meta, .leading) {
+  color: var(--disabled-ink);
+}
+.item[data-disabled] .leading {
+  opacity: 0.5;
+}
+
+.leading {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+.text {
+  display: grid;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+.title {
+  min-width: 0;
+  overflow: hidden;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.desc {
+  min-width: 0;
+  overflow: hidden;
+  font: var(--t-small);
+  color: var(--muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+.meta {
+  flex: none;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: right;
+}
+.trailing {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  margin-right: -4px;
+}
+.chevron {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-right: -4px;
+  color: var(--g-300);
+  transition:
+    color var(--dur-1) var(--ease-out),
+    transform var(--dur-2) var(--ease-out);
+}
+.row:is(:hover, [data-force~='hover']) .chevron {
+  color: var(--g-500);
+  transform: translateX(2px);
+}
+
+/* Caixa de seleção desenhada (a linha inteira é o controle). */
+.box {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 4.5px;
+  color: #fff;
+  background: var(--paper);
+  border: 1px solid #cdd2da;
+  box-shadow: var(--shadow-xs);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out);
+}
+.row:is(:hover, [data-force~='hover']) .box {
+  border-color: #b6bdc8;
+}
+.box svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 3;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity var(--dur-1),
+    transform var(--dur-2) var(--ease-spring);
+}
+.item[data-selected] .box {
+  background: var(--b-600);
+  border-color: var(--b-600);
+  box-shadow: none;
+}
+.item[data-selected] .box svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ——— Reordenar ——— */
+.item[data-reorder] .row {
+  padding-left: 4px;
+}
+.grip {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  align-self: center;
+  width: 28px;
+  height: 32px;
+  margin-left: 6px;
+  border-radius: var(--r-sm);
+  color: var(--icon-quiet);
+  cursor: grab;
+  touch-action: none;
+  transition:
+    color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+}
+.grip svg {
+  width: 16px;
+  height: 16px;
+}
+/* A alça fica sempre à vista (g-400): é ela que diz que a lista reordena. Escurece com a linha. */
+.item:is(:hover, :focus-within) .grip {
+  color: var(--g-600);
+}
+.grip:is(:hover, [data-force~='hover']) {
+  color: var(--g-600);
+  background: var(--g-75);
+}
+.grip:focus-visible {
+  outline-offset: -2px;
+}
+.item[data-dragging],
+.list[data-dividers] > .item[data-dragging] {
+  z-index: 2;
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-drag);
+}
+.item[data-dragging] .grip:focus-visible {
+  outline: none;
+}
+.item[data-dragging] .grip {
+  color: var(--g-700);
+  cursor: grabbing;
+}
+@media (pointer: coarse) {
+  .grip {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* ——— Grupo com cabeçalho preso ——— */
+.group {
+  display: grid;
+}
+.groupHead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 32px;
+  padding: 0 16px;
+  font: var(--t-caption-strong);
+  color: var(--muted);
+  background: rgb(255 255 255 / 0.94);
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 -1px 0 var(--line-soft);
+}
+.groupMeta {
+  font: var(--t-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ——— Vazio e carregando ——— */
+.empty {
+  display: grid;
+  place-items: center;
+  min-height: 88px;
+  padding: 16px;
+  font: var(--t-small);
+  color: var(--muted);
+  text-align: center;
+}
+.skel {
+  display: block;
+  height: 12px;
+  border-radius: var(--r-xs);
+  background: var(--skeleton);
+  animation: pulse var(--skeleton-pulse) ease-in-out infinite;
+}
+.skel[data-kind='sub'] {
+  height: 10px;
+  margin-top: 6px;
+}
+.skel[data-kind='mark'] {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+}
+.skel[data-kind='meta'] {
+  flex: none;
+  width: 56px;
+  height: 10px;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* Estreita (celular), linha com marca: a meta desce para baixo da descrição e o título fica
+   inteiro. Sem marca, a meta curta (hora, contagem) continua ao lado. */
+@container listframe (max-width: 440px) {
+  .item[data-meta][data-lead][data-lines='2'] .row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'lead text end'
+      'lead meta end';
+    gap: 3px 12px;
+  }
+  .item[data-meta][data-lead][data-lines='2'] :is(.leading, .box) {
+    grid-area: lead;
+    align-self: start;
+    margin-top: 2px;
+  }
+  .item[data-meta][data-lead][data-lines='2'] .text {
+    grid-area: text;
+  }
+  .item[data-meta][data-lead][data-lines='2'] .meta {
+    grid-area: meta;
+    justify-self: start;
+    text-align: left;
+  }
+  .item[data-meta][data-lead][data-lines='2'] :is(.trailing, .chevron) {
+    grid-area: end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skel {
+    animation: none;
+  }
+}

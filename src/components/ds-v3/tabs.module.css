@@ -1,0 +1,179 @@
+/*
+ * Abas sublinhadas sobre um fio de 1px. Rótulo 13/500 (como no dashboard aprovado): repouso
+ * `--muted`, selecionada `--ink` com barra azul de 2 px que desliza. Sem caixa, sem pílula, sem ícone
+ * nas abas do produto.
+ */
+.tabs {
+  --tab-h: 40px;
+  --tab-gap: 22px;
+  /* Respiro lateral de cada aba: o anel de foco não encosta no texto. A margem negativa devolve o
+     alinhamento, e o fio e a barra azul continuam na largura do texto. */
+  --tab-pad: 8px;
+  position: relative;
+  display: flex;
+  gap: var(--tab-gap);
+  min-width: 0;
+  margin-inline: calc(-1 * var(--tab-pad));
+  background: linear-gradient(var(--line), var(--line)) var(--tab-pad) 100% / calc(100% - 2 * var(--tab-pad)) 1px no-repeat local;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding-inline: calc(var(--tabs-inset, 0px) + var(--tab-pad));
+  scroll-padding-inline: calc(var(--tabs-inset, 0px) + var(--tab-pad));
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+/* Quando não cabem, o trilho esmaece na borda que ainda tem abas. */
+.tabs[data-fade='end'] {
+  mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+}
+.tabs[data-fade='start'] {
+  mask-image: linear-gradient(to left, #000 calc(100% - 40px), transparent);
+}
+.tabs[data-fade='both'] {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 40px,
+    #000 calc(100% - 40px),
+    transparent
+  );
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  height: var(--tab-h);
+  margin-inline: calc(-1 * var(--tab-pad));
+  padding: 0 var(--tab-pad);
+  border-radius: var(--r-sm);
+  font: var(--t-body-strong);
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color var(--dur-1) var(--ease-out);
+}
+/* Prévia neutra sob a aba em hover: diz “isto é clicável” sem competir com a barra azul. */
+.tab::after {
+  content: '';
+  position: absolute;
+  left: var(--tab-pad);
+  right: var(--tab-pad);
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--g-200);
+  opacity: 0;
+  transition: opacity var(--dur-1) var(--ease-out);
+}
+.tab:is(:hover, [data-force~='hover']):not([aria-selected='true'], [aria-disabled='true']) {
+  color: var(--ink);
+}
+.tab:is(:hover, [data-force~='hover']):not([aria-selected='true'], [aria-disabled='true'])::after {
+  opacity: 1;
+}
+.tab:is(:active, [data-force~='active']):not(
+    [aria-selected='true'],
+    [aria-disabled='true']
+  )::after {
+  opacity: 1;
+  background: var(--g-300);
+}
+.tab[aria-selected='true'] {
+  font-weight: 500;
+  color: var(--ink);
+}
+.tab[aria-disabled='true'] {
+  color: var(--subtle);
+  cursor: not-allowed;
+}
+.tab:is(:focus-visible, [data-force~='focus']) {
+  outline: none;
+}
+/* Anel com 6 px de folga do texto e longe da barra de baixo. */
+.tab:is(:focus-visible, [data-force~='focus'])::before {
+  content: '';
+  position: absolute;
+  inset: 6px 2px;
+  border-radius: var(--r-md);
+  box-shadow: 0 0 0 2px var(--focus-color);
+  pointer-events: none;
+}
+.tab > svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.75;
+  color: var(--g-400);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.tab[aria-selected='true'] > svg {
+  color: var(--b-600);
+}
+
+/* O rótulo reserva a largura do peso 500: trocar de aba não empurra as vizinhas. */
+.label {
+  display: inline-flex;
+  flex-direction: column;
+}
+.label::after {
+  content: attr(data-label);
+  height: 0;
+  font-weight: 500;
+  visibility: hidden;
+  overflow: hidden;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Contagem: azul só na selecionada; nas outras, cinza. Pílula 20 × 18, 11/600 (dashboard aprovado). */
+.count {
+  display: inline-flex;
+}
+.count > span {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 6px;
+  font: 600 11px/1 var(--font);
+  font-variant-numeric: tabular-nums;
+}
+.count > span[data-tone='neutral'] {
+  color: var(--g-600);
+  background: var(--g-100);
+}
+.tab[aria-disabled='true'] .count > span {
+  color: var(--subtle);
+  background: var(--g-50);
+}
+
+.bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  clip-path: inset(0 var(--tab-pad) round 2px 2px 0 0);
+  background: var(--b-600);
+  pointer-events: none;
+}
+.bar[data-animate] {
+  transition:
+    transform var(--dur-3) var(--ease-move),
+    width var(--dur-3) var(--ease-move);
+}
+
+.tabs[data-size='sm'] {
+  --tab-h: 34px;
+  --tab-gap: 18px;
+}
+.tabs[data-size='sm'] .tab {
+  gap: 6px;
+  font: var(--t-small-strong);
+}
+.tabs[data-size='sm'] .tab[aria-selected='true'] {
+  font-weight: 500;
+}

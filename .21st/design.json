@@ -1,0 +1,33 @@
+{
+  "project": "MediaOn Design System V2",
+  "referenceRoute": "/dashboardv2",
+  "catalogRoute": "/design-system-v2",
+  "tokens": "src/components/ds-v2/theme.module.css",
+  "decisions": [
+    {
+      "date": "2026-09-30",
+      "source": "Pedido explícito do usuário",
+      "decision": "Extrair a base aprovada do Dashboard V2 para uma biblioteca local consumida pelo dashboard e pelo catálogo, preservando a identidade e a adequação das tabelas por domínio. Sem integração no produto oficial nesta etapa."
+    },
+    {
+      "date": "2026-09-30",
+      "source": "Solicitação de inventário completo e revisão posterior por item",
+      "decision": "Recuperar 126 referências em 12 famílias na linguagem aprovada. Cada item tem exemplo, orientações, link e revisão local; componentes novos e composições permanecem abertos a ajustes pontuais. Cobertura visual não equivale a aprovação ou publicação de 126 APIs."
+    },
+    {
+      "date": "2026-09-30",
+      "source": "12 referências enviadas pelo usuário para refinamento do design system",
+      "decision": "Incorporar anatomia de upload, variantes de identidade, cards com pendências, etapas, seleção visual e kanban na linguagem azul/Inter aprovada. Preservar IDs e revisão individual; os refinamentos ficam abertos aos ajustes seguintes. Apenas frontend isolado."
+    },
+    {
+      "date": "2026-09-30",
+      "source": "Segunda rodada de 12 prints enviada pelo usuário",
+      "decision": "Refinar agenda, detalhes com histórico, convites, planos, avisos e configurações. Manter azul/Inter e densidade da base aprovada; aplicar rótulos visíveis, hierarquia por seções e ações contextuais. Novas composições seguem em revisão, somente frontend local, preservando os 126 IDs e as notas."
+    },
+    {
+      "date": "2026-09-30",
+      "source": "25 notas em Minha revisão, com pedido explícito de implementação",
+      "decision": "Compactar campos, corrigir herança de tema nos popovers, refinar ações e controles e ampliar mídia/revisão de campanha. Preservar Inter/azul, frontend isolado, IDs, notas e marcações do usuário; ajustes continuam sujeitos à sua revisão."
+    }
+  ]
+}

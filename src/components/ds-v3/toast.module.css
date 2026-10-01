@@ -1,0 +1,185 @@
+.viewport {
+  position: fixed;
+  z-index: var(--z-toast, 90);
+  right: 24px;
+  bottom: 24px;
+  display: grid;
+  gap: 10px;
+  width: min(380px, calc(100vw - 32px));
+  pointer-events: none;
+}
+/* Telas com rodapé fixo de ações (a moldura da criação): o aviso sobe e nunca cobre os botões. */
+:global(body:has([data-fixed-footer])) .viewport {
+  bottom: calc(var(--fixed-footer-h, 64px) + 16px);
+}
+/* Celular: na largura toda, com 16 px de margem dos dois lados. */
+@media (max-width: 640px) {
+  .viewport {
+    right: 16px;
+    left: 16px;
+    bottom: 16px;
+    width: auto;
+  }
+}
+.slot {
+  min-width: 0;
+}
+.toast {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 12px 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  pointer-events: auto;
+  animation: in var(--dur-3) var(--ease-out);
+}
+.toast[data-still] {
+  animation: none;
+}
+/* Saída: esmaece e desliza 8 px para a direita, mais curta que a entrada. */
+.toast[data-leaving] {
+  pointer-events: none;
+  animation: out var(--dur-exit, 160ms) var(--ease-in, ease-in) forwards;
+}
+@keyframes in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes out {
+  to {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+}
+.icon {
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  flex-shrink: 0;
+  color: var(--green-dot);
+}
+.toast[data-tone='info'] .icon {
+  color: var(--b-600);
+}
+.toast[data-tone='error'] .icon {
+  color: var(--red-dot);
+}
+.text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.text strong {
+  font: var(--t-small-strong);
+}
+.text span {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+/* Ação na linha do título, centrada com o X ao lado. */
+.action {
+  flex-shrink: 0;
+  margin-top: -4px;
+  padding: 4px 8px;
+  border-radius: var(--r-sm);
+  font: var(--t-small-strong);
+  color: var(--b-600);
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+.action:is(:hover, [data-force~='hover']) {
+  color: var(--b-700);
+  background: var(--b-50);
+}
+.action:is(:active, [data-force~='active']) {
+  color: var(--b-800);
+  background: var(--b-100);
+  transform: scale(var(--press-scale, 0.985));
+}
+.close {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin-top: -3px;
+  border-radius: var(--r-sm);
+  color: var(--g-400);
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+.close:is(:hover, [data-force~='hover']) {
+  color: var(--ink);
+  background: var(--g-50);
+}
+.close:is(:active, [data-force~='active']) {
+  color: var(--ink);
+  background: var(--g-100);
+  transform: scale(0.94);
+}
+.close svg {
+  width: 14px;
+  height: 14px;
+}
+.toast :is(.action, .close):is(:focus-visible, [data-force~='focus']) {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+}
+@media (pointer: coarse) {
+  .close {
+    position: relative;
+  }
+  .close::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
+}
+/* Tempo restante: fio de 2 px no pé, encolhe da direita para a esquerda; para no hover/foco. */
+.progress {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--g-150);
+  transform-origin: left center;
+  animation: shrink var(--toast-duration, 5000ms) linear forwards;
+}
+.toast[data-paused] .progress {
+  animation-play-state: paused;
+}
+.toast[data-still] .progress {
+  animation: none;
+  transform: scaleX(0.6);
+}
+@keyframes shrink {
+  to {
+    transform: scaleX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .toast[data-leaving] {
+    animation: none;
+  }
+  .progress {
+    display: none;
+  }
+}

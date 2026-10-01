@@ -1,0 +1,134 @@
+/* ——— MediaFrame ———
+ * Proporção exata, fundo g-50, fio interno de 1px, recorte. Sem sombra, sem degradê. */
+.figure {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+.frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  overflow: clip;
+  border-radius: var(--r-md);
+  background: var(--g-50);
+  container-type: inline-size;
+  isolation: isolate;
+}
+.frame[data-radius='sm'] {
+  border-radius: var(--r-sm);
+}
+.frame[data-radius='lg'] {
+  border-radius: var(--r-lg);
+}
+.frame[data-radius='none'] {
+  border-radius: 0;
+}
+/* Fio interno por cima da imagem: define a borda em peça clara e some em peça escura. */
+.frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgb(16 24 40 / 0.06);
+  pointer-events: none;
+}
+.frame img,
+.content {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.frame img {
+  opacity: 0;
+  user-select: none;
+}
+.frame[data-state='loaded'] img {
+  opacity: 1;
+  animation: mediaIn var(--dur-2) var(--ease-out);
+}
+.content > :is(svg, img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@keyframes mediaIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Carregando: bloco chapado g-100 que pulsa devagar (sem brilho correndo). */
+.frame[data-state='loading'] {
+  background: var(--skeleton);
+  animation: wait var(--skeleton-pulse) ease-in-out infinite alternate;
+}
+@keyframes wait {
+  to {
+    background-color: var(--g-75);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .frame[data-state='loading'] {
+    animation: none;
+  }
+}
+
+/* Indisponível: ícone 20 g-400 + legenda muted, centrados. */
+.missing {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  padding: 8px;
+  font: var(--t-caption);
+  color: var(--muted);
+  text-align: center;
+}
+.missing svg {
+  width: 20px;
+  height: 20px;
+  color: var(--g-400);
+}
+@container (max-width: 112px) {
+  .missing span {
+    display: none;
+  }
+  .missing svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.caption {
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+}
+
+/* ——— Nome cortado no meio ——— */
+.middle {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  white-space: nowrap;
+}
+.middleHead {
+  min-width: 0;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.middleTail {
+  flex-shrink: 0;
+  white-space: pre;
+}

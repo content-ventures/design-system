@@ -1,0 +1,1014 @@
+/*
+ * Pranchas do grupo Ações. Só layout e composição; cor, raio, tipo e movimento sempre por token.
+ * Contexto = fatias do produto (papel com fio) sobre a bandeja. Variantes e estados = papel direto.
+ */
+
+.stack {
+  display: grid;
+  gap: var(--s-4);
+  min-width: 0;
+}
+.stackLg {
+  display: grid;
+  gap: var(--s-8);
+  min-width: 0;
+}
+.frame {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.frameBody {
+  padding: var(--s-4) var(--s-5) var(--s-5);
+}
+.span2 {
+  grid-column: 1 / -1;
+}
+
+/* ——— Matriz de estados ——— */
+.matrix {
+  --label-w: 112px;
+  display: grid;
+  min-width: 0;
+}
+.mRow {
+  display: grid;
+  grid-template-columns: var(--label-w) repeat(var(--cols), var(--col-w, minmax(0, 1fr)));
+  align-items: center;
+  min-width: 0;
+}
+.mRow + .mRow {
+  border-top: 1px solid var(--line-soft);
+}
+.mRow[data-head] {
+  padding-bottom: var(--s-3);
+}
+.mHead {
+  font: var(--t-caption);
+  color: var(--muted);
+  text-align: center;
+  white-space: nowrap;
+}
+.matrix[data-align='start'] .mHead {
+  text-align: left;
+}
+.mLabel {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.mCell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 72px;
+  padding: var(--s-4) var(--s-1);
+}
+.matrix[data-align='start'] .mCell {
+  justify-content: flex-start;
+}
+/* Envoltórios da célula sem caixa de linha: o controle fica no centro óptico da célula. */
+.mCell > span:not([class]) {
+  display: inline-flex;
+}
+.none {
+  font: var(--t-body);
+  color: var(--g-300);
+}
+
+/* ——— Fatias do produto ——— */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  height: var(--topbar-h);
+  padding: 0 var(--s-3) 0 var(--s-5);
+  border-bottom: 1px solid var(--line);
+}
+.crumbs {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  font: var(--t-body);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.crumbs > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink);
+  font-weight: 500;
+}
+.crumbs > span + span::before {
+  content: '›';
+  display: inline-block;
+  width: 22px;
+  text-align: center;
+  color: var(--g-300);
+}
+.bell {
+  position: relative;
+  display: inline-flex;
+}
+.bell i {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--b-600);
+  box-shadow: 0 0 0 1.5px var(--paper);
+  pointer-events: none;
+}
+
+.detailHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-4) var(--s-6);
+  padding: var(--s-6) var(--s-6) var(--s-6) var(--s-6);
+}
+.detailTitles {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px var(--s-3);
+}
+.pageTitle {
+  font: var(--t-page);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  font: var(--t-body);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.meta > span {
+  white-space: nowrap;
+}
+.meta > span + span::before {
+  content: '·';
+  display: inline-block;
+  width: 18px;
+  text-align: center;
+  color: var(--g-300);
+}
+.headActions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+/* ——— Rodapé fixo da criação ——— */
+.footerFrame {
+  container-type: inline-size;
+  max-width: 1080px;
+  width: 100%;
+  justify-self: center;
+}
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: var(--action-bar-h);
+  padding: 0 var(--s-4) 0 var(--s-6);
+}
+.footStatus {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.saveState {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: var(--t-small-strong);
+  color: var(--text);
+  animation: fadeIn var(--dur-2) var(--ease-out);
+}
+.saveState i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber-dot);
+}
+.saveState svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  stroke-width: 2.25;
+  color: var(--green-dot);
+}
+.saveState:not([data-state='dirty']) {
+  font-weight: 400;
+  color: var(--muted);
+}
+.stepCount {
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  animation: fadeIn var(--dur-2) var(--ease-out);
+}
+.footButtons {
+  display: flex;
+  gap: var(--s-2);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.footDraft[data-hidden] {
+  visibility: hidden;
+}
+.primarySlot {
+  display: flex;
+  min-width: 196px;
+}
+.primarySlot > button {
+  flex: 1;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+/* Até 600 px de largura útil: [←] [Salvar rascunho] [Principal], sem status nem Cancelar. */
+@container (max-width: 600px) {
+  .footer {
+    height: auto;
+    padding: 10px var(--s-3);
+  }
+  .footStatus,
+  .footCancel {
+    display: none;
+  }
+  .footButtons {
+    width: 100%;
+    margin-left: 0;
+  }
+  .footBack {
+    order: -1;
+    flex: none;
+    width: var(--h-md);
+    padding: 0;
+  }
+  .backText {
+    display: none;
+  }
+  .primarySlot {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* ——— Celular ——— */
+.phone {
+  width: min(390px, 100%);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  background: var(--paper);
+  overflow: clip;
+}
+.phoneTop {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  height: var(--topbar-h);
+  padding: 0 var(--s-2) 0 var(--s-2);
+  border-bottom: 1px solid var(--line);
+}
+.phoneTop .crumbs {
+  flex: 1;
+}
+.phoneBody {
+  display: grid;
+  gap: var(--s-5);
+  padding: var(--s-6) var(--s-4) 0;
+}
+.phoneHead {
+  display: grid;
+  gap: 2px;
+}
+.phoneTitle {
+  font: 600 22px/30px var(--font);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.phoneSub {
+  font: var(--t-body);
+  color: var(--muted);
+}
+.full {
+  width: 100%;
+}
+
+/* ——— Botão de ícone ——— */
+.tableWrap {
+  min-width: 0;
+}
+.nameCell {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.sub {
+  display: flex;
+  min-width: 0;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.sub > span {
+  flex: none;
+}
+.sub > .subAsset {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sub > span + span::before {
+  content: '·';
+  display: inline-block;
+  width: 13px;
+  text-align: center;
+  color: var(--g-300);
+}
+
+/* Linha em hover desenhada: a faixa --g-25 da tabela atrás das ações. */
+.rowBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 6px 12px;
+  border-radius: var(--r-sm);
+}
+/* A faixa da linha em hover (--g-25) com o fio entre linhas, como na tabela. */
+.rowBox[data-force~='hover'] {
+  background: var(--g-25);
+  box-shadow:
+    inset 0 1px 0 var(--line-soft),
+    inset 0 -1px 0 var(--line-soft);
+}
+/* Alvo de toque: 40 (sm) ou 44 (md) tracejado em volta do desenho. */
+.touch {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+.touch::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  translate: -50% -50%;
+  border: 1px dashed var(--b-300);
+  border-radius: var(--r-sm);
+  pointer-events: none;
+}
+.touch[data-size='md']::after {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+}
+
+/* ——— Grupo de botões ——— */
+.groupBoard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--aside-w);
+  gap: var(--s-4);
+  align-items: start;
+  min-width: 0;
+}
+.listBar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s-4);
+  padding: var(--s-2) var(--s-4) 0 var(--s-5);
+  box-shadow: inset 0 -1px 0 var(--line);
+}
+.listBar > :first-child {
+  flex: 1;
+  min-width: 0;
+  box-shadow: none;
+}
+.barEnd {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 6px;
+}
+.pagerEnd {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  flex-shrink: 0;
+}
+.pagerText {
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.piPanel {
+  display: grid;
+  gap: var(--s-4);
+  padding: var(--s-4) var(--s-4) var(--s-4);
+}
+.panelTitle {
+  font: var(--t-title-3);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+.piRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+.piText {
+  display: grid;
+  gap: 1px;
+}
+.piText strong {
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.piText span {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.piPanel > [role='group'] {
+  justify-self: start;
+}
+/* Pedir ajustes no próprio detalhe: painel chapado (sem sombra), ações espaçadas no fim. */
+.askPanel {
+  display: grid;
+  gap: var(--s-3);
+  margin: 0;
+  padding: var(--s-4);
+}
+.askHead {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.askMeta {
+  overflow: hidden;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.askFoot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--s-2);
+  padding-top: var(--s-1);
+}
+.pair {
+  display: inline-flex;
+  gap: var(--s-2);
+}
+.openRow {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding-top: var(--s-6);
+  border-top: 1px solid var(--line-soft);
+}
+/* Menu parado alinhado ao fim do botão dividido, a 6 px dele (como o flutuante). */
+.openMenu {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+.openCaption {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+
+/* ——— Link ——— */
+.linkBoard {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-4);
+  align-items: start;
+  min-width: 0;
+}
+.linkBoard .detailHead {
+  align-items: flex-start;
+}
+/* Ação do cabeçalho alinhada à linha do título (32 px), não ao bloco título + meta. */
+.headLink {
+  margin-top: 7px;
+}
+.reviewPanel,
+.sendPanel,
+.periodPanel {
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-5) var(--s-5);
+}
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+.facts {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 6px var(--s-4);
+  margin: 0;
+}
+.facts dt {
+  font: var(--t-small);
+  color: var(--muted);
+}
+.facts dd {
+  margin: 0;
+  font: var(--t-body);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+/* Intervalo nunca quebra (§11): o travessão permite quebra depois dele. */
+.nowrap {
+  white-space: nowrap;
+}
+.choices {
+  display: grid;
+  gap: var(--s-2);
+}
+.blocked {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  width: 100%;
+}
+.blockedText {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--red-ink);
+}
+.blockedText svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  stroke-width: 2;
+}
+.periodPanel {
+  gap: var(--s-2);
+}
+.period {
+  max-width: 560px;
+}
+.groupLabel {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  font: 600 13px/20px var(--font);
+  color: var(--ink);
+}
+.groupMeta {
+  font: var(--t-caption);
+  font-weight: 400;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.req {
+  margin-left: -4px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 6px;
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.hint b {
+  font-weight: 500;
+  color: var(--text);
+}
+.hint > span[aria-hidden] {
+  color: var(--g-300);
+}
+.sentence {
+  font: var(--t-body);
+  color: var(--text);
+}
+
+/* ——— Toggle ——— */
+.filterFrame {
+  padding: var(--s-3) var(--s-3) var(--s-3) var(--s-5);
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+.toolbarCount {
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.toolbarCount b {
+  font-weight: 500;
+  color: var(--ink);
+}
+.toolbarEnd {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.toolbarSearch {
+  width: 240px;
+  min-width: 0;
+}
+/* Faixa de filtros: altura 0fr → 1fr em 280 ms; o conteúdo esmaece junto. */
+.band {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--dur-3) var(--ease-out),
+    opacity var(--dur-2) var(--ease-out);
+}
+.band[data-open] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.bandClip {
+  min-height: 0;
+  overflow: hidden;
+}
+.bandInner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+  padding: var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--g-50);
+}
+.bandSelects {
+  grid-row: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+}
+.bandField {
+  width: 196px;
+  min-width: 0;
+}
+/* Limpar fica no fim da primeira linha (no celular, por último). */
+.bandClear {
+  grid-row: 1;
+  grid-column: 2;
+}
+/* Grupo de pílulas com rótulo à esquerda, na altura da pílula (32). */
+.bandGroup {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--s-2) var(--s-3);
+}
+.bandLabel {
+  padding-top: 7px;
+  font: var(--t-small-strong);
+  color: var(--muted);
+}
+.fieldGroup {
+  display: grid;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.invalidRow {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: start;
+  padding-top: var(--s-6);
+  border-top: 1px solid var(--line-soft);
+}
+.invalidRow > .mLabel {
+  padding-top: 2px;
+}
+.error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: var(--t-caption-strong);
+  color: var(--red-ink);
+}
+.error svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  stroke-width: 2;
+}
+
+/* ——— Ações de linha ——— */
+/* Parado, o invólucro não existe para o layout; entrando, abre de 0fr a 1fr. */
+.enterWrap,
+.enterWrap > span {
+  display: contents;
+}
+.enterWrap[data-entering] {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: rowExpand var(--dur-3) var(--ease-out);
+}
+.enterWrap[data-entering] > span {
+  display: block;
+  min-height: 0;
+  overflow: hidden;
+}
+@keyframes rowExpand {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+.tableWrap tr:has([data-entering]) > td {
+  animation: tdExpand var(--dur-3) var(--ease-out);
+}
+@keyframes tdExpand {
+  from {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+/* Só nesta célula da prancha: o slot reservado aparece tracejado. */
+.showSlot [data-slot='empty'] {
+  border-radius: var(--r-sm);
+  outline: 1px dashed var(--g-300);
+  outline-offset: -1px;
+}
+.cards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-2) var(--s-3) var(--s-4);
+}
+.card + .card {
+  border-top: 1px solid var(--line-soft);
+}
+.card[data-plain] {
+  padding-right: var(--s-4);
+}
+.card[data-exiting] {
+  pointer-events: none;
+  animation: cardOut var(--dur-exit) var(--ease-in) forwards;
+}
+.card[data-entering] {
+  animation: fadeIn var(--dur-3) var(--ease-out);
+}
+@keyframes cardOut {
+  to {
+    opacity: 0;
+  }
+}
+.cardMain {
+  flex: 1;
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.cardName {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.cardMeta {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.cardMeta > * {
+  flex: none;
+}
+.cardMeta > span + span::before {
+  content: '·';
+  display: inline-block;
+  width: 13px;
+  text-align: center;
+  color: var(--g-300);
+}
+.cardMeta > .cardAdvertiser {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card [data-row-actions] {
+  margin-top: -4px;
+}
+
+/* ——— Responsivo ——— */
+@media (max-width: 1100px) {
+  .groupBoard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  .linkBoard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .listBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding-right: var(--s-3);
+  }
+  .barEnd {
+    padding: var(--s-2) 0 var(--s-2);
+    box-shadow: inset 0 1px 0 var(--line-soft);
+  }
+}
+@media (max-width: 760px) {
+  /* Matriz vira grade de 2: rótulo da linha em cima, legenda em cada célula. */
+  .mRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: var(--s-4) 0;
+    row-gap: var(--s-2);
+  }
+  .mRow[data-head] {
+    display: none;
+  }
+  .mRow:first-child,
+  .matrix[data-head] .mRow:nth-child(2) {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .mLabel {
+    grid-column: 1 / -1;
+  }
+  .mLabel:empty {
+    display: none;
+  }
+  .mCell {
+    flex-direction: column;
+    gap: var(--s-2);
+    min-height: 0;
+    padding: var(--s-2) 0;
+  }
+  .matrix[data-align='start'] .mCell {
+    align-items: flex-start;
+  }
+  .mCell::after {
+    content: attr(data-caption);
+    font: var(--t-caption);
+    color: var(--muted);
+  }
+  /* Amostras autoexplicativas: uma fileira só, sem legenda por célula. */
+  .matrix[data-compact] .mRow:not([data-head]) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2);
+  }
+  .matrix[data-compact] .mLabel {
+    flex-basis: 100%;
+    margin-bottom: var(--s-1);
+  }
+  .matrix[data-compact] .mCell {
+    padding: 0;
+  }
+  .matrix[data-compact] .mCell::after {
+    content: none;
+  }
+  /* Tabelas em contexto: a coluna de ações é o assunto — Status e Verba saem, nada vaza do palco. */
+  .tableWrap table[data-fixed] {
+    min-width: 0;
+  }
+  .tableWrap :is(th, td):is([data-col='status'], [data-col='budget']) {
+    display: none;
+  }
+  .frameBody {
+    padding: var(--s-3);
+  }
+  .headLink {
+    margin-top: 6px;
+  }
+  .detailHead {
+    padding: var(--s-4);
+  }
+  .pageTitle {
+    font: 600 22px/30px var(--font);
+  }
+  .topbar {
+    padding-left: var(--s-4);
+  }
+  .toolbar {
+    flex-wrap: wrap;
+  }
+  .toolbarEnd {
+    flex: 1;
+  }
+  .toolbarSearch {
+    flex: 1;
+    width: auto;
+  }
+  .invalidRow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-3);
+  }
+  .bandField {
+    flex: 1 1 160px;
+    width: auto;
+  }
+}
+@media (max-width: 640px) {
+  /* Fatos empilhados: rótulo sobre o valor, 12 px entre pares. */
+  .facts {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2px;
+  }
+  .facts dd + dt {
+    margin-top: 10px;
+  }
+  .bandGroup {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .bandLabel {
+    padding-top: 0;
+  }
+  .bandInner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bandSelects {
+    display: grid;
+  }
+  .bandClear {
+    grid-row: auto;
+    grid-column: 1;
+    justify-self: start;
+  }
+}
+@media (max-width: 480px) {
+  /* Ação do cabeçalho desce para baixo do título: sem o ajuste de linha. */
+  .headLink {
+    margin-top: 0;
+  }
+  .meta > span:nth-child(3) {
+    display: none;
+  }
+  .headActions {
+    width: 100%;
+  }
+  .headActions > button {
+    flex: 1;
+  }
+  .filterFrame {
+    padding-left: var(--s-3);
+  }
+  .toolbarCount {
+    display: none;
+  }
+}

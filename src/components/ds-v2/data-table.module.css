@@ -1,0 +1,104 @@
+.tableScroll {
+  overflow-x: auto;
+  border: 1px solid #efeff2;
+  border-radius: 9px;
+  scrollbar-width: thin;
+  scrollbar-color: #d7dbe0 transparent;
+}
+.table {
+  width: 100%;
+  min-width: 1015px;
+  border-spacing: 0;
+  table-layout: fixed;
+  text-align: left;
+  font: var(--type-body);
+  color: var(--text);
+}
+.table th {
+  height: 39px;
+  background: #fbfbfd;
+  font: var(--type-overline);
+  color: var(--muted);
+}
+.table th,
+.table td {
+  padding: 0 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.table td {
+  height: 48px;
+  border-top: 1px solid #f0f0f3;
+}
+.table tr:hover td {
+  background: #fcfdff;
+}
+
+.table {
+  table-layout: fixed;
+}
+.table td {
+  height: 62px;
+  padding-block: 10px;
+  vertical-align: middle;
+}
+.table[data-density='compact'] td {
+  height: 44px;
+  padding-block: 8px;
+}
+.table [data-numeric='true'] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.table td[data-kind='code'] {
+  font: var(--type-label);
+}
+.table td[data-kind='date'] {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.table td[data-kind='action'] {
+  overflow: visible;
+  text-align: right;
+}
+.sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  max-width: 100%;
+}
+.sort:hover {
+  color: var(--ink);
+}
+.sort:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+.sort svg {
+  flex-shrink: 0;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.empty {
+  padding: 32px;
+  text-align: center;
+  color: var(--muted);
+}

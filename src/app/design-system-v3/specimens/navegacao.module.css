@@ -1,0 +1,953 @@
+/* Pranchas do grupo Navegação — só layout e composição; cor, raio, tipo e movimento por token. */
+
+/* ——— Molduras ——— */
+.top,
+.moreOpen[data-top] {
+  align-self: flex-start;
+}
+.top {
+  display: flex;
+  width: 100%;
+}
+.top[data-end] {
+  justify-content: flex-end;
+}
+.sideFrame {
+  display: flex;
+  width: 236px;
+  height: 760px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: clip;
+  background: var(--g-25);
+}
+.sideFrame > [data-part='sidebar'] {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-right: 0;
+}
+.shellFrame {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: clip;
+  background: var(--paper);
+}
+/* Moldura de celular = <Phone> do palco. Com altura fixa, o shell ocupa a moldura inteira. */
+div.phoneFill {
+  grid-template-rows: minmax(0, 1fr);
+}
+.phones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+}
+.phones > * {
+  width: 390px;
+  max-width: 100%;
+}
+.phoneBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 52px;
+  padding: 0 4px 0 16px;
+  border-bottom: 1px solid var(--line);
+}
+.phoneBarAction {
+  width: 40px;
+  height: 40px;
+}
+.phoneBody {
+  display: grid;
+  gap: 4px;
+  padding: 20px 16px;
+}
+.scrollFrame {
+  height: 320px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: clip;
+  background: var(--paper);
+}
+.scrollInner {
+  position: relative;
+  container-type: inline-size;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-200) transparent;
+}
+/*
+ * Fim de área com rolagem: os últimos 32 px esmaecem (exceção funcional do contrato), então a
+ * linha cortada pela moldura some em vez de ficar decepada. O fio da moldura fica fora da máscara.
+ */
+.scrollInner,
+.fadeMain [data-part='main'] {
+  mask-image: linear-gradient(#000 calc(100% - 32px), transparent);
+}
+/* Pranchas só de tela larga: somem onde o produto não usa esse layout. */
+.wideOnly {
+  display: contents;
+}
+@media (max-width: 640px) {
+  .wideOnly[data-below='640'] {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .wideOnly[data-below='760'] {
+    display: none;
+  }
+}
+.barFrame {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: clip;
+  background: var(--paper);
+}
+.barPage {
+  padding: 28px 32px 32px;
+}
+@media (max-width: 640px) {
+  .barPage {
+    padding: 20px 16px 24px;
+  }
+}
+
+/* ——— Página de exemplo ——— */
+.page {
+  display: grid;
+  gap: 20px;
+}
+.pageHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.pageTitle {
+  font: var(--t-page);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.pageSub {
+  margin-top: 2px;
+  font: var(--t-body);
+  color: var(--muted);
+}
+.pageAction {
+  flex-shrink: 0;
+}
+@container (max-width: 520px) {
+  .pageTitle {
+    font: 600 22px/30px var(--font);
+  }
+  .pageAction {
+    display: none;
+  }
+}
+
+.detail {
+  display: grid;
+  padding: 28px 32px 40px;
+}
+.detailInset .detail {
+  padding: 0;
+}
+.detailHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+.detailMeta {
+  margin-top: 6px;
+  overflow: hidden;
+  font: var(--t-body);
+  color: var(--muted);
+}
+/* Cada item traz o “·” antes; a linha começa 18 px para fora e o primeiro “·” de cada linha some. */
+.metaLine {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 2px;
+  margin-left: -18px;
+}
+.metaLine > span {
+  white-space: nowrap;
+}
+.metaLine > span::before {
+  content: '·';
+  display: inline-block;
+  width: 18px;
+  text-align: center;
+  color: var(--g-300);
+}
+.sectionTitle {
+  margin: 28px 0 8px;
+  font: var(--t-title-3);
+  color: var(--ink);
+}
+.props {
+  display: grid;
+  margin: 0;
+}
+.props > div {
+  display: grid;
+  grid-template-columns: 196px minmax(0, 1fr);
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.props dt {
+  font: var(--t-body);
+  color: var(--muted);
+}
+.props dd {
+  margin: 0;
+  font: var(--t-body);
+  color: var(--ink);
+}
+@media (max-width: 640px) {
+  .detail {
+    padding: 20px 16px 32px;
+  }
+}
+@container (max-width: 520px) {
+  .props > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}
+
+/* ——— Tabela de campanhas (mesmo desenho da lista do dashboard) ——— */
+.listCard {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.listCard[data-framed] {
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  overflow: clip;
+}
+.tableWrap {
+  container: ctable / inline-size;
+  min-width: 0;
+}
+.listCard[data-framed] .tableWrap {
+  padding: 6px 6px 0;
+}
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: auto;
+}
+.table th {
+  height: 36px;
+  padding: 0 12px;
+  font: var(--t-caption-strong);
+  color: var(--muted);
+  text-align: left;
+  white-space: nowrap;
+  background: var(--g-50);
+}
+.table th:first-child {
+  border-radius: var(--r-md) 0 0 var(--r-md);
+}
+.table th:last-child {
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+}
+.table td {
+  height: 46px;
+  padding: 6px 12px;
+  font: var(--t-body);
+  color: var(--text);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--line-soft);
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.table tbody tr:hover td {
+  background: var(--g-25);
+}
+.table tbody tr:focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: -2px;
+}
+/* Linha com menu de contexto aberto: a seleção grande pinta as células. */
+.table tbody tr[data-context-open] td {
+  background: var(--select-bg);
+}
+.rowsIn {
+  animation: rowsIn var(--dur-1) var(--ease-out);
+}
+@keyframes rowsIn {
+  from {
+    opacity: 0;
+  }
+}
+.cellName {
+  display: block;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 340px;
+}
+/* Ativo · #código numa linha só: no estreito, o nome do ativo encurta e o código fica inteiro. */
+.cellSub {
+  display: grid;
+  grid-template-columns: minmax(0, auto) auto;
+  justify-content: start;
+  column-gap: 0.27em;
+  min-width: 0;
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.subAsset {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.subId {
+  font-variant-numeric: tabular-nums;
+}
+.cellBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.colMoney {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+td.colMoney {
+  font-weight: 500;
+  color: var(--ink) !important;
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font: var(--t-body);
+  color: var(--text);
+  white-space: nowrap;
+}
+.status i {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dot);
+}
+.tableWrap[data-compact] .cellName {
+  max-width: 260px;
+}
+@container ctable (max-width: 720px) {
+  .colAdvertiser {
+    display: none;
+  }
+}
+@container ctable (max-width: 520px) {
+  .colStatus {
+    display: none;
+  }
+  .tableWrap .cellName {
+    max-width: none;
+    white-space: normal;
+  }
+}
+
+/* ——— Menu lateral ——— */
+.navStrip {
+  width: 100%;
+  max-width: 236px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--g-25);
+}
+
+/* ——— Cabeçalho ——— */
+.persona {
+  display: block;
+  width: 184px;
+}
+.bellStates {
+  display: grid;
+  gap: 32px;
+}
+.bellOpen {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: end;
+  gap: 6px;
+  max-width: 100%;
+  margin-inline: auto;
+}
+.bellOpen > [role='menu'] {
+  max-width: 100%;
+}
+
+/* ——— Breadcrumbs ——— */
+.narrowCrumbs {
+  width: 100%;
+  max-width: 380px;
+}
+.moreOpen {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+}
+.moreOpen > :last-child {
+  margin-left: 42px;
+}
+
+/* ——— Abas ——— */
+.detailTabs {
+  display: grid;
+  min-width: 0;
+}
+.tabPanel {
+  padding-top: 20px;
+  animation: rowsIn var(--dur-2) var(--ease-out);
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+.metrics > div {
+  display: grid;
+  gap: 2px;
+  padding: 14px 18px 16px;
+}
+.metrics > div + div {
+  border-left: 1px solid var(--line);
+}
+.metrics dt {
+  font: var(--t-small);
+  color: var(--muted);
+}
+.metrics dd {
+  margin: 4px 0 0;
+  font: var(--t-kpi);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.metrics span {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+@media (max-width: 760px) {
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .metrics > div:nth-child(3) {
+    border-left: 0;
+  }
+  .metrics > div:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+}
+.chartHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font: var(--t-small);
+  color: var(--muted);
+}
+.chartHead strong {
+  font: var(--t-figure);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 96px;
+  margin-top: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.bars i {
+  flex: 1;
+  min-width: 0;
+  border-radius: 3px 3px 0 0;
+  background: var(--b-200);
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.bars i[data-last] {
+  background: var(--b-600);
+}
+.bars i:hover {
+  background: var(--b-400);
+}
+.chartAxis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.sizes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  width: 100%;
+}
+.sizeTabs {
+  width: 100%;
+  padding: 8px 20px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.panelList {
+  display: grid;
+  margin: 0;
+  padding: 4px 0 0;
+  list-style: none;
+  animation: rowsIn var(--dur-1) var(--ease-out);
+}
+.panelList li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  font: var(--t-body);
+  color: var(--text);
+  border-bottom: 1px solid var(--line-soft);
+}
+.panelList li:last-child {
+  border-bottom: 0;
+}
+.panelList li > :last-child {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.panelList li > [data-missing] {
+  color: var(--red-ink);
+}
+.panel .panelList {
+  padding: 4px 16px 6px;
+}
+.panel {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.panelHead {
+  padding: 14px 16px 2px;
+}
+.panelHead strong {
+  font: var(--t-title-3);
+  color: var(--ink);
+}
+.panel > [role='tablist'] {
+  --tabs-inset: 16px;
+}
+@media (max-width: 900px) {
+  .sizes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* Celular: as abas sangram até a borda e a próxima aparece pela metade. */
+.bleedTabs > [role='tablist'] {
+  --tabs-inset: 16px;
+  gap: 16px;
+}
+.cardList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  animation: rowsIn var(--dur-1) var(--ease-out);
+}
+.cardList li {
+  display: grid;
+  gap: 2px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.cardList strong {
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.cardMeta {
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.tabCell {
+  width: 100%;
+}
+
+/* ——— Paginação ——— */
+.footFrame {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: clip;
+}
+.footFrame > div > div {
+  box-shadow: none;
+}
+.arrows {
+  display: inline-flex;
+  gap: 2px;
+}
+
+/* ——— Etapas ——— */
+.creationHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+  min-height: 68px;
+  padding: 12px 32px 14px;
+}
+@media (max-width: 640px) {
+  .creationHead {
+    padding: 12px 16px 14px;
+  }
+}
+.creationTitle {
+  display: grid;
+  flex-shrink: 0;
+}
+.creationTitle h3 {
+  font: var(--t-figure-lg);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.creationTitle span {
+  font: var(--t-small);
+  color: var(--muted);
+}
+.creationSteps {
+  flex: 1 1 360px;
+  min-width: 0;
+}
+.sideColumn {
+  width: 320px;
+  max-width: 100%;
+  padding: 12px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--g-25);
+}
+.phoneCreation {
+  display: grid;
+  gap: 10px;
+  padding: 12px 16px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.phoneCreationTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-right: -8px;
+}
+.phoneCreationTitle h3 {
+  font: var(--t-figure-lg);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.stepChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: var(--t-small-strong);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.stepChip[data-state='current'] {
+  color: var(--ink);
+}
+.stepChip[data-state='done'],
+.stepChip[data-state='warn'] {
+  color: var(--text);
+}
+.stepChip[data-state='error'] {
+  color: var(--red-ink);
+}
+.stepChip[data-state='blocked'] {
+  color: var(--subtle);
+}
+
+/* ——— Menu de opções ——— */
+.menuContexts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  width: 100%;
+}
+.menuHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.accountStrip {
+  width: 236px;
+  max-width: 100%;
+  padding: 8px 12px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--g-25);
+}
+@media (max-width: 900px) {
+  .menuContexts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* Legenda alinhada a cada linha do painel parado (itens 32 · com motivo 48 · separador 9). */
+.menuStates {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  max-width: 100%;
+}
+.menuStates > [role='menu'] {
+  max-width: calc(100% - 112px);
+}
+.menuCaptions {
+  position: relative;
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 96px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.menuCaptions li {
+  position: absolute;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  translate: 0 -50%;
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+  transition: opacity var(--dur-2) var(--ease-out);
+}
+.menuCaptions li::before {
+  content: '';
+  width: 12px;
+  height: 1px;
+  background: var(--g-300);
+}
+
+
+/* ——— Menu de contexto ——— */
+.contextStack {
+  display: grid;
+  gap: 24px;
+  width: 100%;
+  min-width: 0;
+}
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+.column {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  min-height: 248px;
+  padding: 10px 8px 8px;
+  border-radius: var(--r-lg);
+  background: var(--g-50);
+}
+.columnHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+.columnHead strong {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.columnBody {
+  display: grid;
+  gap: 8px;
+}
+.leadCard {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  cursor: default;
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+  animation: rowsIn var(--dur-2) var(--ease-out);
+}
+.leadCard:hover {
+  border-color: var(--line-hover);
+}
+.leadCard:focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+}
+.leadCard[data-force-open] {
+  background: var(--select-bg);
+  border-color: var(--select-line);
+}
+.leadHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.leadHead strong {
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.leadCompany {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: var(--t-small);
+  color: var(--text);
+}
+.leadMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font: var(--t-caption);
+  color: var(--muted);
+}
+@media (max-width: 760px) {
+  .board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .column {
+    min-height: 0;
+  }
+}
+.phoneLongPress {
+  position: relative;
+  display: grid;
+  gap: 0;
+  padding-bottom: 150px;
+}
+.pressPanel {
+  position: absolute;
+  top: 54px;
+  left: 72px;
+}
+
+/* ——— Paleta ——— */
+.quickSearch kbd {
+  margin-left: 4px;
+  margin-right: -4px;
+}
+.quickSearchIcon {
+  display: none;
+}
+@media (max-width: 640px) {
+  .quickSearch {
+    display: none;
+  }
+  .quickSearchIcon {
+    display: inline-flex;
+  }
+}
+.paletteFrame {
+  width: 600px;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  background: var(--paper);
+  box-shadow: var(--shadow-xl);
+  overflow: clip;
+}
+.paletteFrame [role='listbox'] {
+  max-height: 300px;
+}
+
+/* ——— Seletor de portal ——— */
+.portalSwap {
+  display: grid;
+  gap: 20px;
+  animation: portalIn var(--dur-3) var(--ease-out);
+}
+@keyframes portalIn {
+  from {
+    opacity: 0;
+  }
+}
+.emptyPortal {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 48px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  font: var(--t-body);
+  color: var(--muted);
+}
+.emptyPortal strong {
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.identityStrip {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+  height: 52px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--g-25);
+}
+.portalOpen {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+}
+.portalOpen > :last-child {
+  margin-left: 4px;
+}
+.railStrip {
+  width: 66px;
+  height: 54px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: clip;
+}
+.railStrip [data-part='sidebar'] {
+  border-right: 0;
+}
+.railStrip [data-part='sidebar'] > div:first-child {
+  border-bottom: 0;
+}

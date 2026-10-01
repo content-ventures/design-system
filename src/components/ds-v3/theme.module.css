@@ -1,0 +1,351 @@
+/*
+ * MediaOn Design System V3 — tokens.
+ * Rampas próprias, frias (matiz ~255–262). Nenhum valor copiado de DS público.
+ * Regra de uso: telas consomem só os papéis (canvas, paper, ink, accent…);
+ * as rampas numeradas existem para compor os papéis e os tons de status.
+ */
+.theme {
+  /* Neutros frios */
+  --g-0: #ffffff;
+  --g-25: #fafbfc;
+  --g-50: #f6f7f9;
+  --g-75: #f1f3f6;
+  --g-100: #ebedf1;
+  --g-150: #e3e6eb;
+  --g-200: #d8dce3;
+  --g-300: #c0c6d0;
+  --g-400: #9aa1ae;
+  --g-500: #747c8b;
+  --g-600: #5a6272;
+  --g-700: #424958;
+  --g-800: #2c323e;
+  --g-900: #191d27;
+  --g-950: #10131a;
+
+  /* Azul MediaOn — ação, foco e seleção */
+  --b-25: #f5faff;
+  --b-50: #eef6ff;
+  --b-100: #dfeeff;
+  --b-200: #c4e0fb;
+  --b-300: #94c9fa;
+  --b-400: #4fa6f7;
+  --b-500: #1a8cf5;
+  --b-600: #0875db;
+  --b-700: #0869c4;
+  --b-800: #0a559c;
+  --b-900: #0c4477;
+
+  /* Tons de status: fundo suave, fio, sinal (ponto/ícone) e texto */
+  --green-bg: #ecf8f1;
+  --green-line: #cdeedb;
+  --green-dot: #1fa463;
+  --green-ink: #137046;
+  --amber-bg: #fff5e3;
+  --amber-line: #fbe3b4;
+  --amber-dot: #e8950f;
+  --amber-ink: #935700;
+  --orange-bg: #fff1ea;
+  --orange-line: #fdd9c6;
+  --orange-dot: #f0662a;
+  --orange-ink: #b1421a;
+  --red-bg: #fdeff0;
+  --red-line: #f8d3d6;
+  --red-dot: #e0444f;
+  --red-ink: #b92a36;
+  --violet-bg: #f4f1ff;
+  --violet-line: #e2dafd;
+  --violet-dot: #7c5cf0;
+  --violet-ink: #5d3fcf;
+  --teal-bg: #eaf8f8;
+  --teal-line: #c9ecee;
+  --teal-dot: #14a3ad;
+  --teal-ink: #0b7178;
+  --pink-bg: #fdf0f6;
+  --pink-line: #f7d4e5;
+  --pink-dot: #e24b8e;
+  --pink-ink: #b0286a;
+  --blue-bg: var(--b-50);
+  --blue-line: var(--b-100);
+  --blue-dot: var(--b-500);
+  --blue-ink: var(--b-700);
+  --gray-bg: var(--g-75);
+  --gray-line: var(--g-150);
+  --gray-dot: var(--g-400);
+  --gray-ink: var(--g-600);
+
+  /* Papéis de superfície */
+  --canvas: #f3f4f7;
+  --paper: #ffffff;
+  --paper-sunken: var(--g-50);
+  --paper-hover: #f5f6f8;
+  --paper-pressed: var(--g-100);
+  /* Fios: borda real de 1px. Cartões usam --line; controles, --line-strong. */
+  --line: #e7e9ed;
+  --line-soft: #f0f1f4;
+  --line-strong: #dfe2e7;
+  --line-hover: #d2d6dd;
+  --overlay: rgb(14 17 26 / 0.3);
+
+  /* Papéis de texto */
+  --ink: #141824;
+  --text: #3a4151;
+  --muted: #697181;
+  --subtle: #99a0ad;
+  --on-accent: #ffffff;
+
+  /* Ação */
+  --accent: var(--b-600);
+  --accent-hover: var(--b-700);
+  --accent-soft: var(--b-50);
+  --accent-soft-hover: var(--b-100);
+  --accent-ink: var(--b-700);
+  --focus-ring: 0 0 0 3px rgb(8 117 219 / 0.16);
+
+  /* Profundidade: sombras curtas e claras. O contorno é sempre a borda, nunca a sombra. */
+  --shadow-xs: 0 1px 2px rgb(16 24 40 / 0.04);
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.03);
+  --shadow-md: 0 4px 12px -2px rgb(16 24 40 / 0.06), 0 2px 4px -2px rgb(16 24 40 / 0.03);
+  --shadow-lg: 0 12px 28px -8px rgb(16 24 40 / 0.1), 0 4px 8px -4px rgb(16 24 40 / 0.04);
+  --shadow-xl: 0 24px 56px -16px rgb(16 24 40 / 0.18), 0 8px 16px -8px rgb(16 24 40 / 0.05);
+
+  /* Raios */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 10px;
+  --r-xl: 12px;
+  --r-2xl: 16px;
+  --r-full: 999px;
+
+  /* Espaço (base 4) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+
+  /* Tipografia — uma família, três pesos. Escala contida (base 13px, como o V2 aprovado). */
+  --font: var(--font-v3), 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --t-display: 600 28px/36px var(--font);
+  --t-title-1: 600 22px/30px var(--font);
+  --t-title-2: 600 16px/24px var(--font);
+  --t-title-3: 600 14px/20px var(--font);
+  --t-body: 400 13px/20px var(--font);
+  --t-body-strong: 500 13px/20px var(--font);
+  --t-small: 400 12px/18px var(--font);
+  --t-small-strong: 500 12px/18px var(--font);
+  --t-caption: 400 11.5px/16px var(--font);
+  --t-caption-strong: 500 11.5px/16px var(--font);
+  --t-overline: 600 10.5px/14px var(--font);
+  /* Escala numérica e de página: página 24 > KPI ao vivo 22 > número de destaque 18 >
+     número de faixa 16 > seção 14 > corpo 13. */
+  --t-page: 600 24px/32px var(--font);
+  --t-kpi: 600 22px/28px var(--font);
+  --t-figure-lg: 600 18px/26px var(--font);
+  --t-figure: 600 16px/24px var(--font);
+  --track-display: -0.024em;
+  --track-title: -0.016em;
+  --track-tight: -0.006em;
+  --track-overline: 0.06em;
+
+  /* Movimento */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --dur-1: 120ms;
+  --dur-2: 180ms;
+  --dur-3: 280ms;
+  /* Coreografia (Contrato V3 · Movimento): saída sempre mais curta que a entrada;
+     --ease-move para o que já está na tela e muda de lugar (indicador, reordenar, pilha de toasts);
+     --ease-spring só em marcas de seleção (check, ponto do rádio, polegar do switch, selo). */
+  --dur-exit: 160ms;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-move: cubic-bezier(0.65, 0, 0.35, 1);
+  --stagger: 40ms;
+  --press-scale: 0.985;
+  --tip-delay: 250ms;
+  --hover-card-delay: 500ms;
+
+  /* Foco: anel de 2px com 2px de respiro. Campos trocam o anel por borda azul + halo. */
+  --focus-color: var(--b-500);
+  --focus-width: 2px;
+  --focus-offset: 2px;
+  --ring-field: 0 0 0 3px rgb(8 117 219 / 0.12);
+  --ring-invalid: 0 0 0 3px rgb(224 68 79 / 0.1);
+
+  /* Seleção. Grande (cartão, linha, pílula): fundo b-25 + fio b-300. Pequena (item ativo do menu
+     lateral, opção marcada, texto selecionado): b-100. Hover de algo escolhível: fio b-200. */
+  --select-bg: var(--b-25);
+  --select-line: var(--b-300);
+  --select-ink: var(--b-700);
+  --select-strong: var(--b-100);
+  --choice-hover-line: var(--b-200);
+  --accent-pressed: var(--b-800);
+  --nav-active-bg: var(--b-100);
+  --nav-active-bar: var(--b-600);
+
+  /* Destrutiva sólida */
+  --danger: #d9363f;
+  --danger-hover: #c92f38;
+  --danger-pressed: #b72b34;
+  --danger-soft-hover: #fbe4e6;
+
+  /* Indisponível: perde sombra e cor, nunca some. */
+  --disabled-bg: var(--g-50);
+  --disabled-line: var(--line);
+  --disabled-ink: var(--subtle);
+  --disabled-icon: var(--g-300);
+
+  /* Ícones (lucide): tamanhos e traço únicos */
+  --icon-xs: 12px;
+  --icon-sm: 14px;
+  --icon-md: 16px;
+  --icon-lg: 18px;
+  --icon-xl: 20px;
+  --icon-stroke: 1.75;
+  --icon-quiet: var(--g-400);
+  --icon-rest: var(--g-500);
+  --icon-hover: var(--g-700);
+
+  /* Elevação: só o que flutua. Superfícies em repouso não têm sombra. */
+  --shadow-drag: 0 16px 32px -12px rgb(16 24 40 / 0.18), 0 4px 8px -4px rgb(16 24 40 / 0.06);
+  --shadow-dark: 0 16px 32px -12px rgb(10 12 20 / 0.45);
+  --overlay-blur: 3px;
+  --z-sticky: 20;
+  --z-dock: 30;
+  --z-popover: 40;
+  --z-drawer: 60;
+  --z-modal: 70;
+  --z-toast: 90;
+  --z-tooltip: 1000;
+
+  /* Esqueleto: bloco chapado que pulsa devagar */
+  --skeleton: var(--g-100);
+  --skeleton-pulse: 1.4s;
+
+  /* Moldura do app (igual ao /dashboardv3) */
+  --sidebar-w: 236px;
+  --sidebar-w-collapsed: 64px;
+  --topbar-h: 52px;
+  --page-gutter: 32px;
+  --page-gutter-sm: 16px;
+  --content-max: 1760px;
+  --aside-w: 320px;
+  --action-bar-h: 64px;
+  --s-14: 56px;
+  --s-16: 64px;
+
+  /* Alturas de controle: uma só altura pequena (32) para busca, filtros, segmentado e botões. */
+  --h-sm: 32px;
+  --h-md: 36px;
+  --h-lg: 40px;
+
+  /* Acréscimos V3 (fundamentos) — só tokens novos; nenhum valor acima muda. */
+  /* Título de página no celular (≤760) e rótulo de grupo de campos (seção 14 > grupo 13 > campo 12). */
+  --t-page-sm: 600 22px/30px var(--font);
+  --t-group: 600 13px/20px var(--font);
+  /* Alturas de dado: campo herói de dinheiro e linhas de tabela (compacta = padrão do produto). */
+  --h-hero: 56px;
+  --row-h: 46px;
+  --row-h-comfortable: 60px;
+  /* Alvo mínimo de toque para checkbox, switch e ícones. */
+  --target-min: 40px;
+  /* Anel dentro de tabela, menu, grupo colado ou trilho com rolagem. */
+  --focus-offset-inset: -2px;
+  /* Menu lateral e marcas de check. */
+  --icon-nav: 17px;
+  --icon-stroke-nav: 1.5;
+  --icon-stroke-mark: 2.5;
+  /* Único movimento contínuo do produto: o ponto do que está no ar. */
+  --live-pulse: 2.2s;
+  /* Rede de segurança: se a regra global do V2 vencer em alguma ordem de carga, ao menos pinta b-500. */
+  --ds-focus: var(--focus-color);
+
+  color: var(--text);
+  background: var(--canvas);
+  font: var(--t-body);
+  font-synthesis: none;
+  font-feature-settings: 'cv11' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+/* Toque: alvos maiores quando o ponteiro é o dedo. */
+@media (pointer: coarse) {
+  .theme {
+    --h-sm: 36px;
+    --h-md: 44px;
+    --h-lg: 48px;
+  }
+}
+.theme,
+.theme *,
+.theme *::before,
+.theme *::after {
+  box-sizing: border-box;
+}
+:where(.theme) :where(button, input, select, textarea) {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+:where(.theme) :where(button) {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+:where(.theme) :where(h1, h2, h3, h4, p, figure, ul, ol) {
+  margin: 0;
+}
+:where(.theme) :where(a) {
+  color: inherit;
+  text-decoration: none;
+}
+.theme svg {
+  flex-shrink: 0;
+}
+/* Traço único dos ícones. Especificidade zero: regras de componente (marcas de check) prevalecem. */
+:where(.theme) :global(:where(svg.lucide)) {
+  stroke-width: 1.75;
+}
+/* Foco por teclado (Contrato V3 · §9). Especificidade 0,1,0 de propósito: empata com o
+   `:focus-visible` global do V2 (globals.css, anel índigo com respiro 3) e vence pela ordem, já que
+   este módulo carrega depois. Regras de componente (`.x:focus-visible`, 0,2,0) — respiro −2 em grupo
+   colado, tabela e menu — continuam valendo e herdam esta cor. */
+:where(.theme) :focus-visible {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+/* Estado forçado para pranchas (Contrato V3 · data-force): o mesmo anel do foco por teclado. */
+:where(.theme [data-force~='focus']) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+.theme ::selection {
+  background: var(--b-100);
+  color: var(--ink);
+}
+.theme code {
+  padding: 1px 5px;
+  border-radius: var(--r-xs);
+  font: 500 0.92em/1.4 var(--font);
+  color: var(--g-600);
+  background: var(--g-75);
+  border: 1px solid var(--line-soft);
+}
+.theme :where(.num, [data-num]) {
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme *,
+  .theme *::before,
+  .theme *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

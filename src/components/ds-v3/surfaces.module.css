@@ -1,0 +1,387 @@
+/*
+ * Superfícies (Contrato V3 · §5, §7, §10): papel, fio de 1px, --r-lg, nenhuma sombra em repouso.
+ * Estados do cartão-link: hover (fio --line-hover + g-25), pressionado (g-50), foco (anel no cartão),
+ * selecionado (--select-bg + --select-line), indisponível e carregando.
+ */
+
+/* ——— Card ——— */
+.card {
+  --card-ink: var(--ink);
+  position: relative;
+  min-width: 0;
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out);
+}
+.card[data-elevation='lifted'] {
+  box-shadow: var(--shadow-drag);
+}
+.card[data-pad='sm'] {
+  padding: var(--s-3);
+}
+.card[data-pad='md'] {
+  padding: var(--s-4);
+}
+.card[data-pad='lg'] {
+  padding: var(--s-5);
+}
+
+/* Cartão-link: o cartão inteiro reage; o alvo real é o CardLink esticado. */
+.card[data-interactive='true'] {
+  cursor: pointer;
+}
+.card[data-interactive='true']:is(:hover, [data-force~='hover']) {
+  border-color: var(--line-hover);
+  background: var(--g-25);
+}
+.card[data-interactive='true']:is(:active, [data-force~='active']) {
+  border-color: var(--line-hover);
+  background: var(--g-50);
+  transition-duration: 0ms;
+}
+.card[data-interactive='true']:has([data-card-link]:focus-visible) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+
+/* Selecionado: o mesmo azul quase imperceptível das escolhas grandes. */
+.card[data-selected='true'] {
+  border-color: var(--select-line);
+  background: var(--select-bg);
+}
+.card[data-selected='true'][data-interactive='true']:is(:hover, [data-force~='hover']) {
+  border-color: var(--b-400);
+  background: var(--b-50);
+}
+.card[data-selected='true'][data-interactive='true']:is(:active, [data-force~='active']) {
+  background: var(--b-100);
+}
+
+/* Indisponível: perde o hover e a tinta, nunca some. */
+.card[data-disabled='true'] {
+  --card-ink: var(--text);
+  cursor: not-allowed;
+  background: var(--g-25);
+}
+.card[data-loading='true'] {
+  cursor: progress;
+}
+
+.cardLink {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  letter-spacing: inherit;
+  cursor: inherit;
+  outline: none;
+}
+.cardLink::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: 0;
+  border-radius: inherit;
+}
+.card[data-disabled='true'] .cardLink {
+  cursor: not-allowed;
+}
+
+/* ——— Cabeçalho de cartão ——— */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 24px;
+}
+.header[data-stacked='true'] {
+  align-items: flex-start;
+}
+.header[data-divided='true'] {
+  padding-bottom: var(--s-3);
+  margin-bottom: var(--s-4);
+  border-bottom: 1px solid var(--line-soft);
+}
+.headerText {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.title {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+  font: 600 13px/20px var(--font);
+  letter-spacing: var(--track-tight);
+  color: var(--card-ink, var(--ink));
+}
+.header[data-size='md'] .title {
+  font: var(--t-title-3);
+}
+.headerMeta {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.description {
+  font: var(--t-small);
+  color: var(--muted);
+}
+.actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ——— Tray: bandeja rebaixada que agrupa papéis (raio concêntrico: 10 + 4) ——— */
+.tray {
+  display: grid;
+  gap: 4px;
+  padding: 4px;
+  border-radius: calc(var(--r-lg) + 4px);
+  background: var(--g-50);
+  border: 1px solid var(--line);
+}
+.trayHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 4px 12px 2px;
+}
+.trayTitle {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.trayMeta {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.trayActions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ——— Rodapé anexado: faixa tingida que pertence ao cartão (alerta de item) ——— */
+.attached {
+  border: 1px solid var(--tone-line, var(--line));
+  border-radius: var(--r-lg);
+  background: var(--tone-bg, var(--g-75));
+}
+.attached > .card {
+  margin: -1px -1px 0;
+  border-color: var(--tone-line, var(--line));
+}
+.attachedNote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px 10px;
+  font: var(--t-small-strong);
+  color: var(--tone-ink, var(--text));
+}
+.attachedNote svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  stroke-width: 2;
+}
+.attached[data-tone='orange'] {
+  --tone-bg: var(--orange-bg);
+  --tone-line: var(--orange-line);
+  --tone-ink: var(--orange-ink);
+}
+.attached[data-tone='blue'] {
+  --tone-bg: var(--blue-bg);
+  --tone-line: var(--blue-line);
+  --tone-ink: var(--blue-ink);
+}
+.attached[data-tone='red'] {
+  --tone-bg: var(--red-bg);
+  --tone-line: var(--red-line);
+  --tone-ink: var(--red-ink);
+}
+.attached[data-tone='green'] {
+  --tone-bg: var(--green-bg);
+  --tone-line: var(--green-line);
+  --tone-ink: var(--green-ink);
+}
+.attached[data-tone='amber'] {
+  --tone-bg: var(--amber-bg);
+  --tone-line: var(--amber-line);
+  --tone-ink: var(--amber-ink);
+}
+
+/* ——— Lista de propriedades (compatibilidade): rótulo 12 --muted, valor 13 --ink ——— */
+.props {
+  display: grid;
+  grid-template-columns: minmax(120px, max-content) 1fr;
+  column-gap: 20px;
+  row-gap: 2px;
+  margin: 0;
+}
+.prop {
+  display: contents;
+}
+.props dt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  font: var(--t-small);
+  color: var(--muted);
+}
+.props dt svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--icon-quiet);
+}
+.props dd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 32px;
+  margin: 0;
+  font: var(--t-body);
+  color: var(--ink);
+  min-width: 0;
+}
+
+/* ——— Divisórias ——— */
+.divider {
+  height: 1px;
+  margin: 0 0 0 var(--divider-inset, 0);
+  border: 0;
+  background: var(--line);
+}
+.divider[data-tone='soft'],
+.vertical[data-tone='soft'] {
+  background: var(--line-soft);
+}
+.divider[data-spacing='sm'] {
+  margin-block: var(--s-2);
+}
+.divider[data-spacing='md'] {
+  margin-block: var(--s-4);
+}
+.vertical {
+  display: inline-block;
+  align-self: center;
+  flex-shrink: 0;
+  width: 1px;
+  height: var(--divider-length, 20px);
+  margin-block: var(--divider-inset, 0);
+  background: var(--line);
+}
+.vertical[data-spacing='sm'] {
+  margin-inline: var(--s-1);
+}
+.vertical[data-spacing='md'] {
+  margin-inline: var(--s-2);
+}
+.labeled {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-left: var(--divider-inset, 0);
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.labeled::before,
+.labeled::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.labeled[data-tone='soft']::before,
+.labeled[data-tone='soft']::after {
+  background: var(--line-soft);
+}
+.labeled[data-spacing='sm'] {
+  margin-block: var(--s-2);
+}
+.labeled[data-spacing='md'] {
+  margin-block: var(--s-4);
+}
+
+/* ——— MetaList: “·” desenhado à esquerda de cada item; a trilha recua 17px e o recorte
+   esconde o separador de começo de linha (nada pendurado na quebra). Números tabulares só no
+   item numérico (`data-num`): o hífen tabular da Inter é largo como um algarismo. ——— */
+.meta {
+  --meta-gap: 17px;
+  min-width: 0;
+  overflow: hidden;
+  font: var(--t-body);
+  color: var(--muted);
+}
+.meta[data-size='sm'] {
+  --meta-gap: 15px;
+  font: var(--t-small);
+}
+.meta[data-size='xs'] {
+  --meta-gap: 13px;
+  font: var(--t-caption);
+}
+.metaTrack {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: calc(var(--meta-gap) * -1);
+}
+.metaItem {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.metaItem[data-num] {
+  font-variant-numeric: tabular-nums;
+}
+/* Uma linha só: o primeiro fato cede espaço (reticências); os outros ficam inteiros. */
+.meta[data-wrap='false'] .metaTrack {
+  flex-wrap: nowrap;
+}
+.meta[data-wrap='false'] .metaItem {
+  flex: none;
+}
+.meta[data-wrap='false'] .metaItem:first-child {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.metaItem::before {
+  content: var(--meta-sep, '·');
+  display: inline-block;
+  width: var(--meta-gap);
+  text-align: center;
+  color: var(--g-300);
+}
+
+/* ——— Overline: rótulo de seção pequeno, em caixa alta espaçada (raríssimo) ——— */
+.overline {
+  font: var(--t-overline);
+  letter-spacing: var(--track-overline);
+  text-transform: uppercase;
+  color: var(--muted);
+}

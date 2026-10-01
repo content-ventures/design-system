@@ -1,0 +1,147 @@
+/*
+ * Popover e HoverCard — papel, fio de 1px, raio de superfície (10), sombra de flutuante. Sem seta.
+ * Fixos na janela num portal; entram em 180 ms a partir do lado do gatilho (opacidade, 4 px,
+ * escala .98) e saem em 120 ms.
+ */
+.popover {
+  position: fixed;
+  z-index: var(--z-popover);
+  max-width: calc(100vw - 16px);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: var(--text);
+  background: var(--paper);
+  box-shadow: var(--shadow-lg);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-200) transparent;
+  outline: none;
+  text-align: left;
+  transform-origin: top left;
+}
+.popover[data-padding='md'] {
+  padding: 12px 14px;
+}
+.popover[data-padding='none'] {
+  padding: 0;
+}
+.popover[data-side='top'] {
+  transform-origin: bottom left;
+}
+.popover[data-side='right'] {
+  transform-origin: left center;
+}
+.popover[data-side='left'] {
+  transform-origin: right center;
+}
+.popover[data-state='open'] {
+  animation: in var(--dur-2) var(--ease-out);
+}
+.popover[data-state='open'][data-side='top'] {
+  animation-name: inUp;
+}
+.popover[data-state='open'][data-side='right'] {
+  animation-name: inRight;
+}
+.popover[data-state='open'][data-side='left'] {
+  animation-name: inLeft;
+}
+.popover[data-state='closing'] {
+  pointer-events: none;
+  animation: out 120ms var(--ease-in) forwards;
+}
+@keyframes in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+@keyframes inUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+@keyframes inRight {
+  from {
+    opacity: 0;
+    transform: translateX(-4px) scale(0.98);
+  }
+}
+@keyframes inLeft {
+  from {
+    opacity: 0;
+    transform: translateX(4px) scale(0.98);
+  }
+}
+@keyframes out {
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+/* ——— Prancha: aberto e parado, no fluxo ——— */
+.pinned {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.pinned[data-side='top'] {
+  flex-direction: column-reverse;
+}
+.pinned[data-side='right'] {
+  flex-direction: row;
+}
+.pinned[data-side='left'] {
+  flex-direction: row-reverse;
+}
+.pinned[data-align='center'] {
+  align-items: center;
+}
+.pinned[data-align='end'] {
+  align-items: flex-end;
+}
+.pinned:is([data-side='right'], [data-side='left']) {
+  align-items: flex-start;
+}
+.popover[data-static] {
+  position: relative;
+  z-index: auto;
+  overflow: visible;
+}
+
+/* ——— Cabeçalho ——— */
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.title {
+  font: var(--t-group);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+.meta {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ——— Hover card ——— */
+.card {
+  padding: 14px 16px;
+}
+.card[data-state='open'] {
+  animation-duration: var(--dur-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popover[data-state] {
+    animation: none;
+  }
+}

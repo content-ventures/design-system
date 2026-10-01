@@ -1,0 +1,793 @@
+/*
+ * Kanban de leads e registro de atividade.
+ * Colunas em bandeja --g-50 (r-lg), cartões em papel com fio de 1 px e sem sombra em repouso.
+ * Sombra só no cartão em arrasto (--shadow-drag). Tracejado só no “Solte aqui”.
+ */
+
+/* ——— Ícone de etapa ——— */
+.stage {
+  flex-shrink: 0;
+  color: var(--tone, var(--g-400));
+}
+.stage[data-tone='gray'] {
+  --tone: var(--g-400);
+}
+.stage[data-tone='blue'] {
+  --tone: var(--b-500);
+}
+.stage[data-tone='violet'] {
+  --tone: var(--violet-dot);
+}
+.stage[data-tone='green'] {
+  --tone: var(--green-dot);
+}
+.stage[data-tone='red'] {
+  --tone: var(--red-dot);
+}
+.stage[data-tone='amber'] {
+  --tone: var(--amber-dot);
+}
+.stage[data-tone='orange'] {
+  --tone: var(--orange-dot);
+}
+.stage[data-tone='teal'] {
+  --tone: var(--teal-dot);
+}
+.stage[data-tone='pink'] {
+  --tone: var(--pink-dot);
+}
+
+/* ——— Quadro ——— */
+.board {
+  container: kanban / inline-size;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-200) transparent;
+}
+.board:focus-visible {
+  outline-offset: var(--focus-offset-inset);
+}
+/* Celular: colunas de 85% da largura do quadro, encaixando no início (só lá há pontos de encaixe). */
+.board {
+  scroll-snap-type: x mandatory;
+}
+:global(html[data-kanban-dragging]) .board {
+  scroll-snap-type: none;
+}
+@container kanban (max-width: 640px) {
+  .column:not([data-collapsed='true']) {
+    --col-w: 85cqw;
+    scroll-snap-align: start;
+  }
+  .column[data-collapsed='true'] {
+    scroll-snap-align: start;
+  }
+}
+.boardTrack {
+  display: flex;
+  align-items: stretch;
+  gap: var(--s-3);
+  width: max-content;
+  min-width: 100%;
+  padding-bottom: var(--s-2);
+}
+:global(html[data-kanban-dragging]),
+:global(html[data-kanban-dragging] *) {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+/* ——— Coluna ——— */
+.column {
+  --col-w: 280px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 var(--col-w);
+  width: var(--col-w);
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: var(--r-lg);
+  background: var(--g-50);
+  transition:
+    background-color var(--dur-2) var(--ease-out),
+    border-color var(--dur-2) var(--ease-out);
+}
+.column[data-drop='true'] {
+  border-color: var(--b-200);
+  background: var(--b-25);
+}
+.columnHead {
+  display: grid;
+  gap: 0;
+  padding: 10px 6px 8px 12px;
+}
+.columnTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+}
+.columnIcon {
+  display: inline-flex;
+}
+.columnIcon svg {
+  width: 14px;
+  height: 14px;
+}
+.columnTitle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 13px/20px var(--font);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+.columnActions {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-left: auto;
+}
+.columnTotal {
+  padding-left: 22px;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.swap {
+  display: inline-block;
+  animation: swap-in var(--dur-2) var(--ease-out);
+}
+@keyframes swap-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+}
+.columnBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  flex: 1;
+  min-height: 72px;
+  padding: 0 var(--s-2) var(--s-2);
+}
+.columnFoot {
+  display: flex;
+  padding: 0 var(--s-2) var(--s-2);
+}
+
+/* Recolhida: faixa de 44 px com ícone e contagem empilhados (sem texto girado). */
+.column[data-collapsed='true'] {
+  --col-w: 44px;
+}
+.column[data-collapsed='true'] > span {
+  display: flex;
+  flex: 1;
+}
+.collapsedButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+  flex: 1;
+  width: 100%;
+  padding: 14px 0;
+  border-radius: calc(var(--r-lg) - 1px);
+  color: var(--ink);
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.collapsedButton svg {
+  width: 14px;
+  height: 14px;
+}
+.collapsedButton:is(:hover, [data-force~='hover']) {
+  background: var(--g-75);
+}
+.collapsedButton:active {
+  background: var(--g-100);
+}
+.collapsedButton:focus-visible {
+  outline-offset: var(--focus-offset-inset);
+}
+
+/* ——— Espaço de destino ——— */
+.placeholder {
+  --h: 96px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  height: var(--h);
+  border: 1px dashed var(--b-300);
+  border-radius: var(--r-md);
+  background: var(--b-25);
+  overflow: hidden;
+}
+.placeholder span {
+  font: var(--t-caption-strong);
+  color: var(--b-600);
+  white-space: nowrap;
+}
+.placeholder[data-motion='enter'] {
+  animation: slot-grow var(--dur-3) var(--ease-move) both;
+}
+.placeholder[data-motion='exit'] {
+  animation: slot-shrink var(--dur-3) var(--ease-move) both;
+  pointer-events: none;
+}
+/* A coluna tem gap de 8: o espaço que cresce traz o gap junto (margem negativa no começo). */
+@keyframes slot-grow {
+  from {
+    height: 0;
+    margin-top: calc(var(--s-2) * -1);
+    opacity: 0;
+    border-width: 0;
+  }
+}
+@keyframes slot-shrink {
+  to {
+    height: 0;
+    margin-top: calc(var(--s-2) * -1);
+    opacity: 0;
+    border-width: 0;
+  }
+}
+
+/* ——— Coluna vazia ——— */
+.empty {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
+  min-height: 88px;
+  padding: var(--s-3);
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  text-align: center;
+  transition:
+    background-color var(--dur-2) var(--ease-out),
+    border-color var(--dur-2) var(--ease-out);
+}
+.empty[data-compact] {
+  min-height: 56px;
+}
+.emptyTitle {
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+.emptyDesc {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.empty[data-active] {
+  border: 1px dashed var(--b-300);
+  background: var(--b-25);
+}
+.empty[data-active] .emptyTitle {
+  color: var(--b-600);
+}
+
+/* Ícones de 24 px dos cabeçalhos e do cartão. */
+.mini {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px;
+  padding: 0 !important;
+  border-radius: var(--r-sm) !important;
+}
+.mini svg {
+  width: 15px;
+  height: 15px;
+}
+@media (pointer: coarse) {
+  .mini {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}
+
+/* ——— Próxima ação ——— */
+.nextAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font: var(--t-small);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.nextAction svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  color: var(--g-400);
+}
+.nextActionText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nextAction[data-due='today'] {
+  color: var(--orange-ink);
+}
+.nextAction[data-due='overdue'] {
+  color: var(--red-ink);
+}
+.nextAction:is([data-due='today'], [data-due='overdue']) svg {
+  color: currentColor;
+}
+.nextAction[data-variant='chip'] {
+  height: 22px;
+  padding: 0 8px 0 7px;
+  border-radius: var(--r-sm);
+  background: var(--g-75);
+  font: var(--t-caption-strong);
+  transition:
+    background-color var(--dur-2) var(--ease-out),
+    color var(--dur-2) var(--ease-out);
+}
+.nextAction[data-variant='chip'][data-due='today'] {
+  background: var(--orange-bg);
+}
+.nextAction[data-variant='chip'][data-due='overdue'] {
+  background: var(--red-bg);
+}
+.nextAction[data-done] {
+  color: var(--muted);
+}
+.nextAction[data-variant='chip'][data-done] {
+  background: var(--g-50);
+}
+.nextAction[data-done] svg {
+  color: var(--g-300);
+}
+.nextAction .nextActionText {
+  text-decoration: line-through;
+  text-decoration-color: transparent;
+  transition: text-decoration-color var(--dur-2) var(--ease-out);
+}
+.nextAction[data-done] .nextActionText {
+  text-decoration-color: currentColor;
+}
+
+/* ——— Cartão de lead ——— */
+.card {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  text-align: left;
+  scale: 1;
+  touch-action: manipulation;
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out),
+    scale var(--dur-2) var(--ease-out);
+}
+.card[data-open],
+.card[data-kanban-card] {
+  cursor: pointer;
+}
+.card:is(:hover, [data-force~='hover']) {
+  border-color: var(--line-hover);
+}
+.card:focus-visible {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+.card[data-selected] {
+  border-color: var(--select-line);
+  background: var(--select-bg);
+}
+.card[data-lifted] {
+  z-index: 2;
+  border-color: var(--line);
+  box-shadow: var(--shadow-drag);
+  scale: 1.02;
+}
+.card[data-ghost] {
+  border: 1px dashed var(--b-300);
+  background: var(--b-25);
+  box-shadow: none;
+}
+.card[data-ghost] > * {
+  visibility: hidden;
+}
+
+/* Cópia que segue o ponteiro (presa à janela). Sobe em 180 ms; ao soltar, assenta em 180 ms. */
+.dragLayer {
+  position: fixed;
+  z-index: var(--z-popover);
+  margin: 0;
+  pointer-events: none;
+  translate: 0 0;
+  scale: 1;
+  box-shadow: none;
+  cursor: grabbing;
+  transition:
+    scale var(--dur-2) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out),
+    border-color var(--dur-2) var(--ease-out);
+}
+.dragLayer[data-up] {
+  scale: 1.02;
+  border-color: var(--line);
+  box-shadow: var(--shadow-drag);
+}
+.dragLayer[data-settling] {
+  transition:
+    translate var(--dur-2) var(--ease-out),
+    scale var(--dur-2) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out),
+    opacity var(--dur-2) var(--ease-out);
+}
+.dragLayer[data-vanish] {
+  opacity: 0;
+  scale: 0.96;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+  min-height: 20px;
+}
+.company {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.code {
+  flex-shrink: 0;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.cardMenu {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin: -2px -6px -2px -2px;
+}
+.cardMenu svg {
+  color: var(--g-400);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.card:is(:hover, [data-force~='hover'], :focus-within) .cardMenu svg {
+  color: var(--g-600);
+}
+.cardMenu :is(button:hover, button[aria-expanded='true']) svg {
+  color: var(--ink);
+}
+.cardRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  min-width: 0;
+  min-height: 20px;
+}
+.cardRow[data-start] {
+  justify-content: flex-start;
+  gap: 6px;
+}
+.value {
+  flex-shrink: 0;
+  font: 600 13px/20px var(--font);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.005em;
+}
+.valueMissing {
+  font: var(--t-small);
+  color: var(--muted);
+}
+.origin {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--t-small);
+  color: var(--muted);
+}
+.owner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.ownerName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--t-small);
+  color: var(--text);
+}
+.age {
+  flex-shrink: 0;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.age[data-stale] {
+  font-weight: 500;
+  color: var(--amber-ink);
+}
+.cardLine {
+  display: flex;
+  min-width: 0;
+  padding-top: 2px;
+}
+.tags {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 2px;
+}
+.tags > :not(:last-child) {
+  min-width: 0;
+}
+.more {
+  display: inline-flex;
+}
+.outcome,
+.note {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  padding-top: 2px;
+  font: var(--t-caption-strong);
+  color: var(--text);
+}
+.outcome i,
+.note i {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green-dot);
+}
+.outcome[data-kind='lost'] {
+  font-weight: 400;
+  color: var(--muted);
+}
+.outcome[data-kind='lost'] i {
+  background: none;
+  box-shadow: inset 0 0 0 1.5px var(--g-300);
+}
+.note[data-tone='orange'] i {
+  background: var(--orange-dot);
+}
+.note[data-tone='red'] i {
+  background: var(--red-dot);
+}
+.note[data-tone='amber'] i {
+  background: var(--amber-dot);
+}
+.note[data-tone='blue'] i {
+  background: var(--blue-dot);
+}
+/* Perdido: o cartão inteiro baixa um degrau (sem opacidade na marca). */
+.card[data-outcome='lost'] .company,
+.card[data-outcome='lost'] .value {
+  color: var(--text);
+  font-weight: 500;
+}
+.card[data-outcome='lost'] .ownerName {
+  color: var(--muted);
+}
+.card[data-density='compact'] {
+  gap: 4px;
+  padding: 10px var(--s-3);
+}
+
+/* ——— Compositor de atividade ——— */
+.composer {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.composer > :first-child {
+  justify-self: start;
+}
+.composerText {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.composerError {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: var(--t-caption-strong);
+  color: var(--red-ink);
+  animation: swap-in var(--dur-2) var(--ease-out);
+}
+.composerError svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.composerFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) 10px;
+  min-width: 0;
+}
+.composerLabel {
+  font: var(--t-small-strong);
+  color: var(--text);
+  white-space: nowrap;
+}
+.composerNext {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.composerDate {
+  width: 150px;
+}
+.composerTime {
+  width: 96px;
+}
+.composerOwner {
+  width: 168px;
+}
+.composerSubmit {
+  margin-left: auto;
+}
+@container (max-width: 440px) {
+  .composerSubmit {
+    width: 100%;
+  }
+}
+.composer {
+  container-type: inline-size;
+}
+@media (max-width: 640px) {
+  .composerFoot {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .composerNext {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 104px;
+  }
+  .composerDate,
+  .composerTime,
+  .composerOwner {
+    width: auto;
+  }
+  .composerOwner {
+    grid-column: 1 / -1;
+  }
+  .composerSubmit {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* ——— Linha do tempo de atividades ——— */
+.feed {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.entry {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+.entry[data-enter] {
+  animation: entry-in var(--dur-3) var(--ease-out);
+}
+@keyframes entry-in {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+.entryInner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  min-height: 0;
+  overflow: hidden;
+  padding-bottom: var(--s-5);
+}
+.entry:last-child .entryInner {
+  padding-bottom: 0;
+}
+.entry:not(:last-child) .entryInner::before {
+  content: '';
+  position: absolute;
+  top: 26px;
+  bottom: 6px;
+  left: 9.5px;
+  width: 1px;
+  background: var(--line);
+}
+.entryMarker {
+  display: inline-flex;
+  padding-top: 0;
+}
+.entryBody {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.entryHead {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+  min-height: 20px;
+}
+.entryTitle {
+  flex: 1;
+  min-width: 0;
+  font: var(--t-body);
+  color: var(--text);
+}
+.entryTitle b {
+  font-weight: 500;
+  color: var(--ink);
+}
+.entryWhen {
+  flex-shrink: 0;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.entryMenu {
+  display: inline-flex;
+  margin: -2px -4px -2px 0;
+}
+.entryMenu svg {
+  color: var(--g-400);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.entry:is(:hover, [data-force~='hover'], :focus-within) .entryMenu svg {
+  color: var(--g-600);
+}
+.entryText {
+  font: var(--t-body);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.entryNext {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px var(--s-3);
+  padding-top: 4px;
+}

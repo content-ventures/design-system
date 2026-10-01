@@ -1,0 +1,1183 @@
+/*
+ * AppShell — a moldura do /dashboardv3: menu lateral encostado em g-25 com fio à direita, topo de
+ * 52 px com fio (um único fio corre do menu ao conteúdo) e conteúdo branco direto.
+ * O item ativo é o único lugar do sistema com barra lateral azul.
+ */
+.shell {
+  container: shell / inline-size;
+  position: relative;
+  min-width: 0;
+  background: var(--paper);
+}
+.shell[data-fill] {
+  height: 100%;
+  overflow: clip;
+}
+.frame {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  min-height: 100dvh;
+  transition: grid-template-columns var(--dur-3) var(--ease-move);
+}
+.shell[data-fill] .frame {
+  height: 100%;
+  min-height: 0;
+}
+.shell[data-collapsed] .frame {
+  grid-template-columns: var(--sidebar-w-collapsed) minmax(0, 1fr);
+}
+
+/* ——— Menu lateral ——— */
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-width: 0;
+  background: var(--g-25);
+  border-right: 1px solid var(--line);
+}
+.shell[data-fill] .sidebar {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+}
+/* Mesma altura do topo: o fio da identidade continua o fio do topo em y = 52. */
+.identity {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: var(--topbar-h);
+  padding: 0 10px;
+  border-bottom: 1px solid var(--line);
+}
+.identity > * {
+  flex: 1;
+  min-width: 0;
+}
+.sideTools,
+.searchSlot {
+  flex-shrink: 0;
+  padding: 8px 8px 0;
+}
+
+.product {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 0 6px;
+}
+.logo {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-md);
+  color: var(--on-accent);
+  background: var(--b-600);
+}
+.logo svg {
+  width: 17px;
+  height: 17px;
+}
+.productText {
+  display: grid;
+  min-width: 0;
+}
+.productText strong {
+  font: var(--t-body-strong);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+.productText span {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+
+/* Âncora do Menu ocupa a largura da barra */
+.menuWrap,
+.menuWrap > span {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Seletor de portal: linha chapada, sem cartão, fio ou sombra. */
+.portal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 6px;
+  border-radius: var(--r-md);
+  text-align: left;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.portal:is(:hover, [data-force~='hover'], [aria-expanded='true']) {
+  background: var(--g-75);
+}
+.portal:is(:active, [data-force~='active']) {
+  background: var(--g-100);
+}
+.portal:is(:focus-visible, [data-force~='focus']) {
+  outline: 2px solid var(--focus-color);
+  outline-offset: -2px;
+}
+.portalText,
+.accountText {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+.portalText strong,
+.accountText strong {
+  font: var(--t-small-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.portalText span,
+.accountText span {
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.portalIcon {
+  width: 15px;
+  height: 15px;
+  color: var(--g-400);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.portal:is(:hover, [data-force~='hover'], [aria-expanded='true']) .portalIcon,
+.account:is(:hover, [aria-expanded='true']) .portalIcon {
+  color: var(--g-600);
+}
+
+/* Busca do menu: discreta, sem caixa; o foco desenha um anel azul claro. */
+.filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  height: 32px;
+  margin: 8px 8px 2px;
+  padding: 0 4px 0 12px;
+  border-radius: var(--r-sm);
+  color: var(--g-400);
+  cursor: text;
+}
+.filter > svg {
+  width: 15px;
+  height: 15px;
+}
+.filter input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: var(--t-body);
+  color: var(--ink);
+  appearance: none;
+}
+.filter input::-webkit-search-cancel-button {
+  display: none;
+}
+.filter input::placeholder {
+  color: var(--subtle);
+}
+.filter:focus-within {
+  outline: 2px solid var(--b-200);
+  outline-offset: 0;
+}
+.filterClear {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-xs);
+  color: var(--g-400);
+  transition:
+    background-color var(--dur-1),
+    color var(--dur-1);
+}
+.filterClear:hover {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.filterClear svg {
+  width: 14px;
+  height: 14px;
+}
+.mark {
+  padding: 0 1px;
+  margin: 0 -1px;
+  border-radius: 3px;
+  color: var(--ink);
+  background: var(--b-100);
+}
+.navItem[aria-current='page'] .mark {
+  background: var(--b-200);
+}
+
+/* Botão de busca rápida (abre ⌘K) */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 32px;
+  padding: 0 6px 0 12px;
+  border-radius: var(--r-sm);
+  font: var(--t-body);
+  color: var(--subtle);
+  text-align: left;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.search:hover {
+  color: var(--muted);
+  background: var(--g-75);
+}
+.search > svg {
+  width: 15px;
+  height: 15px;
+  color: var(--g-400);
+}
+.searchText {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ——— Navegação ——— */
+.nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 8px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-200) transparent;
+  /* Se faltar altura, o fim da lista esmaece em vez de cortar um item ao meio. */
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 16px), transparent);
+}
+.group + .group {
+  margin-top: 16px;
+}
+.groupLabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: calc(100% - 22px);
+  margin: 0 11px 6px;
+  font: var(--t-caption-strong);
+  color: var(--muted);
+  text-align: left;
+}
+button.groupLabel {
+  border-radius: var(--r-xs);
+}
+.groupLabel svg {
+  width: 13px;
+  height: 13px;
+  margin-left: auto;
+  color: var(--g-400);
+  opacity: 0;
+  transition:
+    transform var(--dur-2) var(--ease-out),
+    opacity var(--dur-1);
+}
+button.groupLabel:hover {
+  color: var(--ink);
+}
+button.groupLabel:is(:hover, :focus-visible) svg,
+button.groupLabel[aria-expanded='false'] svg {
+  opacity: 1;
+}
+button.groupLabel[aria-expanded='false'] svg {
+  transform: rotate(-90deg);
+}
+.group:first-child > .groupRule {
+  display: none;
+}
+.groupRule {
+  width: 16px;
+  height: 1px;
+  margin: 4px auto 10px;
+  border: 0;
+  background: var(--line-strong);
+}
+.list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 11px;
+  border-radius: var(--r-md);
+  font: var(--t-body);
+  color: var(--text);
+  text-align: left;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+/* A barra do ativo existe sempre e só aparece: troca de item é um crossfade, não um salto. */
+.navItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  bottom: 9px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--nav-active-bar);
+  opacity: 0;
+  transform: scaleY(0.5);
+  transition:
+    opacity var(--dur-1) var(--ease-out),
+    transform var(--dur-2) var(--ease-out);
+}
+.navItem:is(:hover, [data-force~='hover']) {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.navItem:is(:active, [data-force~='active']) {
+  color: var(--ink);
+  background: var(--g-100);
+}
+.navItem:is(:focus-visible, [data-force~='focus']) {
+  outline: 2px solid var(--focus-color);
+  outline-offset: -2px;
+}
+.navItem[aria-current='page'] {
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--nav-active-bg);
+}
+.navItem[aria-current='page']::before {
+  opacity: 1;
+  transform: none;
+}
+.navIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+}
+.navIcon svg {
+  width: 17px;
+  height: 17px;
+  color: var(--g-500);
+  stroke-width: 1.5;
+  transition: color var(--dur-1) var(--ease-out);
+}
+.navItem:is(:hover, [data-force~='hover']) .navIcon svg {
+  color: var(--g-600);
+}
+.navItem[aria-current='page'] .navIcon svg {
+  color: var(--b-600);
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dot);
+}
+.navLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.navCount {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.navCount[data-tone='accent'] {
+  font-weight: 500;
+  color: var(--b-700);
+}
+.navEmpty {
+  padding: 8px 11px;
+  font: var(--t-small);
+  color: var(--muted);
+}
+.pip {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--b-600);
+  box-shadow: 0 0 0 1.5px var(--g-25);
+}
+.navItem:hover .pip {
+  box-shadow: 0 0 0 1.5px var(--g-75);
+}
+.navItem[aria-current='page'] .pip {
+  box-shadow: 0 0 0 1.5px var(--nav-active-bg);
+}
+
+/* ——— Rodapé do menu ——— */
+.sideFoot {
+  flex-shrink: 0;
+  display: grid;
+  gap: 2px;
+  padding: 8px 12px 10px;
+  border-top: 1px solid var(--line);
+}
+.account {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+  padding: 6px 4px;
+  border-radius: var(--r-md);
+  text-align: left;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.account:is(:hover, [aria-expanded='true']) {
+  background: var(--g-75);
+}
+.account:active {
+  background: var(--g-100);
+}
+.account:focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: -2px;
+}
+.footNote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 0 4px;
+  font: var(--t-caption);
+  color: var(--muted);
+}
+
+/* ——— Recolhida (64 px): só ícones, dica à direita ——— */
+.shell[data-collapsed] .identity {
+  justify-content: center;
+  padding: 0 12px;
+}
+.shell[data-collapsed] .identity > * {
+  flex: 0 0 auto;
+}
+.shell[data-collapsed] .menuWrap,
+.shell[data-collapsed] .menuWrap > span {
+  width: auto;
+}
+.shell[data-collapsed] .portal,
+.shell[data-collapsed] .account {
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+.shell[data-collapsed] .product {
+  justify-content: center;
+  padding: 0;
+}
+.shell[data-collapsed] .searchSlot {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 0;
+}
+.shell[data-collapsed] .search {
+  justify-content: center;
+  width: 40px;
+  padding: 0;
+}
+.shell[data-collapsed] .nav {
+  padding: 12px 12px 16px;
+}
+.shell[data-collapsed] .navItem {
+  justify-content: center;
+  width: 40px;
+  min-height: 36px;
+  padding: 0;
+}
+.shell[data-collapsed] .sideFoot {
+  justify-items: center;
+  padding: 8px 12px 10px;
+}
+
+.tipAnchor {
+  position: relative;
+  display: inline-flex;
+}
+.tip {
+  position: fixed;
+  z-index: var(--z-tooltip);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border-radius: var(--r-md);
+  font: var(--t-caption-strong);
+  color: #fff;
+  white-space: nowrap;
+  background: var(--g-900);
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  translate: 0 -50%;
+  animation: tipIn var(--dur-2) var(--ease-out);
+}
+@keyframes tipIn {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+}
+.tip::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: 8px;
+  height: 8px;
+  translate: 50% -50%;
+  rotate: 45deg;
+  border-radius: 0 0 0 2px;
+  background: var(--g-900);
+}
+.tipDetail {
+  font-weight: 400;
+  color: rgb(255 255 255 / 0.64);
+  font-variant-numeric: tabular-nums;
+}
+.tip kbd {
+  padding: 1px 4px;
+  border-radius: 4px;
+  font: 500 10.5px/1.3 var(--font);
+  color: rgb(255 255 255 / 0.72);
+  background: rgb(255 255 255 / 0.12);
+}
+
+/* ——— Conteúdo ——— */
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.shell[data-fill] .main {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-200) transparent;
+}
+.content {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding: 28px var(--page-gutter) 48px;
+  container-type: inline-size;
+  container-name: page;
+}
+
+/* Véu da gaveta */
+.veil {
+  display: none;
+}
+
+/* ——— Gaveta: até 1199 px (medido no shell) o menu sai da grade ——— */
+.shell[data-drawer] .frame {
+  grid-template-columns: minmax(0, 1fr);
+}
+.shell[data-drawer] .sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: var(--z-drawer);
+  width: min(300px, 86vw);
+  height: 100dvh;
+  transform: translateX(-100%);
+  visibility: hidden;
+  transition:
+    transform var(--dur-3) var(--ease-out),
+    visibility 0s linear var(--dur-3);
+}
+.shell[data-drawer][data-fill] .sidebar {
+  position: absolute;
+  width: min(300px, 86%);
+  height: 100%;
+}
+.shell[data-drawer][data-nav-open] .sidebar {
+  transform: none;
+  visibility: visible;
+  box-shadow: var(--shadow-xl);
+  transition: transform var(--dur-3) var(--ease-out);
+}
+.shell[data-drawer] .veil {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-drawer) - 1);
+  display: block;
+  border: 0;
+  background: var(--overlay);
+  backdrop-filter: blur(var(--overlay-blur));
+  cursor: default;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-3) var(--ease-out);
+}
+.shell[data-drawer][data-fill] .veil {
+  position: absolute;
+}
+.shell[data-drawer][data-nav-open] .veil {
+  opacity: 1;
+  pointer-events: auto;
+}
+.shell[data-drawer] .topbar[data-menu='auto'] .menuButton {
+  display: inline-flex;
+}
+.shell[data-drawer] .topbar .toggle,
+.shell[data-drawer] .topbar .toggle + .topRule {
+  display: none;
+}
+@container shell (max-width: 1199px) {
+  .content {
+    padding-inline: 24px;
+  }
+}
+@container shell (max-width: 640px) {
+  .content {
+    padding: 20px var(--page-gutter-sm) 40px;
+  }
+}
+
+/* ——— Topo ——— */
+.topbar {
+  container: topbar / inline-size;
+  flex-shrink: 0;
+  z-index: var(--z-sticky);
+  height: var(--topbar-h);
+  border-bottom: 1px solid var(--line);
+  background: rgb(255 255 255 / 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.topbar[data-sticky] {
+  position: sticky;
+  top: 0;
+}
+/* O caminho começa no x do título (gutter 32) e o sino termina na borda direita da página. */
+.topInner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 100%;
+  min-width: 0;
+  padding: 0 25px 0 32px;
+}
+.menuButton {
+  display: none;
+  margin-left: -8px;
+}
+.topbar[data-menu='always'] .menuButton {
+  display: inline-flex;
+}
+.toggle {
+  margin-left: -8px;
+}
+.topRule {
+  width: 1px;
+  height: 16px;
+  margin: 0 -4px;
+  background: var(--line);
+}
+.topActions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+.topItem {
+  display: inline-flex;
+}
+.bell {
+  position: relative;
+  display: inline-flex;
+}
+.bellDot {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--b-500);
+  box-shadow: 0 0 0 1.5px var(--paper);
+  pointer-events: none;
+  animation: dotIn var(--dur-2) var(--ease-spring);
+}
+@keyframes dotIn {
+  from {
+    transform: scale(0);
+  }
+}
+.topAccount {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: background-color var(--dur-1);
+}
+.topAccount:hover,
+.topAccount[aria-expanded='true'] {
+  background: var(--g-75);
+}
+@container topbar (max-width: 1023px) {
+  .topInner {
+    padding: 0 17px 0 24px;
+  }
+}
+@container topbar (max-width: 760px) {
+  .topInner {
+    gap: 8px;
+    padding: 0 8px 0 16px;
+  }
+}
+/* Celular: botão do menu, só o nível atual e o sino — alvos quadrados de 40 px. */
+@container topbar (max-width: 640px) {
+  .topInner {
+    padding: 0 4px 0 16px;
+  }
+  .crumbs li:not(:last-child),
+  .crumbs li:last-child > .crumbSep {
+    display: none;
+  }
+  .topItem[data-phone='hide'] {
+    display: none;
+  }
+  .topActions {
+    gap: 4px;
+  }
+  .topbar .menuButton,
+  .topbar .bell button {
+    width: 40px;
+    height: 40px;
+  }
+  .topbar .menuButton {
+    margin-left: -12px;
+  }
+  .bellDot {
+    top: 12px;
+    right: 13px;
+  }
+}
+
+/* ——— Trilha ——— */
+.crumbs {
+  min-width: 0;
+}
+.crumbs ol {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.crumbs li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+.crumbs li:last-child {
+  flex-shrink: 1;
+}
+.crumbSep {
+  width: 14px;
+  height: 14px;
+  color: var(--g-300);
+  flex-shrink: 0;
+}
+.crumbLink,
+.crumbCurrent,
+.crumbBack {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 280px;
+  font: var(--t-body);
+  white-space: nowrap;
+  border-radius: var(--r-xs);
+}
+.crumbLink,
+.crumbBack {
+  padding: 3px 4px;
+  margin: -3px -4px;
+  border-radius: var(--r-sm);
+  color: var(--muted);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.crumbLink:is(:hover, [data-force~='hover']),
+.crumbBack:is(:hover, [data-force~='hover']) {
+  color: var(--ink);
+}
+/* Link da trilha: sublinhado fino no hover — o atual (500, ink) nunca sublinha, então não se confundem. */
+.crumbLink .crumbText {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--dur-1) var(--ease-out);
+}
+.crumbLink:is(:hover, [data-force~='hover']) .crumbText {
+  text-decoration-color: var(--line-hover);
+}
+.crumbCurrent {
+  font-weight: 500;
+  color: var(--ink);
+}
+.crumbText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.crumbLead {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.crumbBack {
+  gap: 2px;
+  margin-left: -6px;
+  font-weight: 500;
+  color: var(--text);
+}
+.crumbBack svg {
+  width: 16px;
+  height: 16px;
+  color: var(--g-500);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.crumbBack:hover svg {
+  color: var(--ink);
+}
+.crumbMore {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-sm);
+  color: var(--g-500);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.crumbMore:is(:hover, [data-force~='hover'], [aria-expanded='true']) {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.crumbMore:is(:active, [data-force~='active']) {
+  background: var(--g-100);
+}
+.crumbMore svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ——— Cabeçalho da página ——— */
+.pageHeader {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.pageRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 24px;
+}
+.pageTitles {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.pageTitle {
+  font: var(--t-title-1);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.pageDesc {
+  max-width: 64ch;
+  font: var(--t-body);
+  color: var(--muted);
+}
+.pageActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.pageToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+/* ——— Busca rápida ——— */
+.palette {
+  width: min(600px, calc(100vw - 32px));
+  max-height: min(520px, calc(100dvh - 18vh - 32px));
+  margin: 18vh auto auto;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  color: var(--text);
+  background: var(--paper);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+}
+.palette[open] {
+  display: flex;
+  flex-direction: column;
+  animation: paletteIn var(--dur-2) var(--ease-out);
+}
+.palette[data-closing] {
+  animation: paletteOut 120ms var(--ease-in) forwards;
+}
+.palette::backdrop {
+  background: var(--overlay);
+  backdrop-filter: blur(var(--overlay-blur));
+  animation: veilIn var(--dur-2) var(--ease-out);
+}
+.palette[data-closing]::backdrop {
+  animation: veilOut 120ms var(--ease-in) forwards;
+}
+@keyframes paletteIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+@keyframes paletteOut {
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+@keyframes veilIn {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes veilOut {
+  to {
+    opacity: 0;
+  }
+}
+.command {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+  background: var(--paper);
+}
+.cmdField {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  height: 48px;
+  padding: 0 12px 0 16px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.cmdField > svg {
+  width: 18px;
+  height: 18px;
+  color: var(--g-400);
+}
+.cmdField input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: none;
+  background: none;
+  font: 400 15px/22px var(--font);
+  color: var(--ink);
+}
+.cmdField input::placeholder {
+  color: var(--subtle);
+}
+.cmdResults {
+  min-height: 0;
+  overflow: hidden;
+  transition: height var(--dur-2) var(--ease-out);
+}
+.cmdList {
+  position: relative;
+  max-height: 360px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 6px 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-200) transparent;
+}
+.cmdGroup + .cmdGroup {
+  margin-top: 4px;
+}
+.cmdGroupLabel {
+  padding: 8px 10px 4px;
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+.cmdItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.cmdItem[aria-selected='true'] {
+  background: var(--g-75);
+}
+.cmdLead {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--g-500);
+}
+.cmdLead:empty {
+  visibility: hidden;
+}
+.cmdLead svg {
+  width: 16px;
+  height: 16px;
+}
+.cmdText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.cmdLabel {
+  flex: 0 1 auto;
+  min-width: 0;
+  font: var(--t-body);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cmdDesc {
+  flex: 0 100 auto;
+  min-width: 0;
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cmdTrail {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  font: var(--t-small);
+  color: var(--text);
+  white-space: nowrap;
+}
+.cmdEnter {
+  display: inline-flex;
+  opacity: 0;
+  transition: opacity var(--dur-1) var(--ease-out);
+}
+.cmdItem[aria-selected='true'] .cmdEnter {
+  opacity: 1;
+}
+.cmdLoading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 10px;
+  font: var(--t-body);
+  color: var(--muted);
+}
+.cmdLoading svg {
+  width: 16px;
+  height: 16px;
+  color: var(--g-400);
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* Painel estreito: o status à direita sai e o complemento desce para a segunda linha. */
+@container (max-width: 440px) {
+  .cmdTrail {
+    display: none;
+  }
+  .cmdItem {
+    height: auto;
+    min-height: 40px;
+    padding-block: 6px;
+  }
+  .cmdText {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+  .cmdDesc {
+    font: var(--t-caption);
+  }
+}
+.cmdEmpty {
+  padding: 32px 24px 36px;
+  font: var(--t-body);
+  color: var(--muted);
+  text-align: center;
+}

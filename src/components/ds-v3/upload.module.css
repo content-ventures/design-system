@@ -1,0 +1,391 @@
+/* ——— Upload ———
+ * Repouso: fio sólido line-strong, raio 8, altura estável 78. Tracejado b-400 só durante o arrasto.
+ * Até 560 px de largura disponível, a área empilha. */
+.dropzone {
+  width: 100%;
+  min-width: 0;
+  container-type: inline-size;
+}
+.zone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 78px;
+  padding: 12px 14px 12px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  box-shadow: var(--shadow-xs);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-1) var(--ease-out),
+    min-height var(--dur-3) var(--ease-out);
+}
+.zone:is(:hover, [data-force~='hover']):not([data-disabled]) {
+  border-color: var(--line-hover);
+  background: var(--g-25);
+}
+.zone:is(:active, [data-force~='active']):not([data-disabled]) {
+  background: var(--g-50);
+}
+.zone:focus-visible,
+.zone[data-force~='focus'] {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+}
+/* Arrastando: fio tracejado b-400 sobre b-25 e “Solte para enviar”. */
+.zone[data-over] {
+  border-style: dashed;
+  border-color: var(--b-400);
+  background: var(--b-25);
+  box-shadow: none;
+}
+.zone[data-invalid] {
+  border-color: var(--red-dot);
+  box-shadow: var(--ring-invalid);
+}
+.zone[data-invalid]:is(:hover, [data-force~='hover']) {
+  border-color: var(--red-dot);
+}
+.zone[data-disabled] {
+  min-height: 44px;
+  padding-block: 10px;
+  border-color: var(--disabled-line);
+  background: var(--disabled-bg);
+  box-shadow: none;
+  cursor: default;
+}
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.formatSlot {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 120px;
+}
+/* Quadro do formato: proporção exata, fio sólido b-300. */
+.format {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  overflow: clip;
+  border: 1px solid var(--b-300);
+  border-radius: var(--r-xs);
+  background: var(--b-25);
+  font: 500 11px/1 var(--font);
+  color: var(--b-700);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+}
+.format[data-image] {
+  border-color: transparent;
+  background: var(--g-50);
+  box-shadow: inset 0 0 0 1px rgb(16 24 40 / 0.06);
+}
+.format img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.zone[data-over] .format {
+  border-color: var(--b-400);
+  background: var(--b-50);
+}
+.glyph {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0 2px 0 4px;
+  color: var(--g-400);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.zone:is(:hover, [data-force~='hover']) .glyph {
+  color: var(--g-500);
+}
+.zone[data-over] .glyph {
+  color: var(--b-600);
+}
+
+.text {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+/* Título e “Solte para enviar” no mesmo lugar: crossfade de 120 ms. */
+.title {
+  display: grid;
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.titleRest,
+.titleOver {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+.titleOver {
+  color: var(--b-700);
+  opacity: 0;
+  transform: translateY(2px);
+}
+.zone[data-over] .titleRest {
+  opacity: 0;
+  transform: translateY(-2px);
+}
+.zone[data-over] .titleOver {
+  opacity: 1;
+  transform: none;
+}
+.spec {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font: var(--t-caption-strong);
+  color: var(--red-ink);
+}
+.error svg {
+  width: 14px;
+  height: 14px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+/* “Escolher arquivo”: aparência de botão secundário pequeno (a área toda é o botão). */
+.pick {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: var(--h-sm);
+  padding: 0 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  font: var(--t-small-strong);
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--shadow-xs);
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+.zone:is(:hover, [data-force~='hover']) .pick {
+  border-color: var(--line-hover);
+  background: var(--g-25);
+}
+.zone:is(:active, [data-force~='active']) .pick {
+  background: var(--g-75);
+  transform: scale(var(--press-scale));
+}
+.zone[data-over] .pick {
+  opacity: 0;
+}
+
+/* Indisponível: uma linha só. */
+.line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  white-space: nowrap;
+}
+.lineText {
+  font: var(--t-body-strong);
+  color: var(--muted);
+}
+.lineSpec {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: var(--t-caption);
+  color: var(--subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+@container (max-width: 560px) {
+  .zone:not([data-disabled]) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+  }
+  .formatSlot {
+    display: none;
+  }
+  .glyph {
+    display: none;
+  }
+  .line {
+    display: grid;
+    gap: 2px;
+    white-space: normal;
+  }
+}
+
+/* ——— FileRow ——— */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 78px;
+  min-width: 0;
+  padding: 12px 8px 12px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  animation: rowIn var(--dur-2) var(--ease-out);
+}
+@keyframes rowIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+}
+.row[data-status='error'] {
+  border-color: var(--red-line);
+}
+.row[data-compact] {
+  min-height: 52px;
+  gap: 12px;
+  padding: 8px 6px 8px 12px;
+}
+.thumbSlot {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 120px;
+}
+.rowGlyph {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--g-500);
+}
+.row[data-status='error'] .rowGlyph {
+  color: var(--red-ink);
+}
+.body {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.name {
+  display: flex;
+  min-width: 0;
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.meta {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.progressLine {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin: 4px 0 2px;
+}
+.track {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  overflow: clip;
+  border-radius: var(--r-full);
+  background: var(--g-100);
+}
+.track i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--b-600);
+  transition: width var(--dur-2) linear;
+}
+.pct {
+  min-width: 32px;
+  text-align: right;
+  font: var(--t-caption-strong);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.ok,
+.fail {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font: var(--t-caption-strong);
+}
+.msg {
+  flex: 1;
+  min-width: 0;
+}
+.ok {
+  color: var(--green-ink);
+  animation: rowIn var(--dur-2) var(--ease-out);
+}
+.ok svg {
+  width: 12px;
+  height: 12px;
+  margin-top: 2px;
+  stroke-width: var(--icon-stroke-mark);
+}
+.fail {
+  color: var(--red-ink);
+}
+.fail svg {
+  width: 14px;
+  height: 14px;
+  margin-top: 1px;
+}
+.retry {
+  margin-left: 4px;
+  white-space: nowrap;
+}
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  align-self: center;
+}
+@container (max-width: 560px) {
+  .thumbSlot {
+    width: auto;
+  }
+}
+@media (max-width: 560px) {
+  .row:not([data-compact]) {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .row:not([data-compact]) .thumbSlot {
+    width: 64px;
+    margin-top: 3px;
+  }
+  .row:not([data-compact]) .thumbSlot > * {
+    max-width: 64px;
+    height: auto !important;
+  }
+}

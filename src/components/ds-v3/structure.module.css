@@ -1,0 +1,982 @@
+/*
+ * Estrutura — PageHeader, Section/Panel, Accordion/Disclosure/ExpandableText, ScrollArea,
+ * ResizablePanels, DescriptionList e FixedFrame.
+ * Chapado, fio de 1px, sem sombra em repouso. Estados com gêmeo [data-force] para pranchas.
+ * Os blocos respondem à própria largura (container queries): funcionam dentro de molduras.
+ */
+
+/* ——————————————————————————— PageHeader ——————————————————————————— */
+.ph {
+  container: dsv3-page-header / inline-size;
+  display: grid;
+  gap: var(--s-6);
+  min-width: 0;
+}
+/* Respiro até o que vem embaixo; especificidade zero para o consumidor ajustar. */
+:where(.ph) {
+  margin-bottom: var(--s-6);
+}
+:where(.ph[data-variant='frame']) {
+  margin-bottom: 0;
+}
+.ph[data-variant='frame'] {
+  gap: var(--s-3);
+}
+.phMain {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas: 'text actions more';
+  align-items: start;
+  column-gap: var(--s-2);
+  min-width: 0;
+}
+.phText {
+  grid-area: text;
+  display: grid;
+  gap: var(--s-1);
+  min-width: 0;
+  padding-right: var(--s-4);
+}
+.phEyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-bottom: var(--s-1);
+}
+.phTitleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 12px;
+  min-width: 0;
+}
+/* Título longo: duas linhas e reticências (o completo fica no title). */
+.phTitle {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  min-width: 0;
+  font: var(--t-page);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  overflow-wrap: break-word;
+}
+.phStatus {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.phDesc {
+  font: var(--t-body);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.phMeta {
+  margin-top: -1px;
+}
+/* Botões de 36 centrados no título de 32 (−2 px). */
+.phActions {
+  grid-area: actions;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: -2px;
+}
+.phMore {
+  grid-area: more;
+  display: flex;
+  margin-top: -2px;
+}
+.phToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  min-width: 0;
+}
+
+/* Moldura de criação: título contido (18), legenda e régua de etapas à direita. */
+.ph[data-variant='frame'] .phMain {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--s-6);
+}
+.ph[data-variant='frame'] .phText {
+  gap: 1px;
+  padding-right: 0;
+}
+.ph[data-variant='frame'] .phTitle {
+  -webkit-line-clamp: 1;
+  font: var(--t-figure-lg);
+  letter-spacing: -0.018em;
+}
+.ph[data-variant='frame'] .phDesc {
+  font: var(--t-caption);
+}
+.ph[data-variant='frame'] .phActions {
+  justify-content: flex-end;
+  min-width: 0;
+  margin-top: 0;
+}
+.ph[data-variant='frame'] .phMore {
+  margin-top: 0;
+}
+
+@container dsv3-page-header (max-width: 760px) {
+  .ph[data-variant='page'] .phTitle {
+    font-size: 22px;
+    line-height: 30px;
+  }
+}
+/* Celular: ações descem; a principal estica; o “⋯” fica na linha do título. */
+@container dsv3-page-header (max-width: 640px) {
+  .phMain,
+  .ph[data-variant='frame'] .phMain {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'text more'
+      'actions actions';
+    row-gap: var(--s-4);
+    column-gap: var(--s-2);
+  }
+  .ph[data-variant='frame'] .phMain {
+    row-gap: var(--s-3);
+  }
+  .phText {
+    padding-right: 0;
+  }
+  .phActions {
+    flex-wrap: wrap;
+    margin-top: 0;
+  }
+  .phActions > :first-child {
+    flex: 1 1 auto;
+  }
+}
+
+/* ——————————————————————————— Section · Panel ——————————————————————————— */
+.section {
+  min-width: 0;
+}
+.sectionHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 24px;
+}
+.sectionTitle {
+  min-width: 0;
+  font: var(--t-title-3);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+.sectionMeta {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.sectionMeta[data-tone='missing'] {
+  color: var(--red-ink);
+}
+.sectionAction {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.sectionBody {
+  min-width: 0;
+  margin-top: 14px;
+}
+/* Seções abertas irmãs: um fio e 28 px de cada lado (ritmo da página de detalhe). */
+.section[data-variant='open'] + .section[data-variant='open'] {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.panel,
+.section[data-variant='panel'] {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.section[data-variant='panel'],
+.section[data-variant='block'] {
+  padding: 14px 16px 16px;
+}
+.panel[data-pad='lg'] > .section[data-variant='block'] {
+  padding: 18px 20px 20px;
+}
+.section[data-variant='block'] + .section[data-variant='block'] {
+  border-top: 1px solid var(--line);
+}
+/* Dentro de painel: um degrau abaixo do título de seção da página (13 contra 14). */
+.section[data-variant='panel'] .sectionTitle,
+.section[data-variant='block'] .sectionTitle {
+  font: 600 13px/20px var(--font);
+}
+.section[data-variant='panel'] .sectionBody,
+.section[data-variant='block'] .sectionBody {
+  margin-top: 10px;
+}
+
+.band {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+  padding: 10px;
+  border-radius: var(--r-md);
+  background: var(--g-50);
+}
+.bandTitle {
+  margin: 0 var(--s-1) 0 var(--s-1);
+  font: var(--t-small-strong);
+  color: var(--muted);
+}
+
+/* ——————————————————————————— Accordion · Disclosure ——————————————————————————— */
+/* Coluna 0–1fr: meta e título cedem espaço; o cabeçalho nunca empurra a caixa (celular). */
+.accordion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+.accordion[data-variant='panel'] {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  overflow: clip;
+}
+.accordion[data-variant='plain'] .accItem {
+  border-bottom: 1px solid var(--line-soft);
+}
+.accordion[data-variant='panel'] .accItem + .accItem {
+  border-top: 1px solid var(--line-soft);
+}
+.accordion[data-variant='bar'] .accItem {
+  border-bottom: 1px solid var(--line);
+}
+.accHeading {
+  margin: 0;
+  font: inherit;
+}
+.accTrigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 16px;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  text-align: left;
+  background: transparent;
+  outline-offset: -2px;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+/* Simples: o hover sangra 8 px para fora do texto, como item de menu. */
+.accordion[data-variant='plain'] .accTrigger {
+  width: calc(100% + 16px);
+  margin-inline: -8px;
+  padding-inline: 8px;
+  border-radius: var(--r-md);
+}
+.accordion[data-variant='panel'] .accItem:first-child .accTrigger {
+  border-radius: calc(var(--r-lg) - 1px) calc(var(--r-lg) - 1px) 0 0;
+}
+.accordion[data-variant='panel'] .accItem:last-child:not([data-open]) .accTrigger {
+  border-radius: 0 0 calc(var(--r-lg) - 1px) calc(var(--r-lg) - 1px);
+}
+.accTrigger:is(:hover, [data-force~='hover']):not(:disabled) {
+  background: var(--g-25);
+}
+.accTrigger:is(:active, [data-force~='active']):not(:disabled) {
+  background: var(--g-50);
+  transition-duration: 0ms;
+}
+.accTrigger:is(:focus-visible, [data-force~='focus']) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: -2px;
+}
+.accTrigger:disabled {
+  cursor: not-allowed;
+  color: var(--disabled-ink);
+}
+.accTitle {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* A meta cede espaço ao título e corta com reticências em larguras estreitas. */
+.accMeta {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 62%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.accTrigger[data-status='error'] .accMeta {
+  color: var(--red-ink);
+}
+.accTrigger[data-status='warning'] .accMeta {
+  color: var(--amber-ink);
+}
+.accTrigger:disabled .accMeta {
+  color: var(--disabled-ink);
+}
+.accChevron {
+  flex-shrink: 0;
+  width: var(--icon-md);
+  height: var(--icon-md);
+  color: var(--icon-quiet);
+  transition:
+    transform var(--dur-2) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.accTrigger:is(:hover, [data-force~='hover']):not(:disabled) .accChevron {
+  color: var(--g-600);
+}
+.accItem[data-open] .accChevron {
+  transform: rotate(180deg);
+}
+.accTrigger:disabled .accChevron {
+  color: var(--disabled-icon);
+}
+/* Marcador de 16: concluído (azul claro + check), pendência (“!” vermelho), aviso (“!” âmbar). */
+.accMark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--b-200);
+  border-radius: 50%;
+  color: var(--b-600);
+  background: var(--b-50);
+}
+.accMark svg {
+  width: 9px;
+  height: 9px;
+  stroke-width: 3;
+}
+.accMark b {
+  font: 700 10px/1 var(--font);
+}
+.accMark[data-status='error'] {
+  border-color: var(--red-line);
+  color: var(--red-ink);
+  background: var(--red-bg);
+}
+.accMark[data-status='warning'] {
+  border-color: var(--amber-line);
+  color: var(--amber-ink);
+  background: var(--amber-bg);
+}
+.accTrigger:disabled .accMark {
+  opacity: 0.5;
+}
+
+/* Altura por grid-template-rows (0fr → 1fr); abre em 280 ms, fecha mais curto. */
+.accPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--dur-exit) var(--ease-out);
+}
+.accItem[data-open] .accPanel {
+  grid-template-rows: 1fr;
+  transition-duration: var(--dur-3);
+}
+.accClip {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity var(--dur-1) var(--ease-out);
+}
+.accItem[data-open] .accClip {
+  opacity: 1;
+  transition-duration: var(--dur-2);
+  transition-delay: 40ms;
+}
+.accBody {
+  padding: 0 16px 16px;
+  font: var(--t-body);
+  color: var(--text);
+}
+.accordion[data-variant='plain'] .accBody {
+  padding-inline: 0;
+}
+/* Com marcador, o conteúdo alinha ao texto do título (16 + 10 de respiro). */
+.accItem:has(.accMark) .accBody {
+  padding-left: 42px;
+}
+.accordion[data-variant='plain'] .accItem:has(.accMark) .accBody {
+  padding-left: 26px;
+}
+
+/* ——— Texto expansível ——— */
+.expandable {
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  min-width: 0;
+}
+.expandableText {
+  min-width: 0;
+  overflow: hidden;
+  transition: max-height var(--dur-3) var(--ease-out);
+}
+.expandableText[data-clamped] {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--lines, 3);
+}
+.textAction {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0;
+  border-radius: var(--r-xs);
+  font: var(--t-small-strong);
+  color: var(--b-600);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.textAction:hover {
+  color: var(--b-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.textAction:active {
+  color: var(--b-800);
+}
+
+/* ——————————————————————————— ScrollArea ——————————————————————————— */
+@property --dsv3-fade-start {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+@property --dsv3-fade-end {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+.scrollRoot {
+  --fade-size: 16px;
+  --dsv3-fade-start: 0px;
+  --dsv3-fade-end: 0px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border-radius: inherit;
+  transition:
+    --dsv3-fade-start var(--dur-2) var(--ease-out),
+    --dsv3-fade-end var(--dur-2) var(--ease-out);
+}
+.scrollRoot[data-fade-start='true'][data-overflow='true'][data-at-start='false'] {
+  --dsv3-fade-start: var(--fade-size);
+}
+.scrollRoot[data-fade-end='true'][data-overflow='true'][data-at-end='false'] {
+  --dsv3-fade-end: var(--fade-size);
+}
+.viewport {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  border-radius: inherit;
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-200) transparent;
+  overscroll-behavior: contain;
+  outline: none;
+}
+.viewport:hover {
+  scrollbar-color: var(--g-300) transparent;
+}
+.scrollRoot[data-orientation='vertical'] > .viewport {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.scrollRoot[data-orientation='horizontal'] > .viewport {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+/* Máscara só quando há excesso: esmaece apenas o lado que ainda tem conteúdo. */
+.scrollRoot[data-overflow='true'][data-orientation='vertical'] > .viewport {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--dsv3-fade-start),
+    #000 calc(100% - var(--dsv3-fade-end)),
+    transparent
+  );
+}
+.scrollRoot[data-overflow='true'][data-orientation='horizontal'] > .viewport {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--dsv3-fade-start),
+    #000 calc(100% - var(--dsv3-fade-end)),
+    transparent
+  );
+}
+/* Anel por dentro, desenhado fora da máscara (não esmaece junto com o conteúdo). */
+.scrollRoot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 var(--focus-width) transparent;
+}
+.scrollRoot:has(> .viewport:focus-visible)::after,
+.scrollRoot:has(> .viewport[data-force~='focus'])::after {
+  box-shadow: inset 0 0 0 var(--focus-width) var(--focus-color);
+}
+.viewport:focus-visible,
+.viewport[data-force~='focus'] {
+  outline: none;
+}
+
+/* ——————————————————————————— ResizablePanels ——————————————————————————— */
+.split {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--split-left, 320px) 1px minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  transition: grid-template-columns var(--dur-2) var(--ease-out);
+}
+.split[data-dragging] {
+  cursor: col-resize;
+  user-select: none;
+  transition: none;
+}
+.splitLeft,
+.splitRight {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.splitRight {
+  transition: padding var(--dur-2) var(--ease-out);
+}
+.split[data-collapsed] .splitRight {
+  padding-left: 44px;
+}
+.split[data-dragging] .splitRight {
+  transition: none;
+}
+.splitHandle {
+  position: relative;
+  z-index: 2;
+  width: 1px;
+  background: var(--line);
+  cursor: col-resize;
+  touch-action: none;
+  outline: none;
+}
+/* Alvo invisível de 12 px; o anel de foco é desenhado nele (pílula em volta do fio). */
+.splitHandle::before {
+  content: '';
+  position: absolute;
+  inset: 0 -6px;
+  border-radius: var(--r-md);
+}
+.splitHandle::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -0.5px;
+  width: 2px;
+  background: transparent;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.splitHandle:is(:hover, [data-force~='hover'])::after {
+  background: var(--b-300);
+}
+.split[data-dragging] .splitHandle::after,
+.splitHandle[data-force~='active']::after {
+  background: var(--b-500);
+  transition-duration: 0ms;
+}
+.splitHandle:is(:focus-visible, [data-force~='focus'])::before {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: -2px;
+}
+.splitShow {
+  position: absolute;
+  top: 12px;
+  left: 8px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  color: var(--icon-rest);
+  background: var(--paper);
+  box-shadow: var(--shadow-xs);
+  animation: splitShowIn var(--dur-2) var(--ease-out);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+.splitShow svg {
+  width: var(--icon-md);
+  height: var(--icon-md);
+}
+.splitShow:hover {
+  color: var(--ink);
+  background: var(--g-25);
+  border-color: var(--line-hover);
+}
+.splitShow:active {
+  background: var(--g-75);
+  transform: scale(var(--press-scale));
+}
+@keyframes splitShowIn {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+}
+@media (pointer: coarse) {
+  .splitShow {
+    width: 40px;
+    height: 40px;
+  }
+}
+.split[data-stacked] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto;
+}
+.split[data-stacked] .splitLeft,
+.split[data-stacked] .splitRight {
+  overflow: visible;
+}
+.split[data-stacked] .splitRight {
+  padding-left: 0;
+  border-top: 1px solid var(--line);
+}
+
+/* ——————————————————————————— DescriptionList ——————————————————————————— */
+/* A caixa é o contêiner: as colunas de grade e faixa respondem à largura disponível. */
+.dlBox {
+  container-type: inline-size;
+  width: 100%;
+  min-width: 0;
+}
+.dl {
+  min-width: 0;
+  margin: 0;
+}
+.dl dt {
+  min-width: 0;
+  padding-top: 1px;
+  font: var(--t-small);
+  color: var(--muted);
+}
+/* Números tabulares só no valor numérico (`numeric`): o hífen tabular da Inter abre buracos em
+   texto (“Primavera - Verão”, “(16) 99812 - 4410”). */
+.dl dd {
+  min-width: 0;
+  margin: 0;
+  font: var(--t-body);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.dl dd[data-num] {
+  font-variant-numeric: tabular-nums;
+}
+.dl dd[data-state='empty'] {
+  color: var(--muted);
+}
+.dl dd[data-state='missing'] {
+  color: var(--red-ink);
+}
+.dlValue {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.dlText {
+  min-width: 0;
+}
+.dlLead {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: 20px;
+}
+.dlHint {
+  display: block;
+  margin-top: 1px;
+  font: var(--t-caption);
+  color: var(--muted);
+}
+
+/* rows: coluna de rótulos, fio suave entre linhas (≈37 px). Quando o valor não cabe ao lado do
+   rótulo com pelo menos 164 px, ele desce para baixo dele (celular, laterais estreitas). */
+.dl[data-layout='rows'] .dlItem {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--s-4);
+  padding: 8px 0;
+}
+.dl[data-layout='rows'] dt {
+  flex: 0 0 calc(var(--dl-label, 196px) - 16px);
+  max-width: 100%;
+}
+.dl[data-layout='rows'] dd {
+  flex: 1 1 164px;
+}
+.dl[data-layout='rows'] .dlItem + .dlItem {
+  border-top: 1px solid var(--line-soft);
+}
+.dl[data-layout='rows'] .dlBoneCell:first-child {
+  flex: 0 0 calc(var(--dl-label, 196px) - 16px);
+}
+.dl[data-layout='rows'] .dlBoneCell + .dlBoneCell {
+  flex: 1 1 164px;
+}
+
+/* grid: rótulo acima do valor */
+.dl[data-layout='grid'] {
+  display: grid;
+  grid-template-columns: repeat(var(--dl-cols, 2), minmax(0, 1fr));
+  gap: 14px 24px;
+  align-items: start;
+}
+.dl[data-layout='grid'] .dlItem {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+}
+.dl[data-layout='grid'] dt {
+  padding-top: 0;
+}
+@container (max-width: 640px) {
+  .dl[data-layout='grid'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (max-width: 400px) {
+  .dl[data-layout='grid'] {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 12px;
+  }
+}
+
+/* strip: fatos compactos numa faixa com divisórias e reticências */
+.dl[data-layout='strip'] {
+  display: grid;
+  grid-template-columns: repeat(var(--dl-cols, 3), minmax(0, 1fr));
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--g-25);
+  overflow: hidden;
+}
+.dl[data-layout='strip'] .dlItem {
+  display: grid;
+  align-content: start;
+  gap: 1px;
+  min-width: 0;
+  padding: 8px 14px 9px;
+  box-shadow:
+    -1px 0 0 var(--line),
+    0 -1px 0 var(--line);
+}
+.dl[data-layout='strip'] dt {
+  padding-top: 0;
+  overflow: hidden;
+  font: var(--t-caption-strong);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.dl[data-layout='strip'] dd {
+  font: var(--t-small-strong);
+  overflow-wrap: normal;
+}
+.dl[data-layout='strip'] .dlText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.dl[data-layout='strip'] .dlLead {
+  height: 18px;
+}
+@container (max-width: 520px) {
+  .dl[data-layout='strip'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Copiar: aparece no hover/foco da linha; check por 1,2 s. */
+.copy {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin-block: -2px;
+  border-radius: var(--r-sm);
+  color: var(--icon-rest);
+  opacity: 0;
+  transition:
+    opacity var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.dlItem:hover .copy,
+.copy:focus-visible,
+.copy[data-done] {
+  opacity: 1;
+}
+.copy:hover {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.copy:active {
+  background: var(--g-100);
+}
+.copy:focus-visible {
+  outline-offset: 0;
+}
+.copy svg {
+  grid-area: 1 / 1;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  transition:
+    opacity var(--dur-1) var(--ease-out),
+    transform var(--dur-2) var(--ease-spring);
+}
+.copyDone {
+  color: var(--green-dot);
+  opacity: 0;
+  transform: scale(0.6);
+  stroke-width: 2.5;
+}
+.copy[data-done] .copyIcon {
+  opacity: 0;
+  transform: scale(0.6);
+}
+.copy[data-done] .copyDone {
+  opacity: 1;
+  transform: none;
+}
+@media (pointer: coarse) {
+  .copy {
+    width: 32px;
+    height: 32px;
+    margin-block: -6px;
+    opacity: 1;
+  }
+}
+
+/* Carregando: esqueleto com a geometria final, pulso lento */
+.dlBoneCell {
+  display: flex;
+  align-items: center;
+  min-height: 20px;
+}
+.dl[data-layout='grid'] .dlBoneCell:first-child,
+.dl[data-layout='strip'] .dlBoneCell:first-child {
+  min-height: 16px;
+}
+.bone {
+  display: block;
+  height: 10px;
+  border-radius: var(--r-xs);
+  background: var(--skeleton);
+  animation: bonePulse var(--skeleton-pulse) ease-in-out infinite;
+}
+.dlBoneCell + .dlBoneCell .bone {
+  height: 12px;
+}
+@keyframes bonePulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ——————————————————————————— FixedFrame ——————————————————————————— */
+.frame {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  overflow: clip;
+  background: var(--paper);
+}
+.frameHead {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 68px;
+  padding: 12px 32px;
+  border-bottom: 1px solid var(--line);
+}
+.frameHead > * {
+  flex: 1;
+  min-width: 0;
+}
+.frame[data-narrow] .frameHead {
+  padding: 12px 16px;
+}
+.frameBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+}
+.frame[data-aside]:not([data-narrow]) .frameBody {
+  grid-template-columns: minmax(0, 1fr) var(--aside-w, 320px);
+}
+.frameMain,
+.frameAside {
+  min-height: 0;
+}
+.frameMainViewport {
+  scrollbar-gutter: stable;
+}
+.frameContent {
+  padding: 22px 32px 28px;
+}
+.frame[data-narrow] .frameContent {
+  padding: 18px 16px 24px;
+}
+.frameAside {
+  border-left: 1px solid var(--line);
+  background: var(--g-25);
+}
+.frameAsideViewport {
+  padding: 18px 20px 28px;
+}
+.frameAsideInline {
+  display: grid;
+}
+.frameFoot {
+  position: relative;
+  min-width: 0;
+}

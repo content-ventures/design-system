@@ -1,0 +1,242 @@
+/*
+ * Menu — papel com fio de 1px, sombra de flutuante e raio de superfície.
+ * Fixo na janela (nunca recortado); entra do lado do gatilho em 180 ms e sai em 120 ms.
+ */
+.anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+.panel {
+  position: fixed;
+  z-index: var(--z-popover);
+  min-width: 200px;
+  max-width: calc(100vw - 16px);
+  padding: 4px;
+  border-radius: var(--r-lg);
+  color: var(--text);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-200) transparent;
+  outline: none;
+  text-align: left;
+}
+.panel[data-static] {
+  position: relative;
+  z-index: auto;
+  overflow: visible;
+}
+.panel[data-phase='open'] {
+  animation: menuIn var(--dur-2) var(--ease-out);
+}
+.panel[data-phase='open'][data-side='top'] {
+  animation-name: menuInUp;
+}
+.panel[data-phase='open'][data-side='right'] {
+  animation-name: menuInRight;
+}
+.panel[data-phase='open'][data-side='left'] {
+  animation-name: menuInLeft;
+}
+.panel[data-phase='closing'] {
+  pointer-events: none;
+  animation: menuOut 120ms var(--ease-in) forwards;
+}
+@keyframes menuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+@keyframes menuInUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+@keyframes menuInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-4px) scale(0.98);
+  }
+}
+@keyframes menuInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(4px) scale(0.98);
+  }
+}
+@keyframes menuOut {
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+/* ——— Seções ——— */
+.section + .section {
+  margin: 4px -4px 0;
+  padding: 4px 4px 0;
+  border-top: 1px solid var(--line-soft);
+}
+.sectionLabel {
+  padding: 6px 8px 4px;
+  font: var(--t-caption-strong);
+  color: var(--muted);
+  user-select: none;
+}
+
+/* ——— Itens ——— */
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 32px;
+  padding: 0 8px;
+  border-radius: var(--r-sm);
+  font: var(--t-body);
+  color: var(--text);
+  text-align: left;
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.icon {
+  width: 16px;
+  height: 16px;
+  color: var(--g-500);
+  stroke-width: 1.5;
+  transition: color var(--dur-1) var(--ease-out);
+}
+.lead {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  min-width: 16px;
+}
+.text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+.label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.desc {
+  font: var(--t-caption);
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.end {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 12px;
+}
+.meta {
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.check {
+  width: 16px;
+  height: 16px;
+  color: var(--b-600);
+  stroke-width: 2.25;
+}
+.chevron {
+  width: 14px;
+  height: 14px;
+  margin-right: -2px;
+  color: var(--g-400);
+  stroke-width: 1.75;
+}
+.item[data-rich] {
+  align-items: flex-start;
+  min-height: 44px;
+  padding: 6px 8px;
+}
+.item[data-rich] > .icon,
+.item[data-rich] > .lead {
+  margin-top: 2px;
+}
+.item[data-rich] > .end {
+  align-self: center;
+}
+
+/* Hover e foco por teclado são o mesmo destaque: o item em foco segue o ponteiro. */
+.item:is(:focus, [data-force~='hover'], [data-force~='focus'], [aria-expanded='true']) {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.item:is(:focus, [data-force~='hover'], [data-force~='focus'], [aria-expanded='true']) .icon {
+  color: var(--g-700);
+}
+.item:is(:active, [data-force~='active']):not([aria-disabled='true']) {
+  color: var(--ink);
+  background: var(--g-100);
+}
+/* No palco, o foco forçado também mostra o anel interno (§9: dentro de menu, offset −2). */
+.item[data-force~='focus'] {
+  outline: 2px solid var(--focus-color);
+  outline-offset: -2px;
+}
+
+/* Destrutiva: tinta vermelha; hover em fundo vermelho claro. */
+.item[data-danger] {
+  color: var(--red-ink);
+}
+.item[data-danger] .icon {
+  color: var(--red-ink);
+}
+.item[data-danger]:is(:focus, [data-force~='hover'], [data-force~='focus']) {
+  color: var(--red-ink);
+  background: var(--red-bg);
+}
+.item[data-danger]:is(:focus, [data-force~='hover'], [data-force~='focus']) .icon {
+  color: var(--red-ink);
+}
+.item[data-danger]:is(:active, [data-force~='active']):not([aria-disabled='true']) {
+  background: var(--danger-soft-hover);
+}
+
+/* Esmaecido: escolhível, mas apagado (portal encerrado). */
+.item[data-muted] .label {
+  color: var(--muted);
+}
+
+/* Indisponível: alcançável pelo teclado para ler o motivo; não executa. */
+.item[aria-disabled='true'] {
+  color: var(--subtle);
+  cursor: not-allowed;
+}
+.item[aria-disabled='true'] .icon {
+  color: var(--disabled-icon);
+}
+.item[aria-disabled='true']:is(:focus, [data-force~='hover'], [data-force~='focus']) {
+  color: var(--subtle);
+  background: var(--g-50);
+}
+.item[aria-disabled='true']:is(:focus, [data-force~='hover'], [data-force~='focus']) .icon {
+  color: var(--disabled-icon);
+}
+
+@media (pointer: coarse) {
+  .item {
+    min-height: 40px;
+  }
+}

@@ -1,0 +1,274 @@
+/* ——— Galeria ———
+ * Palco chapado g-50 com a peça inteira no centro; miniaturas 64 × 48; navegação nas laterais. */
+.gallery {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+.stageWrap {
+  position: relative;
+  min-width: 0;
+}
+.stage {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: clip;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--g-50);
+  cursor: zoom-in;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color var(--dur-1) var(--ease-out);
+}
+.stage:hover {
+  border-color: var(--line-hover);
+}
+.stage:focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+}
+.layer {
+  position: absolute;
+  inset: 28px 56px;
+  display: grid;
+  place-items: center;
+  container-type: size;
+}
+/* Entrada: crossfade de 180 ms + 8 px no sentido da navegação. */
+.layer[data-dir] {
+  animation: pieceIn var(--dur-2) var(--ease-out);
+}
+@keyframes pieceIn {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--dir) * 8px));
+  }
+}
+.layer[data-leaving] {
+  animation: pieceOut var(--dur-exit) var(--ease-in) forwards;
+  pointer-events: none;
+}
+@keyframes pieceOut {
+  to {
+    opacity: 0;
+    transform: translateX(calc(var(--dir) * -8px));
+  }
+}
+.dragLayer {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  container-type: size;
+  transition: transform var(--dur-3) var(--ease-out);
+}
+.piece {
+  display: block;
+  width: min(100cqw, 100cqh * var(--ar));
+}
+.piece > * {
+  width: 100%;
+}
+
+/* Anterior / próximo: secundários pequenos, sobre o palco. */
+.nav {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+}
+.prev {
+  left: 12px;
+}
+.next {
+  right: 12px;
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+.thumbs {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  padding: 7px;
+  margin: -7px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.thumbs::-webkit-scrollbar {
+  display: none;
+}
+.thumb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 48px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--g-50);
+  container-type: size;
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out),
+    outline-color var(--dur-1) var(--ease-out);
+}
+.thumb .piece {
+  width: min(100cqw, 100cqh * var(--ar));
+  opacity: 0.78;
+  transition: opacity var(--dur-1) var(--ease-out);
+}
+.thumb:is(:hover, :focus-visible, [data-force]) .piece,
+.thumb[aria-current='true'] .piece {
+  opacity: 1;
+}
+.thumb:is(:hover, [data-force~='hover']) {
+  border-color: var(--line-hover);
+  background: var(--g-75);
+}
+.thumb:active {
+  background: var(--g-100);
+}
+/* Selecionada: anel de 2 px b-600 com 2 px de respiro. A faixa tem foco itinerante (só a
+ * selecionada entra no Tab; ←/→ trocam): no foco, o anel ganha um halo claro em volta. */
+.thumb[aria-current='true'] {
+  border-color: var(--line);
+  outline: 2px solid var(--b-600);
+  outline-offset: 2px;
+}
+.thumb:focus-visible,
+.thumb[data-force~='focus'] {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px rgb(8 117 219 / 0.16);
+}
+.counter {
+  margin-left: auto;
+  flex-shrink: 0;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.gallery[data-single] .stage {
+  cursor: zoom-in;
+}
+
+/* Peça grande no diálogo */
+.light {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  max-height: 60dvh;
+  width: 100%;
+  padding: 20px;
+  border-radius: var(--r-lg);
+  background: var(--g-50);
+  container-type: size;
+}
+.light .piece {
+  width: min(100cqw, 100cqh * var(--ar));
+}
+.lightNav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.lightNav .counter {
+  margin: 0 4px;
+}
+
+@media (max-width: 640px) {
+  .layer {
+    inset: 16px 16px;
+  }
+  .nav {
+    display: none;
+  }
+}
+
+/* ——— Carrossel ——— */
+.carousel {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+.carouselHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 32px;
+}
+.carouselTitle {
+  font: var(--t-title-3);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+.carouselNav {
+  display: inline-flex;
+  gap: 6px;
+}
+.trackWrap {
+  position: relative;
+  min-width: 0;
+  container-type: inline-size;
+}
+.track {
+  --gap: 16px;
+  display: grid;
+  grid-auto-flow: column;
+  /* N itens inteiros + metade do próximo à vista. */
+  grid-auto-columns: calc((100% - var(--per) * var(--gap)) / (var(--per) + 0.4));
+  gap: var(--gap);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 0;
+  scrollbar-width: none;
+  padding: 3px;
+  margin: -3px;
+}
+.track::-webkit-scrollbar {
+  display: none;
+}
+.slide {
+  min-width: 0;
+  scroll-snap-align: start;
+}
+@container (max-width: 720px) {
+  .track {
+    --gap: 12px;
+    grid-auto-columns: calc((100% - 2 * var(--gap)) / 2.4);
+  }
+}
+@container (max-width: 420px) {
+  .track {
+    grid-auto-columns: 62%;
+  }
+}
+.trackWrap[data-floating] .carouselNav {
+  position: absolute;
+  inset: 50% -12px auto;
+  justify-content: space-between;
+  translate: 0 -50%;
+  pointer-events: none;
+}
+.trackWrap[data-floating] .carouselNav > * {
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    scroll-behavior: auto;
+  }
+}

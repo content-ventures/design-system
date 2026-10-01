@@ -1,0 +1,29 @@
+/* Horário: `.control` dos campos com relógio à esquerda e números tabulares. */
+.box {
+  cursor: text;
+}
+.box input {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+.box[data-force~='hover']:not([data-disabled]) {
+  border-color: var(--line-hover);
+}
+.box.box[data-force~='focus'],
+.box.box[data-open='true'] {
+  outline: none;
+  border-color: var(--b-500);
+  box-shadow: var(--ring-field);
+}
+.box[data-open='true'] > svg {
+  color: var(--g-600);
+}
+.list {
+  scroll-padding: 8px;
+}
+.option {
+  min-height: 32px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}

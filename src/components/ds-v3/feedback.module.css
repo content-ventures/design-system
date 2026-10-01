@@ -1,0 +1,1011 @@
+/*
+ * Feedback do DS V3. Tons de status chapados (fundo, fio e tinta do tom), raio 8 em avisos,
+ * raio 10 em superfícies. Movimento: entrada 280 ms --ease-out, saída 160–180 ms --ease-in,
+ * altura por grid-template-rows. Estados parados das pranchas por [data-force].
+ */
+
+/* ——————————————————————————— Presença ——————————————————————————— */
+.reveal {
+  display: grid;
+  grid-template-rows: 1fr;
+  min-width: 0;
+}
+.revealClip {
+  min-width: 0;
+  min-height: 0;
+}
+.reveal:not([data-phase='shown']) > .revealClip {
+  overflow: hidden;
+}
+.reveal[data-phase='enter'] {
+  animation: rowsIn var(--dur-3) var(--ease-out);
+}
+.reveal[data-phase='enter'] > .revealClip {
+  animation: fadeUp var(--dur-3) var(--ease-out);
+}
+.reveal[data-phase='leave'] {
+  animation: rowsOut var(--dur-2) var(--ease-move) forwards;
+  pointer-events: none;
+}
+.reveal[data-phase='leave'] > .revealClip {
+  animation: fadeOut var(--dur-1) var(--ease-in) forwards;
+}
+@keyframes rowsIn {
+  from {
+    grid-template-rows: 0fr;
+  }
+}
+@keyframes rowsOut {
+  to {
+    grid-template-rows: 0fr;
+  }
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ——————————————————————————— Tons ——————————————————————————— */
+.alert,
+.banner {
+  --tone-bg: var(--blue-bg);
+  --tone-line: var(--blue-line);
+  --tone-ink: var(--blue-ink);
+}
+:is(.alert, .banner)[data-tone='success'] {
+  --tone-bg: var(--green-bg);
+  --tone-line: var(--green-line);
+  --tone-ink: var(--green-ink);
+}
+:is(.alert, .banner)[data-tone='warning'] {
+  --tone-bg: var(--amber-bg);
+  --tone-line: var(--amber-line);
+  --tone-ink: var(--amber-ink);
+}
+:is(.alert, .banner)[data-tone='attention'] {
+  --tone-bg: var(--orange-bg);
+  --tone-line: var(--orange-line);
+  --tone-ink: var(--orange-ink);
+}
+:is(.alert, .banner)[data-tone='danger'] {
+  --tone-bg: var(--red-bg);
+  --tone-line: var(--red-line);
+  --tone-ink: var(--red-ink);
+}
+:is(.alert, .banner)[data-tone='neutral'] {
+  --tone-bg: var(--g-50);
+  --tone-line: var(--line);
+  --tone-ink: var(--g-700);
+}
+
+/* Ação em texto dentro de um aviso: tinta do tom; sublinhado só no hover. */
+.toneAction {
+  display: inline-flex;
+  color: var(--tone-ink);
+}
+.alert .toneAction > :is(button, a),
+.banner .toneAction > :is(button, a) {
+  color: var(--tone-ink);
+  white-space: nowrap;
+}
+.alert .toneAction > :is(button, a):is(:hover, [data-force~='hover']),
+.banner .toneAction > :is(button, a):is(:hover, [data-force~='hover']),
+.alert .toneAction > :is(button, a):is(:active, [data-force~='active']),
+.banner .toneAction > :is(button, a):is(:active, [data-force~='active']) {
+  color: var(--tone-ink);
+  text-decoration-color: currentColor;
+}
+
+/* X dos avisos: 24 px, tinta do tom a 70%, véu do tom no hover. */
+.dismiss {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin: -3px -6px -3px 0;
+  border-radius: var(--r-sm);
+  color: color-mix(in srgb, var(--tone-ink) 70%, transparent);
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+.dismiss svg {
+  width: 14px;
+  height: 14px;
+}
+.dismiss:is(:hover, [data-force~='hover']) {
+  color: var(--tone-ink);
+  background: color-mix(in srgb, var(--tone-ink) 8%, transparent);
+}
+.dismiss:is(:active, [data-force~='active']) {
+  color: var(--tone-ink);
+  background: color-mix(in srgb, var(--tone-ink) 14%, transparent);
+  transform: scale(0.94);
+}
+@media (pointer: coarse) {
+  .dismiss {
+    position: relative;
+  }
+  .dismiss::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
+}
+
+/* ——————————————————————————— Alerta ——————————————————————————— */
+.alert {
+  container-type: inline-size;
+  padding: 11px 14px;
+  border: 1px solid var(--tone-line);
+  border-radius: var(--r-md);
+  background: var(--tone-bg);
+}
+.alertRow {
+  display: grid;
+  grid-template-columns: 15px minmax(0, 1fr) auto auto;
+  grid-template-areas: 'icon body side close';
+  align-items: center;
+  column-gap: 10px;
+}
+.alertIcon {
+  grid-area: icon;
+  align-self: start;
+  width: 15px;
+  height: 15px;
+  margin-top: 1.5px;
+  color: var(--tone-ink);
+}
+.alertBody {
+  grid-area: body;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.alertTitle {
+  font: var(--t-small-strong);
+  color: var(--tone-ink);
+}
+.alertText {
+  font: var(--t-small);
+  color: var(--text);
+  text-wrap: pretty;
+}
+.alertMeta {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.alertSide {
+  grid-area: side;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-left: 6px;
+}
+.alertEnd {
+  font: var(--t-small-strong);
+  color: var(--tone-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.alertRow > .dismiss {
+  grid-area: close;
+  margin-left: 2px;
+}
+/* Compacto: uma linha de 36 px (formulário, rodapé). */
+.alert[data-compact] {
+  padding: 8px 12px;
+}
+.alert[data-compact] .alertRow {
+  column-gap: 8px;
+}
+.alert[data-compact] .alertIcon {
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+}
+/* Estreito: prazo e ação descem para baixo do texto, alinhados à coluna do texto; o X fica no alto. */
+@container (max-width: 400px) {
+  .alertRow {
+    grid-template-columns: 15px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'icon body close'
+      '. side side';
+    align-items: start;
+  }
+  .alertSide {
+    padding: 6px 0 0;
+    justify-content: space-between;
+  }
+  .alertRow > .dismiss {
+    margin-top: -3px;
+  }
+  .alert[data-compact] .alertRow {
+    grid-template-areas: 'icon body side close';
+    grid-template-columns: 14px minmax(0, 1fr) auto auto;
+    align-items: center;
+  }
+  .alert[data-compact] .alertSide {
+    padding: 0 0 0 6px;
+  }
+}
+
+/* ——————————————————————————— Faixa ——————————————————————————— */
+.banner {
+  --banner-gutter: var(--page-gutter, 32px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 10px var(--banner-gutter);
+  color: var(--text);
+  background: var(--tone-bg);
+  border-bottom: 1px solid var(--tone-line);
+}
+.banner[data-variant='inline'] {
+  padding: 10px 14px;
+  border: 1px solid var(--tone-line);
+  border-radius: var(--r-md);
+}
+.bannerIcon {
+  align-self: flex-start;
+  width: 15px;
+  height: 15px;
+  margin-top: 1.5px;
+  color: var(--tone-ink);
+}
+.bannerText {
+  flex: 1;
+  min-width: 0;
+  font: var(--t-small);
+  color: var(--text);
+  text-wrap: pretty;
+}
+.bannerText strong {
+  font: var(--t-small-strong);
+  color: var(--tone-ink);
+}
+.bannerText strong + span,
+.bannerText time + span {
+  margin-left: 6px;
+}
+.bannerText strong + span::before,
+.bannerText time + span::before {
+  content: '·';
+  margin-right: 6px;
+  color: color-mix(in srgb, var(--tone-ink) 45%, transparent);
+}
+.countdown {
+  display: inline-block;
+  min-width: 2.6em;
+  font: var(--t-small-strong);
+  color: var(--tone-ink);
+  font-variant-numeric: tabular-nums;
+}
+.bannerAction {
+  flex: none;
+  margin-left: 6px;
+}
+.banner > .dismiss {
+  margin-left: 2px;
+}
+/* Recuo e quebra seguem a largura da própria faixa, com os mesmos degraus do topo (32 · 24 · 16):
+   o ícone fica no x da trilha e do título da página. */
+.bannerBox {
+  container: banner / inline-size;
+}
+@container banner (max-width: 1023px) {
+  .banner {
+    --banner-gutter: 24px;
+  }
+}
+@container banner (max-width: 760px) {
+  .banner {
+    --banner-gutter: 16px;
+  }
+}
+@container banner (max-width: 640px) {
+  .banner {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+  .bannerText {
+    flex-basis: calc(100% - 60px);
+  }
+  .banner .bannerAction {
+    order: 3;
+    flex-basis: 100%;
+    margin-left: 25px;
+  }
+  .banner > .dismiss {
+    align-self: flex-start;
+    margin-top: -3px;
+  }
+}
+
+/* ——————————————————————————— Progresso ——————————————————————————— */
+.progress {
+  --fill: var(--b-600);
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.progress[data-tone='success'] {
+  --fill: var(--green-dot);
+}
+.progress[data-tone='warning'] {
+  --fill: var(--amber-dot);
+}
+.progress[data-tone='danger'] {
+  --fill: var(--red-dot);
+}
+.progressHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+.progressLabel {
+  min-width: 0;
+  overflow: hidden;
+  font: var(--t-small-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.progressValue {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  margin-left: auto;
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.progress[data-tone='danger'] .progressValue,
+.progress[data-tone='warning'] .progressValue {
+  font-weight: 500;
+}
+.progress[data-tone='danger'] .progressValue {
+  color: var(--red-ink);
+}
+.progress[data-tone='warning'] .progressValue {
+  color: var(--amber-ink);
+}
+.progressDone {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: var(--t-small-strong);
+  color: var(--green-ink);
+  animation: doneIn var(--dur-2) var(--ease-out) var(--dur-3) backwards;
+}
+.progressDone svg {
+  width: 14px;
+  height: 14px;
+  animation: settle 320ms var(--ease-spring) var(--dur-3) backwards;
+}
+@keyframes doneIn {
+  from {
+    opacity: 0;
+    transform: translateX(4px);
+  }
+}
+@keyframes settle {
+  from {
+    transform: scale(0.6);
+  }
+}
+.progressTrack {
+  position: relative;
+  height: 4px;
+  border-radius: var(--r-full);
+  background: var(--g-100);
+  overflow: hidden;
+}
+.progress[data-size='sm'] .progressTrack {
+  height: 3px;
+}
+.progressFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  border-radius: inherit;
+  background: var(--fill);
+  transition:
+    width var(--dur-3) var(--ease-out),
+    background-color var(--dur-2) var(--ease-out);
+}
+.progress[data-complete] .progressFill {
+  transition:
+    width var(--dur-3) var(--ease-out),
+    background-color var(--dur-2) var(--ease-out) var(--dur-3);
+}
+.progress[data-indeterminate] .progressFill {
+  width: 30%;
+  animation: slide 1.2s var(--ease-move) infinite;
+}
+@keyframes slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(334%);
+  }
+}
+
+/* ——— Etapas (diálogo de criação) ——— */
+.steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  border-top: 1px solid var(--line-soft);
+  font: var(--t-body);
+  color: var(--muted);
+  transition: color var(--dur-2) var(--ease-out);
+}
+.step[data-state='current'] {
+  font-weight: 500;
+  color: var(--ink);
+}
+.step[data-state='done'] {
+  color: var(--text);
+}
+.stepLabel {
+  flex: 1;
+  min-width: 0;
+}
+.stepMeta {
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  animation: fadeIn var(--dur-2) var(--ease-out);
+}
+.marker {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--g-200);
+  border-radius: 50%;
+  font: 600 11px/18px var(--font);
+  color: var(--muted);
+  background: var(--paper);
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--dur-2) var(--ease-out),
+    border-color var(--dur-2) var(--ease-out);
+}
+.step[data-state='current'] .marker {
+  border-width: 0;
+  background: var(--b-50);
+}
+.step[data-state='done'] .marker {
+  color: var(--b-600);
+  border-color: var(--b-200);
+  background: var(--b-50);
+}
+.markerSpin {
+  width: 20px;
+  height: 20px;
+  animation: spin 0.8s linear infinite;
+}
+.markerTrack,
+.markerArc {
+  fill: none;
+  stroke-width: 2;
+}
+.markerTrack {
+  stroke: var(--b-100);
+}
+.markerArc {
+  stroke: var(--b-600);
+  stroke-linecap: round;
+  stroke-dasharray: 0.26 1;
+}
+.tick {
+  width: 11px;
+  height: 11px;
+}
+.tick path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  animation: draw var(--dur-2) var(--ease-out) backwards;
+}
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* ——————————————————————————— Spinner ——————————————————————————— */
+.spinner {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  vertical-align: middle;
+  --arc: currentColor;
+  --track: color-mix(in srgb, currentColor 18%, transparent);
+}
+.spinner[data-tone='accent'] {
+  --arc: var(--b-600);
+  --track: var(--b-100);
+}
+.spinner[data-tone='muted'] {
+  --arc: var(--g-500);
+  --track: var(--g-150);
+}
+.spinnerSvg {
+  width: 100%;
+  height: 100%;
+  animation:
+    spin 0.8s linear infinite,
+    fadeIn var(--dur-1) var(--ease-out);
+}
+.spinnerTrack,
+.spinnerArc {
+  fill: none;
+  stroke-width: 2;
+}
+.spinnerTrack {
+  stroke: var(--track);
+}
+.spinnerArc {
+  stroke: var(--arc);
+  stroke-linecap: round;
+  stroke-dasharray: 0.26 1;
+}
+
+/* ——————————————————————————— Esqueleto ——————————————————————————— */
+.skel {
+  display: block;
+  flex: none;
+  max-width: 100%;
+  border-radius: var(--r-xs);
+  background: var(--skeleton);
+  animation: pulse var(--skeleton-pulse) ease-in-out infinite;
+}
+.skel[data-shape='circle'] {
+  border-radius: 50%;
+}
+.skel[data-shape='block'] {
+  border-radius: var(--r-md);
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+.skelText {
+  display: grid;
+  grid-auto-rows: var(--skel-line, 20px);
+  align-items: center;
+  min-width: 0;
+}
+.skelRows {
+  display: grid;
+  min-width: 0;
+}
+.skelRow {
+  display: grid;
+  align-items: center;
+  min-width: 0;
+}
+.skelRow[data-divided] + .skelRow[data-divided] {
+  border-top: 1px solid var(--line-soft);
+}
+.skelCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.skelCell[data-align='end'] {
+  justify-content: flex-end;
+}
+.skelCell[data-align='end'] .skelStack {
+  justify-items: end;
+}
+.skelCell[data-align='center'] {
+  justify-content: center;
+}
+.skelStack {
+  display: grid;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Troca esqueleto → conteúdo: mesma célula, crossfade de 180 ms. */
+.swap {
+  display: grid;
+  min-width: 0;
+}
+.swapLayer {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.swapLayer[data-layer='leaving'] {
+  animation: fadeOut var(--dur-2) var(--ease-out) forwards;
+  pointer-events: none;
+}
+.swapLayer[data-layer='content'][data-fade] {
+  animation: fadeIn var(--dur-2) var(--ease-out);
+}
+
+/* ——————————————————————————— Estados ——————————————————————————— */
+.state {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 32px 24px;
+  text-align: center;
+  animation: fadeIn var(--dur-2) var(--ease-out);
+}
+.state[data-size='page'] {
+  padding: 48px 24px;
+}
+.stateTile {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--g-150);
+  border-radius: var(--r-md);
+  color: var(--g-500);
+  background: var(--g-75);
+}
+.stateTile[data-tone='red'] {
+  color: var(--red-ink);
+  border-color: var(--red-line);
+  background: var(--red-bg);
+}
+.stateTile svg {
+  width: 18px;
+  height: 18px;
+}
+.stateText {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  min-width: 0;
+  max-width: 420px;
+}
+.stateTitle {
+  margin: 0;
+  font: var(--t-title-3);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+  text-wrap: balance;
+}
+.stateDesc {
+  font: var(--t-body);
+  color: var(--muted);
+  text-wrap: balance;
+}
+.stateMeta {
+  margin-top: 2px;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.stateActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.state[data-size='page'] .stateActions {
+  margin-top: 8px;
+}
+.stateInline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  min-width: 0;
+  min-height: 20px;
+  font: var(--t-body);
+  color: var(--muted);
+  animation: fadeIn var(--dur-2) var(--ease-out);
+}
+.stateInlineIcon {
+  width: 14px;
+  height: 14px;
+  color: var(--g-400);
+}
+.stateInline[data-tone='red'] {
+  color: var(--text);
+}
+.stateInline[data-tone='red'] .stateInlineIcon {
+  color: var(--red-dot);
+}
+.stateInlineText {
+  min-width: 0;
+}
+.stateInlineActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+/* ——————————————————————————— Notificações ——————————————————————————— */
+.nPanel {
+  display: grid;
+  width: 344px;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: var(--text);
+  background: var(--paper);
+  overflow: clip;
+}
+.nPanel[data-elevated] {
+  box-shadow: var(--shadow-lg);
+}
+.nHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 6px;
+}
+.nHeadTitle {
+  font: var(--t-title-3);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+.nBody {
+  display: grid;
+  gap: 4px;
+  max-height: 440px;
+  padding: 0 4px 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-200) transparent;
+}
+.nGroupLabel {
+  padding: 8px 12px 4px;
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+.nList {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.nItem {
+  position: relative;
+  border-radius: var(--r-md);
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.nItem:is(:hover, [data-force~='hover']) {
+  background: var(--g-75);
+}
+.nItem:has(.nMain:active),
+.nItem[data-force~='active'] {
+  background: var(--g-100);
+}
+.nMain {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 40px 10px 14px;
+  border-radius: inherit;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+.nMain:focus-visible,
+.nMain[data-force~='focus'] {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset-inset);
+}
+.nDot {
+  position: absolute;
+  top: 17px;
+  left: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--b-600);
+  opacity: 0;
+  transform: scale(0.4);
+  pointer-events: none;
+  transition:
+    opacity var(--dur-2) var(--ease-out),
+    transform var(--dur-2) var(--ease-out);
+}
+.nItem[data-unread] .nDot {
+  opacity: 1;
+  transform: none;
+}
+.nLead {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+.nText {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.nTitle {
+  font: var(--t-body);
+  color: var(--text);
+  text-wrap: pretty;
+}
+.nItem[data-unread] .nTitle {
+  font-weight: 500;
+  color: var(--ink);
+}
+.nMeta {
+  overflow: hidden;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.nStatus {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gray-dot);
+}
+.nStatus[data-tone='green'] {
+  background: var(--green-dot);
+}
+.nStatus[data-tone='violet'] {
+  background: var(--violet-dot);
+}
+.nStatus[data-tone='amber'] {
+  background: var(--amber-dot);
+}
+.nStatus[data-tone='orange'] {
+  background: var(--orange-dot);
+}
+.nStatus[data-tone='red'] {
+  background: var(--red-dot);
+}
+.nStatus[data-tone='teal'] {
+  background: var(--teal-dot);
+}
+/* “Marcar como lida”: aparece no hover/foco da linha; no toque fica sempre. */
+.nMark {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-sm);
+  color: var(--g-500);
+  opacity: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    opacity var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+.nMark svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+.nItem[data-unread]:is(:hover, :focus-within, [data-force~='hover'], :has([data-force~='focus']))
+  .nMark {
+  opacity: 1;
+}
+.nMark:disabled {
+  visibility: hidden;
+  opacity: 0;
+}
+.nMark:hover {
+  color: var(--ink);
+  background: var(--g-150);
+}
+.nMark:active {
+  background: var(--g-200);
+  transform: scale(0.94);
+}
+.nMark:focus-visible {
+  outline-offset: 0;
+}
+@media (pointer: coarse) {
+  .nItem[data-unread] .nMark {
+    opacity: 1;
+  }
+  .nMark::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
+}
+.nEmpty {
+  display: grid;
+  place-items: center;
+  min-height: 112px;
+  padding: 8px 16px 20px;
+}
+.nFoot {
+  display: flex;
+  justify-content: center;
+  padding: 10px 16px;
+  border-top: 1px solid var(--line-soft);
+}
+
+/* ——————————————————————————— Movimento reduzido ——————————————————————————— */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal > .revealClip,
+  .progressDone,
+  .progressDone svg,
+  .tick path,
+  .stepMeta,
+  .skel,
+  .swapLayer,
+  .state,
+  .stateInline {
+    animation: none !important;
+  }
+  .progress[data-indeterminate] .progressFill {
+    left: 35%;
+    animation: none !important;
+  }
+  /* Como no botão: o spinner gira devagar em vez de tremer. */
+  .spinner .spinnerSvg,
+  .marker .markerSpin {
+    animation: spin 2.4s linear infinite !important;
+  }
+  .reveal[data-phase='leave'] {
+    visibility: hidden;
+  }
+}

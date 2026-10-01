@@ -1,0 +1,415 @@
+/* ——— Gatilho ——— */
+.root {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: var(--h-md);
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  box-shadow: var(--shadow-xs);
+  font: var(--t-body);
+  color: var(--ink);
+  text-align: left;
+  outline: none;
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+}
+.trigger:is(:hover, [data-force~='hover']):not(:disabled) {
+  border-color: var(--line-hover);
+}
+.trigger:is(:active, [data-force~='active']):not(:disabled) {
+  background: var(--g-25);
+}
+.trigger:is(:focus-visible, [data-force~='focus']),
+.trigger[aria-expanded='true'] {
+  outline: none;
+  border-color: var(--b-500);
+  box-shadow: var(--ring-field);
+}
+.trigger[data-invalid='true'],
+.trigger[data-invalid='true']:is(
+    :hover,
+    :focus-visible,
+    [data-force~='hover'],
+    [data-force~='focus']
+  ) {
+  border-color: var(--red-dot);
+  box-shadow: var(--ring-invalid);
+}
+/* Aberto: o anel azul diz onde está a escolha, mesmo com erro (como os seletores de data). */
+.trigger[data-invalid='true'][aria-expanded='true'] {
+  border-color: var(--b-500);
+  box-shadow: var(--ring-field);
+}
+.trigger:disabled {
+  cursor: not-allowed;
+  color: var(--disabled-ink);
+  background: var(--disabled-bg);
+  border-color: var(--disabled-line);
+  box-shadow: none;
+}
+.trigger[data-size='sm'] {
+  height: var(--h-sm);
+  padding: 0 8px 0 10px;
+  border-radius: var(--r-sm);
+  font: var(--t-small);
+}
+.value {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+/* O texto é um item flex: o corte com reticências precisa estar nele, não no contêiner. */
+.valueText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.placeholder {
+  color: var(--subtle);
+}
+.trigger:disabled .valueText {
+  color: var(--disabled-ink);
+}
+.lead {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.trigger:disabled .lead {
+  opacity: 0.5;
+}
+.chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--g-400);
+  transition:
+    transform var(--dur-2) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.trigger[data-size='sm'] .chevron {
+  width: 15px;
+  height: 15px;
+}
+.trigger:is(:hover, [data-force~='hover']):not(:disabled) .chevron,
+.trigger[aria-expanded='true'] .chevron {
+  color: var(--g-600);
+}
+.trigger[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+}
+.trigger:disabled .chevron {
+  color: var(--disabled-icon);
+}
+
+/* Spinner de campo: aparece só depois de 300 ms, gira em 0,8 s. */
+.spinner.spinner {
+  width: 14px;
+  height: 14px;
+  margin: 0 1px;
+  color: var(--g-400);
+  animation:
+    appear var(--dur-2) var(--ease-out) 300ms both,
+    spin 0.8s linear infinite;
+}
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ——— Painel flutuante ——— */
+.panel {
+  position: fixed;
+  z-index: var(--z-popover);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 4px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: var(--text);
+  font: var(--t-body);
+  background: var(--paper);
+  box-shadow: var(--shadow-lg);
+  transform-origin: top center;
+  animation: popIn var(--dur-2) var(--ease-out);
+}
+/* Cresce com as opções (texto inteiro), entre a largura do gatilho e o máximo que o JS prende. */
+.panel[data-fit] {
+  width: max-content;
+}
+.panel[data-inline] {
+  position: relative;
+  z-index: auto;
+  margin-top: 6px;
+  animation: none;
+}
+.panel[data-side='above'] {
+  transform-origin: bottom center;
+  animation-name: popInAbove;
+}
+.panel[data-state='closing'] {
+  pointer-events: none;
+  animation: popOut var(--dur-1) var(--ease-in) forwards;
+}
+.panel[data-state='closing'][data-side='above'] {
+  animation-name: popOutAbove;
+}
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+@keyframes popInAbove {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+@keyframes popOut {
+  to {
+    opacity: 0;
+    transform: translateY(-2px) scale(0.99);
+  }
+}
+@keyframes popOutAbove {
+  to {
+    opacity: 0;
+    transform: translateY(2px) scale(0.99);
+  }
+}
+
+/* Busca sem caixa no topo do painel */
+.search {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  margin: -4px -4px 4px;
+  padding: 0 8px 0 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.search > svg {
+  width: 15px;
+  height: 15px;
+  color: var(--g-400);
+}
+.search input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: var(--t-body);
+  color: var(--ink);
+}
+.search input::placeholder {
+  color: var(--subtle);
+}
+.searchClear {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-xs);
+  color: var(--g-400);
+  transition:
+    background-color var(--dur-1),
+    color var(--dur-1);
+}
+.searchClear:hover {
+  color: var(--ink);
+  background: var(--g-100);
+}
+.searchClear svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.25;
+}
+
+/* Lista */
+.list {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+  scroll-padding: 4px;
+}
+/* Há mais opções abaixo: o fim da lista esmaece (a única máscara do sistema). */
+.list[data-more] {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 40px), transparent);
+}
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding: 7px 8px 7px 10px;
+  border-radius: var(--r-sm);
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.list[data-size='sm'] .option {
+  min-height: 32px;
+  font: var(--t-small);
+}
+.option[data-active='true'] {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.option[aria-selected='true'] {
+  color: var(--ink);
+  font-weight: 500;
+}
+.option[aria-disabled='true'] {
+  color: var(--subtle);
+  cursor: not-allowed;
+}
+.option[aria-disabled='true'][data-active='true'] {
+  background: var(--g-50);
+}
+.optionText {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+.optionLabel {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.optionText small {
+  font: var(--t-caption);
+  font-weight: 400;
+  color: var(--muted);
+}
+.check {
+  width: 16px;
+  height: 16px;
+  color: var(--b-600);
+  stroke-width: 2.25;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity var(--dur-1) var(--ease-out),
+    transform var(--dur-2) var(--ease-spring);
+}
+.option[aria-selected='true'] .check {
+  opacity: 1;
+  transform: none;
+}
+.mark {
+  padding: 0;
+  border-radius: 2px;
+  color: inherit;
+  font-weight: 600;
+  background: var(--b-100);
+  box-shadow: 0 0 0 1px var(--b-100);
+}
+.empty {
+  padding: 9px 10px;
+  font: var(--t-body);
+  color: var(--muted);
+}
+.list[data-size='sm'] .empty {
+  font: var(--t-small);
+}
+
+/* Linha de estado dentro da lista (ex.: "Buscando…") */
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 10px;
+  color: var(--muted);
+}
+.status .spinner.spinner {
+  margin: 0;
+}
+
+/* Esqueleto: blocos chapados que pulsam devagar */
+.skeleton {
+  display: grid;
+}
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 10px;
+}
+.skeletonRow > span {
+  height: 10px;
+  border-radius: var(--r-xs);
+  background: var(--skeleton);
+  animation: pulse var(--skeleton-pulse) ease-in-out infinite;
+}
+.skeletonRow:nth-child(2) > span {
+  animation-delay: 120ms;
+}
+.skeletonRow:nth-child(3) > span {
+  animation-delay: 240ms;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* Rodapé do painel (seleção múltipla): contagem e ação em texto */
+.foot {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+  margin: 4px -4px -4px;
+  padding: 0 12px;
+  border-top: 1px solid var(--line-soft);
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .panel[data-state='closing'] {
+    animation: none;
+  }
+  .panel[data-state='closing'] {
+    opacity: 0;
+  }
+}

@@ -1,0 +1,128 @@
+/* Kanban e cartão de lead — só layout; cor, tipo e raio por token. */
+
+.pipeline {
+  display: grid;
+  gap: var(--s-4);
+  min-width: 0;
+  width: 100%;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.search {
+  width: 240px;
+}
+.owner {
+  width: 196px;
+}
+.toolbarEnd {
+  margin-left: auto;
+}
+.board {
+  margin-inline: calc(var(--s-6) * -1);
+  padding-inline: var(--s-6);
+  scroll-padding-inline: var(--s-6);
+}
+.listView {
+  max-width: 720px;
+}
+.money {
+  font-variant-numeric: tabular-nums;
+}
+.fresh {
+  animation: fresh-in var(--dur-3) var(--ease-out);
+}
+@keyframes fresh-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* Celular: moldura de 390 com o mesmo quadro. */
+.phone {
+  width: min(390px, 100%);
+  height: 720px;
+  padding: var(--s-4) 0 var(--s-4) var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  background: var(--paper);
+  overflow: clip;
+}
+.pipeline[data-narrow] .toolbar {
+  padding-right: var(--s-4);
+}
+.pipeline[data-narrow] .search {
+  flex: 1 1 100%;
+  width: auto;
+}
+.pipeline[data-narrow] .owner {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+}
+.pipeline[data-narrow] .toolbarEnd {
+  margin-left: 0;
+}
+.pipeline[data-narrow] .board {
+  margin-inline: 0 0;
+  padding-inline: 0 var(--s-4);
+  scroll-padding-inline: 0;
+}
+
+/* Estados parados */
+.states {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--s-8) var(--s-6);
+}
+.states > figure:last-child {
+  width: auto;
+}
+.liftedWrap {
+  position: relative;
+  display: grid;
+}
+.lifted {
+  position: absolute;
+  inset: -6px -12px auto 12px;
+}
+.collapsedCell {
+  display: flex;
+  height: 236px;
+}
+.cell {
+  width: 100%;
+  max-width: 296px;
+}
+.cell[data-lift] {
+  padding: 4px 6px 10px;
+}
+
+@media (max-width: 640px) {
+  .search {
+    flex: 1 1 100%;
+    width: auto;
+  }
+  .owner {
+    flex: 1;
+    width: auto;
+  }
+  .toolbarEnd {
+    margin-left: 0;
+  }
+  .board {
+    margin-inline: calc(var(--s-4) * -1);
+    padding-inline: var(--s-4);
+  }
+  .phone {
+    border: 0;
+    padding: 0;
+    height: 640px;
+  }
+}

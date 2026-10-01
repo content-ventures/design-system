@@ -1,0 +1,335 @@
+/*
+ * Gaveta lateral. Papel branco flutuando 8 px dentro da janela, raio 2xl e sombra de camada
+ * (--shadow-xl) sobre o mesmo véu do modal. Chapada: nada de degradê ou brilho.
+ */
+.drawer {
+  --drawer-w: 520px;
+  --drawer-inset: 8px;
+  --drawer-pad: 24px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: min(var(--drawer-w), calc(100vw - var(--drawer-inset) * 2));
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-2xl);
+  color: var(--text);
+  background: var(--paper);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  outline: none;
+}
+
+/* ——— Camada real (<dialog>) ——— */
+dialog.drawer {
+  position: fixed;
+  inset: var(--drawer-inset) var(--drawer-inset) var(--drawer-inset) auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+}
+dialog.drawer:not([open]) {
+  display: none;
+}
+dialog.drawer[data-state='open'] {
+  animation: slideIn var(--dur-3) var(--ease-out);
+}
+dialog.drawer[data-state='closing'] {
+  pointer-events: none;
+  animation: slideOut 200ms var(--ease-in) forwards;
+}
+dialog.drawer::backdrop {
+  background: var(--overlay);
+  backdrop-filter: blur(var(--overlay-blur));
+  animation: fadeIn var(--dur-2) var(--ease-out);
+}
+dialog.drawer[data-state='closing']::backdrop {
+  animation: fadeOut 200ms var(--ease-in) forwards;
+}
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+@keyframes slideOut {
+  to {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}
+/* Presa a um contêiner (simulador): mesma geometria, dentro dele. */
+.containedRoot {
+  display: block;
+  padding: 0;
+}
+dialog.drawer[data-contained] {
+  position: absolute;
+  inset: var(--drawer-inset) var(--drawer-inset) var(--drawer-inset) auto;
+  width: min(var(--drawer-w), calc(100% - var(--drawer-inset) * 2));
+}
+
+/* Celular: tela inteira, sem raio, entra pela direita. */
+@media (max-width: 640px) {
+  dialog.drawer:not([data-contained]) {
+    --drawer-inset: 0px;
+    width: 100vw;
+    border-radius: 0;
+  }
+  dialog.drawer:not([data-contained])[data-state='open'] {
+    animation-name: pushIn;
+  }
+  dialog.drawer:not([data-contained])[data-state='closing'] {
+    animation-name: pushOut;
+  }
+}
+@keyframes pushIn {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes pushOut {
+  to {
+    transform: translateX(100%);
+  }
+}
+/*
+ * A margem interna acompanha a largura da própria gaveta, não a da janela. O contêiner é um
+ * invólucro interno: a camada (<dialog>) não vira bloco de contenção dos flutuantes fixos.
+ */
+.inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  container: drawer / inline-size;
+}
+/* Estreita: margem 16; o estado do rodapé ocupa a linha de cima e as ações dividem a de baixo. */
+@container drawer (max-width: 420px) {
+  .toolbar,
+  .head,
+  .body,
+  .foot {
+    --drawer-pad: 16px;
+  }
+  .footStart {
+    flex-basis: 100%;
+  }
+  .foot > :not(.footStart) {
+    flex: 1 1 0;
+    min-width: max-content;
+  }
+}
+
+/* ——— Moldura estática (pranchas) ——— */
+.frame {
+  position: relative;
+  max-width: 100%;
+}
+.frame[data-fullscreen] {
+  --drawer-pad: 16px;
+  width: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+
+/*
+ * Alinhamento: a borda esquerda de tudo (ação da barra, título, corpo, rodapé) cai a 24 px;
+ * à direita, o desenho do ícone de fechar cai a 24 px (o botão fantasma sobra 8 px para fora).
+ */
+
+/* ——— Barra de ações (com `toolbar`) ——— */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  min-height: 56px;
+  padding: 12px calc(var(--drawer-pad) - 8px) 12px var(--drawer-pad);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-1) var(--ease-out);
+}
+.toolbar[data-scrolled],
+.head[data-scrolled] {
+  border-bottom-color: var(--line-soft);
+}
+.toolbarStart {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* em gavetas muito estreitas a ação corta em vez de invadir os ícones; a folga guarda o foco */
+  overflow: hidden;
+  margin: -4px;
+  padding: 4px;
+}
+/* nome em linha quando o título rolou para fora */
+.condensed {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  margin-left: 4px;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 4px;
+  transition:
+    opacity var(--dur-2) var(--ease-out),
+    translate var(--dur-2) var(--ease-out),
+    visibility 0s linear var(--dur-2);
+}
+.condensed::before {
+  content: '';
+  flex-shrink: 0;
+  width: 1px;
+  height: 16px;
+  background: var(--line);
+}
+.condensedText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.toolbar[data-condensed] .condensed {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 0;
+  transition:
+    opacity var(--dur-2) var(--ease-out),
+    translate var(--dur-2) var(--ease-out),
+    visibility 0s;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+/* ——— Cabeçalho compacto (sem `toolbar`) ——— */
+.head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 20px calc(var(--drawer-pad) - 8px) 18px var(--drawer-pad);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-1) var(--ease-out);
+}
+.head .actions {
+  margin-top: -4px;
+}
+
+/* ——— Título ——— */
+.heading {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.leading {
+  display: flex;
+  flex-shrink: 0;
+}
+.titles {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.title {
+  font: var(--t-title-2);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.heading[data-size='lg'] .title {
+  font: var(--t-figure-lg);
+  letter-spacing: var(--track-title);
+  /* nomes longos param na segunda linha; o nome inteiro segue no leitor de tela */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+.description {
+  font: var(--t-small);
+  color: var(--muted);
+}
+
+/* ——— Corpo rolável ——— */
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-200) transparent;
+}
+.body[data-padding='md'] {
+  padding: 4px var(--drawer-pad) 24px;
+}
+.head + .body[data-padding='md'] {
+  padding-top: 4px;
+}
+.body[data-padding='none'] .intro {
+  padding: 4px var(--drawer-pad) 0;
+}
+.intro {
+  padding-bottom: 20px;
+}
+
+/* ——— Rodapé em faixa clara ——— */
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  /* sem espaço, os botões descem para uma segunda linha em vez de espremer o texto de apoio */
+  flex-wrap: wrap;
+  row-gap: 10px;
+  padding: 16px var(--drawer-pad);
+  border-top: 1px solid var(--line-soft);
+  background: var(--g-25);
+}
+.footStart {
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font: var(--t-small);
+  color: var(--muted);
+}
+.footStart svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.75;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog.drawer[data-state],
+  dialog.drawer::backdrop {
+    animation: none !important;
+  }
+}

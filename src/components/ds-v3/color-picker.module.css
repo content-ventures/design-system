@@ -1,0 +1,189 @@
+/* Cor de marca: amostra + hexadecimal no `.control` dos campos; painel com cores prontas. */
+.box.box {
+  gap: 8px;
+  padding: 0 4px 0 5px;
+}
+.box[data-force~='hover']:not([data-disabled]) {
+  border-color: var(--line-hover);
+}
+.box.box[data-force~='focus'],
+.box.box[data-open='true'] {
+  outline: none;
+  border-color: var(--b-500);
+  box-shadow: var(--ring-field);
+}
+.box input {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.box input::placeholder {
+  text-transform: none;
+}
+
+.swatchButton {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-sm);
+  transition: transform var(--dur-1) var(--ease-out);
+}
+.swatchButton:hover:not(:disabled) {
+  transform: scale(1.06);
+}
+.swatchButton:active:not(:disabled) {
+  transform: scale(0.96);
+}
+.swatchButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.swatch,
+.readoutSwatch {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-sm);
+  background: var(--swatch);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+  transition: background-color var(--dur-2) var(--ease-out);
+}
+
+.toggle {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-sm);
+  color: var(--g-400);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.toggle svg {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--dur-2) var(--ease-out);
+}
+.toggle:hover:not(:disabled),
+.box[data-open='true'] .toggle {
+  color: var(--g-600);
+}
+.box[data-open='true'] .toggle svg {
+  transform: rotate(180deg);
+}
+.toggle:disabled {
+  cursor: not-allowed;
+  color: var(--disabled-icon);
+}
+
+/* ——— Painel: do tamanho da grade, alinhado à esquerda do campo (aberto ou parado na prancha) ——— */
+.panel.panel {
+  --preset: 28px;
+  display: grid;
+  gap: 12px;
+  width: max-content;
+  padding: 12px;
+}
+.panel.panel[data-inline] {
+  justify-self: start;
+  max-width: 100%;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, var(--preset));
+  gap: 8px;
+}
+.preset {
+  width: var(--preset);
+  height: var(--preset);
+  border-radius: var(--r-md);
+  background: var(--swatch);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+  transition:
+    transform var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-1) var(--ease-out);
+}
+/* Hover: cresce um pouco e ganha um fio neutro em volta (a escolhida tem o fio em tinta) */
+.preset:is(:hover, [data-force~='hover']):not([aria-pressed='true']) {
+  transform: scale(1.06);
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.08),
+    0 0 0 2px var(--paper),
+    0 0 0 3px var(--g-300);
+}
+.preset:active {
+  transform: scale(0.94);
+}
+/* Escolhida: 2 px de papel e 1 px de tinta em volta */
+.preset[aria-pressed='true'] {
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.08),
+    0 0 0 2px var(--paper),
+    0 0 0 3px var(--ink);
+}
+.preset:focus-visible {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: 4px;
+}
+
+.readout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  margin: 0 -12px;
+  padding: 10px 12px 0;
+  border-top: 1px solid var(--line-soft);
+}
+.readoutSwatch {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--r-xs);
+}
+.hex {
+  font: var(--t-small-strong);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.contrast {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font: var(--t-caption-strong);
+  color: var(--amber-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.contrast[data-pass] {
+  color: var(--green-ink);
+}
+/* Texto branco sobre a cor: o caso que o contraste mede */
+.contrastDemo {
+  display: inline-grid;
+  place-items: center;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--r-xs);
+  font: 600 11.5px/1 var(--font);
+  color: #fff;
+  background: var(--swatch);
+}
+
+/* Toque: amostras de 36 px (8 de vão) e a amostra do campo com 40 px de alvo. */
+@media (pointer: coarse) {
+  .panel.panel {
+    --preset: 36px;
+  }
+  .swatchButton {
+    position: relative;
+  }
+  .swatchButton::after {
+    content: '';
+    position: absolute;
+    inset: -7px;
+  }
+}

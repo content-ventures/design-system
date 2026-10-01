@@ -1,0 +1,239 @@
+/*
+ * Alternáveis. Só cor muda: fundo, fio e texto cruzam em 120 ms, sem escala nem marca de check.
+ * Cada :hover / :active / :focus-visible tem o gêmeo [data-force] das pranchas.
+ */
+
+/* ——— ToggleButton ——— */
+.toggle {
+  --tg-h: var(--h-sm);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--tg-h);
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  font: var(--t-small-strong);
+  letter-spacing: var(--track-tight);
+  white-space: nowrap;
+  color: var(--text);
+  background: var(--paper);
+  box-shadow: var(--shadow-xs);
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.toggle[data-size='md'] {
+  --tg-h: var(--h-md);
+  gap: 7px;
+  padding: 0 13px;
+  border-radius: var(--r-md);
+  font: var(--t-body-strong);
+}
+.toggle svg {
+  width: 15px;
+  height: 15px;
+  color: var(--icon-rest);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.toggle[data-size='md'] svg {
+  width: var(--icon-md);
+  height: var(--icon-md);
+}
+.toggle[data-variant='ghost'] {
+  border-color: transparent;
+  background: none;
+  box-shadow: none;
+}
+
+.toggle:where(:hover, [data-force~='hover']):where(:not(:disabled)) {
+  color: var(--ink);
+  background: var(--g-25);
+  border-color: var(--line-hover);
+}
+.toggle[data-variant='ghost']:where(:hover, [data-force~='hover']):where(:not(:disabled)) {
+  background: var(--paper-hover);
+  border-color: transparent;
+}
+.toggle:where(:hover, [data-force~='hover']):where(:not(:disabled)) svg {
+  color: var(--icon-hover);
+}
+.toggle:where(:active, [data-force~='active']):where(:not(:disabled)) {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.toggle[data-variant='ghost']:where(:active, [data-force~='active']):where(:not(:disabled)) {
+  background: var(--paper-pressed);
+}
+
+/* Ligado: azul suave, sem fio (igual ao “Filtros” aberto do dashboard) */
+.toggle[aria-pressed='true'] {
+  color: var(--b-700);
+  background: var(--b-50);
+  border-color: transparent;
+  box-shadow: none;
+}
+.toggle[aria-pressed='true'] svg {
+  color: var(--b-600);
+}
+.toggle[aria-pressed='true']:where(:hover, [data-force~='hover']):where(:not(:disabled)) {
+  color: var(--b-700);
+  background: var(--b-100);
+  border-color: transparent;
+}
+.toggle[aria-pressed='true']:where(:active, [data-force~='active']):where(:not(:disabled)) {
+  color: var(--b-800);
+  background: var(--b-200);
+}
+
+.toggle:disabled {
+  cursor: not-allowed;
+  color: var(--disabled-ink);
+  background: var(--disabled-bg);
+  border-color: var(--disabled-line);
+  box-shadow: none;
+}
+.toggle:disabled svg {
+  color: var(--disabled-icon);
+}
+.toggle[data-variant='ghost']:disabled {
+  background: none;
+  border-color: transparent;
+}
+
+.toggle .count {
+  font: var(--t-small-strong);
+  color: var(--muted);
+  animation: countIn var(--dur-2) var(--ease-out);
+}
+.toggle[aria-pressed='true'] .count {
+  color: var(--b-600);
+}
+@keyframes countIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ——— ToggleGroup: pílulas de escolha ——— */
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pill {
+  --tg-h: var(--h-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: var(--tg-h);
+  padding: 0 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  font: var(--t-small-strong);
+  letter-spacing: var(--track-tight);
+  white-space: nowrap;
+  color: var(--text);
+  background: var(--paper);
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.group[data-size='md'] .pill {
+  --tg-h: var(--h-md);
+  padding: 0 13px;
+  font: var(--t-body-strong);
+}
+.pill svg {
+  width: 15px;
+  height: 15px;
+  color: var(--icon-quiet);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.pill .count {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  transition: color var(--dur-1) var(--ease-out);
+}
+
+/* Hover de algo escolhível: fio b-200 + fundo g-25 */
+.pill:where(:hover, [data-force~='hover']):where(:not(:disabled)) {
+  color: var(--ink);
+  background: var(--g-25);
+  border-color: var(--choice-hover-line);
+}
+.pill:where(:hover, [data-force~='hover']):where(:not(:disabled)) svg {
+  color: var(--icon-rest);
+}
+.pill:where(:active, [data-force~='active']):where(:not(:disabled)) {
+  background: var(--g-75);
+  border-color: var(--choice-hover-line);
+}
+
+/* Ligada: seleção grande — b-25 + fio b-300 + texto b-700; ícone e contagem em b-600 */
+.pill[aria-pressed='true'] {
+  color: var(--select-ink);
+  background: var(--select-bg);
+  border-color: var(--select-line);
+}
+.pill[aria-pressed='true'] svg,
+.pill[aria-pressed='true'] .count {
+  color: var(--b-600);
+}
+.pill[aria-pressed='true']:where(:hover, [data-force~='hover']):where(:not(:disabled)) {
+  color: var(--select-ink);
+  background: var(--b-50);
+  border-color: var(--select-line);
+}
+.pill[aria-pressed='true']:where(:hover, [data-force~='hover']):where(:not(:disabled)) svg {
+  color: var(--b-600);
+}
+.pill[aria-pressed='true']:where(:active, [data-force~='active']):where(:not(:disabled)) {
+  background: var(--b-100);
+}
+
+/* Inválido: o grupo pede uma escolha — fio vermelho suave nas opções desligadas */
+.group[aria-invalid='true'] .pill:not([aria-pressed='true'], :disabled) {
+  border-color: var(--red-line);
+}
+.group[aria-invalid='true']
+  .pill:not([aria-pressed='true'], :disabled):where(:hover, [data-force~='hover']) {
+  border-color: var(--red-dot);
+}
+
+.pill:disabled {
+  cursor: not-allowed;
+  color: var(--disabled-ink);
+  background: var(--disabled-bg);
+  border-color: var(--disabled-line);
+}
+.pill:disabled svg,
+.pill:disabled .count {
+  color: var(--disabled-icon);
+}
+.pill[aria-pressed='true']:disabled {
+  opacity: 0.55;
+}
+
+/* Toque: 40 px de alvo nas pílulas (o fio continua com 32/36) */
+@media (pointer: coarse) {
+  .pill {
+    position: relative;
+  }
+  .pill::after {
+    content: '';
+    position: absolute;
+    inset: -3px 0;
+  }
+}

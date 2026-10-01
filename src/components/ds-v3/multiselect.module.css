@@ -1,0 +1,252 @@
+/*
+ * Seleção múltipla. A caixa é o `.control` dos campos; o botão do combobox cobre a caixa inteira
+ * (clique em qualquer ponto abre) e as fichas ficam por cima, numa linha só.
+ */
+.root {
+  position: relative;
+  min-width: 0;
+}
+.box.box[data-size] {
+  gap: 6px;
+  padding: 0 10px 0 6px;
+  cursor: pointer;
+}
+.box[data-disabled='true'] {
+  cursor: not-allowed;
+}
+.box[data-force~='hover']:not([data-disabled]),
+.box:hover:not([data-disabled]):not([data-open]) {
+  border-color: var(--line-hover);
+}
+.box.box:has(.trigger:focus-visible),
+.box.box[data-force~='focus'],
+.box.box[data-open='true'] {
+  outline: none;
+  border-color: var(--b-500);
+  box-shadow: var(--ring-field);
+}
+/* Clique não acende o anel: só teclado (foco visível) ou painel aberto. */
+.box.box:focus-within:not([data-open], [data-force~='focus'], [data-disabled], [data-invalid]):not(
+    :has(.trigger:focus-visible)
+  ) {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-xs);
+}
+.box.box:focus-within:hover:not([data-open], [data-invalid]):not(:has(.trigger:focus-visible)) {
+  border-color: var(--line-hover);
+}
+.box.box[data-invalid='true']:not([data-open]) {
+  border-color: var(--red-dot);
+  box-shadow: var(--ring-invalid);
+}
+.trigger {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 34px 0 12px;
+  border-radius: inherit;
+  text-align: left;
+  outline: none;
+}
+.box[data-size='sm'] .trigger {
+  padding-left: 10px;
+}
+.trigger:disabled {
+  cursor: not-allowed;
+}
+.placeholder {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: var(--t-body);
+  color: var(--subtle);
+}
+.box[data-size='sm'] .placeholder {
+  font: var(--t-small);
+}
+
+/* Fichas: até duas e a contagem, sem quebrar linha */
+.chips {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  /* Corta só na horizontal: a área de toque do "remover" passa da ficha para cima e para baixo. */
+  overflow-x: clip;
+  overflow-y: visible;
+  pointer-events: none;
+}
+/* Régua invisível com a largura natural das fichas (o JS decide quantas cabem). */
+.ruler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  width: max-content;
+  visibility: hidden;
+  pointer-events: none;
+}
+.ruler > * {
+  flex-shrink: 0;
+}
+.ruler .chip {
+  animation: none;
+}
+.chipWrap {
+  display: inline-grid;
+  flex: 0 1 auto;
+  grid-template-columns: 1fr;
+  min-width: 0;
+  margin-right: 4px;
+}
+.chipWrap[data-leaving] {
+  pointer-events: none;
+  animation: chipOut var(--dur-2) var(--ease-in) forwards;
+}
+@keyframes chipOut {
+  to {
+    grid-template-columns: 0fr;
+    margin-right: 0;
+    opacity: 0;
+  }
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  height: 24px;
+  padding: 0 2px 0 8px;
+  border-radius: var(--r-sm);
+  font: var(--t-small-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  background: var(--g-75);
+  overflow-x: clip;
+  overflow-y: visible;
+  animation: chipIn var(--dur-1) var(--ease-out);
+}
+.box[data-size='sm'] .chip {
+  height: 22px;
+  border-radius: var(--r-xs);
+  font: var(--t-caption-strong);
+}
+@keyframes chipIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+.chipText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chipRemove {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-xs);
+  color: var(--g-400);
+  pointer-events: auto;
+  transition:
+    color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+}
+.chipRemove:hover {
+  color: var(--ink);
+  background: var(--g-150);
+}
+.chipRemove svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.25;
+}
+.box[data-disabled='true'] .chip {
+  color: var(--disabled-ink);
+  background: var(--g-75);
+}
+.more {
+  display: inline-flex;
+  flex-shrink: 0;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.box .chevron {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  color: var(--g-400);
+  pointer-events: none;
+  transition:
+    transform var(--dur-2) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.box:hover:not([data-disabled]) .chevron,
+.box[data-open='true'] .chevron {
+  color: var(--g-600);
+}
+.box[data-open='true'] .chevron {
+  transform: rotate(180deg);
+}
+.box[data-disabled='true'] .chevron {
+  color: var(--disabled-icon);
+}
+
+/* Painel: opções com caixa à esquerda */
+.option {
+  align-items: flex-start;
+}
+.option > :first-child {
+  margin-top: 1px;
+}
+.list .option:not([aria-disabled='true']):is([data-active='true']) {
+  background: var(--g-75);
+}
+.option.option[aria-selected='true'] {
+  font-weight: 400;
+}
+.all {
+  margin-bottom: 4px;
+}
+.all::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: -3px;
+  height: 1px;
+  background: var(--line-soft);
+}
+.all {
+  position: relative;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* Toque: o campo tem a altura dos outros (44) e o "remover" ganha 40 px de alvo sem mudar o desenho. */
+@media (pointer: coarse) {
+  .box.box[data-size='md'] {
+    height: var(--h-md);
+    min-height: var(--h-md);
+  }
+  /* Sem corte na ficha (o texto já encurta sozinho): o alvo do "remover" chega a 40 × 40. */
+  .chip {
+    overflow: visible;
+  }
+  .chipRemove::after {
+    content: '';
+    position: absolute;
+    inset: -10px -6px -10px -14px;
+  }
+}

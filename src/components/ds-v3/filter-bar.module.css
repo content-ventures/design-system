@@ -1,0 +1,257 @@
+/* ——— Barra: recortes à esquerda, ferramentas à direita, um fio só embaixo ——— */
+.root {
+  container: filterbar / inline-size;
+  width: 100%;
+  min-width: 0;
+}
+.bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  min-width: 0;
+}
+.root[data-tabs] .bar {
+  box-shadow: inset 0 -1px 0 var(--line);
+}
+.tabs {
+  flex: 1;
+  min-width: 0;
+}
+/* Lado a lado, o fio é da barra inteira: as abas não desenham o próprio. */
+.root:not([data-stacked]) .tabs > [role='tablist'] {
+  box-shadow: none;
+}
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding-bottom: 6px;
+}
+/* Sem abas: busca à esquerda, botões à direita. */
+.root:not([data-tabs]) .tools {
+  flex: 1;
+  padding-bottom: 0;
+}
+/* A busca nunca fica abaixo de 220 px (o texto de ajuda inteiro); com abas, a medida da barra
+   empilha antes disso. Sem abas, ela ocupa o espaço livre até 320. */
+.search {
+  width: clamp(220px, 17vw, 260px);
+}
+.root:not([data-tabs]) .search {
+  flex: 0 1 320px;
+  min-width: 240px;
+  margin-right: auto;
+}
+
+/* Empilhada: abas inteiras em cima com o fio delas; ferramentas embaixo, a busca estica até 320. */
+.root[data-stacked] .bar {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  box-shadow: none;
+}
+.root[data-stacked] .tools {
+  justify-content: flex-start;
+  padding: 10px 0 0;
+}
+.root[data-stacked] .search {
+  flex: 1;
+  width: auto;
+  max-width: 320px;
+}
+@container filterbar (max-width: 640px) {
+  .tools {
+    flex-wrap: wrap;
+  }
+  .root[data-stacked] .search,
+  .root:not([data-tabs]) .search,
+  .search {
+    flex: 1 1 100%;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
+  /* Abas sangram até a borda e esmaecem: a próxima aparece pela metade, convidando a rolar. */
+  .tabs > [role='tablist'] {
+    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  }
+}
+
+/* ——— Faixa de filtros: abre por altura, sem “Aplicar” ——— */
+/* Fecha mais curto que abre: saída em --dur-exit com --ease-in; entrada em --dur-3 com --ease-out. */
+.bandWrap {
+  container: filterband / inline-size;
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-bottom: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--dur-exit) var(--ease-in),
+    margin-bottom var(--dur-exit) var(--ease-in),
+    visibility 0s linear var(--dur-exit);
+}
+.bandWrap[data-open] {
+  grid-template-rows: 1fr;
+  margin-bottom: 14px;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--dur-3) var(--ease-out),
+    margin-bottom var(--dur-3) var(--ease-out),
+    visibility 0s;
+}
+.bandClip {
+  min-height: 0;
+  overflow: clip;
+}
+.bandWrap[data-settled] .bandClip {
+  overflow: visible;
+}
+.band {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: var(--r-md);
+  background: var(--g-50);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity var(--dur-exit) var(--ease-in),
+    transform var(--dur-exit) var(--ease-in);
+}
+.bandWrap[data-open] .band {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--dur-2) var(--ease-out),
+    transform var(--dur-3) var(--ease-out);
+}
+.field {
+  width: 196px;
+  min-width: 0;
+}
+.field[data-wide] {
+  width: 264px;
+}
+.clear {
+  display: inline-flex;
+  align-items: center;
+  height: var(--h-sm);
+  padding: 0 6px;
+  animation: fadeIn var(--dur-2) var(--ease-out);
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Celular: duas colunas fluidas; o período e “Limpar” ganham a linha. */
+@container filterband (max-width: 640px) {
+  .band {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .field,
+  .field[data-wide] {
+    width: auto;
+  }
+  .field[data-wide],
+  .clear {
+    grid-column: 1 / -1;
+  }
+  .clear {
+    justify-self: start;
+    height: auto;
+    padding: 2px 2px 0;
+  }
+}
+
+/* ——— Filtros aplicados ——— */
+.active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-width: 0;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+/* “+2”: o mesmo desenho do chip, abre um menu com o resto. */
+.more {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  font: var(--t-small-strong);
+  color: var(--text);
+  background: var(--paper);
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out);
+}
+.more:is(:hover, [data-force~='hover'], [aria-expanded='true']) {
+  color: var(--ink);
+  background: var(--g-25);
+  border-color: var(--line-hover);
+}
+.more:is(:active, [data-force~='active']) {
+  background: var(--g-50);
+}
+.clearAll {
+  flex: none;
+}
+.summary {
+  margin-left: auto;
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Painel do chip (editar o filtro) */
+.popover {
+  position: fixed;
+  z-index: var(--z-popover);
+  min-width: 220px;
+  max-width: calc(100vw - 16px);
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  box-shadow: var(--shadow-lg);
+  animation: popIn var(--dur-2) var(--ease-out);
+}
+.popover[data-up] {
+  animation-name: popInUp;
+}
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+@keyframes popInUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clear,
+  .popover {
+    animation: none;
+  }
+}

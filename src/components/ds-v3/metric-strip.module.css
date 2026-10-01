@@ -1,0 +1,261 @@
+/*
+ * Faixa de indicadores (a mesma régua do Analytics do /dashboardv3): um contorno de 1 px e raio 10,
+ * células em papel unidas por fio de 1 px. Sem ícone, sem fundo colorido, sem contagem animada.
+ * O fio é um traço à direita e embaixo de cada célula, pintado numa camada acima dos fundos (senão o
+ * papel da célula vizinha o cobre); a moldura recorta os da borda, então uma linha incompleta não
+ * deixa buraco cinza.
+ */
+.root {
+  container: metrics / inline-size;
+  width: 100%;
+  min-width: 0;
+}
+.strip {
+  --cols: 4;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  overflow: clip;
+  isolation: isolate;
+}
+.strip[data-cols='1'] {
+  --cols: 1;
+}
+.strip[data-cols='2'] {
+  --cols: 2;
+}
+.strip[data-cols='3'] {
+  --cols: 3;
+}
+.strip[data-cols='5'] {
+  --cols: 5;
+}
+.strip[data-cols='6'] {
+  --cols: 6;
+}
+
+/* Célula com dica: o invólucro da dica vira a célula da grade. */
+.strip > span {
+  display: grid;
+  min-width: 0;
+}
+.metric {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'label change'
+    'value value'
+    'meter meter'
+    'hint hint';
+  align-content: start;
+  align-items: center;
+  gap: 2px 6px;
+  min-width: 0;
+  padding: 13px 14px 14px 16px;
+  background: var(--paper);
+  outline-offset: -2px;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.metric::after {
+  content: '';
+  position: absolute;
+  inset: 0 -1px -1px 0;
+  z-index: 1;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  pointer-events: none;
+}
+/* Célula com comparação na dica: reage ao ponteiro e ao foco. */
+.metric[data-tip] {
+  cursor: default;
+}
+.metric[data-tip]:is(:hover, [data-force~='hover']) {
+  background: var(--g-25);
+}
+.metric:is(:focus-visible, [data-force~='focus']) {
+  z-index: 2;
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: -2px;
+}
+
+.label {
+  grid-area: label;
+  min-width: 0;
+  min-height: 18px;
+  font: var(--t-small);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.change {
+  grid-area: change;
+  justify-self: end;
+  display: inline-flex;
+  animation: swap var(--dur-1) var(--ease-out);
+}
+.value {
+  grid-area: value;
+  align-self: end;
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+  min-width: 0;
+  margin-top: 4px;
+  font: var(--t-kpi);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  animation: swap var(--dur-1) var(--ease-out);
+}
+.value[data-empty] {
+  color: var(--muted);
+}
+.unit {
+  font: 500 14px/20px var(--font);
+  letter-spacing: 0;
+  color: var(--muted);
+}
+@keyframes swap {
+  from {
+    opacity: 0;
+  }
+}
+.meter {
+  grid-area: meter;
+  position: relative;
+  display: block;
+  height: 4px;
+  margin: 6px 0 4px;
+  border-radius: var(--r-full);
+  background: var(--g-100);
+  overflow: hidden;
+}
+.meter i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--b-600);
+  transition: width var(--dur-3) var(--ease-out);
+}
+.hint {
+  grid-area: hint;
+  min-width: 0;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hint[data-warn] {
+  font-weight: 500;
+  color: var(--amber-ink);
+}
+
+/* Carregando: a geometria final em blocos chapados que pulsam. */
+.skelValue,
+.skelHint {
+  display: block;
+  border-radius: var(--r-xs);
+  background: var(--skeleton);
+  animation: pulse var(--skeleton-pulse) ease-in-out infinite;
+}
+/* Mesma altura do valor (28 + 4) e da legenda (16); a largura é da célula inteira, não da trilha. */
+.skelValue {
+  grid-area: value;
+  grid-column: 1 / -1;
+  width: clamp(56px, 62%, 140px);
+  height: 20px;
+  margin: 9px 0 3px;
+}
+.skelHint {
+  grid-area: hint;
+  grid-column: 1 / -1;
+  width: clamp(48px, 44%, 112px);
+  height: 10px;
+  margin: 5px 0 1px;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* Faixa de formulário: números de 16, célula mais baixa. */
+.strip[data-size='figure'] .metric {
+  padding: 11px 14px 12px;
+}
+.strip[data-size='figure'] .value {
+  margin-top: 2px;
+  font: var(--t-figure);
+  letter-spacing: -0.012em;
+}
+.strip[data-size='figure'] .unit {
+  font: 500 12px/18px var(--font);
+}
+.strip[data-size='figure'] .skelValue {
+  height: 16px;
+  margin: 6px 0 4px;
+}
+
+/* ——— Quebras pela largura do contêiner ——— */
+/* Seis células abaixo de 1120 px ficam com menos de 180 px: “Entrega vs. plano” e a variação não
+   cabem lado a lado. Viram 3 × 2, como o Analytics em painel estreito. */
+@container metrics (max-width: 1120px) {
+  .strip[data-cols='6'] {
+    --cols: 3;
+  }
+}
+@container metrics (max-width: 1040px) {
+  .strip[data-cols='5'] {
+    --cols: 3;
+  }
+}
+@container metrics (max-width: 640px) {
+  .strip:is([data-cols='4'], [data-cols='5'], [data-cols='6']) {
+    --cols: 2;
+  }
+  .strip[data-size='kpi'] .metric {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'label label'
+      'value change'
+      'meter meter'
+      'hint hint';
+    padding: 12px 14px 13px;
+  }
+  .strip[data-size='kpi'] .value {
+    font: 600 20px/26px var(--font);
+  }
+  .strip[data-size='kpi'] .skelValue {
+    height: 18px;
+    margin: 8px 0 4px;
+  }
+  .strip[data-size='kpi'] .change {
+    justify-self: start;
+    align-self: end;
+    margin-bottom: 4px;
+  }
+  .hint {
+    white-space: normal;
+  }
+}
+@container metrics (max-width: 340px) {
+  .strip[data-size='figure'] .metric {
+    padding: 10px 10px 11px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .value,
+  .change,
+  .skelValue,
+  .skelHint {
+    animation: none;
+  }
+}

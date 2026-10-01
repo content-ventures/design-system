@@ -1,0 +1,357 @@
+/*
+ * Diálogo de criação da campanha: progresso em fios (marcadores de 20 px, como a régua de etapas)
+ * e sucesso com um selo desenhado. Mesma superfície do Dialog do DS (raio 2xl, sem borda, sombra
+ * de camada flutuante) e o mesmo rodapé em faixa: os dois modais da criação são um modal só.
+ */
+.dialog {
+  width: min(440px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-2xl);
+  color: var(--text);
+  background: var(--paper);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  outline: none;
+}
+.dialog[open] {
+  animation: rise var(--dur-3) var(--ease-out);
+}
+/* A altura só anima depois da primeira medida: a troca progresso → sucesso cresce em vez de saltar. */
+.dialog[data-animate] {
+  transition: height var(--dur-3) var(--ease-out);
+}
+.dialog::backdrop {
+  background: var(--overlay);
+  backdrop-filter: blur(3px);
+  animation: fade var(--dur-2) ease-out;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+.inner {
+  padding: 24px;
+}
+
+/* ——— Cabeçalho comum ——— */
+.title {
+  overflow: hidden;
+  font: var(--t-title-2);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* Fatos em uma linha: quebram entre itens, nunca dentro; o "·" do começo de linha fica fora do recorte. */
+.facts {
+  overflow: hidden;
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.factsRow {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -13px;
+}
+.factsRow > span {
+  white-space: nowrap;
+}
+.factsRow > span::before {
+  content: '·';
+  display: inline-block;
+  width: 13px;
+  text-align: center;
+  color: var(--g-300);
+}
+
+/* ——— Progresso ——— */
+/* Saída: concluídas as etapas, o progresso esmaece e sobe 4 px antes de o sucesso entrar. */
+.progress {
+  transition:
+    opacity var(--dur-2) var(--ease-out),
+    transform var(--dur-2) var(--ease-out);
+}
+.progress[data-leaving] {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+.head {
+  display: grid;
+  gap: 2px;
+}
+.steps {
+  margin-top: 18px;
+  padding: 0;
+  list-style: none;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  border-top: 1px solid var(--line-soft);
+  font: var(--t-body);
+  color: var(--muted);
+  transition: color var(--dur-2) var(--ease-out);
+}
+.step[data-state='running'] {
+  font-weight: 500;
+  color: var(--ink);
+}
+.step[data-state='done'] {
+  color: var(--text);
+}
+.label {
+  flex: 1;
+  min-width: 0;
+}
+.marker {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--g-200);
+  border-radius: 50%;
+  font: 600 11px/18px var(--font);
+  color: var(--muted);
+  background: var(--paper);
+  font-variant-numeric: tabular-nums;
+  transition:
+    background var(--dur-2) var(--ease-out),
+    border-color var(--dur-2) var(--ease-out);
+}
+/* Em andamento já nasce azul claro: ao concluir, o marcador só ganha o check (sem anel cinza vazio). */
+.step[data-state='running'] .marker {
+  border-width: 0;
+  border-color: var(--b-200);
+  background: var(--b-50);
+}
+.step[data-state='done'] .marker {
+  color: var(--b-600);
+  border-color: var(--b-200);
+  background: var(--b-50);
+}
+.spinner {
+  width: 20px;
+  height: 20px;
+  animation: spin 0.8s linear infinite;
+}
+.spinnerTrack,
+.spinnerArc {
+  fill: none;
+  stroke-width: 2;
+}
+.spinnerTrack {
+  stroke: var(--b-100);
+}
+.spinnerArc {
+  stroke: var(--b-600);
+  stroke-linecap: round;
+  stroke-dasharray: 0.26 1;
+}
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+/* Check da linha: mesmo desenho da régua (11 px, traço 2,75), traçado da ponta curta para a longa. */
+.tick {
+  width: 11px;
+  height: 11px;
+}
+.tick path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  animation: draw var(--dur-2) var(--ease-out) backwards;
+}
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+.stepRef {
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  animation: fade var(--dur-2) ease-out;
+}
+
+/* ——— Sucesso ——— */
+.success {
+  display: grid;
+  gap: 18px;
+}
+/* Selo ao lado do título: um único bloco de leitura, alinhado ao conteúdo e ao rodapé. */
+.successHead {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+}
+.success .title {
+  white-space: normal;
+}
+.note {
+  margin-top: 1px;
+  font: var(--t-body);
+  color: var(--muted);
+  text-wrap: pretty;
+}
+/* O selo e o título já estão no primeiro quadro do sucesso (sem atraso nem opacidade zero): o disco
+   assenta, o anel e o check se desenham por cima. */
+.seal {
+  width: 40px;
+  height: 40px;
+  animation: settle 360ms var(--ease-spring) backwards;
+}
+.sealFill {
+  fill: var(--b-50);
+}
+.sealCheck {
+  fill: none;
+  stroke: var(--b-600);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  animation: draw var(--dur-3) var(--ease-out) 160ms backwards;
+}
+@keyframes settle {
+  from {
+    transform: scale(0.88);
+  }
+}
+.record {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px 11px;
+  border-radius: var(--r-md);
+  background: var(--g-50);
+}
+.recordHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.recordName {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.recordId {
+  flex: none;
+  margin-left: auto;
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+/* Rodapé em faixa, como o .dialogFoot do DS (g-25, fio interno, 16 × 24, gap 10). */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 4px -24px -24px;
+  padding: 16px 24px;
+  background: var(--g-25);
+  box-shadow: inset 0 1px 0 var(--line-soft);
+}
+/* O título não espera: só desliza 4 px. Registro e ações entram em seguida (60 / 120 ms). */
+.reveal {
+  animation: rise-in var(--dur-3) var(--ease-out) backwards;
+}
+.reveal[data-delay] {
+  animation-name: lift;
+}
+.reveal[data-delay='1'] {
+  animation-delay: 60ms;
+}
+.reveal[data-delay='2'] {
+  animation-delay: 120ms;
+}
+@keyframes rise-in {
+  from {
+    transform: translateY(4px);
+  }
+}
+@keyframes lift {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Celular: ações empilhadas, a principal em cima, as duas na largura toda. */
+@media (max-width: 480px) {
+  .inner {
+    padding: 20px;
+  }
+  .actions {
+    flex-direction: column-reverse;
+    margin: 4px -20px -20px;
+    padding: 14px 20px;
+  }
+  .actions > button {
+    width: 100%;
+  }
+}
+
+/* Tela muito baixa (celular deitado): o conteúdo rola dentro do diálogo em vez de ser cortado. */
+@media (max-height: 420px) {
+  .dialog {
+    overflow-y: auto;
+  }
+}
+
+/* Movimento reduzido: o sucesso aparece pronto (sem atrasos nem traçado). */
+@media (prefers-reduced-motion: reduce) {
+  .dialog[open],
+  .dialog::backdrop,
+  .spinner,
+  .tick path,
+  .stepRef,
+  .seal,
+  .sealFill,
+  .sealCheck,
+  .reveal {
+    animation: none;
+  }
+  .dialog[data-animate],
+  .progress,
+  .progress[data-leaving],
+  .step,
+  .marker {
+    transition: none;
+  }
+}

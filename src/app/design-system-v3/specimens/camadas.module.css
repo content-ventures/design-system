@@ -1,0 +1,1279 @@
+/* Camadas — layout local das pranchas. Cor, raio, tipo e movimento sempre por token. */
+
+/* ——————————————————————————— Base ——————————————————————————— */
+.stack {
+  display: grid;
+  gap: var(--s-4);
+  min-width: 0;
+}
+.panel {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.panelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  min-height: 52px;
+  padding: 0 var(--s-5);
+  border-bottom: 1px solid var(--line-soft);
+}
+.panelTitle {
+  font: var(--t-title-3);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+.figure {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  align-content: start;
+  gap: var(--s-3);
+  min-width: 0;
+  margin: 0;
+}
+.figure > figcaption {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+/* Fatos numa linha: quebram entre itens, nunca dentro; o “·” do começo de linha fica recortado. */
+.meta {
+  min-width: 0;
+  /* recorta só a esquerda: o anel de foco de um link na linha continua inteiro */
+  clip-path: inset(-6px -6px -6px 0);
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -13px;
+}
+.metaRow > span {
+  white-space: nowrap;
+}
+.metaRow > span::before {
+  content: '·';
+  display: inline-block;
+  width: 13px;
+  text-align: center;
+  color: var(--g-300);
+}
+.num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.rowText {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.rowText > strong {
+  overflow: hidden;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.rowText > span {
+  overflow: hidden;
+  font: var(--t-small);
+  color: var(--muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.grow {
+  flex: 1;
+}
+.miniEmpty {
+  padding: var(--s-4) 0;
+  font: var(--t-small);
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Vínculos e pares curtos: rótulo 13 --muted, número tabular à direita, fio fino entre linhas. */
+.links {
+  display: grid;
+  margin: 0;
+}
+.links > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: 7px 0;
+}
+.links > div + div {
+  border-top: 1px solid var(--line-soft);
+}
+.links dt {
+  font: var(--t-body);
+  color: var(--muted);
+}
+.links dd {
+  margin: 0;
+  font: var(--t-body);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Erro de envio no corpo do diálogo. */
+.sendError {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  padding: 10px 12px;
+  border: 1px solid var(--red-line);
+  border-radius: var(--r-md);
+  font: var(--t-small-strong);
+  color: var(--red-ink);
+  background: var(--red-bg);
+}
+.sendError svg {
+  flex-shrink: 0;
+  width: var(--icon-md);
+  height: var(--icon-md);
+  margin-top: 1px;
+  color: var(--red-dot);
+}
+.formStack {
+  display: grid;
+  gap: var(--s-4);
+}
+
+/* ——————————————————————————— Simulador de celular ——————————————————————————— */
+.phone {
+  position: relative;
+  width: min(390px, 100%);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  background: var(--paper);
+}
+.phoneSm {
+  width: 100%;
+}
+.phoneMd {
+  width: min(390px, 100%);
+}
+.phoneScreen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.phoneBar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  height: 48px;
+  padding: 0 var(--s-3);
+  border-bottom: 1px solid var(--line);
+  font: var(--t-body-strong);
+  color: var(--text);
+}
+.phoneBar svg {
+  width: var(--icon-md);
+  height: var(--icon-md);
+  color: var(--icon-rest);
+}
+.phoneBody {
+  display: grid;
+  align-content: start;
+  gap: var(--s-2);
+  padding: var(--s-5) var(--s-4);
+}
+.phoneTitle {
+  font: var(--t-figure-lg);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.phoneBody > :last-child {
+  margin-top: var(--s-3);
+}
+.phoneScrim {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay);
+  backdrop-filter: blur(var(--overlay-blur));
+}
+.phoneCenter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-4);
+}
+.phoneHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  flex-shrink: 0;
+  padding: var(--s-4) var(--s-4) var(--s-3);
+}
+.cardList {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: var(--s-2);
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0 var(--s-4) var(--s-4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  list-style: none;
+}
+.campaignCard {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  padding: 10px 6px 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.cardTop {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.cardName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.campaignCard .meta {
+  padding-right: var(--s-2);
+}
+.cardBottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px var(--s-3);
+  margin-top: 6px;
+  padding-right: var(--s-2);
+}
+.cardMoney {
+  margin-left: auto;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.inlineLink {
+  padding: 0;
+  border-radius: var(--r-xs);
+  font: inherit;
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+  transition: color var(--dur-1) var(--ease-out);
+}
+.inlineLink:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ——————————————————————————— Modal ——————————————————————————— */
+.detailHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s-4) var(--s-6);
+  padding: var(--s-6);
+}
+.detailTitles {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.titleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px var(--s-3);
+}
+.pageTitle {
+  font: var(--t-page);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.detailActions {
+  display: flex;
+  gap: var(--s-2);
+}
+.barPanel {
+  overflow: hidden;
+}
+.creationBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  min-height: var(--action-bar-h);
+  padding: 0 var(--s-6);
+  background: var(--paper);
+}
+.creationStep {
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.creationActions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.mainAction {
+  min-width: 196px;
+}
+.sizes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--s-8) var(--s-6);
+}
+.sizes > .figure {
+  max-width: 100%;
+}
+.stateGrid {
+  --cols: 3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--s-8) var(--s-5);
+}
+.stateGrid > .figure {
+  flex: 0 0 calc((100% - var(--s-5) * (var(--cols) - 1)) / var(--cols));
+  min-width: 0;
+}
+.splitRows {
+  display: grid;
+}
+.splitRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 104px 128px;
+  align-items: center;
+  gap: var(--s-4);
+  min-height: 52px;
+}
+.splitRow + .splitRow {
+  border-top: 1px solid var(--line-soft);
+}
+.splitName {
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.splitInput {
+  width: 104px;
+}
+.splitValue {
+  font: var(--t-body);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* ——————————————————————————— Confirmação ——————————————————————————— */
+.confirmGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-6) var(--s-5);
+}
+.confirmGrid > figure > div:first-child {
+  display: block;
+}
+.confirmCard {
+  width: 100%;
+}
+.rowLine {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 72px;
+  padding: var(--s-3) var(--s-5);
+}
+.rowLine > .rowText {
+  flex: 1;
+}
+.selectionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  min-height: 48px;
+  padding: 0 var(--s-3) 0 var(--s-5);
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--g-25);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+}
+.selectionCount {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.miniList {
+  margin: 0;
+  padding: 2px var(--s-5) 6px;
+  list-style: none;
+}
+.miniList > li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 40px;
+}
+.miniList > li + li {
+  border-top: 1px solid var(--line-soft);
+}
+.miniName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font: var(--t-body);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.triple {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 400px));
+  justify-content: center;
+  gap: var(--s-5);
+}
+.quad {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 400px));
+  justify-content: center;
+  gap: var(--s-8) var(--s-6);
+}
+.triple > figure,
+.quad > figure {
+  justify-items: stretch;
+}
+.triple figcaption,
+.quad figcaption {
+  text-align: center;
+}
+
+/* ——————————————————————————— Gaveta ——————————————————————————— */
+.drawerContext {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--s-4);
+}
+.drawerContext .links {
+  padding: 6px var(--s-5) 10px;
+}
+.leadList {
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+}
+.leadRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto 64px;
+  align-items: center;
+  gap: var(--s-3);
+  width: 100%;
+  min-height: 60px;
+  padding: 0 var(--s-3);
+  border-radius: var(--r-md);
+  text-align: left;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.leadRow:hover {
+  background: var(--g-25);
+}
+.leadRow:active {
+  background: var(--g-75);
+}
+.leadRow[data-current] {
+  background: var(--select-bg);
+}
+.leadRow:focus-visible {
+  outline-offset: -2px;
+}
+.leadOrigin {
+  font: var(--t-small);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.leadWhen {
+  display: flex;
+  justify-content: flex-end;
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.drawerPair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 520px));
+  justify-content: center;
+  gap: var(--s-8) var(--s-6);
+}
+.drawerPair > * {
+  min-width: 0;
+}
+.drawerPair > figure {
+  justify-items: stretch;
+}
+.drawerPair figcaption {
+  text-align: center;
+}
+.drawerBody {
+  display: grid;
+  gap: var(--s-6);
+}
+.drawerSection {
+  display: grid;
+  gap: var(--s-3);
+}
+.sectionTitle {
+  margin: 0;
+  font: var(--t-group);
+  color: var(--ink);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.channelForm {
+  display: grid;
+}
+.channelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  min-height: 64px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.shareInput {
+  flex-shrink: 0;
+  width: 96px;
+}
+.channelTotal {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-top: var(--s-4);
+  font: var(--t-body);
+  color: var(--muted);
+}
+.channelTotal strong {
+  font: var(--t-body-strong);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.channelTotal[data-off] strong {
+  color: var(--amber-ink);
+}
+.unsaved {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  white-space: nowrap;
+}
+.unsaved i {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--r-full);
+  background: var(--amber-dot);
+}
+
+/* ——————————————————————————— Bottom sheet ——————————————————————————— */
+.sheetStates {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s-5);
+}
+.sheetStates > figure {
+  justify-items: stretch;
+}
+.sheetStates figcaption {
+  text-align: center;
+}
+.linkGroups {
+  display: grid;
+  gap: var(--s-4);
+}
+.linkGroup {
+  display: grid;
+  gap: 6px;
+}
+.linkGroup > span {
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+.linkGroup em {
+  margin-left: 2px;
+  font-style: normal;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.filtersForm {
+  display: grid;
+  gap: var(--s-5);
+  padding-top: var(--s-1);
+}
+.fieldLike {
+  display: grid;
+  gap: 6px;
+}
+.fieldLabel {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.actionList {
+  margin: 0 -8px;
+  padding: 0;
+  list-style: none;
+}
+.actionItem {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--s-3);
+  border-radius: var(--r-md);
+  font: var(--t-body-strong);
+  color: var(--ink);
+  text-align: left;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.actionItem svg {
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+  color: var(--icon-rest);
+}
+.actionItem:is(:hover, [data-force~='hover']) {
+  background: var(--g-75);
+}
+.actionItem:is(:active, [data-force~='active']) {
+  background: var(--g-100);
+}
+.actionItem:focus-visible {
+  outline-offset: -2px;
+}
+.actionItem[data-danger] {
+  color: var(--red-ink);
+}
+.actionItem[data-danger] svg {
+  color: var(--red-dot);
+}
+.actionItem[data-danger]:hover {
+  background: var(--red-bg);
+}
+
+/* ——————————————————————————— Diálogo responsivo ——————————————————————————— */
+.device {
+  position: relative;
+  container: device / inline-size;
+  width: min(720px, 100%);
+  height: 480px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  background: var(--paper);
+  transition:
+    width var(--dur-3) var(--ease-move),
+    height var(--dur-3) var(--ease-move);
+}
+.device[data-device='celular'] {
+  width: min(390px, 100%);
+  height: 640px;
+}
+.deviceScreen {
+  display: grid;
+  align-content: start;
+  gap: var(--s-6);
+  height: 100%;
+  padding: var(--s-6);
+}
+.deviceScreen[data-phone] {
+  gap: var(--s-5);
+  padding: var(--s-5) var(--s-4);
+}
+.deviceHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s-4);
+}
+.deviceTitle {
+  font: var(--t-figure-lg);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.deviceActions {
+  display: flex;
+  gap: var(--s-2);
+}
+.deviceScreen[data-phone] .deviceActions {
+  width: 100%;
+}
+.deviceScreen[data-phone] .deviceActions > * {
+  flex: 1 1 0;
+  min-width: max-content;
+}
+.deviceGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  align-items: start;
+  gap: var(--s-6);
+}
+.deviceScreen[data-phone] .deviceGrid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-5);
+}
+.deviceMain,
+.deviceAside {
+  display: grid;
+  align-content: start;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.deviceAside {
+  justify-items: start;
+  padding: var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+.asideFigure {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+  font: var(--t-figure);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.asideFigure > span {
+  font: var(--t-small);
+  color: var(--muted);
+}
+.deviceScreen[data-phone] .deviceAside {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+.deviceScreen[data-phone] .deviceAside > h5 {
+  grid-column: 1 / -1;
+}
+.deviceScreen[data-phone] .asideFigure {
+  margin: 0;
+}
+.sideBySide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 390px);
+  align-items: center;
+  gap: var(--s-8);
+}
+.desktopStage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  width: 100%;
+  min-height: 560px;
+  padding: var(--s-6);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  background: var(--paper);
+}
+.desktopBg {
+  position: absolute;
+  inset: 0;
+}
+.desktopDialog {
+  position: relative;
+  max-width: 100%;
+}
+/* O palco do diálogo responsivo estreito (celular de verdade): o detalhe empilha. */
+@container device (max-width: 560px) {
+  .deviceScreen {
+    gap: var(--s-5);
+    padding: var(--s-5) var(--s-4);
+  }
+  .deviceActions {
+    width: 100%;
+  }
+  .deviceActions > * {
+    flex: 1 1 0;
+    min-width: max-content;
+  }
+  .deviceGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-5);
+  }
+}
+
+/* ——————————————————————————— Popover ——————————————————————————— */
+.listLayout {
+  display: grid;
+  gap: var(--s-3);
+  min-width: 0;
+}
+.filterBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+.filterCount {
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.tableScroll {
+  max-height: 420px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.cellName {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.cellName > strong {
+  overflow: hidden;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.cellName > span {
+  font: var(--t-small);
+  color: var(--muted);
+}
+.cellBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  white-space: nowrap;
+}
+.headWithInfo {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.infoButton {
+  --btn-h: 24px;
+  width: 24px;
+  margin: -4px 0;
+}
+.infoButton svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+/* Número de vínculos: texto sem borda; hover e aberto ganham fundo g-75 (aprovado na lista). */
+.linksButton {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  margin-right: -6px;
+  padding: 0 6px;
+  border-radius: var(--r-sm);
+  font: var(--t-body);
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.linksButton:is(:hover, [data-force~='hover']),
+.linksButton[aria-expanded='true'] {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.linksButton:active {
+  background: var(--g-100);
+}
+.coverage {
+  display: grid;
+  gap: 6px;
+  margin-top: var(--s-2);
+}
+.coverageTrack {
+  position: relative;
+  height: 4px;
+  border-radius: var(--r-full);
+  background: var(--g-100);
+}
+.coverageTrack > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: var(--r-full);
+  background: var(--b-600);
+}
+.coverageNote {
+  justify-self: end;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.statusList {
+  display: grid;
+  margin: 0 -4px;
+}
+.statusOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  min-height: 34px;
+  padding: 0 4px;
+}
+.statusCount {
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.popStates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-8) var(--s-6);
+}
+.popPair {
+  display: grid;
+  align-content: center;
+  gap: var(--s-8);
+}
+.popCell {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+.popCell > span {
+  max-width: 100%;
+}
+.popStates > figure > div:first-child {
+  align-items: flex-start;
+}
+.miniRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  width: 300px;
+  max-width: 100%;
+  height: var(--row-h);
+  padding: 0 var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.miniRowName {
+  min-width: 0;
+  overflow: hidden;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.cellLabel {
+  font: var(--t-caption-strong);
+  color: var(--muted);
+  line-height: 24px;
+}
+
+/* ——————————————————————————— Tooltip ——————————————————————————— */
+.tipHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+.tipHead > h4 {
+  font: var(--t-title-2);
+  letter-spacing: var(--track-title);
+}
+.switchHit {
+  display: inline-flex;
+}
+.rowIcons {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.truncate {
+  display: block;
+  overflow: hidden;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.term {
+  font: var(--t-caption-strong);
+  color: var(--muted);
+  text-decoration: underline dotted var(--g-300);
+  text-underline-offset: 3px;
+  cursor: help;
+}
+.tipStates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-10) var(--s-6);
+  padding-top: var(--s-2);
+}
+.tipStates > figure > div:first-child {
+  justify-content: center;
+}
+.tipStates > figure > figcaption {
+  text-align: center;
+}
+
+/* ——————————————————————————— Hover card ——————————————————————————— */
+.hoverContext {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--s-4);
+}
+.historyBody {
+  padding: var(--s-4) var(--s-5) var(--s-5);
+}
+.hoverCard {
+  display: grid;
+  gap: var(--s-3);
+}
+.cardIdentity {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-width: 0;
+}
+.cardIdentity .rowText > a {
+  justify-self: start;
+  margin-top: 2px;
+}
+.facts {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  margin: 0;
+  padding: var(--s-3) 0;
+  border-block: 1px solid var(--line-soft);
+}
+.facts > div {
+  display: grid;
+  gap: 2px;
+  padding: 0 var(--s-3);
+}
+.facts > div:first-child {
+  padding-left: 0;
+}
+.facts > div + div {
+  border-left: 1px solid var(--line-soft);
+}
+.facts dt {
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.facts dd {
+  margin: 0;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.lastCampaign {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+  font: var(--t-small);
+  color: var(--muted);
+}
+.lastCampaign > i {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--r-full);
+  background: var(--gray-dot);
+}
+.lastCampaign > i[data-tone='green'] {
+  background: var(--green-dot);
+}
+.lastCampaign > i[data-tone='amber'] {
+  background: var(--amber-dot);
+}
+.lastCampaign > i[data-tone='teal'] {
+  background: var(--teal-dot);
+}
+.lastName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.cardLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  justify-self: start;
+}
+.cardLink svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  transition: transform var(--dur-1) var(--ease-out);
+}
+.cardLink:hover svg {
+  transform: translateX(2px);
+}
+.hoverStates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-8) var(--s-6);
+}
+.hoverStates > figure > div:first-child {
+  align-items: flex-start;
+  justify-content: center;
+}
+.hoverStates > figure > figcaption {
+  text-align: center;
+}
+.personLine {
+  font: var(--t-small);
+  color: var(--muted);
+}
+
+/* ——————————————————————————— Responsivo ——————————————————————————— */
+@media (max-width: 1100px) {
+  .stateGrid {
+    --cols: 2;
+  }
+  .triple {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sheetStates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 900px) {
+  .drawerContext,
+  .hoverContext,
+  .confirmGrid,
+  .sideBySide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .drawerPair,
+  .quad {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tipStates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .stateGrid {
+    --cols: 1;
+  }
+  .triple,
+  .sheetStates,
+  .popStates,
+  .hoverStates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .detailHead {
+    padding: var(--s-4);
+  }
+  .pageTitle {
+    font: var(--t-figure-lg);
+  }
+  .detailActions {
+    width: 100%;
+  }
+  .detailActions > * {
+    flex: 1 1 0;
+    min-width: max-content;
+  }
+  .creationBar {
+    padding: 0 var(--s-3);
+  }
+  .creationStep,
+  .creationActions > :nth-child(-n + 2) {
+    display: none;
+  }
+  .creationActions {
+    width: 100%;
+  }
+  .mainAction {
+    flex: 1;
+    min-width: 0;
+  }
+  .leadRow {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  .leadOrigin {
+    display: none;
+  }
+  .rowLine {
+    flex-wrap: wrap;
+    padding: var(--s-3) var(--s-4);
+  }
+  .rowLine > .rowText {
+    flex-basis: calc(100% - 40px);
+  }
+  .miniList > li {
+    flex-wrap: wrap;
+    row-gap: 0;
+    padding: 8px 0;
+  }
+  .miniList > li > :last-child {
+    margin-left: 30px;
+  }
+  .miniName {
+    flex-basis: calc(100% - 30px);
+  }
+  .splitRow {
+    grid-template-columns: minmax(0, 1fr) 88px;
+  }
+  .splitValue {
+    display: none;
+  }
+  .desktopStage {
+    min-height: 420px;
+    padding: var(--s-4);
+  }
+  .device {
+    height: 600px;
+  }
+  .tipStates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

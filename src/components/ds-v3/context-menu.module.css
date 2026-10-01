@@ -1,0 +1,9 @@
+/* Alvo do menu de contexto: enquanto aberto, ganha a seleção grande (fundo b-25 + fio b-300). */
+.target {
+  -webkit-touch-callout: none;
+}
+.target.target[data-context-open] {
+  background-color: var(--select-bg);
+  outline: 1px solid var(--select-line);
+  outline-offset: -1px;
+}

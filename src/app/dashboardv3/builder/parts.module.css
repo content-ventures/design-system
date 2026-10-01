@@ -1,0 +1,1897 @@
+/* Peças das etapas — compactas para caber na moldura: texto, fio e cor só com significado.
+   Raios: superfícies (cartões, faixas, tabelas) --r-lg; controles --r-md.
+   Seleção: borda --b-300 e fundo --b-25, sem anel. */
+.label {
+  font: var(--t-small-strong);
+  color: var(--text);
+}
+.req {
+  margin-left: 4px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.hintText {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.nowrap {
+  white-space: nowrap;
+}
+/* Repetições que só aparecem quando a moldura estreita esconde as colunas. */
+.narrowOnly,
+.narrowerOnly {
+  display: none;
+}
+.sectionMeta {
+  padding-top: 4px;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.empty {
+  padding: 18px 16px;
+  border: 1px dashed var(--g-200);
+  border-radius: var(--r-lg);
+  text-align: center;
+  font: var(--t-small);
+  color: var(--muted);
+}
+
+/* Anunciante fixo (papel anunciante) */
+.fieldLike {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+.fixedAdvertiser {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: var(--h-md);
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--g-25);
+  font: var(--t-body);
+  color: var(--ink);
+}
+.fixedAdvertiser > svg {
+  margin-left: auto;
+  width: 14px;
+  height: 14px;
+  color: var(--g-400);
+}
+
+/* Marcador de rádio desenhado: 18px, sempre no canto superior direito do cartão */
+.radio {
+  position: relative;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--g-300);
+  border-radius: 50%;
+  background: var(--paper);
+  transition: border-color var(--dur-1);
+}
+[aria-checked='true'] > .radio,
+[aria-checked='true'] > * > .radio {
+  border-color: var(--b-600);
+}
+[aria-checked='true'] > .radio::after,
+[aria-checked='true'] > * > .radio::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: var(--b-600);
+}
+
+/* Botões de filtro (categorias do ativo, opções múltiplas do briefing) */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: var(--h-sm, 32px);
+  padding: 0 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  font: var(--t-small-strong);
+  color: var(--text);
+  background: var(--paper);
+  transition:
+    background var(--dur-1),
+    border-color var(--dur-1),
+    color var(--dur-1);
+}
+.pill:hover {
+  border-color: var(--line-hover);
+}
+.pill svg {
+  width: 15px;
+  height: 15px;
+  color: var(--g-400);
+}
+.pill > span {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.pill[aria-pressed='true'] {
+  color: var(--b-700);
+  border-color: var(--b-300);
+  background: var(--b-25);
+}
+.pill[aria-pressed='true'] svg,
+.pill[aria-pressed='true'] > span {
+  color: var(--b-600);
+}
+.pills[aria-invalid='true'] .pill {
+  border-color: var(--red-line);
+}
+
+/* Ativos e pacotes em cartões */
+.assets {
+  display: grid;
+  /* Três colunas já em 1280/1366 com a lateral aberta: o Período não cai abaixo da dobra. */
+  grid-template-columns: repeat(auto-fill, minmax(min(196px, 100%), 1fr));
+  gap: 8px;
+}
+/* Pacotes (até três itens): uma linha só enquanto couber, mesmo a 1280 com a lateral aberta */
+.assets[data-row] {
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, calc((100% - 16px) / 3)), 1fr));
+}
+.assets[aria-invalid='true'] .asset {
+  border-color: var(--red-line);
+}
+.asset {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  min-width: 0;
+  padding: 10px 12px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  text-align: left;
+  transition:
+    border-color var(--dur-1),
+    background var(--dur-1);
+}
+.asset:not([data-static]):hover {
+  border-color: var(--b-200);
+  background: var(--g-25);
+}
+.asset[aria-checked='true'],
+.asset[aria-checked='true']:hover {
+  border-color: var(--b-300);
+  background: var(--b-25);
+}
+.assetTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.assetTop strong {
+  min-width: 0;
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.assetTop .radio {
+  margin-top: 1px;
+}
+.assetTag {
+  font: var(--t-caption);
+  color: var(--b-700);
+}
+.assetDesc {
+  display: -webkit-box;
+  min-height: 32px;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.assetDesc[data-lines='1'] {
+  min-height: 16px;
+  -webkit-line-clamp: 1;
+}
+/* Pacote: os ativos que ele traz, cada um com a própria janela */
+.packList {
+  display: grid;
+  gap: 2px;
+  margin-top: 6px;
+  padding-top: 7px;
+  border-top: 1px solid var(--line-soft);
+  font: var(--t-caption);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.packList > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+.packList > span > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.packList small {
+  font: inherit;
+  color: var(--b-700);
+}
+.packList > span > span:last-child {
+  flex: none;
+  color: var(--muted);
+}
+.packList[data-empty] {
+  color: var(--muted);
+}
+/* Cartões de pacote lado a lado: o preço fica na base de todos, mesmo com listas de tamanhos diferentes. */
+.assets[data-row] > .asset {
+  display: flex;
+  flex-direction: column;
+}
+.packPrice {
+  margin-top: auto;
+  padding-top: 6px;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.packPrice b {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.assetMeta {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 8px;
+  margin-top: 3px;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.assetMeta > span {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.assetMeta > span:last-child {
+  grid-column: 1 / -1;
+}
+.assetMeta b {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Escolhas em cartão compacto (modelo do pacote) */
+.choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.choice {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 10px 12px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  text-align: left;
+  transition:
+    border-color var(--dur-1),
+    background var(--dur-1);
+}
+.choice:hover {
+  border-color: var(--b-200);
+}
+.choice[aria-checked='true'] {
+  border-color: var(--b-300);
+  background: var(--b-25);
+}
+.choiceDesc {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.choices[aria-invalid='true'] .choice {
+  border-color: var(--red-line);
+}
+
+.inlineNote {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font: var(--t-small);
+  color: var(--muted);
+}
+.inlineNote b {
+  font-weight: 500;
+  color: var(--ink);
+}
+.inlineNote svg {
+  width: 14px;
+  height: 14px;
+  color: var(--g-400);
+}
+/* A única ação em linha das etapas: texto azul, sem ícone */
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0;
+  font: var(--t-small-strong);
+  color: var(--b-600);
+}
+.linkButton:hover {
+  color: var(--b-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Precificação: modelo e preço, depois a regra. O invólucro recorta; a linha interna recua 13 px,
+   então o "·" de começo de linha fica fora do recorte. */
+.modelLine {
+  display: block;
+  overflow: hidden;
+}
+.modelLine > span {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 2px;
+  margin-left: -13px;
+}
+.modelLine > span > span {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+.modelLine > span > span::before {
+  content: '·';
+  flex: none;
+  width: 13px;
+  text-align: center;
+  color: var(--g-300);
+}
+.modelLine b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.modelLine svg {
+  width: 12px;
+  height: 12px;
+  margin-left: 3px;
+  color: var(--g-400);
+}
+/* Precificação: a verba é o bloco focal da etapa. Valor grande à esquerda, o que ele compra e o
+   preço à direita (mesma régua de linhas do campo), a barra com as marcas embaixo e a projeção
+   como rodapé do próprio bloco. Sem título: o campo "Verba planejada" já diz o que é. */
+.budget {
+  --pad-x: 20px;
+  --pad-b: 14px;
+  display: grid;
+  gap: 12px;
+  padding: 16px var(--pad-x) var(--pad-b);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+/* Projeção: faixa de números colada à base do bloco, separada só por um fio. */
+.budget > .budgetStrip {
+  margin: 2px calc(-1 * var(--pad-x)) calc(-1 * var(--pad-b));
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+.budgetCols {
+  display: grid;
+  /* 340: a regra dos múltiplos cabe em uma linha até o maior preço-base (R$ 1.800,00). */
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  align-items: stretch;
+}
+.budgetMain {
+  min-width: 0;
+  padding-right: 24px;
+}
+/* Com a barra, duas linhas reservadas para a ajuda, o aviso de ajuste ou o erro: ela não pula no blur. */
+.budget[data-scale] .budgetMain p {
+  min-height: 32px;
+}
+.hintLines {
+  display: grid;
+}
+/* Campo de verba grande: 56 px, valor na régua do título da página, R$ discreto na mesma linha de base. */
+.money[data-size] {
+  --ctl-h: 56px;
+  gap: 8px;
+  padding: 0 16px;
+}
+.money[data-size] input {
+  font: var(--t-page);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.money[data-size] > [data-kind='prefix'] {
+  margin: 0;
+  padding-top: 3px;
+  font: 500 16px/24px var(--font);
+  color: var(--muted);
+}
+.outcome {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  padding-left: 24px;
+  border-left: 1px solid var(--line);
+}
+.outcomeFig {
+  display: grid;
+  grid-template-rows: 18px 56px;
+  gap: 6px;
+  min-width: 0;
+}
+.outcomeLabel {
+  font: var(--t-small-strong);
+  color: var(--text);
+}
+.outcomeValue {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  white-space: nowrap;
+}
+.outcomeValue > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: var(--t-body);
+  color: var(--muted);
+}
+.outcomeValue b {
+  /* Número herói secundário (18): a verba no campo é o único herói da etapa. */
+  font: var(--t-figure-lg);
+  letter-spacing: -0.016em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+/* Pacote: o mínimo é referência, não preço — tamanho de faixa e tinta de texto. */
+.outcome[data-kind='minimum'] .outcomeValue b {
+  font: var(--t-figure, 600 16px/24px var(--font));
+  letter-spacing: -0.012em;
+  color: var(--text);
+}
+.minLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 10px;
+  font: var(--t-small);
+  color: var(--muted);
+}
+.minLine > .linkButton {
+  min-height: 18px;
+}
+/* O preço que gera a estimativa: modelo, valor por unidade e o cadeado de "definido pelo ativo".
+   Cada fato é um bloco sem quebra; o "·" é do fato seguinte e, como em .modelLine, fica fora do
+   recorte quando o fato começa uma linha — nunca sobra "·" pendurado. */
+.priceLine {
+  display: block;
+  overflow: hidden;
+  font: var(--t-small);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.priceLine > span {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 2px;
+  margin-left: -13px;
+}
+.priceLine > span > span {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.priceLine > span > span::before {
+  content: '·';
+  flex: none;
+  width: 13px;
+  text-align: center;
+  color: var(--g-300);
+}
+.priceLine b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.priceLine em {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--ink);
+}
+.priceLine svg {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-left: 4px;
+  color: var(--g-400);
+}
+/* Barra na largura do bloco e marcas rotuladas presas ao trilho: cada uma é um atalho. */
+.scale {
+  display: grid;
+  min-width: 0;
+  padding-top: 2px;
+}
+/* As marcas usam o mesmo recuo do polegar do Slider (--inset): o traço cai sob o centro dele. */
+.ticks {
+  --inset: 10px;
+  position: relative;
+  height: 36px;
+  margin-top: 4px;
+}
+@media (pointer: coarse) {
+  .ticks {
+    --inset: 13px;
+  }
+}
+.tick {
+  --x: calc(var(--inset) + (100% - 2 * var(--inset)) * var(--f, 0));
+  position: absolute;
+  top: 0;
+  left: calc(var(--x) - 7px);
+  display: grid;
+  justify-items: start;
+  padding: 2px 7px;
+  border-radius: var(--r-sm);
+  text-align: left;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  transition: background var(--dur-1) var(--ease-out);
+}
+/* O traço sai do trilho até o rótulo, no x exato da marca. */
+.tick::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 6px;
+  width: 1px;
+  height: 5px;
+  background: var(--g-300);
+}
+.tick[data-key='max'],
+.tick[data-flip] {
+  left: auto;
+  right: calc(var(--inset) + (100% - 2 * var(--inset)) * (1 - var(--f, 0)) - 7px);
+  justify-items: end;
+  text-align: right;
+}
+.tick[data-key='max']::before,
+.tick[data-flip]::before {
+  left: auto;
+  right: 6px;
+}
+/* Pontas: o texto fica rente ao fim do trilho; só o traço anda até o centro do polegar. */
+.tick[data-key='min'] {
+  left: -7px;
+}
+.tick[data-key='min']::before {
+  left: calc(var(--inset) + 6px);
+}
+.tick[data-key='max'] {
+  right: -7px;
+}
+.tick[data-key='max']::before {
+  right: calc(var(--inset) + 6px);
+}
+.tick > span {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+/* O valor é a ação (mesmo azul do .linkButton): clicar leva a verba até ele. */
+.tick > b {
+  font: var(--t-caption-strong);
+  color: var(--b-600);
+}
+.tick:hover > b {
+  color: var(--b-700);
+}
+/* Recomendado: o ponto repete o verde da marca sobre o trilho. */
+.tick[data-key='rec'] > span::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 5px 1px 0;
+  border-radius: 50%;
+  background: var(--green-dot);
+}
+.tick[data-key='rec']::before {
+  background: var(--green-dot);
+}
+.tick:hover {
+  background: var(--g-75);
+}
+/* Selecionado = borda b-300 + fundo b-25, como os demais selecionados do construtor (A-67). */
+.tick[aria-pressed='true'] {
+  background: var(--b-25);
+  box-shadow: inset 0 0 0 1px var(--b-300);
+}
+.tick[aria-pressed='true'] > span,
+.tick[aria-pressed='true'] > b {
+  color: var(--b-700);
+}
+.tick[aria-pressed='true']::before {
+  background: var(--b-500);
+}
+/* Pouca altura (1280×800, 1366×768): o bloco aperta o respiro, o campo desce para 48 px e a ajuda
+   fica só com a regra dos múltiplos (o campo grande e a barra já dizem como informar o valor).
+   Só com a moldura fixa (acima de 1020 px); no celular a página rola e nada aperta. */
+@media (max-height: 820px) and (min-width: 1021px) {
+  .budget {
+    gap: 10px;
+    padding-top: 14px;
+  }
+  .money[data-size] {
+    --ctl-h: 48px;
+  }
+  .outcomeFig {
+    grid-template-rows: 18px 48px;
+  }
+  .budget[data-scale] .budgetMain p {
+    min-height: 16px;
+  }
+  .hintLines > span:first-child:not(:last-child) {
+    display: none;
+  }
+  .ticks {
+    height: 34px;
+    margin-top: 0;
+  }
+  .tick {
+    padding-block: 1px;
+  }
+  .budget {
+    --pad-x: 18px;
+    --pad-b: 12px;
+  }
+  /* Pacote: os cartões de modelo apertam 2 px por linha e o erro de modelo + verba ainda cabe. */
+  .choice {
+    padding-block: 8px 9px;
+  }
+}
+
+/* Faixa de fatos com divisórias. Sem data-compact é faixa de números (mesma régua dos KPIs da revisão). */
+.strip {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr));
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  overflow: hidden;
+}
+.strip[data-cols='3'] {
+  --n: 3;
+}
+.strip[data-cols='4'] {
+  --n: 4;
+}
+.strip > div {
+  display: grid;
+  align-content: start;
+  gap: 1px;
+  min-width: 0;
+  padding: 12px 16px 13px;
+  box-shadow:
+    -1px 0 0 var(--line),
+    0 -1px 0 var(--line);
+}
+.strip dt {
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+.strip dd {
+  margin: 2px 0 0;
+  font: var(--t-figure, 600 16px/24px var(--font));
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.strip small {
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Fatos não numéricos: texto de 12px numa linha, o completo no title */
+.strip[data-compact] {
+  background: var(--g-25);
+}
+.strip[data-compact] > div {
+  padding: 8px 14px 9px;
+}
+.strip[data-compact] dd {
+  margin-top: 1px;
+  font: var(--t-small-strong);
+  letter-spacing: 0;
+}
+
+/* Período de veiculação: o controle de intervalo ocupa duas colunas da grade (Início + Término). */
+.period {
+  display: grid;
+  grid-column: span 2;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .period {
+    grid-column: auto;
+  }
+}
+/* Erros do período numa grade igual à das duas caixas: o erro cai sob a data vazia. */
+.periodErrors {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--date-split-gap, 16px);
+  row-gap: 4px;
+  min-width: 0;
+}
+.periodErrors > div {
+  min-width: 0;
+}
+/* A janela do ativo como dica do campo; âmbar quando o período herdado cai fora dela. */
+.periodNote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+  margin: 0;
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.periodNote > span {
+  font-weight: 500;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.periodNote[data-state='out'],
+.periodNote[data-state='out'] > span {
+  font-weight: 500;
+  color: var(--amber-ink);
+}
+.periodNote > .linkButton {
+  min-height: 16px;
+  margin-left: 4px;
+}
+
+/* Pacote: dias do período dentro da janela de cada ativo (a janela está no cartão do ativo) */
+.coverage {
+  display: grid;
+  margin-top: 6px;
+}
+.coverage ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.coverHead,
+.coverage li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) 92px;
+  align-items: center;
+  gap: 12px;
+}
+.coverHead {
+  min-height: 26px;
+  border-bottom: 1px solid var(--line);
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+.coverHead > :last-child {
+  grid-column: 2 / -1;
+  text-align: right;
+}
+.coverage li {
+  min-height: 28px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.coverName {
+  font: var(--t-body);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.coverDays {
+  font: var(--t-small);
+  color: var(--ink);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.coverBar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--g-100);
+  overflow: hidden;
+}
+.coverBar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--b-600);
+}
+.coverage li[data-partial] .coverBar i {
+  background: var(--amber-dot);
+}
+.coverage li[data-partial] .coverDays {
+  font-weight: 500;
+  color: var(--amber-ink);
+}
+
+/* Anunciantes do portal: ranking por campanhas (escolha em um clique) */
+.rank {
+  display: grid;
+  min-width: 0;
+}
+.rankHead,
+.rankRow {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) 88px 104px 132px minmax(0, 1.2fr);
+  gap: 12px;
+  align-items: center;
+}
+.rankHead {
+  min-height: 28px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--line);
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+.rankHead > :nth-child(2),
+.rankHead > :nth-child(3),
+.rankHead > :nth-child(4) {
+  text-align: right;
+}
+.rankHead > :last-child,
+.rankLast {
+  padding-left: 12px;
+}
+.rankRow {
+  min-height: 40px;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--line-soft);
+  text-align: left;
+  transition: background var(--dur-1);
+}
+.rankRow:hover {
+  background: var(--g-25);
+}
+.rankName {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.rankName > span:last-child {
+  display: grid;
+  min-width: 0;
+}
+.rankName strong {
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rankName small {
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rankNum {
+  font: var(--t-body);
+  color: var(--ink);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* Última campanha: status (ponto + texto) e, embaixo, o período — o mesmo desenho do nome. */
+.rankLast {
+  display: grid;
+  justify-items: start;
+  min-width: 0;
+  font: var(--t-small);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.rankLast > span[data-variant] {
+  max-width: 100%;
+  font: var(--t-small);
+}
+.rankLast small {
+  padding-left: 13px;
+  font: var(--t-caption);
+  color: var(--muted);
+}
+
+/* Anunciante escolhido */
+.advertiser {
+  display: grid;
+  gap: 12px;
+}
+.advertiserHead {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.advertiserHead > div {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+.advertiserHead strong {
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.advertiserHead > div > span {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.recent {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line-soft);
+}
+.recent li {
+  display: grid;
+  /* O status nunca é cortado: a coluna mede o rótulo ("Aguardando assinatura do P.I."). */
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) max-content 96px 104px;
+  align-items: center;
+  gap: 12px;
+  min-height: 36px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.recentName {
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recentAsset {
+  font: var(--t-small);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recentMeta {
+  font: var(--t-small);
+  color: var(--muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.exclusive {
+  display: flex;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid var(--amber-line);
+  border-radius: var(--r-md);
+  background: var(--amber-bg);
+  font: var(--t-small);
+  color: var(--amber-ink);
+}
+.exclusive svg {
+  width: 15px;
+  height: 15px;
+  margin-top: 1.5px;
+  flex-shrink: 0;
+}
+.note {
+  font: var(--t-body);
+  color: var(--text);
+}
+.note b {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Bônus em três cartões; o estado é um ponto + texto, como na lateral */
+.bonusGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.bonusCard {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.bonusCard[data-state='liberado'] {
+  border-color: var(--line);
+  background: var(--paper);
+}
+.bonusState {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font: var(--t-caption-strong);
+  color: var(--text);
+}
+.bonusState > i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green-dot);
+}
+.bonusState[data-state='bloqueado'] {
+  color: var(--muted);
+}
+.bonusState[data-state='bloqueado'] > i {
+  background: none;
+  box-shadow: inset 0 0 0 1.5px var(--g-300);
+}
+.bonusState[data-state='incluido'] > i {
+  background: var(--blue-dot);
+}
+.bonusCard strong {
+  margin-top: 4px;
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.bonusCard[data-state='bloqueado'] strong {
+  color: var(--text);
+}
+.bonusCard > span:not(:first-child) {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.bonusProgress {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--g-100);
+  overflow: hidden;
+}
+.bonusProgress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--g-500);
+}
+.bonusFoot {
+  display: grid;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+.bonusCard small {
+  font: var(--t-caption-strong);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Canal + Público: tabelas de alocação */
+.alloc {
+  display: grid;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.alloc[data-kind='channels'] {
+  --cols: minmax(0, 1fr) 120px 104px;
+}
+.alloc[data-kind='audiences'] {
+  --cols: minmax(0, 1fr) 92px 92px 78px 104px;
+}
+.allocHead,
+.allocRow {
+  display: grid;
+  grid-template-columns: var(--cols);
+  align-items: center;
+  column-gap: 12px;
+}
+.allocHead {
+  height: 32px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--g-25);
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+.allocHead span:not(:first-child) {
+  text-align: right;
+}
+.allocRow {
+  min-height: 46px;
+  padding: 6px 12px;
+  background: var(--paper);
+}
+.allocRow + .allocRow {
+  border-top: 1px solid var(--line-soft);
+}
+.allocRow[data-selected] {
+  background: var(--b-25);
+}
+.allocRow[data-over] {
+  background: var(--red-bg);
+}
+.allocName {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.allocName > svg {
+  width: 15px;
+  height: 15px;
+  color: var(--g-400);
+  flex-shrink: 0;
+}
+.allocName > span {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+.allocName small {
+  font: var(--t-caption);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.num {
+  font: var(--t-small);
+  color: var(--text);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.num[data-over] {
+  font-weight: 600;
+  color: var(--red-ink);
+}
+.share {
+  display: flex;
+  justify-content: flex-end;
+  font: var(--t-small-strong);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.share > * {
+  width: 92px;
+}
+.rowIssue {
+  grid-column: 1 / -1;
+  padding: 2px 0 2px 26px;
+  font: var(--t-caption-strong);
+  color: var(--red-ink);
+}
+.allocFoot {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--g-25);
+}
+.allocFoot > :first-child {
+  flex: 1;
+}
+.allocFoot[data-ok] {
+  justify-content: flex-end;
+}
+.allocFoot[data-ok] > :first-child {
+  flex: 0 0 auto;
+}
+.totalText {
+  font: var(--t-small-strong);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.totalText[data-ok] {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--green-ink);
+}
+.totalText[data-off] {
+  color: var(--amber-ink);
+}
+.totalText svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Briefing em duas colunas; texto longo seguido de campo curto ocupa duas linhas */
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 16px;
+}
+.fields > [data-wide] {
+  grid-column: 1 / -1;
+}
+.fields > [data-tall] {
+  grid-row: span 2;
+}
+.fields > * {
+  min-width: 0;
+}
+.conditional {
+  animation: reveal var(--dur-3) var(--ease-out);
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+/* Mesma altura com e sem arquivo: escolher a peça não move os campos de baixo */
+.uploadWrap {
+  display: grid;
+  gap: 8px;
+  min-height: 78px;
+}
+.uploadWrap > .dropzone,
+.uploadWrap > .file {
+  min-height: 78px;
+}
+.dropzone {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px dashed var(--g-300);
+  border-radius: var(--r-lg);
+  background: var(--g-25);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-1),
+    background var(--dur-1);
+}
+.dropzone:hover,
+.dropzone[data-over='true'] {
+  border-color: var(--b-400);
+  background: var(--b-25);
+}
+.dropzone[data-invalid] {
+  border-color: var(--red-dot);
+}
+.dropzone:focus-within {
+  outline: 2px solid var(--b-200);
+  outline-offset: 2px;
+}
+.dropzone input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.ratio {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid var(--b-200);
+  border-radius: var(--r-xs);
+  background: var(--b-25);
+  overflow: hidden;
+  font: 600 10.5px/1 var(--font);
+  color: var(--b-700);
+  font-variant-numeric: tabular-nums;
+}
+.ratio img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ratio svg {
+  width: 16px;
+  height: 16px;
+}
+.dropText {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+.dropText strong {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.dropNote {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.specs {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.dropButton {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: var(--h-sm, 32px);
+  padding: 0 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  font: var(--t-small-strong);
+  color: var(--ink);
+  background: var(--paper);
+}
+.dropzone:hover .dropButton {
+  border-color: var(--line-hover);
+}
+.uploadError {
+  font: var(--t-caption-strong);
+  color: var(--red-ink);
+}
+.dropText .uploadError {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.file {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}
+.fileText {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.fileText strong {
+  font: var(--t-small-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fileText > span:not(.specs):not(.fileCheck) {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.fileCheck {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font: var(--t-caption-strong);
+  color: var(--amber-ink);
+}
+.fileCheck[data-ok] {
+  color: var(--green-ink);
+}
+.fileCheck svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.5;
+}
+.group {
+  display: grid;
+  gap: 12px;
+  padding: 12px 14px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+.groupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+
+/* ——— Revisão: seções em fios; só a faixa de números é superfície ——— */
+.overview {
+  margin-bottom: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+.overviewHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 0 10px;
+}
+.overviewHead > div {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+.overviewHead h2 {
+  font: 600 18px/26px var(--font);
+  letter-spacing: -0.016em;
+  color: var(--ink);
+  outline: none;
+}
+.overviewHead > div > span {
+  font: var(--t-small);
+  color: var(--muted);
+}
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  overflow: hidden;
+}
+.kpis > div {
+  display: grid;
+  align-content: start;
+  gap: 1px;
+  min-width: 0;
+  padding: 10px 14px;
+}
+.kpis > div + div {
+  border-left: 1px solid var(--line);
+}
+.kpis dt {
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+.kpis dd {
+  margin: 2px 0 0;
+  font: var(--t-figure, 600 16px/24px var(--font));
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Legenda em até duas linhas: "impressões · +20% com bônus" nunca é cortada no meio. */
+.kpis small {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font: var(--t-caption);
+  color: var(--muted);
+}
+
+.reviewGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 32px;
+}
+.card {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 0 12px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: none;
+}
+.card[data-wide] {
+  grid-column: 1 / -1;
+}
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cardHead h3 {
+  font: 600 13px/20px var(--font);
+  color: var(--ink);
+}
+.cardMeta {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+/* "Editar" da revisão: mesma forma da ação em linha, discreto até o hover */
+.editLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  margin: 0 -6px 0 auto;
+  padding: 0 6px;
+  border-radius: var(--r-sm);
+  font: var(--t-small-strong);
+  color: var(--muted);
+  transition:
+    color var(--dur-1),
+    background var(--dur-1);
+}
+.editLink:hover {
+  color: var(--b-700);
+  background: var(--g-75);
+}
+@media (pointer: coarse) {
+  .editLink {
+    min-height: 40px;
+  }
+}
+.facts {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+.facts > div {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 10px;
+}
+.facts dt {
+  font: var(--t-small);
+  color: var(--muted);
+}
+.facts dd {
+  margin: 0;
+  font: var(--t-body);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.facts dd[data-empty] {
+  color: var(--muted);
+}
+.bonusList {
+  display: grid;
+  gap: 5px;
+  margin: 2px 0 0;
+  padding: 8px 0 0;
+  border-top: 1px solid var(--line-soft);
+  list-style: none;
+}
+.bonusList li {
+  display: grid;
+  grid-template-columns: 7px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  font: var(--t-small);
+  color: var(--text);
+}
+.bonusList i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green-dot);
+}
+.bonusList li[data-state='bloqueado'] {
+  color: var(--muted);
+}
+.bonusList li[data-state='bloqueado'] i {
+  background: none;
+  box-shadow: inset 0 0 0 1.5px var(--g-300);
+}
+.bonusList li[data-state='incluido'] i {
+  background: var(--blue-dot);
+}
+.bonusList small {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.cardEmpty {
+  font: var(--t-small);
+  color: var(--muted);
+}
+.briefList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 24px;
+  margin: 0;
+}
+.briefList > div {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+.briefList dt {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.briefList dd {
+  margin: 0;
+  font: var(--t-body);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.briefList dd[data-state='empty'] {
+  color: var(--muted);
+}
+.briefList dd[data-state='warn'] {
+  color: var(--amber-ink);
+}
+.briefList dd[data-state='missing'] {
+  font-weight: 400;
+  color: var(--red-ink);
+}
+
+/* Pouca altura (1280×800, 1366×768): o segmento do anunciante vai para a mesma linha do nome */
+@media (max-height: 820px) {
+  .rankName > span:last-child {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+}
+
+/* Catálogo em colunas estreitas: descrição em uma linha, o cartão fica baixo. */
+@container (max-width: 760px) {
+  .assetDesc {
+    -webkit-line-clamp: 1;
+    min-height: 16px;
+  }
+}
+
+/* Moldura média (a .content do construtor é um container): tabelas perdem as colunas secundárias,
+   que voltam como texto na linha do nome. Vale a partir de 1280 com a lateral aberta. */
+@container (max-width: 680px) {
+  .alloc[data-kind='audiences'] {
+    --cols: minmax(0, 1fr) 92px 104px;
+  }
+  .alloc[data-kind='audiences'] .allocHead span:nth-child(2),
+  .alloc[data-kind='audiences'] .allocHead span:nth-child(4),
+  .numAvail,
+  .numFreq {
+    display: none;
+  }
+  .narrowOnly {
+    display: inline;
+  }
+  .alloc[data-kind='audiences'] .allocName small {
+    white-space: normal;
+  }
+  .rankHead,
+  .rankRow {
+    grid-template-columns: minmax(0, 2.2fr) 88px 104px 132px;
+  }
+  .rankRow > :nth-child(5),
+  .rankHead > :nth-child(5) {
+    display: none;
+  }
+  .recent li {
+    grid-template-columns: minmax(0, 1fr) max-content 96px 104px;
+  }
+  .recentAsset {
+    display: none;
+  }
+}
+
+/* Verba: valor e entrega empilhados quando a coluna da direita não comporta a estimativa e o preço
+   (a coluna do campo tem 340 px fixos). 620, e não 680: em 1280 com a lateral aberta o miolo mede
+   ~650 px e ainda cabe lado a lado. */
+@container (max-width: 620px) {
+  .budgetCols {
+    grid-template-columns: 1fr;
+    row-gap: 14px;
+  }
+  .budgetMain {
+    padding-right: 0;
+  }
+  .outcome {
+    padding: 12px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .outcomeFig {
+    grid-template-rows: auto auto;
+    gap: 2px;
+  }
+}
+
+/* Moldura média-estreita (1200 com a lateral aberta): números em duas colunas, revisão em uma */
+@container (max-width: 600px) {
+  .kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .kpis > div:nth-child(3) {
+    border-left: 0;
+  }
+  .kpis > div:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+  /* Só a faixa de quatro números vira 2×2; as de três fatos seguem em três até 560. */
+  .strip[data-cols='4'],
+  .assets[data-row] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .reviewGrid {
+    grid-template-columns: 1fr;
+  }
+  .rankRow > :nth-child(n + 3),
+  .rankHead > :nth-child(n + 3) {
+    display: none;
+  }
+  .rankHead,
+  .rankRow {
+    grid-template-columns: minmax(0, 1fr) 88px;
+  }
+}
+
+/* Moldura estreita: tudo em uma coluna */
+@container (max-width: 560px) {
+  /* Upload: texto na largura toda e o botão embaixo; o quadro de proporção sai. */
+  .dropzone {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 10px 12px;
+  }
+  .dropzone > .ratio {
+    display: none;
+  }
+  .dropText {
+    flex: 1 1 100%;
+  }
+  .dropButton {
+    width: 100%;
+    justify-content: center;
+  }
+  .file > .ratio {
+    max-width: 64px;
+    max-height: 48px;
+  }
+  .sectionMeta {
+    white-space: normal;
+  }
+  .assets,
+  .assets[data-row],
+  .choices,
+  .bonusGrid,
+  .reviewGrid,
+  .fields,
+  .briefList {
+    grid-template-columns: 1fr;
+  }
+  .fields > [data-tall] {
+    grid-row: auto;
+  }
+  .strip {
+    grid-template-columns: 1fr;
+  }
+  /* Faixa de números em uma coluna: cada fato vira uma linha rótulo · valor, com a legenda embaixo. */
+  .strip[data-cols='3']:not([data-compact]) > div {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    column-gap: 12px;
+    padding: 10px 14px;
+  }
+  .strip[data-cols='3']:not([data-compact]) dd {
+    margin: 0;
+  }
+  .strip[data-cols='3']:not([data-compact]) small {
+    grid-column: 1 / -1;
+  }
+  .budget {
+    --pad-x: 16px;
+    --pad-b: 16px;
+    padding-top: 14px;
+  }
+  /* Colunas pelo conteúdo: "Recomendado" é o rótulo mais largo e não pode virar reticências. */
+  .ticks {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 6px;
+    height: auto;
+    margin-top: 10px;
+  }
+  .tick,
+  .tick[data-key='max'],
+  .tick[data-flip] {
+    position: static;
+    justify-items: start;
+    min-width: 0;
+    padding: 6px 8px 7px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-md);
+    text-align: left;
+  }
+  .tick::before {
+    display: none;
+  }
+  .tick > span,
+  .tick > b {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* No atalho com borda, a borda já diz que é botão: o valor volta à tinta. */
+  .tick > b,
+  .tick:hover > b {
+    color: var(--ink);
+  }
+  .tick[aria-pressed='true'] {
+    border-color: var(--b-300);
+    background: var(--b-25);
+    box-shadow: none;
+  }
+  .tick[aria-pressed='true'] > b {
+    color: var(--b-700);
+  }
+  .tick[data-key='rec'] > span::before {
+    width: 5px;
+    height: 5px;
+    margin-right: 4px;
+  }
+  .recent li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .recent li > .recentMeta {
+    display: none;
+  }
+  .coverHead,
+  .coverage li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .coverBar {
+    display: none;
+  }
+  .coverHead > :last-child {
+    grid-column: auto;
+  }
+  .alloc[data-kind='channels'] {
+    --cols: minmax(0, 1fr) 76px 92px;
+  }
+  .allocName > svg {
+    display: none;
+  }
+  .alloc[data-kind='audiences'] {
+    --cols: minmax(0, 1fr) 92px;
+  }
+  .alloc[data-kind='audiences'] .allocHead span:nth-child(n + 2):nth-child(-n + 4),
+  .alloc[data-kind='audiences'] .allocRow > .num {
+    display: none;
+  }
+  .narrowerOnly {
+    display: inline;
+  }
+}
+
+/* Celular estreito (≤360): o ponto do "Recomendado" sai para o rótulo caber no atalho. */
+@container (max-width: 340px) {
+  .tick[data-key='rec'] > span::before {
+    display: none;
+  }
+}

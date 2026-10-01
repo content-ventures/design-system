@@ -1,0 +1,222 @@
+/* ——— StatCard: cabeçalho em papel, número numa bandeja rebaixada ——— */
+.stat {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-width: 0;
+  container-type: inline-size;
+  padding: 5px;
+  border-radius: var(--r-xl);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+}
+.statHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 11px 14px;
+}
+.statTitles {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+.statTitle {
+  font: var(--t-body-strong);
+  color: var(--ink);
+  letter-spacing: var(--track-tight);
+}
+.statSub {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.statLink {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin: -2px -2px 0 0;
+  border-radius: 8px;
+  color: var(--g-400);
+  transition:
+    background var(--dur-1),
+    color var(--dur-1);
+}
+.statLink:hover {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.statLink svg {
+  width: 16px;
+  height: 16px;
+}
+.statBody {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  align-content: flex-end;
+  column-gap: 14px;
+  row-gap: 6px;
+  padding: 14px 14px 13px;
+  border-radius: var(--r-md);
+  background: var(--g-50);
+  border: 1px solid var(--line);
+}
+.value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font: var(--t-kpi);
+  letter-spacing: -0.026em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.unit {
+  font: 500 15px/20px var(--font);
+  letter-spacing: 0;
+  color: var(--muted);
+}
+.breakdown {
+  display: grid;
+  white-space: nowrap;
+  gap: 1px;
+  padding-bottom: 3px;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.breakdown b {
+  font-weight: 500;
+  color: var(--text);
+}
+.statAside {
+  margin-left: auto;
+  align-self: stretch;
+  display: flex;
+  align-items: flex-end;
+}
+.statFoot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 11px 6px;
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.stat[data-state='unavailable'] .value {
+  color: var(--g-300);
+}
+
+/* ——— Variação ——— */
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+  padding: 0 6px 0 4px;
+  border-radius: var(--r-sm);
+  font: var(--t-caption-strong);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--green-ink);
+  background: var(--green-bg);
+}
+.delta svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.5;
+}
+.delta[data-tone='bad'] {
+  color: var(--red-ink);
+  background: var(--red-bg);
+}
+.delta[data-tone='flat'] {
+  color: var(--g-600);
+  background: var(--g-75);
+}
+/* Texto: só seta e número, sem selo — a faixa de indicadores. */
+.delta[data-variant='text'] {
+  gap: 2px;
+  height: auto;
+  padding: 0;
+  background: none;
+}
+.delta[data-variant='text'] svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.25;
+}
+.delta[data-variant='text'][data-tone='flat'] {
+  color: var(--muted);
+}
+
+/* ——— Medidor ——— */
+.meter {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.meterTrack {
+  position: relative;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--g-100);
+  overflow: hidden;
+}
+.meter[data-size='sm'] .meterTrack {
+  height: 4px;
+}
+.meter[data-size='lg'] .meterTrack {
+  height: 8px;
+}
+.meterFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--b-600);
+  transition: width var(--dur-3) var(--ease-out);
+}
+.meter[data-tone='green'] .meterFill {
+  background: var(--green-dot);
+}
+.meter[data-tone='amber'] .meterFill {
+  background: var(--amber-dot);
+}
+.meter[data-tone='red'] .meterFill {
+  background: var(--red-dot);
+}
+.meterLabels {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.meterLabels b {
+  font-weight: 500;
+  color: var(--ink);
+}
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.inline .meterTrack {
+  flex: 1;
+  min-width: 48px;
+}
+.inline span {
+  font: var(--t-caption-strong);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  min-width: 34px;
+  text-align: right;
+}
+
+.spark {
+  display: block;
+  overflow: visible;
+}
