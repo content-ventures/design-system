@@ -106,6 +106,7 @@ export {
   PanelLeftOpen,
   PanelTop,
   Pause,
+  PenLine,
   Pencil,
   Phone,
   PhoneOff,
