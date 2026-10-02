@@ -2,7 +2,13 @@
 
 import { ChartSpline, Table2 } from 'lucide-react';
 import { useEffect, useRef, useState, type ComponentType, type ReactNode } from 'react';
-import { Badge, BrandMark, IconButton, Segmented, type SegmentOption } from '@mediaon/design-system/v3';
+import {
+  Badge,
+  BrandMark,
+  IconButton,
+  Segmented,
+  type SegmentOption,
+} from '@mediaon/design-system/v3';
 import {
   BarChart,
   ChartCard,
@@ -39,7 +45,8 @@ const two = (n: number) => String(n).padStart(2, '0');
 const dayLabel = (day: number, month = 10) => `${two(day)}/${two(month)}`;
 const dayTitle = (day: number, month = 10) =>
   `${dayLabel(day, month)}/2026 · ${WEEKDAY[new Date(2026, month - 1, day).getDay()]}`;
-const range = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, i) => from + i);
+const range = (from: number, to: number) =>
+  Array.from({ length: to - from + 1 }, (_, i) => from + i);
 const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
 const ref = 'var(--g-400)';
 
@@ -51,7 +58,10 @@ const OCT_REAL = [
 const OCT_FORECAST = [13_600, 9_200, 8_700, 13_900, 14_100, 14_300, 14_200, 13_800, 13_900];
 const TODAY = OCT_REAL.length - 1;
 const OCT_DAILY = [...OCT_REAL, ...OCT_FORECAST];
-const OCT_CUM = OCT_DAILY.reduce<number[]>((acc, v) => [...acc, (acc[acc.length - 1] ?? 0) + v], []);
+const OCT_CUM = OCT_DAILY.reduce<number[]>(
+  (acc, v) => [...acc, (acc[acc.length - 1] ?? 0) + v],
+  [],
+);
 const CONTRACTED = 400_000;
 const PLANNED = 12_903;
 
@@ -100,7 +110,11 @@ const MONTHS: [string, string, number][] = [
   ['Set', 'Setembro de 2026', 312_400],
   ['Out', 'Outubro de 2026', 272_000],
 ];
-const MONTH_DATA: ChartDatum[] = MONTHS.map(([label, title, v]) => ({ label, title, values: { imp: v } }));
+const MONTH_DATA: ChartDatum[] = MONTHS.map(([label, title, v]) => ({
+  label,
+  title,
+  values: { imp: v },
+}));
 const MONTH_SERIES: ChartSeries[] = [{ key: 'imp', label: 'Impressões', color: 'blue' }];
 type Span = '6m' | '12m';
 const SPANS: SegmentOption<Span>[] = [
@@ -123,6 +137,43 @@ function MonthlyCard() {
         highlight={data.length - 1}
         values="highlight"
         height={244}
+      />
+    </ChartCard>
+  );
+}
+
+/** Quando o valor já é a razão: sem o % repetido, e "—" onde não há dado (não é zero). */
+function RatioCard() {
+  return (
+    <ChartCard title="Cumprimento de prazo" description="Etapas concluídas no prazo">
+      <MeterList
+        label="Cumprimento por etapa"
+        shares={false}
+        format={(value) => `${value}%`}
+        items={[
+          {
+            key: 'onboarding',
+            label: 'Onboarding',
+            value: 92,
+            share: 92,
+            caption: '11 de 12 no prazo',
+          },
+          {
+            key: 'briefing',
+            label: 'Briefing técnico',
+            value: 64,
+            share: 64,
+            caption: '7 de 11 no prazo',
+          },
+          {
+            key: 'renovacao',
+            label: 'Renovação',
+            value: 0,
+            share: 0,
+            empty: true,
+            caption: 'Sem conclusões no período',
+          },
+        ]}
       />
     </ChartCard>
   );
@@ -208,6 +259,7 @@ export function GraficoBarras() {
             <ChannelsCard />
           </div>
           <PavilionCard />
+          <RatioCard />
         </div>
       </Shot>
       <Shot title="Estados" tone="white" align="stretch">
@@ -251,7 +303,13 @@ function deliveryLegend(mode: Mode): LegendItem[] {
   return [
     { key: 'imp', label: 'Impressões', color: 'blue', shape: 'line' },
     mode === 'daily'
-      ? { key: 'ref', label: 'Ritmo planejado', color: ref, shape: 'dashed', detail: '12.903 por dia' }
+      ? {
+          key: 'ref',
+          label: 'Ritmo planejado',
+          color: ref,
+          shape: 'dashed',
+          detail: '12.903 por dia',
+        }
       : { key: 'ref', label: 'Contratado', color: ref, shape: 'dashed', detail: '400.000' },
   ];
 }
@@ -263,11 +321,19 @@ function DeliveryCard() {
       title={mode === 'daily' ? 'Entrega diária' : 'Entrega acumulada'}
       legend={<Legend items={deliveryLegend(mode)} />}
       actions={
-        <Segmented size="sm" label="Leitura do gráfico" options={MODES} value={mode} onChange={setMode} />
+        <Segmented
+          size="sm"
+          label="Leitura do gráfico"
+          options={MODES}
+          value={mode}
+          onChange={setMode}
+        />
       }
     >
       <LineChart
-        label={mode === 'daily' ? 'Entrega diária de impressões' : 'Entrega acumulada de impressões'}
+        label={
+          mode === 'daily' ? 'Entrega diária de impressões' : 'Entrega acumulada de impressões'
+        }
         data={deliveryData(mode)}
         series={[{ key: 'imp', label: 'Impressões', color: 'blue' }]}
         area
@@ -286,15 +352,33 @@ function ClicksCard() {
       legend={
         <Legend
           items={[
-            { key: 'portal', label: 'Portal da feira', color: 'blue', shape: 'line', value: formatInt(sum(PORTAL)) },
-            { key: 'app', label: 'App Francal', color: 'teal', shape: 'line', value: formatInt(sum(APP)) },
+            {
+              key: 'portal',
+              label: 'Portal da feira',
+              color: 'blue',
+              shape: 'line',
+              value: formatInt(sum(PORTAL)),
+            },
+            {
+              key: 'app',
+              label: 'App Francal',
+              color: 'teal',
+              shape: 'line',
+              value: formatInt(sum(APP)),
+            },
           ]}
           hidden={hidden}
           onToggle={toggle}
         />
       }
     >
-      <LineChart label="Cliques por canal" data={CHANNEL_DATA} series={CHANNEL_SERIES} hidden={hidden} height={220} />
+      <LineChart
+        label="Cliques por canal"
+        data={CHANNEL_DATA}
+        series={CHANNEL_SERIES}
+        hidden={hidden}
+        height={220}
+      />
     </ChartCard>
   );
 }
@@ -311,8 +395,21 @@ function CompareCard({ active }: { active?: number }) {
       legend={
         <Legend
           items={[
-            { key: 'now', label: 'Esta semana', color: 'blue', shape: 'line', value: formatInt(sum(PORTAL)) },
-            { key: 'prev', label: '7 dias anteriores', color: 'blue', faded: true, shape: 'dashed', value: formatInt(sum(PORTAL_PREV)) },
+            {
+              key: 'now',
+              label: 'Esta semana',
+              color: 'blue',
+              shape: 'line',
+              value: formatInt(sum(PORTAL)),
+            },
+            {
+              key: 'prev',
+              label: '7 dias anteriores',
+              color: 'blue',
+              faded: true,
+              shape: 'dashed',
+              value: formatInt(sum(PORTAL_PREV)),
+            },
           ]}
         />
       }
@@ -429,7 +526,11 @@ function AccumulatedChart({ height = 260, active }: { height?: number; active?: 
               color: 'blue',
               shape: forecast ? 'dashed' : 'line',
             },
-            { key: 'day', label: forecast ? 'Previsto no dia' : 'No dia', value: formatInt(OCT_DAILY[i] ?? 0) },
+            {
+              key: 'day',
+              label: forecast ? 'Previsto no dia' : 'No dia',
+              value: formatInt(OCT_DAILY[i] ?? 0),
+            },
           ],
         };
       }}
@@ -456,8 +557,20 @@ function StackedAreaCard() {
       legend={
         <Legend
           items={[
-            { key: 'portal', label: 'Portal da feira', color: 'blue', shape: 'square', value: formatInt(sum(LEADS_PORTAL)) },
-            { key: 'app', label: 'App Francal', color: 'teal', shape: 'square', value: formatInt(sum(LEADS_APP)) },
+            {
+              key: 'portal',
+              label: 'Portal da feira',
+              color: 'blue',
+              shape: 'square',
+              value: formatInt(sum(LEADS_PORTAL)),
+            },
+            {
+              key: 'app',
+              label: 'App Francal',
+              color: 'teal',
+              shape: 'square',
+              value: formatInt(sum(LEADS_APP)),
+            },
           ]}
         />
       }
@@ -598,7 +711,12 @@ export function GraficoRosca() {
               />
             </ChartCard>
             <ChartCard title="Público potencial">
-              <DonutChart label="Público potencial" data={AUDIENCE} {...DONUT} centerLabel="Pessoas" />
+              <DonutChart
+                label="Público potencial"
+                data={AUDIENCE}
+                {...DONUT}
+                centerLabel="Pessoas"
+              />
             </ChartCard>
           </div>
           <DeliveryMetric />
@@ -650,9 +768,21 @@ function OriginLegend({ hidden, toggle }: { hidden: string[]; toggle: (key: stri
   return (
     <Legend
       items={[
-        { key: 'portal', label: 'Portal', color: 'blue', shape: 'square', value: originTotal('portal') },
+        {
+          key: 'portal',
+          label: 'Portal',
+          color: 'blue',
+          shape: 'square',
+          value: originTotal('portal'),
+        },
         { key: 'app', label: 'App', color: 'teal', shape: 'square', value: originTotal('app') },
-        { key: 'vitrine', label: 'Vitrine', color: 'violet', shape: 'square', value: originTotal('vitrine') },
+        {
+          key: 'vitrine',
+          label: 'Vitrine',
+          color: 'violet',
+          shape: 'square',
+          value: originTotal('vitrine'),
+        },
       ]}
       hidden={hidden}
       onToggle={toggle}
@@ -663,7 +793,10 @@ function OriginLegend({ hidden, toggle }: { hidden: string[]; toggle: (key: stri
 function WeeklyLeadsCard({ active }: { active?: number }) {
   const [hidden, toggle] = useHidden();
   return (
-    <ChartCard title="Leads por semana e origem" legend={<OriginLegend hidden={hidden} toggle={toggle} />}>
+    <ChartCard
+      title="Leads por semana e origem"
+      legend={<OriginLegend hidden={hidden} toggle={toggle} />}
+    >
       <BarChart
         label="Leads por semana e origem"
         data={WEEK_DATA}
@@ -795,7 +928,13 @@ function FunnelCard() {
     <ChartCard
       title="Funil da campanha"
       actions={
-        <Segmented size="sm" label="Entre etapas" options={CHANGES} value={change} onChange={setChange} />
+        <Segmented
+          size="sm"
+          label="Entre etapas"
+          options={CHANGES}
+          value={change}
+          onChange={setChange}
+        />
       }
       bleed
     >
@@ -819,13 +958,24 @@ export function GraficoFunil() {
           </State>
           <State label="Hover">
             <div className={g.frame}>
-              <FunnelChart label="Funil da campanha" stages={FUNNEL} change="rate" height={120} forceActive={2} />
+              <FunnelChart
+                label="Funil da campanha"
+                stages={FUNNEL}
+                change="rate"
+                height={120}
+                forceActive={2}
+              />
             </div>
           </State>
           <State label="Celular">
             <div className={g.phone}>
               <ChartCard title="Funil da campanha">
-                <FunnelChart label="Funil da campanha" stages={FUNNEL} change="rate" variant="bars" />
+                <FunnelChart
+                  label="Funil da campanha"
+                  stages={FUNNEL}
+                  change="rate"
+                  variant="bars"
+                />
               </ChartCard>
             </div>
           </State>
@@ -853,17 +1003,47 @@ function ToggleLegendCard() {
       legend={
         <Legend
           items={[
-            { key: 'portal', label: 'Portal da feira', color: 'blue', shape: 'line', value: formatInt(sum(PORTAL)) },
-            { key: 'app', label: 'App Francal', color: 'teal', shape: 'line', value: formatInt(sum(APP)) },
-            { key: 'news', label: 'Newsletter', color: 'violet', shape: 'line', value: formatInt(sum(NEWSLETTER)) },
-            { key: 'vitrine', label: 'Vitrine', color: 'amber', shape: 'line', value: formatInt(sum(VITRINE)) },
+            {
+              key: 'portal',
+              label: 'Portal da feira',
+              color: 'blue',
+              shape: 'line',
+              value: formatInt(sum(PORTAL)),
+            },
+            {
+              key: 'app',
+              label: 'App Francal',
+              color: 'teal',
+              shape: 'line',
+              value: formatInt(sum(APP)),
+            },
+            {
+              key: 'news',
+              label: 'Newsletter',
+              color: 'violet',
+              shape: 'line',
+              value: formatInt(sum(NEWSLETTER)),
+            },
+            {
+              key: 'vitrine',
+              label: 'Vitrine',
+              color: 'amber',
+              shape: 'line',
+              value: formatInt(sum(VITRINE)),
+            },
           ]}
           hidden={hidden}
           onToggle={toggle}
         />
       }
     >
-      <LineChart label="Cliques por canal" data={FOUR_DATA} series={FOUR_SERIES} hidden={hidden} height={220} />
+      <LineChart
+        label="Cliques por canal"
+        data={FOUR_DATA}
+        series={FOUR_SERIES}
+        hidden={hidden}
+        height={220}
+      />
     </ChartCard>
   );
 }
@@ -873,7 +1053,11 @@ function EndLabelsCard() {
     <ChartCard title="Leads por canal">
       <LineChart
         label="Leads por canal"
-        data={weekData({ portal: [7, 5, 3, 8, 6, 6, 7], app: [5, 4, 2, 6, 5, 5, 6], news: [2, 1, 1, 3, 2, 2, 3] })}
+        data={weekData({
+          portal: [7, 5, 3, 8, 6, 6, 7],
+          app: [5, 4, 2, 6, 5, 5, 6],
+          news: [2, 1, 1, 3, 2, 2, 3],
+        })}
         series={[
           { key: 'portal', label: 'Portal da feira', color: 'blue' },
           { key: 'app', label: 'App Francal', color: 'teal' },
@@ -891,7 +1075,16 @@ function LegendButtonCell({ force, off }: { force?: string; off?: boolean }) {
   const [hidden, toggle] = useHidden(off ? ['portal'] : []);
   return (
     <Legend
-      items={[{ key: 'portal', label: 'Portal da feira', color: 'blue', shape: 'line', value: '1.026', force }]}
+      items={[
+        {
+          key: 'portal',
+          label: 'Portal da feira',
+          color: 'blue',
+          shape: 'line',
+          value: '1.026',
+          force,
+        },
+      ]}
       hidden={hidden}
       onToggle={toggle}
     />
@@ -961,7 +1154,15 @@ export function GraficoLegenda() {
   );
 }
 
-function Key({ shape, color, label }: { shape: 'line' | 'dashed' | 'dot' | 'square'; color: string; label: string }) {
+function Key({
+  shape,
+  color,
+  label,
+}: {
+  shape: 'line' | 'dashed' | 'dot' | 'square';
+  color: string;
+  label: string;
+}) {
   return (
     <span className={g.key}>
       <ChartKey color={color} shape={shape} />
@@ -1209,13 +1410,16 @@ function StatesCard({
         height={height}
         title="Sem entregas no período"
         action={
-          <LinkButton onClick={onState ? () => onState('data') : undefined}>Ver todo o período</LinkButton>
+          <LinkButton onClick={onState ? () => onState('data') : undefined}>
+            Ver todo o período
+          </LinkButton>
         }
       />
     );
   else if (state === 'error')
     body = <ChartState kind="error" height={height} onRetry={retry} retrying={retrying} />;
-  else if (table) body = <ChartTable caption="Entrega diária de impressões" data={data} series={series} />;
+  else if (table)
+    body = <ChartTable caption="Entrega diária de impressões" data={data} series={series} />;
   else
     body = (
       <LineChart
@@ -1275,7 +1479,13 @@ function StatesDemo() {
     <div className={g.stack}>
       <div className={g.toolbar}>
         <div className={g.scrollX}>
-          <Segmented size="sm" label="Estado do gráfico" options={STATES} value={state} onChange={setState} />
+          <Segmented
+            size="sm"
+            label="Estado do gráfico"
+            options={STATES}
+            value={state}
+            onChange={setState}
+          />
         </div>
       </div>
       <StatesCard state={state} onState={setState} />

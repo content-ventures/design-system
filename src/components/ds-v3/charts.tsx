@@ -60,7 +60,14 @@ export type ChartColor =
  * solid: marca · muted: barra em repouso · soft: faixa clara · hover: barra em repouso sob o
  * ponteiro · light: série de comparação (mesma matiz, mais clara) · ink: texto na cor da série.
  */
-type Tone = { solid: string; muted: string; soft: string; hover: string; light: string; ink: string };
+type Tone = {
+  solid: string;
+  muted: string;
+  soft: string;
+  hover: string;
+  light: string;
+  ink: string;
+};
 export type ChartTone = keyof Tone;
 
 const tint = (token: string, amount: number) =>
@@ -131,7 +138,8 @@ export function chartColor(color: ChartColor, step: ChartTone = 'solid') {
 }
 
 const isChartColor = (value: string): value is ChartColor => value in palette;
-const cssColor = (color: ChartColor | string) => (isChartColor(color) ? palette[color].solid : color);
+const cssColor = (color: ChartColor | string) =>
+  isChartColor(color) ? palette[color].solid : color;
 
 const seriesColor = (series: ChartSeries, index: number): ChartColor =>
   series.color ?? chartPalette[index] ?? 'gray';
@@ -530,7 +538,9 @@ const TIP_EDGE = 8;
 function span(lo: number, hi: number, size: number, view: number) {
   const a = Math.max(lo, TIP_EDGE);
   const b = Math.min(hi, view - TIP_EDGE);
-  return b - a >= size ? { lo: a, hi: b } : { lo: TIP_EDGE, hi: Math.max(TIP_EDGE + size, view - TIP_EDGE) };
+  return b - a >= size
+    ? { lo: a, hi: b }
+    : { lo: TIP_EDGE, hi: Math.max(TIP_EDGE + size, view - TIP_EDGE) };
 }
 
 /**
@@ -581,15 +591,21 @@ function FloatingTip({
       const fitsAfter = after + w <= xs.hi;
       const fitsBefore = before >= xs.lo;
       // Cabe dos dois lados: direita. Em nenhum: o lado com mais espaço.
-      left =
-        fitsAfter || (!fitsBefore && xs.hi - box.right >= box.left - xs.lo) ? after : before;
+      left = fitsAfter || (!fitsBefore && xs.hi - box.right >= box.left - xs.lo) ? after : before;
       top = (box.top + box.bottom) / 2 - h / 2;
     } else {
       const above = box.top - TIP_GAP - h;
       const below = box.bottom + TIP_GAP;
       const fitsAbove = above >= ys.lo;
       const fitsBelow = below + h <= ys.hi;
-      top = placement === 'above' ? (fitsAbove || !fitsBelow ? above : below) : fitsBelow || !fitsAbove ? below : above;
+      top =
+        placement === 'above'
+          ? fitsAbove || !fitsBelow
+            ? above
+            : below
+          : fitsBelow || !fitsAbove
+            ? below
+            : above;
       left = (box.left + box.right) / 2 - w / 2;
     }
     left = clamp(left, xs.lo, xs.hi - w);
@@ -733,7 +749,8 @@ export function Legend({
       <ul className={s.legend} aria-label={label} data-interactive={onToggle ? true : undefined}>
         {items.map((item) => {
           const off = hidden.includes(item.key);
-          const color = item.faded && isChartColor(item.color) ? palette[item.color].light : item.color;
+          const color =
+            item.faded && isChartColor(item.color) ? palette[item.color].light : item.color;
           const content = (
             <>
               <ChartKey color={color} shape={item.shape} hollow={off} />
@@ -874,10 +891,7 @@ export function ChartTooltip({
       )}
       {footer && <div className={s.tipFoot}>{footer}</div>}
       {delta && (
-        <div
-          className={s.tipDelta}
-          data-tone={good === undefined ? 'flat' : good ? 'good' : 'bad'}
-        >
+        <div className={s.tipDelta} data-tone={good === undefined ? 'flat' : good ? 'good' : 'bad'}>
           {!flat && <Arrow aria-hidden="true" />}
           <span>
             {delta.unit === 'p.p.'
@@ -1518,12 +1532,7 @@ function VerticalBars({
   const padTop = (values === 'none' ? 12 : 26) + (yLabel ? 20 : 0);
   const axisH = 28;
   const plotH = Math.max(10, height - padTop - axisH);
-  const ticks = niceTicks(
-    Math.max(0, ...tops),
-    Math.min(0, ...lows),
-    undefined,
-    tickLimit(plotH),
-  );
+  const ticks = niceTicks(Math.max(0, ...tops), Math.min(0, ...lows), undefined, tickLimit(plotH));
   const top = ticks[ticks.length - 1] ?? 1;
   const bottom = ticks[0] ?? 0;
   const tickLabels = ticks.map(axisFormat);
@@ -1561,7 +1570,8 @@ function VerticalBars({
 
   function fillFor(color: ChartColor, index: number) {
     const tone = palette[color];
-    if (appearance === 'tinted') return hovered === index || locked === index ? tone.hover : tone.muted;
+    if (appearance === 'tinted')
+      return hovered === index || locked === index ? tone.hover : tone.muted;
     if (highlight === undefined || index === highlight || index === locked) return tone.solid;
     return hovered === index ? tone.hover : tone.muted;
   }
@@ -1693,7 +1703,11 @@ function VerticalBars({
                           : barD(bx, zeroY, barW, vy - zeroY, 0, radius);
                       return (
                         <g key={sr.key}>
-                          <path className={s.bar} d={p} style={morph(p, { fill: fillFor(color, i) })} />
+                          <path
+                            className={s.bar}
+                            d={p}
+                            style={morph(p, { fill: fillFor(color, i) })}
+                          />
                           {appearance === 'tinted' && v > 0 && zeroY - vy > 2 && (
                             <rect
                               x={bx}
@@ -2031,17 +2045,25 @@ export type MeterItem = {
   /** Legenda com os números de apoio (“1.026 cliques · CTR 2,08%”). */
   caption?: ReactNode;
   color?: ChartColor;
+  /** Sem dado (não é zero): o valor sai "—" e a trilha fica vazia. */
+  empty?: boolean;
 };
 
-/** Barras de participação do Analytics aprovado (“Por canal”): nome, valor, %, trilha de 6 px. */
+/**
+ * Barras de participação do Analytics aprovado (“Por canal”): nome, valor, %, trilha de 6 px.
+ * Quando o valor já é a razão (cumprimento, conversão), `shares={false}` tira o % repetido.
+ */
 export function MeterList({
   label,
   items,
   format = formatInt,
+  shares = true,
 }: {
   label: string;
   items: MeterItem[];
   format?: (value: number) => string;
+  /** Mostra a participação (%) ao lado do valor. */
+  shares?: boolean;
 }) {
   return (
     <ol className={s.meters} aria-label={label}>
@@ -2050,14 +2072,14 @@ export function MeterList({
           <div className={s.meterHead}>
             <span className={s.meterName}>{item.label}</span>
             <span className={s.meterValue}>
-              <b>{format(item.value)}</b>
-              <span>{formatPct(item.share)}</span>
+              <b>{item.empty ? '—' : format(item.value)}</b>
+              {shares && !item.empty && <span>{formatPct(item.share)}</span>}
             </span>
           </div>
           <span className={s.meterTrack} aria-hidden="true">
             <i
               style={{
-                width: `${clamp(item.share, 0, 100)}%`,
+                width: `${item.empty ? 0 : clamp(item.share, 0, 100)}%`,
                 background: item.color ? palette[item.color].solid : undefined,
               }}
             />
@@ -2198,7 +2220,9 @@ export function LineChart({
   const colors = new Map(series.map((sr, i) => [sr.key, seriesColor(sr, i)] as const));
   const n = data.length;
   const today =
-    forecastFrom !== undefined && forecastFrom >= 0 && forecastFrom < n - 1 ? forecastFrom : undefined;
+    forecastFrom !== undefined && forecastFrom >= 0 && forecastFrom < n - 1
+      ? forecastFrom
+      : undefined;
   // Toque: a dica fica depois que o dedo sai e some num toque fora do gráfico (useExplorer).
   const explorer = useExplorer(n, today ?? n - 1, {
     force: forceActive,
@@ -2248,9 +2272,10 @@ export function LineChart({
   const bottom = ticks[0] ?? lo;
   const tickLabels = ticks.map(axisFormat);
   const axisW = Math.ceil(Math.max(...tickLabels.map((t) => textWidth(t, 11.5)))) + 12;
-  const endW = endLabels && !endsAsLegend
-    ? Math.ceil(Math.max(0, ...shown.map((sr) => textWidth(sr.label, 11.5)))) + 18
-    : 0;
+  const endW =
+    endLabels && !endsAsLegend
+      ? Math.ceil(Math.max(0, ...shown.map((sr) => textWidth(sr.label, 11.5)))) + 18
+      : 0;
   const left = axisW;
   const right = Math.max(left + 20, width - 2 - endW);
   const inset = 10;
@@ -2287,7 +2312,8 @@ export function LineChart({
   }
   const pointsOf = (key: string, piece: Piece) => {
     const pts: Pt[] = [];
-    for (let i = piece.from; i <= piece.to; i++) pts.push({ x: x(i), y: y(plotValue(key, i) ?? 0) });
+    for (let i = piece.from; i <= piece.to; i++)
+      pts.push({ x: x(i), y: y(plotValue(key, i) ?? 0) });
     return pts;
   };
   const strokeOf = (sr: ChartSeries) => {
@@ -2320,20 +2346,28 @@ export function LineChart({
     .filter((item) => item.index >= 0 && plotValue(item.sr.key, item.index) != null);
 
   /* Rótulos no fim das linhas, afastados quando colam. */
-  const ends = endLabels && !endsAsLegend
-    ? shown
-        .map((sr) => {
-          let at = -1;
-          data.forEach((_, i) => {
-            if (plotValue(sr.key, i) != null) at = i;
-          });
-          return at < 0
-            ? null
-            : { sr, x: x(at), y: y(plotValue(sr.key, at) ?? 0), ly: y(plotValue(sr.key, at) ?? 0) };
-        })
-        .filter((item): item is { sr: ChartSeries; x: number; y: number; ly: number } => item !== null)
-        .sort((a, b) => a.y - b.y)
-    : [];
+  const ends =
+    endLabels && !endsAsLegend
+      ? shown
+          .map((sr) => {
+            let at = -1;
+            data.forEach((_, i) => {
+              if (plotValue(sr.key, i) != null) at = i;
+            });
+            return at < 0
+              ? null
+              : {
+                  sr,
+                  x: x(at),
+                  y: y(plotValue(sr.key, at) ?? 0),
+                  ly: y(plotValue(sr.key, at) ?? 0),
+                };
+          })
+          .filter(
+            (item): item is { sr: ChartSeries; x: number; y: number; ly: number } => item !== null,
+          )
+          .sort((a, b) => a.y - b.y)
+      : [];
   for (let i = 1; i < ends.length; i++) {
     const prev = ends[i - 1];
     const cur = ends[i];
@@ -2450,7 +2484,13 @@ export function LineChart({
                         path = `${draw(pts)}L${f2(last.x)} ${baseY}L${f2(first.x)} ${baseY}Z`;
                       }
                       const tone = palette[colors.get(sr.key) ?? 'gray'];
-                      const opacity = stack ? (piece.dashed ? 0.55 : 1) : piece.dashed ? 0.04 : 0.08;
+                      const opacity = stack
+                        ? piece.dashed
+                          ? 0.55
+                          : 1
+                        : piece.dashed
+                          ? 0.04
+                          : 0.08;
                       return (
                         <path
                           key={`a:${sr.key}:${piece.from}-${piece.to}:${piece.dashed}`}
@@ -2466,30 +2506,18 @@ export function LineChart({
                 )}
           </g>
           {reference && (
-            <g
-              className={s.ref}
-              style={{ transform: `translateY(${refY}px)` }}
-              aria-hidden="true"
-            >
+            <g className={s.ref} style={{ transform: `translateY(${refY}px)` }} aria-hidden="true">
               <line className={s.refLine} x1={left} x2={right} y1={0} y2={0} />
             </g>
           )}
           {markerX !== null && marker && (
             <g aria-hidden="true">
-              <line
-                className={s.markerLine}
-                x1={markerX}
-                x2={markerX}
-                y1={padTop - 6}
-                y2={baseY}
-              />
+              <line className={s.markerLine} x1={markerX} x2={markerX} y1={padTop - 6} y2={baseY} />
               <text
                 className={s.markerText}
                 x={markerX}
                 y={padTop - 12}
-                textAnchor={
-                  markerX < left + 20 ? 'start' : markerX > right - 20 ? 'end' : 'middle'
-                }
+                textAnchor={markerX < left + 20 ? 'start' : markerX > right - 20 ? 'end' : 'middle'}
               >
                 {marker.label}
               </text>
@@ -2512,11 +2540,7 @@ export function LineChart({
             )}
           </g>
           {reference?.label && (
-            <g
-              className={s.ref}
-              style={{ transform: `translateY(${refY}px)` }}
-              aria-hidden="true"
-            >
+            <g className={s.ref} style={{ transform: `translateY(${refY}px)` }} aria-hidden="true">
               <text
                 key={reference.label}
                 className={s.refText}
@@ -2549,7 +2573,10 @@ export function LineChart({
                     cx={x(active)}
                     cy={y(v)}
                     r="4"
-                    style={{ fill: hollow ? 'var(--paper)' : stroke, stroke: hollow ? stroke : undefined }}
+                    style={{
+                      fill: hollow ? 'var(--paper)' : stroke,
+                      stroke: hollow ? stroke : undefined,
+                    }}
                     data-hollow={hollow || undefined}
                   />
                 );
@@ -2623,7 +2650,9 @@ export function LineChart({
       )}
       {tip}
       <SrTable caption={label} head={table.head} rows={table.rows} />
-      <Live>{explorer.keyboard && active !== null ? announce(data[active], shown, format) : ''}</Live>
+      <Live>
+        {explorer.keyboard && active !== null ? announce(data[active], shown, format) : ''}
+      </Live>
     </div>
   );
 }
@@ -2790,7 +2819,8 @@ export function DonutChart({
     const list = event.currentTarget.closest('ul');
     const buttons = list ? Array.from(list.querySelectorAll<HTMLButtonElement>('button')) : [];
     let next = -1;
-    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') next = Math.min(buttons.length - 1, index + 1);
+    if (event.key === 'ArrowDown' || event.key === 'ArrowRight')
+      next = Math.min(buttons.length - 1, index + 1);
     else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') next = Math.max(0, index - 1);
     else if (event.key === 'Home') next = 0;
     else if (event.key === 'End') next = buttons.length - 1;
@@ -2983,7 +3013,13 @@ export function DonutMeter({
       role="img"
       aria-label={`${label}: ${formatPct(pct, 0)}`}
     >
-      <circle cx={size / 2} cy={size / 2} r={r} className={s.dmeterTrack} style={{ strokeWidth: thickness }} />
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        className={s.dmeterTrack}
+        style={{ strokeWidth: thickness }}
+      />
       {pct > 0 && (
         <circle
           cx={size / 2}
@@ -3084,9 +3120,7 @@ export function FunnelChart({
   };
   const ofTop = (i: number) => (first ? ((values[i] ?? 0) / first) * 100 : 0);
   const pill = (i: number) =>
-    change === 'drop'
-      ? formatDelta(pass(i) - 100, 1)
-      : formatRate(pass(i));
+    change === 'drop' ? formatDelta(pass(i) - 100, 1) : formatRate(pass(i));
   const summaryText =
     summary ??
     `${label}: ${stages
@@ -3193,9 +3227,7 @@ export function FunnelChart({
                   <span className={s.fbarLabel}>{st.label}</span>
                   <span className={s.fbarValue}>{format(st.value)}</span>
                 </span>
-                <span className={s.fbarConv}>
-                  {i === 0 ? '' : <b key={change}>{pill(i)}</b>}
-                </span>
+                <span className={s.fbarConv}>{i === 0 ? '' : <b key={change}>{pill(i)}</b>}</span>
                 <span className={s.fbarTrack}>
                   {st.value > 0 && (
                     <i
@@ -3274,7 +3306,13 @@ export function FunnelChart({
         </div>
         <div ref={setRibbon} className={s.fribbon}>
           {width > 0 && (
-            <svg width={width} height={height} role="img" aria-label={summaryText} className={s.fsvg}>
+            <svg
+              width={width}
+              height={height}
+              role="img"
+              aria-label={summaryText}
+              className={s.fsvg}
+            >
               {paths.map((d, i) =>
                 (values[i] ?? 0) > 0 ? (
                   <path
