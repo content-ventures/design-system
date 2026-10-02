@@ -278,11 +278,14 @@ const glyphs: ReactNode[] = [
  */
 export function BrandMark({
   name,
+  src,
   size = 'md',
   variant = 'solid',
   decorative = false,
 }: {
   name: string;
+  /** Logo enviado pela organização. Some no erro de carga e o glifo volta. */
+  src?: string | null;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   variant?: 'solid' | 'soft' | 'paper';
   decorative?: boolean;
@@ -290,6 +293,22 @@ export function BrandMark({
   const seed = seedOf(name);
   const mark = markColors[seed % markColors.length] ?? '#0875db';
   const glyph = glyphs[Math.floor(seed / markColors.length) % glyphs.length] ?? glyphs[0];
+  const [broken, setBroken] = useState<string | null>(null);
+  if (src && broken !== src) {
+    return (
+      <span
+        className={s.brand}
+        data-size={size}
+        data-variant="logo"
+        role={decorative ? undefined : 'img'}
+        aria-label={decorative ? undefined : name}
+        aria-hidden={decorative || undefined}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element -- logo de terceiro, tamanho fixo */}
+        <img src={src} alt="" loading="lazy" decoding="async" onError={() => setBroken(src)} />
+      </span>
+    );
+  }
   return (
     <span
       className={s.brand}

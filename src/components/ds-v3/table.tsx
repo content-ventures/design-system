@@ -460,8 +460,12 @@ export function DataTable<Row>({
                           key={column.key}
                           data-col={column.key}
                           data-label={
-                            column.name ?? (typeof column.header === 'string' ? column.header : undefined)
+                            column.header === ''
+                              ? undefined
+                              : (column.name ??
+                                (typeof column.header === 'string' ? column.header : undefined))
                           }
+                          data-actions={column.header === '' || undefined}
                           data-align={column.numeric ? 'end' : column.align}
                           data-truncate={column.truncate || undefined}
                           className={column.numeric ? s.num : undefined}

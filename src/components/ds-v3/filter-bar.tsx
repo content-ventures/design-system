@@ -29,7 +29,10 @@ const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayout
 export function usePresence<T>(items: T[], keyOf: (item: T) => string, duration = 180) {
   const sig = items.map(keyOf).join('\u0000');
   const latest = useRef(items);
-  const [state, setState] = useState<{ sig: string; leaving: Map<string, { item: T; index: number }> }>(() => ({
+  const [state, setState] = useState<{
+    sig: string;
+    leaving: Map<string, { item: T; index: number }>;
+  }>(() => ({
     sig,
     leaving: new Map(),
   }));
@@ -48,13 +51,18 @@ export function usePresence<T>(items: T[], keyOf: (item: T) => string, duration 
   });
   useEffect(() => {
     if (!state.leaving.size) return;
-    const timer = window.setTimeout(() => setState((current) => ({ ...current, leaving: new Map() })), duration + 20);
+    const timer = window.setTimeout(
+      () => setState((current) => ({ ...current, leaving: new Map() })),
+      duration + 20,
+    );
     return () => window.clearTimeout(timer);
   }, [state.leaving, duration]);
   const out = items.map((item) => ({ item, key: keyOf(item), leaving: false }));
   [...state.leaving.entries()]
     .sort((a, b) => a[1].index - b[1].index)
-    .forEach(([key, { item, index }]) => out.splice(Math.min(index, out.length), 0, { item, key, leaving: true }));
+    .forEach(([key, { item, index }]) =>
+      out.splice(Math.min(index, out.length), 0, { item, key, leaving: true }),
+    );
   return out;
 }
 
@@ -86,7 +94,9 @@ export function useAnchoredPanel({
   matchWidth?: boolean;
 }) {
   const [host, setHost] = useState<Element | null>(null);
-  const [pos, setPos] = useState<{ top: number; left: number; width?: number; up: boolean } | null>(null);
+  const [pos, setPos] = useState<{ top: number; left: number; width?: number; up: boolean } | null>(
+    null,
+  );
   useIsoLayoutEffect(() => {
     if (!open) {
       setPos(null);
@@ -104,11 +114,19 @@ export function useAnchoredPanel({
       const vh = window.innerHeight;
       const w = matchWidth ? a.width : p.offsetWidth;
       const h = p.offsetHeight;
-      const left = Math.min(Math.max(align === 'end' ? a.right - w : a.left, 8), Math.max(8, vw - w - 8));
+      const left = Math.min(
+        Math.max(align === 'end' ? a.right - w : a.left, 8),
+        Math.max(8, vw - w - 8),
+      );
       const below = vh - a.bottom - gap - 8;
       const above = a.top - gap - 8;
       const up = h > below && above > below;
-      setPos({ top: up ? a.top - gap - h : a.bottom + gap, left, width: matchWidth ? a.width : undefined, up });
+      setPos({
+        top: up ? a.top - gap - h : a.bottom + gap,
+        left,
+        width: matchWidth ? a.width : undefined,
+        up,
+      });
     };
     update();
     window.addEventListener('scroll', update, true);
@@ -156,6 +174,7 @@ export function FilterBar({
   actions,
   bandId,
   filtersLabel = 'Filtros',
+  filters = true,
   'data-force': force,
 }: {
   tabs?: ReactNode;
@@ -169,6 +188,8 @@ export function FilterBar({
   /** Id da `FilterBand` controlada pelo botão. */
   bandId?: string;
   filtersLabel?: string;
+  /** Sem faixa de filtros na tela: o botão “Filtros” não aparece (abas e busca bastam). */
+  filters?: boolean;
   /** Prancha: estado do botão “Filtros”. */
   'data-force'?: string;
 }) {
@@ -197,7 +218,12 @@ export function FilterBar({
     return () => observer.disconnect();
   }, [tabs]);
   return (
-    <div ref={rootRef} className={s.root} data-stacked={stacked ? '' : undefined} data-tabs={tabs ? '' : undefined}>
+    <div
+      ref={rootRef}
+      className={s.root}
+      data-stacked={stacked ? '' : undefined}
+      data-tabs={tabs ? '' : undefined}
+    >
       <div className={s.bar}>
         {tabs && (
           <div ref={tabsRef} className={s.tabs}>
@@ -206,20 +232,22 @@ export function FilterBar({
         )}
         <div ref={toolsRef} className={s.tools}>
           {search && <div className={s.search}>{search}</div>}
-          <ToggleButton
-            variant="ghost"
-            size="sm"
-            icon={ListFilter}
-            pressed={filtersOpen}
-            onPressedChange={onFiltersOpenChange}
-            aria-expanded={filtersOpen}
-            aria-controls={bandId}
-            count={filterCount || undefined}
-            countLabel={`${filterCount} ${filterCount === 1 ? 'filtro aplicado' : 'filtros aplicados'}`}
-            data-force={force}
-          >
-            {filtersLabel}
-          </ToggleButton>
+          {filters && (
+            <ToggleButton
+              variant="ghost"
+              size="sm"
+              icon={ListFilter}
+              pressed={filtersOpen}
+              onPressedChange={onFiltersOpenChange}
+              aria-expanded={filtersOpen}
+              aria-controls={bandId}
+              count={filterCount || undefined}
+              countLabel={`${filterCount} ${filterCount === 1 ? 'filtro aplicado' : 'filtros aplicados'}`}
+              data-force={force}
+            >
+              {filtersLabel}
+            </ToggleButton>
+          )}
           {actions}
         </div>
       </div>
@@ -344,7 +372,9 @@ export function ActiveFilters({
     if (index === null) return;
     focusAfter.current = null;
     const chips = [
-      ...(rootRef.current?.querySelectorAll<HTMLElement>(':scope > [data-chips] > span[data-kind]:not([data-leaving])') ?? []),
+      ...(rootRef.current?.querySelectorAll<HTMLElement>(
+        ':scope > [data-chips] > span[data-kind]:not([data-leaving])',
+      ) ?? []),
     ];
     const target = chips[Math.min(index, chips.length - 1)];
     (target?.querySelector<HTMLElement>('button') ?? clearRef.current)?.focus();
@@ -427,17 +457,27 @@ function FilterChip({
   const anchorRef = useRef<HTMLSpanElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const panelId = useId();
-  const { host, style, up, placed } = useAnchoredPanel({ open, anchor: anchorRef, panel: panelRef });
+  const { host, style, up, placed } = useAnchoredPanel({
+    open,
+    anchor: anchorRef,
+    panel: panelRef,
+  });
   const text = filter.valueText ?? (typeof filter.value === 'string' ? filter.value : '');
   // Foco entra no painel só depois de posicionado (antes disso ele está invisível e não aceita foco).
   useEffect(() => {
     if (!open || !placed) return;
     const panel = panelRef.current;
-    const chosen = panel?.querySelector<HTMLElement>('[aria-pressed="true"], [aria-selected="true"]');
-    (chosen ?? panel?.querySelector<HTMLElement>('button, [href], input, [tabindex]:not([tabindex="-1"])'))?.focus();
+    const chosen = panel?.querySelector<HTMLElement>(
+      '[aria-pressed="true"], [aria-selected="true"]',
+    );
+    (
+      chosen ??
+      panel?.querySelector<HTMLElement>('button, [href], input, [tabindex]:not([tabindex="-1"])')
+    )?.focus();
     const onDown = (event: PointerEvent) => {
       const target = event.target as Node;
-      if (!panelRef.current?.contains(target) && !anchorRef.current?.contains(target)) onOpenChange(false);
+      if (!panelRef.current?.contains(target) && !anchorRef.current?.contains(target))
+        onOpenChange(false);
     };
     document.addEventListener('pointerdown', onDown, true);
     return () => document.removeEventListener('pointerdown', onDown, true);

@@ -1,4 +1,5 @@
 .frame {
+  container: table / inline-size;
   min-width: 0;
   border-radius: var(--r-lg);
   background: var(--paper);
@@ -661,15 +662,10 @@
 
 /* Paginação no celular: ver pagination.module.css. */
 
-/* ——— Celular: tabela → cartões (≤ 760, contrato §12) ———
- * Cada linha é um cartão: a primeira coluna é o título; as demais, rótulo à esquerda e valor à
- * direita. O cabeçalho sai (a ordenação continua pelos filtros da tela). */
-@media (max-width: 760px) {
-  .frame[data-stack] {
-    border: 0;
-    border-radius: 0;
-    background: none;
-  }
+/* ——— Estreito: tabela → cartões (celular, contrato §12) ———
+ * Pela largura da própria tabela, como o resto do DS: até 680 px (janela de ~760) cada linha é um
+ * cartão. A primeira coluna é o título; as demais, rótulo à esquerda e valor à direita. */
+@container table (max-width: 680px) {
   .frame[data-stack] .scroll {
     overflow: visible;
     padding: 0;
@@ -684,21 +680,17 @@
   .frame[data-stack] .table thead {
     display: none;
   }
-  .frame[data-stack] .table tbody {
-    display: grid;
-    gap: var(--s-2);
-  }
   .frame[data-stack] .table tbody > tr:is([data-key], .skeletonRow) {
     position: relative;
     display: grid;
     gap: 6px;
     padding: var(--s-3) var(--s-4);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--paper);
+    box-shadow: inset 0 -1px 0 var(--line-soft);
+  }
+  .frame[data-stack] .table tbody > tr:is([data-key], .skeletonRow):last-child {
+    box-shadow: none;
   }
   .frame[data-stack] .table tbody > tr[data-selected] {
-    border-color: var(--select-line);
     background: var(--select-bg);
   }
   .frame[data-stack] .table tbody > tr > td {
@@ -723,7 +715,6 @@
   /* Título do cartão: a primeira coluna de dados, sem rótulo. */
   .frame[data-stack] .table tbody > tr > td[data-col]:is(:first-child, .check + td) {
     justify-content: flex-start;
-    padding-right: 32px;
     color: var(--ink);
     font: var(--t-body-strong);
     text-align: left;
@@ -731,15 +722,36 @@
   .frame[data-stack] .table tbody > tr > td[data-col]:is(:first-child, .check + td)::before {
     content: none;
   }
+  /* Seleção: a caixa fica à esquerda do título. */
   .frame[data-stack] .table tbody > tr > td.check {
     position: absolute;
     top: var(--s-3);
-    right: var(--s-3);
+    left: var(--s-4);
+  }
+  .frame[data-stack] .table tbody > tr > td.check + td {
+    padding-left: 28px;
+  }
+  /* Ações (cabeçalho vazio): sobem para o canto do cartão. */
+  .frame[data-stack] .table tbody > tr > td[data-actions] {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+  }
+  .frame[data-stack]
+    .table
+    tbody
+    > tr:has(td[data-actions])
+    > td[data-col]:is(:first-child, .check + td) {
+    padding-right: 72px;
+  }
+  .frame[data-stack] .table td[data-truncate] {
+    max-width: none;
+  }
+  .frame[data-stack] .table td[data-truncate] .truncate {
+    max-width: 64%;
   }
   .frame[data-stack] .table tbody > tr > td.emptyCell {
     padding: var(--s-6) var(--s-4);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
     text-align: center;
   }
 }
