@@ -680,6 +680,14 @@
   .frame[data-stack] .table thead {
     display: none;
   }
+  /* Larguras fixas são da grade de mesa: no cartão, a tabela cabe no contêiner. */
+  .frame[data-stack] .table[data-fixed='true'] {
+    min-width: 0;
+    table-layout: auto;
+  }
+  .frame[data-stack] .table[data-fixed='true'] td {
+    overflow: visible;
+  }
   .frame[data-stack] .table tbody > tr:is([data-key], .skeletonRow) {
     position: relative;
     display: grid;
@@ -736,6 +744,11 @@
     position: absolute;
     top: 6px;
     right: 6px;
+    width: auto;
+  }
+  /* No cartão não há coluna para alinhar: o slot vazio não guarda lugar. */
+  .frame[data-stack] .table td[data-actions] [data-slot='empty'] {
+    display: none;
   }
   .frame[data-stack]
     .table
