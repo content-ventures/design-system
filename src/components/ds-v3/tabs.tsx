@@ -86,22 +86,40 @@ export function Tabs<T extends string>({
   }, [bar, animate]);
 
   // Traz a aba ativa para a vista rolando só o próprio trilho (nunca scrollIntoView, que arrasta a página).
+  // Roda de novo quando o trilho muda de largura: a barra pode empilhar depois da primeira medida, e
+  // o trilho largo não pode ficar com a rolagem que fazia sentido quando era estreito.
   useEffect(() => {
     const rail = railRef.current;
-    const tab = refs.current[value];
-    const instant = first.current;
+    if (!rail) return;
+    const reveal = (instant: boolean) => {
+      const tab = refs.current[value];
+      if (!tab) return;
+      if (rail.scrollWidth <= rail.clientWidth + 1) {
+        if (rail.scrollLeft) rail.scrollTo({ left: 0 });
+        return;
+      }
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const behavior: ScrollBehavior = instant || reduce ? 'auto' : 'smooth';
+      const left = tab.getBoundingClientRect().left - rail.getBoundingClientRect().left + rail.scrollLeft;
+      const right = left + tab.offsetWidth;
+      const room = 40;
+      if (right > rail.scrollLeft + rail.clientWidth - room) {
+        rail.scrollTo({ left: right - rail.clientWidth + room, behavior });
+      } else if (left < rail.scrollLeft + room / 2) {
+        rail.scrollTo({ left: Math.max(0, left - room), behavior });
+      }
+    };
+    reveal(first.current);
     first.current = false;
-    if (!rail || !tab || rail.scrollWidth <= rail.clientWidth + 1) return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const behavior: ScrollBehavior = instant || reduce ? 'auto' : 'smooth';
-    const left = tab.offsetLeft;
-    const right = left + tab.offsetWidth;
-    const room = 40;
-    if (right > rail.scrollLeft + rail.clientWidth - room) {
-      rail.scrollTo({ left: right - rail.clientWidth + room, behavior });
-    } else if (left < rail.scrollLeft + room / 2) {
-      rail.scrollTo({ left: Math.max(0, left - room), behavior });
-    }
+    if (typeof ResizeObserver === 'undefined') return;
+    let width = rail.clientWidth;
+    const observer = new ResizeObserver(() => {
+      if (rail.clientWidth === width) return;
+      width = rail.clientWidth;
+      reveal(true);
+    });
+    observer.observe(rail);
+    return () => observer.disconnect();
   }, [value]);
 
   function onKey(event: KeyboardEvent<HTMLDivElement>) {
