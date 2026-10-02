@@ -89,6 +89,7 @@ export {
   Lock,
   LogOut,
   Mail,
+  MailCheck,
   Maximize,
   Megaphone,
   Menu,
