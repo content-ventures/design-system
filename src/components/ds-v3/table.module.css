@@ -755,7 +755,8 @@
     tbody
     > tr:has(td[data-actions])
     > td[data-col]:is(:first-child, .check + td) {
-    padding-right: 72px;
+    /* Até três ações de 32 px no canto: o título não corre por baixo delas. */
+    padding-right: 112px;
   }
   .frame[data-stack] .table td[data-truncate] {
     max-width: none;
