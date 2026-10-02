@@ -160,10 +160,17 @@ function drawerFocus(root: HTMLElement) {
   return (
     root.querySelector<HTMLElement>('[data-autofocus]') ??
     root.querySelector<HTMLElement>(
-      `.${CSS.escape(s.body ?? '')} :is(input:not(:disabled):not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), textarea:not(:disabled), select:not(:disabled))`,
+      FOCUSABLE_FIELDS.map((field) => `.${CSS.escape(s.body ?? '')} ${field}`).join(', '),
     )
   );
 }
+
+// Lista simples em vez de `:is()`: o mesmo efeito, e parseável também fora do navegador (jsdom).
+const FOCUSABLE_FIELDS = [
+  'input:not(:disabled):not([type="hidden"]):not([type="checkbox"]):not([type="radio"])',
+  'textarea:not(:disabled)',
+  'select:not(:disabled)',
+];
 
 /**
  * Gaveta lateral: `<dialog>` ancorado à direita. Entra deslizando 24 px com esmaecimento (280 ms)

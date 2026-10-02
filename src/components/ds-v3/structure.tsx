@@ -900,6 +900,8 @@ export type DescriptionItem = {
   state?: 'empty' | 'missing';
   /** Dinheiro, data, contagem ou código: números tabulares. Texto comum fica proporcional. */
   numeric?: boolean;
+  /** Atributos `data-*` da linha (`{ testid: 'x' }` → `data-testid="x"`). */
+  data?: Record<string, string>;
 };
 
 function CopyButton({ text, label }: { text: string; label: string }) {
@@ -1022,7 +1024,14 @@ export function DescriptionList({
           const titleText =
             layout === 'strip' && typeof item.value === 'string' && !state ? item.value : undefined;
           return (
-            <div key={item.label} className={s.dlItem} data-copy={item.copy ? true : undefined}>
+            <div
+              key={item.label}
+              {...Object.fromEntries(
+                Object.entries(item.data ?? {}).map(([key, value]) => [`data-${key}`, value]),
+              )}
+              className={s.dlItem}
+              data-copy={item.copy ? true : undefined}
+            >
               <dt>{item.label}</dt>
               <dd
                 data-state={state}

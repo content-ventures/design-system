@@ -35,6 +35,11 @@
     color var(--dur-1) var(--ease-out),
     transform var(--dur-1) var(--ease-out);
 }
+/* Link com cara de botão: sem sublinhado nem cor de link. */
+.anchor {
+  text-decoration: none;
+  cursor: pointer;
+}
 .button svg {
   width: var(--btn-icon);
   height: var(--btn-icon);

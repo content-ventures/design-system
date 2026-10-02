@@ -265,6 +265,7 @@ export function ListItem({
   draggable = false,
   checkbox = false,
   'data-force': force,
+  'data-testid': testId,
 }: {
   leading?: ReactNode;
   title: ReactNode;
@@ -281,6 +282,8 @@ export function ListItem({
   checkbox?: boolean;
   /** Prancha: `hover`, `active`, `focus`. */
   'data-force'?: string;
+  /** Vai na linha clicável (link, botão ou bloco), para testes. */
+  'data-testid'?: string;
 }) {
   const reorder = useContext(ReorderContext);
   const liRef = useRef<HTMLLIElement>(null);
@@ -316,6 +319,7 @@ export function ListItem({
   const common = {
     className: s.row,
     'data-force': force,
+    'data-testid': testId,
     onKeyDown,
   };
   const row = href ? (

@@ -13,6 +13,7 @@ export { VisuallyHidden, LiveRegion, useAnnouncer } from './a11y';
 export {
   Button,
   IconButton,
+  ButtonLink,
   ButtonGroup,
   SplitButton,
   type ButtonProps,

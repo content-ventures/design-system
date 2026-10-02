@@ -20,6 +20,11 @@ import s from './timeline.module.css';
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 export type TimelineState = 'done' | 'current' | 'upcoming' | 'blocked';
+/** `{ kind: 'manual' }` → `{ 'data-kind': 'manual' }`. */
+function dataAttrs(data?: Record<string, string>) {
+  return Object.fromEntries(Object.entries(data ?? {}).map(([key, value]) => [`data-${key}`, value]));
+}
+
 export type TimelineEntry = {
   /** Chave estável (para animar só o que chega). Padrão: título + posição. */
   id?: string;
@@ -36,6 +41,8 @@ export type TimelineEntry = {
   marker?: ReactNode;
   /** `activity`: texto citado (comentário, motivo), recolhido em 3 linhas. */
   quote?: ReactNode;
+  /** Atributos `data-*` da linha (`{ kind: 'manual' }` → `data-kind="manual"`): marcação e testes. */
+  data?: Record<string, string>;
 };
 
 const stateLabel: Record<TimelineState, string> = {
@@ -91,6 +98,7 @@ export function Timeline({
         return (
           <li
             key={key}
+            {...dataAttrs(entry.data)}
             className={s.item}
             data-state={state}
             data-enter={arrival !== undefined || undefined}

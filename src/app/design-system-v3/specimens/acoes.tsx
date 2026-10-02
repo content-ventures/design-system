@@ -64,7 +64,7 @@ import {
   type MenuSection,
   type Tone,
 } from '@mediaon/design-system/v3';
-import { SplitButton } from '@mediaon/design-system/v3/button';
+import { ButtonLink, SplitButton } from '@mediaon/design-system/v3/button';
 import { LinkButton, TextLink } from '@mediaon/design-system/v3/link';
 import { RowActions, type RowAction } from '@mediaon/design-system/v3/row-actions';
 import { Select } from '@mediaon/design-system/v3/select';
@@ -1168,6 +1168,11 @@ function GrupoBotoes() {
           </State>
           <State label="Ícones">
             <Pager />
+          </State>
+          <State label="Link com cara de botão">
+            <ButtonLink size="sm" href="#" icon={Download} onClick={(event) => event.preventDefault()}>
+              Baixar CSV
+            </ButtonLink>
           </State>
         </States>
       </Shot>

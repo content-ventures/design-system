@@ -108,6 +108,7 @@ export {
   Pause,
   Pencil,
   Phone,
+  PhoneOff,
   Play,
   Plus,
   Power,

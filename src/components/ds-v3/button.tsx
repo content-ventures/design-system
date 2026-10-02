@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronDown, LoaderCircle, type LucideIcon } from 'lucide-react';
-import type { ComponentProps, MouseEvent, ReactNode } from 'react';
+import type { ComponentProps, ElementType, MouseEvent, ReactNode } from 'react';
 import { Menu, type MenuSection } from './overlays';
 import s from './button.module.css';
 
@@ -104,6 +104,46 @@ export function Button({
           <Trailing className={s.trailing} aria-hidden="true" />
         ))}
     </button>
+  );
+}
+
+/**
+ * Navegação com cara de botão (“Voltar ao início”, “Baixar CSV”): é um link de verdade — abre em
+ * outra aba, copia endereço, leitor de tela anuncia “link”. Ação que muda dado continua `Button`.
+ * `as` recebe o link do framework (`next/link`) para navegar sem recarregar.
+ */
+export function ButtonLink({
+  as: Component = 'a',
+  variant = 'secondary',
+  size = 'md',
+  shape = 'rounded',
+  icon: Icon,
+  trailingIcon: Trailing,
+  className = '',
+  children,
+  ...props
+}: Omit<ComponentProps<'a'>, 'href'> & {
+  href: string;
+  as?: ElementType;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  shape?: 'rounded' | 'pill';
+  icon?: LucideIcon;
+  trailingIcon?: LucideIcon;
+  'data-force'?: string;
+}) {
+  return (
+    <Component
+      {...props}
+      className={`${s.button} ${s.anchor} ${className}`}
+      data-variant={variant}
+      data-size={size}
+      data-shape={shape}
+    >
+      {Icon && <Icon aria-hidden="true" />}
+      {children}
+      {Trailing && <Trailing className={s.trailing} aria-hidden="true" />}
+    </Component>
   );
 }
 
