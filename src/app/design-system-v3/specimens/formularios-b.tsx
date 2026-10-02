@@ -38,6 +38,7 @@ import {
   Radio,
   RadioGroup,
   Switch,
+  SwitchRow,
 } from '@mediaon/design-system/v3/selection';
 import { RangeSlider, Slider } from '@mediaon/design-system/v3/slider';
 import { TimeField } from '@mediaon/design-system/v3/time-field';
@@ -1385,27 +1386,21 @@ function SettingsList() {
   return (
     <div className={x.settings}>
       {SETTINGS.map((setting) => (
-        <div key={setting.key} className={x.setting}>
-          <span className={x.settingText}>
-            <label htmlFor={`${id}-${setting.key}`}>{setting.label}</label>
-            <span id={`${id}-${setting.key}-d`}>{setting.description}</span>
-          </span>
-          <Switch
-            id={`${id}-${setting.key}`}
-            hideLabel
-            label={setting.label}
-            describedBy={`${id}-${setting.key}-d`}
-            checked={Boolean(values[setting.key])}
-            loading={saving === setting.key}
-            onCheckedChange={(checked) => {
-              setSaving(setting.key);
-              window.setTimeout(() => {
-                setValues((current) => ({ ...current, [setting.key]: checked }));
-                setSaving(null);
-              }, 500);
-            }}
-          />
-        </div>
+        <SwitchRow
+          key={setting.key}
+          id={`${id}-${setting.key}`}
+          label={setting.label}
+          description={setting.description}
+          checked={Boolean(values[setting.key])}
+          loading={saving === setting.key}
+          onCheckedChange={(checked) => {
+            setSaving(setting.key);
+            window.setTimeout(() => {
+              setValues((current) => ({ ...current, [setting.key]: checked }));
+              setSaving(null);
+            }, 500);
+          }}
+        />
       ))}
     </div>
   );

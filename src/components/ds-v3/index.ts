@@ -100,6 +100,7 @@ export {
   Radio,
   RadioGroup,
   Switch,
+  SwitchRow,
   Segmented,
   ChoiceCard,
   type CheckboxProps,

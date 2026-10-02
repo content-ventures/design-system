@@ -294,6 +294,58 @@ export function Switch({
   );
 }
 
+/**
+ * Linha de configuração: título e descrição à esquerda, interruptor à direita. O texto inteiro é o
+ * rótulo (clicar nele alterna) e a descrição é a descrição acessível do interruptor. Para listas de
+ * preferências ("Publicar o ativo", "Visível ao anunciante"); empilhadas, ganham fio entre si.
+ */
+export function SwitchRow({
+  label,
+  description,
+  checked,
+  onCheckedChange,
+  disabled,
+  loading,
+  id: idProp,
+  'data-force': force,
+}: {
+  label: string;
+  description?: ReactNode;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  disabled?: boolean;
+  loading?: boolean;
+  id?: string;
+  'data-force'?: string;
+}) {
+  const auto = useId();
+  const id = idProp ?? auto;
+  const descId = `${id}-desc`;
+  return (
+    <div className={s.switchRow} data-disabled={disabled || undefined}>
+      <label htmlFor={id} className={s.switchRowText}>
+        <span className={s.switchRowTitle}>{label}</span>
+        {description && (
+          <span id={descId} className={s.switchRowDesc}>
+            {description}
+          </span>
+        )}
+      </label>
+      <Switch
+        id={id}
+        label={label}
+        hideLabel
+        checked={checked}
+        onCheckedChange={onCheckedChange}
+        {...(disabled !== undefined ? { disabled } : {})}
+        {...(loading !== undefined ? { loading } : {})}
+        {...(description ? { describedBy: descId } : {})}
+        {...(force ? { 'data-force': force } : {})}
+      />
+    </div>
+  );
+}
+
 /* ——— Segmentado ——— */
 
 export type SegmentOption<T extends string> = {

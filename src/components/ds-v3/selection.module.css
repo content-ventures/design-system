@@ -639,3 +639,35 @@
     pointer-events: auto;
   }
 }
+
+/* ——— Linha de configuração ——— */
+.switchRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-3) 0;
+}
+.switchRow + .switchRow {
+  border-top: 1px solid var(--line-soft);
+}
+.switchRow[data-disabled='true'] .switchRowText {
+  cursor: default;
+}
+.switchRowText {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  cursor: pointer;
+}
+.switchRowTitle {
+  color: var(--ink);
+  font: var(--t-body-strong);
+}
+.switchRow[data-disabled='true'] .switchRowTitle {
+  color: var(--muted);
+}
+.switchRowDesc {
+  color: var(--muted);
+  font: var(--t-small);
+}

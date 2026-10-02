@@ -98,6 +98,7 @@ export function DataTable<Row>({
   exiting,
   transitionKey,
   rowLabel,
+  rowData,
   stack = true,
 }: {
   label: string;
@@ -136,6 +137,8 @@ export function DataTable<Row>({
   transitionKey?: string;
   /** Nome acessível de cada linha (seleção): “Selecionar {nome}”. */
   rowLabel?: (row: Row) => string;
+  /** Atributos `data-*` da linha (`{ testid: 'x' }` → `data-testid="x"`): marcação e testes. */
+  rowData?: (row: Row) => Record<string, string>;
   /**
    * Até 760 px cada linha vira um cartão: a primeira coluna é o título e as outras viram
    * pares rótulo–valor (contrato §12). Desligue só em tabelas que já cabem no celular.
@@ -424,6 +427,12 @@ export function DataTable<Row>({
                 return (
                   <tr
                     key={key}
+                    {...Object.fromEntries(
+                      Object.entries(rowData?.(row) ?? {}).map(([name, value]) => [
+                        `data-${name}`,
+                        value,
+                      ]),
+                    )}
                     data-key={key}
                     data-selected={isSelected || undefined}
                     data-clickable={(Boolean(onRowClick) && !isExiting) || undefined}
