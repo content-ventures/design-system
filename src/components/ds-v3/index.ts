@@ -135,6 +135,7 @@ export {
   COLOR_PRESETS,
   normalizeHex,
   contrastRatio,
+  whiteTextContrast,
   type ColorFieldProps,
 } from './color-picker';
 export { TagInput } from './tag-input';

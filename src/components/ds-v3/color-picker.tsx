@@ -45,6 +45,10 @@ export function contrastRatio(a: string, b: string) {
   const lb = luminance(b);
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 }
+/** Contraste de texto branco sobre a cor — a leitura que o campo mostra. */
+export function whiteTextContrast(hex: string) {
+  return contrastRatio(hex, '#FFFFFF');
+}
 const ratioText = (n: number) =>
   `${(Math.floor(n * 10) / 10).toLocaleString('pt-BR', { minimumFractionDigits: 1 })}:1`;
 
