@@ -98,6 +98,7 @@ export function DataTable<Row>({
   exiting,
   transitionKey,
   rowLabel,
+  stack = true,
 }: {
   label: string;
   rows: Row[];
@@ -135,6 +136,11 @@ export function DataTable<Row>({
   transitionKey?: string;
   /** Nome acessível de cada linha (seleção): “Selecionar {nome}”. */
   rowLabel?: (row: Row) => string;
+  /**
+   * Até 760 px cada linha vira um cartão: a primeira coluna é o título e as outras viram
+   * pares rótulo–valor (contrato §12). Desligue só em tabelas que já cabem no celular.
+   */
+  stack?: boolean;
 }) {
   const keys = rows.map(rowKey);
   const chosen = selected ?? new Set<string>();
@@ -271,7 +277,7 @@ export function DataTable<Row>({
   const mode = loading ? 'loading' : error ? 'error' : rows.length === 0 ? 'empty' : 'rows';
 
   return (
-    <div className={s.frame} data-variant={variant}>
+    <div className={s.frame} data-variant={variant} data-stack={stack || undefined}>
       <div className={s.scroll}>
         <table
           ref={tableRef}
@@ -453,6 +459,9 @@ export function DataTable<Row>({
                         <td
                           key={column.key}
                           data-col={column.key}
+                          data-label={
+                            column.name ?? (typeof column.header === 'string' ? column.header : undefined)
+                          }
                           data-align={column.numeric ? 'end' : column.align}
                           data-truncate={column.truncate || undefined}
                           className={column.numeric ? s.num : undefined}

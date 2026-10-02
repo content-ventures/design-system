@@ -660,3 +660,86 @@
 }
 
 /* Paginação no celular: ver pagination.module.css. */
+
+/* ——— Celular: tabela → cartões (≤ 760, contrato §12) ———
+ * Cada linha é um cartão: a primeira coluna é o título; as demais, rótulo à esquerda e valor à
+ * direita. O cabeçalho sai (a ordenação continua pelos filtros da tela). */
+@media (max-width: 760px) {
+  .frame[data-stack] {
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .frame[data-stack] .scroll {
+    overflow: visible;
+    padding: 0;
+  }
+  .frame[data-stack] .table,
+  .frame[data-stack] .table tbody,
+  .frame[data-stack] .table tr,
+  .frame[data-stack] .table td {
+    display: block;
+    width: auto;
+  }
+  .frame[data-stack] .table thead {
+    display: none;
+  }
+  .frame[data-stack] .table tbody {
+    display: grid;
+    gap: var(--s-2);
+  }
+  .frame[data-stack] .table tbody > tr:is([data-key], .skeletonRow) {
+    position: relative;
+    display: grid;
+    gap: 6px;
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--paper);
+  }
+  .frame[data-stack] .table tbody > tr[data-selected] {
+    border-color: var(--select-line);
+    background: var(--select-bg);
+  }
+  .frame[data-stack] .table tbody > tr > td {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    text-align: right;
+  }
+  .frame[data-stack] .table tbody > tr > td[data-label]::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    color: var(--muted);
+    font: var(--t-small);
+    text-align: left;
+  }
+  /* Título do cartão: a primeira coluna de dados, sem rótulo. */
+  .frame[data-stack] .table tbody > tr > td[data-col]:is(:first-child, .check + td) {
+    justify-content: flex-start;
+    padding-right: 32px;
+    color: var(--ink);
+    font: var(--t-body-strong);
+    text-align: left;
+  }
+  .frame[data-stack] .table tbody > tr > td[data-col]:is(:first-child, .check + td)::before {
+    content: none;
+  }
+  .frame[data-stack] .table tbody > tr > td.check {
+    position: absolute;
+    top: var(--s-3);
+    right: var(--s-3);
+  }
+  .frame[data-stack] .table tbody > tr > td.emptyCell {
+    padding: var(--s-6) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    text-align: center;
+  }
+}
