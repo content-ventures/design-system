@@ -85,6 +85,7 @@
   --line-strong: #dfe2e7;
   --line-hover: #d2d6dd;
   --overlay: rgb(14 17 26 / 0.3);
+  --tooltip-bg: #191d27;
 
   /* Papéis de texto */
   --ink: #141824;
@@ -272,6 +273,70 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  color-scheme: light;
+}
+/* Aparência escura: os mesmos papéis e rampas V3, sem tema paralelo do legado.
+   Cada componente continua consumindo sua superfície, texto, borda e estado. */
+.theme[data-color-scheme='dark'] {
+  color-scheme: dark;
+  --g-0: #191d27;
+  --g-25: #10131a;
+  --g-50: #2c323e;
+  --g-75: #2c323e;
+  --g-100: #424958;
+  --g-150: #424958;
+  --g-200: #5a6272;
+  --g-300: #747c8b;
+  --g-400: #9aa1ae;
+  --g-500: #c0c6d0;
+  --g-600: #d8dce3;
+  --g-700: #e3e6eb;
+  --g-800: #ebedf1;
+  --g-900: #f6f7f9;
+  --g-950: #ffffff;
+  --canvas: #10131a;
+  --paper: #191d27;
+  --paper-sunken: #10131a;
+  --paper-hover: #2c323e;
+  --paper-pressed: #424958;
+  --line: #2c323e;
+  --line-soft: #2c323e;
+  --line-strong: #424958;
+  --line-hover: #5a6272;
+  --ink: #f6f7f9;
+  --text: #d8dce3;
+  --muted: #c0c6d0;
+  --subtle: #9aa1ae;
+  --overlay: rgb(16 19 26 / 0.7);
+  --b-25: color-mix(in srgb, #0875db 8%, var(--paper));
+  --b-50: color-mix(in srgb, #0875db 14%, var(--paper));
+  --b-100: color-mix(in srgb, #0875db 24%, var(--paper));
+  --b-200: #0a559c;
+  --accent-ink: #94c9fa;
+  --blue-ink: #94c9fa;
+  --select-ink: #94c9fa;
+  --green-bg: color-mix(in srgb, var(--green-dot) 12%, var(--paper));
+  --green-line: color-mix(in srgb, var(--green-dot) 30%, var(--paper));
+  --green-ink: #cdeedb;
+  --amber-bg: color-mix(in srgb, var(--amber-dot) 12%, var(--paper));
+  --amber-line: color-mix(in srgb, var(--amber-dot) 30%, var(--paper));
+  --amber-ink: #fbe3b4;
+  --orange-bg: color-mix(in srgb, var(--orange-dot) 12%, var(--paper));
+  --orange-line: color-mix(in srgb, var(--orange-dot) 30%, var(--paper));
+  --orange-ink: #fdd9c6;
+  --red-bg: color-mix(in srgb, var(--red-dot) 12%, var(--paper));
+  --red-line: color-mix(in srgb, var(--red-dot) 30%, var(--paper));
+  --red-ink: #f8d3d6;
+  --violet-bg: color-mix(in srgb, var(--violet-dot) 12%, var(--paper));
+  --violet-line: color-mix(in srgb, var(--violet-dot) 30%, var(--paper));
+  --violet-ink: #e2dafd;
+  --teal-bg: color-mix(in srgb, var(--teal-dot) 12%, var(--paper));
+  --teal-line: color-mix(in srgb, var(--teal-dot) 30%, var(--paper));
+  --teal-ink: #c9ecee;
+  --pink-bg: color-mix(in srgb, var(--pink-dot) 12%, var(--paper));
+  --pink-line: color-mix(in srgb, var(--pink-dot) 30%, var(--paper));
+  --pink-ink: #f7d4e5;
+  --danger-soft-hover: var(--red-bg);
 }
 /* Toque: alvos maiores quando o ponteiro é o dedo. */
 @media (pointer: coarse) {

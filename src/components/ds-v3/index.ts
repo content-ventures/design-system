@@ -5,7 +5,8 @@
  */
 
 /* Fundamentos */
-export { ThemeV3 } from './theme';
+export { ThemeV3, type ThemeMode } from './theme';
+export { interV3 } from './font';
 export { VisuallyHidden, LiveRegion, useAnnouncer } from './a11y';
 
 /* Ações */
@@ -194,6 +195,7 @@ export { ContextMenu } from './context-menu';
 /* Estrutura */
 export {
   PageHeader,
+  PageStack,
   Panel,
   Section,
   Accordion,
@@ -229,13 +231,7 @@ export {
   type SortState,
   type BulkAction,
 } from './table';
-export {
-  FilterBar,
-  FilterBand,
-  FilterField,
-  ActiveFilters,
-  type ActiveFilter,
-} from './filter-bar';
+export { FilterBar, FilterBand, FilterField, ActiveFilters, type ActiveFilter } from './filter-bar';
 export { List, ListGroup, ListItem, ListItemSkeleton } from './list-item';
 export { StatCard, Delta, Meter, Sparkline } from './stat';
 export { Metric, MetricStrip, type MetricDelta, type MetricProps } from './metric-strip';
@@ -353,6 +349,10 @@ export {
   KanbanPlaceholder,
   KanbanEmpty,
   KanbanIconButton,
+  KanbanCard,
+  KanbanCardRow,
+  KanbanCardValue,
+  KanbanCardMeta,
   useKanbanDrag,
   StageIcon,
   NextAction,
@@ -369,7 +369,9 @@ export {
   type LeadNote,
   type LeadOutcome,
   type LeadCardProps,
+  type KanbanCardProps,
   type ActivityKind,
   type ActivityDraft,
   type ActivityEntry,
 } from './kanban';
+export { CampaignKanbanCard } from './campaign-kanban-card';

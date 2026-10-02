@@ -92,22 +92,22 @@ import {
   type MenuSection,
   type TimelineEntry,
   type Tone,
-} from '@/components/ds-v3';
-import { List, ListItem } from '@/components/ds-v3/list-item';
-import { TagInput } from '@/components/ds-v3/tag-input';
-import { Slider } from '@/components/ds-v3/slider';
-import { Alert, Progress } from '@/components/ds-v3/feedback';
-import { Popover, PopoverHeader } from '@/components/ds-v3/popover';
-import { Select, type SelectOption } from '@/components/ds-v3/select';
-import { CheckboxMark, RadioGroup } from '@/components/ds-v3/selection';
-import { LinkButton, TextLink } from '@/components/ds-v3/link';
-import { NumberField } from '@/components/ds-v3/number-field';
-import { ToggleGroup } from '@/components/ds-v3/toggle';
-import { SplitButton } from '@/components/ds-v3/button';
-import { StepMarker, StepperCompact, type StepItem, type StepState } from '@/components/ds-v3/stepper';
-import { Accordion, DescriptionList, Disclosure, ExpandableText, type AccordionItem } from '@/components/ds-v3/structure';
-import { Toaster, toast } from '@/components/ds-v3/toast';
-import toastStyles from '@/components/ds-v3/toast.module.css';
+} from '@mediaon/design-system/v3';
+import { List, ListItem } from '@mediaon/design-system/v3/list-item';
+import { TagInput } from '@mediaon/design-system/v3/tag-input';
+import { Slider } from '@mediaon/design-system/v3/slider';
+import { Alert, Progress } from '@mediaon/design-system/v3/feedback';
+import { Popover, PopoverHeader } from '@mediaon/design-system/v3/popover';
+import { Select, type SelectOption } from '@mediaon/design-system/v3/select';
+import { CheckboxMark, RadioGroup } from '@mediaon/design-system/v3/selection';
+import { LinkButton, TextLink } from '@mediaon/design-system/v3/link';
+import { NumberField } from '@mediaon/design-system/v3/number-field';
+import { ToggleGroup } from '@mediaon/design-system/v3/toggle';
+import { SplitButton } from '@mediaon/design-system/v3/button';
+import { StepMarker, StepperCompact, type StepItem, type StepState } from '@mediaon/design-system/v3/stepper';
+import { Accordion, DescriptionList, Disclosure, ExpandableText, type AccordionItem } from '@mediaon/design-system/v3/structure';
+import { Toaster, toast } from '@mediaon/design-system/v3/toast';
+import toastStyles from '@mediaon/design-system/v3/toast.module.css';
 import { Shot, Shots, SpecRows, State, States } from '../stage';
 import { createPortal } from 'react-dom';
 import p from './padroes-b.module.css';

@@ -8,10 +8,14 @@
   width: min(var(--dialog-w), calc(100vw - 32px));
   max-width: none;
   max-height: min(760px, calc(100dvh - 48px));
+  /* Centralização explícita: não depende da margem nativa, removida pelo preflight do app. */
+  margin: auto;
   padding: 0;
   border: 0;
   border-radius: var(--r-2xl);
   color: var(--text);
+  /* A camada não herda o alinhamento da célula de ações em que foi montada. */
+  text-align: left;
   background: var(--paper);
   box-shadow: var(--shadow-xl);
   overflow: hidden;
@@ -148,7 +152,9 @@ dialog.dialog[data-contained] {
 }
 /* Rede de segurança: confirmação sem corpo não deixa uma faixa vazia entre cabeçalho e rodapé. */
 .dialogBody:has(> .dialogBodyInner:empty),
-.dialogBody:has(> .dialogBodyInner > :only-child:empty:not(input, textarea, select, img, svg, canvas, iframe)) {
+.dialogBody:has(
+  > .dialogBodyInner > :only-child:empty:not(input, textarea, select, img, svg, canvas, iframe)
+) {
   display: none;
 }
 .dialogFoot {
@@ -233,7 +239,7 @@ dialog.dialog[data-contained] {
   white-space: normal;
   /* pretty, não balance: balance divide as linhas mas não encolhe a caixa, sobra vazio à direita. */
   text-wrap: pretty;
-  background: var(--g-900);
+  background: var(--tooltip-bg);
   box-shadow: var(--shadow-md);
   pointer-events: none;
   animation: tipIn var(--dur-2) var(--ease-out);
@@ -267,7 +273,7 @@ dialog.dialog[data-contained] {
   translate: -50% -50%;
   rotate: 45deg;
   border-radius: 0 0 2px 0;
-  background: var(--g-900);
+  background: var(--tooltip-bg);
 }
 .tip[data-below]::after {
   top: auto;

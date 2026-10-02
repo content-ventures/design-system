@@ -46,9 +46,9 @@ import {
   Tabs,
   VisuallyHidden,
   type Tone,
-} from '@/components/ds-v3';
-import { TopBar, type Crumb } from '@/components/ds-v3/app-shell';
-import { BarChart, ChartCard, ChartSwap } from '@/components/ds-v3/charts';
+} from '@mediaon/design-system/v3';
+import { TopBar, type Crumb } from '@mediaon/design-system/v3/app-shell';
+import { BarChart, ChartCard, ChartSwap } from '@mediaon/design-system/v3/charts';
 import {
   AccessState,
   Alert,
@@ -69,10 +69,10 @@ import {
   type AccessKind,
   type NotificationEntry,
   type ProgressStep,
-} from '@/components/ds-v3/feedback';
-import { LinkButton } from '@/components/ds-v3/link';
-import { ToastCard, Toaster, toast } from '@/components/ds-v3/toast';
-import toastStyles from '@/components/ds-v3/toast.module.css';
+} from '@mediaon/design-system/v3/feedback';
+import { LinkButton } from '@mediaon/design-system/v3/link';
+import { ToastCard, Toaster, toast } from '@mediaon/design-system/v3/toast';
+import toastStyles from '@mediaon/design-system/v3/toast.module.css';
 import { Shot, Shots, State, States } from '../stage';
 import x from './feedback.module.css';
 

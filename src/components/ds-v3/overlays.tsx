@@ -20,13 +20,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { IconButton } from './button';
-import {
-  layerHost,
-  reducedMotion,
-  trapTab,
-  useIsoLayoutEffect,
-  usePresence,
-} from './popover';
+import { layerHost, reducedMotion, trapTab, useIsoLayoutEffect, usePresence } from './popover';
 import s from './overlays.module.css';
 
 /* ——— Menu ——— O desenho e o comportamento vivem em `menu.tsx` (dono: navegação). */
@@ -117,6 +111,9 @@ export function useModalLayer({
       } else {
         dialog.showModal?.();
       }
+      // Navegadores atuais expõem `showModal`, mas a camada continua utilizável em ambientes
+      // sem a API nativa (webviews antigos e o DOM de teste): `open` preserva a semântica.
+      if (!dialog.open) dialog.open = true;
       const focus = () => {
         const chosen = latest.current.initialFocus?.(dialog);
         (chosen ?? dialog).focus({ preventScroll: true });
@@ -130,7 +127,8 @@ export function useModalLayer({
       return () => cancelAnimationFrame(frame);
     }
     if (presence === 'closed' && dialog.open) {
-      dialog.close?.();
+      if (typeof dialog.close === 'function') dialog.close();
+      else dialog.open = false;
     }
     if (presence === 'closed') {
       inerted.current.forEach((node) => node.removeAttribute('inert'));
@@ -138,7 +136,11 @@ export function useModalLayer({
       const back = returnTo.current;
       returnTo.current = null;
       const active = document.activeElement;
-      if (back && back.isConnected && (!active || active === document.body || dialog.contains(active))) {
+      if (
+        back &&
+        back.isConnected &&
+        (!active || active === document.body || dialog.contains(active))
+      ) {
         back.focus({ preventScroll: true });
       }
     }
@@ -163,7 +165,10 @@ export function useModalLayer({
       return;
     }
     if (!reducedMotion()) {
-      ref.current?.animate(latest.current.nudge, { duration: 260, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+      ref.current?.animate(latest.current.nudge, {
+        duration: 260,
+        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+      });
     }
   };
 
@@ -187,12 +192,12 @@ export function useModalLayer({
       downOnBackdrop.current = false;
     },
     onKeyDown: (event: ReactKeyboardEvent<HTMLDialogElement>) => {
-      if (!contained || event.defaultPrevented) return;
       if (event.key === 'Escape') {
         event.preventDefault();
         latest.current.onClose();
         return;
       }
+      if (!contained || event.defaultPrevented) return;
       trapTab(event, event.currentTarget);
     },
   };
@@ -222,7 +227,12 @@ export function ContainedLayer({
   className?: string;
 }) {
   return (
-    <div className={`${s.layerRoot} ${className}`} data-layer-root data-state={presence} hidden={presence === 'closed'}>
+    <div
+      className={`${s.layerRoot} ${className}`}
+      data-layer-root
+      data-state={presence}
+      hidden={presence === 'closed'}
+    >
       <div className={s.scrim} {...scrimProps} />
       {children}
     </div>
@@ -277,7 +287,14 @@ function DialogLayout({
             </p>
           )}
         </div>
-        <IconButton label="Fechar" icon={X} variant="ghost" size="sm" className={s.close} onClick={onClose} />
+        <IconButton
+          label="Fechar"
+          icon={X}
+          variant="ghost"
+          size="sm"
+          className={s.close}
+          onClick={onClose}
+        />
       </header>
       {hasBody(children) && (
         <div className={s.dialogBody}>
@@ -331,6 +348,18 @@ export function DialogFrame({
 const ENABLED_CONTROL =
   'input:not(:disabled):not([type="hidden"]), textarea:not(:disabled), select:not(:disabled), button:not(:disabled)';
 
+function firstEnabledControl(container: HTMLElement, className: string) {
+  for (const selector of ENABLED_CONTROL.split(', ')) {
+    const control = container.querySelector<HTMLElement>(`.${CSS.escape(className)} ${selector}`);
+
+    if (control) {
+      return control;
+    }
+  }
+
+  return null;
+}
+
 /**
  * Foco inicial: `[data-autofocus]`, depois o primeiro controle do corpo, depois o primeiro botão do
  * rodapé. Nunca o X do cabeçalho — confirmações destrutivas abrem em Cancelar.
@@ -338,7 +367,7 @@ const ENABLED_CONTROL =
 function dialogFocus(dialog: HTMLElement) {
   return (
     dialog.querySelector<HTMLElement>('[data-autofocus]') ??
-    dialog.querySelector<HTMLElement>(`.${CSS.escape(s.dialogBody ?? '')} :is(${ENABLED_CONTROL})`) ??
+    firstEnabledControl(dialog, s.dialogBody ?? '') ??
     dialog.querySelector<HTMLElement>(`.${CSS.escape(s.dialogFoot ?? '')} button:not(:disabled)`)
   );
 }
@@ -445,7 +474,9 @@ export function Dialog({
       aria-describedby={shown.description ? descId : undefined}
       tabIndex={-1}
     >
-      {layer.mounted && <DialogLayout {...shown} titleId={titleId} descId={descId} onClose={onClose} />}
+      {layer.mounted && (
+        <DialogLayout {...shown} titleId={titleId} descId={descId} onClose={onClose} />
+      )}
     </dialog>
   );
   if (!contained) return dialog;
@@ -479,7 +510,11 @@ function tipDelay(anchor: Element | null) {
   if (!anchor) return 250;
   const raw = getComputedStyle(anchor).getPropertyValue('--tip-delay').trim();
   const value = parseFloat(raw);
-  return Number.isFinite(value) ? (raw.endsWith('s') && !raw.endsWith('ms') ? value * 1000 : value) : 250;
+  return Number.isFinite(value)
+    ? raw.endsWith('s') && !raw.endsWith('ms')
+      ? value * 1000
+      : value
+    : 250;
 }
 
 /**
@@ -584,9 +619,12 @@ export function Tooltip({
     });
   }, [open, host, content, shortcut, side]);
 
-  const child = isValidElement<Describable>(children) ? (children as ReactElement<Describable>) : null;
+  const child = isValidElement<Describable>(children)
+    ? (children as ReactElement<Describable>)
+    : null;
   // Botão de ícone que já tem esse nome: repetir a dica como descrição faria o leitor falar duas vezes.
-  const describe = child !== null && child.props['aria-label'] !== content && child.props.label !== content;
+  const describe =
+    child !== null && child.props['aria-label'] !== content && child.props.label !== content;
   const trigger = child
     ? cloneElement(child, {
         // A bolha substitui o `title` nativo, que apareceria por cima dela um segundo depois.
@@ -601,7 +639,11 @@ export function Tooltip({
       {content}
     </span>
   );
-  const bubble = (style: CSSProperties, below: boolean | undefined, extra: Record<string, unknown>) => (
+  const bubble = (
+    style: CSSProperties,
+    below: boolean | undefined,
+    extra: Record<string, unknown>,
+  ) => (
     <span
       ref={pinned ? undefined : tipRef}
       className={s.tip}
@@ -657,7 +699,8 @@ export function Tooltip({
       }}
       onFocus={(event) => {
         // Só foco de teclado: o clique já mostrou a dica pelo hover.
-        if (event.target instanceof HTMLElement && event.target.matches(':focus-visible')) show('keyboard');
+        if (event.target instanceof HTMLElement && event.target.matches(':focus-visible'))
+          show('keyboard');
       }}
       onBlur={hide}
     >

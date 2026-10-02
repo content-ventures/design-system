@@ -28,6 +28,7 @@ import {
   useSyncExternalStore,
   type CSSProperties,
   type KeyboardEvent,
+  type MouseEvent,
   type ReactNode,
   type RefObject,
 } from 'react';
@@ -162,7 +163,9 @@ export function AppShell({
     if (focusOnOpen.current) {
       focusOnOpen.current = false;
       rootRef.current
-        ?.querySelector<HTMLElement>(`[data-part='sidebar'] :is(a[href], button:not(:disabled), input)`)
+        ?.querySelector<HTMLElement>(
+          `[data-part='sidebar'] :is(a[href], button:not(:disabled), input)`,
+        )
         ?.focus();
     }
     const onKey = (event: globalThis.KeyboardEvent) => {
@@ -349,7 +352,8 @@ function SideTip({
         setHover(false);
       }}
       onFocus={(event) => {
-        if (event.target instanceof HTMLElement && event.target.matches(':focus-visible')) setHover(true);
+        if (event.target instanceof HTMLElement && event.target.matches(':focus-visible'))
+          setHover(true);
       }}
       onBlur={() => setHover(false)}
     >
@@ -401,7 +405,7 @@ function NavEntry({
 }: {
   item: NavItem;
   active?: string;
-  onNavigate?: (id: string) => void;
+  onNavigate?: (id: string, event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
   peek?: string;
   query?: string;
 }) {
@@ -447,8 +451,8 @@ function NavEntry({
     title: !collapsed && item.label.length > 24 ? item.label : undefined,
     'data-plain': item.icon ? undefined : true,
     'data-force': item.force,
-    onClick: () => {
-      onNavigate?.(item.id);
+    onClick: (event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
+      onNavigate?.(item.id, event);
       closeNav();
     },
   };
@@ -492,7 +496,7 @@ function NavSection({
 }: {
   group: NavGroup;
   active?: string;
-  onNavigate?: (id: string) => void;
+  onNavigate?: (id: string, event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
   peek?: string;
   query: string;
 }) {
@@ -578,7 +582,12 @@ function SidebarFilter({
         spellCheck={false}
       />
       {value && (
-        <button type="button" className={s.filterClear} aria-label="Limpar busca" onClick={() => onChange('')}>
+        <button
+          type="button"
+          className={s.filterClear}
+          aria-label="Limpar busca"
+          onClick={() => onChange('')}
+        >
           <X aria-hidden="true" />
         </button>
       )}
@@ -613,7 +622,7 @@ export function Sidebar({
   filter?: boolean | { placeholder?: string; label?: string };
   groups: NavGroup[];
   active?: string;
-  onNavigate?: (id: string) => void;
+  onNavigate?: (id: string, event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void;
   /** Itens do rodapé (configurações, ajuda). */
   utilities?: NavItem[];
   account?: ReactNode;
@@ -627,7 +636,10 @@ export function Sidebar({
   const term = collapsed ? '' : fold(query.trim());
   const visibleGroups = term
     ? groups
-        .map((group) => ({ ...group, items: group.items.filter((item) => fold(item.label).includes(term)) }))
+        .map((group) => ({
+          ...group,
+          items: group.items.filter((item) => fold(item.label).includes(term)),
+        }))
         .filter((group) => group.items.length > 0)
     : groups;
   const filterOptions = typeof filter === 'object' ? filter : {};
@@ -667,7 +679,13 @@ export function Sidebar({
           {utilities && utilities.length > 0 && (
             <ul className={s.list} aria-label="Utilidades">
               {utilities.map((item) => (
-                <NavEntry key={item.id} item={item} active={active} onNavigate={onNavigate} peek={peek} />
+                <NavEntry
+                  key={item.id}
+                  item={item}
+                  active={active}
+                  onNavigate={onNavigate}
+                  peek={peek}
+                />
               ))}
             </ul>
           )}
@@ -687,7 +705,12 @@ export function ProductMark({ name = 'MediaOn', caption }: { name?: string; capt
       <span className={s.logo} aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none">
           <circle cx="7.6" cy="12" r="3.1" fill="currentColor" />
-          <path d="M13 7.4a6.6 6.6 0 0 1 0 9.2" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+          <path
+            d="M13 7.4a6.6 6.6 0 0 1 0 9.2"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+          />
           <path
             d="M16.6 4.4a11 11 0 0 1 0 15.2"
             stroke="currentColor"
@@ -869,11 +892,13 @@ export function SidebarSearch({
 /** Conta no rodapé da barra lateral: orbe, nome e papel. O menu abre para cima. */
 export function SidebarAccount({
   name,
+  src,
   detail,
   sections,
   presence,
 }: {
   name: string;
+  src?: string;
   detail: string;
   sections: MenuSection[];
   presence?: 'online' | 'away' | 'offline';
@@ -893,7 +918,7 @@ export function SidebarAccount({
           aria-label={`${name}, ${detail}. Menu da conta`}
           data-part="account"
         >
-          <Avatar name={name} size="md" presence={presence} decorative />
+          <Avatar name={name} src={src} size="md" presence={presence} decorative />
           {!collapsed && (
             <>
               <span className={s.accountText}>
@@ -907,7 +932,11 @@ export function SidebarAccount({
       )}
     />
   );
-  return <div className={s.menuWrap}>{collapsed ? <SideTip content={name}>{trigger}</SideTip> : trigger}</div>;
+  return (
+    <div className={s.menuWrap}>
+      {collapsed ? <SideTip content={name}>{trigger}</SideTip> : trigger}
+    </div>
+  );
 }
 
 /* ——————————————————————————— Trilha ——————————————————————————— */
@@ -961,11 +990,23 @@ function CrumbNode({ item, current }: { item: Crumb; current: boolean }) {
       </span>
     );
   return item.href ? (
-    <a className={s.crumbLink} href={item.href} onClick={item.onClick} title={title} data-force={item.force}>
+    <a
+      className={s.crumbLink}
+      href={item.href}
+      onClick={item.onClick}
+      title={title}
+      data-force={item.force}
+    >
       {body}
     </a>
   ) : (
-    <button type="button" className={s.crumbLink} onClick={item.onClick} title={title} data-force={item.force}>
+    <button
+      type="button"
+      className={s.crumbLink}
+      onClick={item.onClick}
+      title={title}
+      data-force={item.force}
+    >
       {body}
     </button>
   );
@@ -1011,12 +1052,22 @@ export function Breadcrumb({
       <nav aria-label={label} className={s.crumbs} data-variant="compact">
         {parent ? (
           parent.href ? (
-            <a className={s.crumbBack} href={parent.href} onClick={parent.onClick} data-force={parent.force}>
+            <a
+              className={s.crumbBack}
+              href={parent.href}
+              onClick={parent.onClick}
+              data-force={parent.force}
+            >
               <ChevronLeft aria-hidden="true" />
               <span className={s.crumbText}>{parent.label}</span>
             </a>
           ) : (
-            <button type="button" className={s.crumbBack} onClick={parent.onClick} data-force={parent.force}>
+            <button
+              type="button"
+              className={s.crumbBack}
+              onClick={parent.onClick}
+              data-force={parent.force}
+            >
               <ChevronLeft aria-hidden="true" />
               <span className={s.crumbText}>{parent.label}</span>
             </button>
@@ -1114,7 +1165,12 @@ export function TopBar({
   const shell = useShell();
   const openMenu = onOpenMenu ?? (shell.navId ? shell.openNav : undefined);
   return (
-    <header className={s.topbar} data-menu={menuButton} data-sticky={sticky || undefined} data-part="topbar">
+    <header
+      className={s.topbar}
+      data-menu={menuButton}
+      data-sticky={sticky || undefined}
+      data-part="topbar"
+    >
       <div className={s.topInner}>
         {openMenu && menuButton !== 'never' && (
           <IconButton
@@ -1157,7 +1213,13 @@ export function TopBar({
 }
 
 /** Item das ações do topo que sai no celular (o seletor de papel desce para a gaveta). */
-export function TopBarItem({ children, phone = 'show' }: { children: ReactNode; phone?: 'show' | 'hide' }) {
+export function TopBarItem({
+  children,
+  phone = 'show',
+}: {
+  children: ReactNode;
+  phone?: 'show' | 'hide';
+}) {
   return (
     <span className={s.topItem} data-phone={phone}>
       {children}
@@ -1184,7 +1246,9 @@ export function NotificationsButton({
   force?: string;
 }) {
   const fresh = unread ?? count > 0;
-  const name = fresh ? `${label}: ${count > 0 ? `${count} ${count === 1 ? 'nova' : 'novas'}` : 'há novidades'}` : label;
+  const name = fresh
+    ? `${label}: ${count > 0 ? `${count} ${count === 1 ? 'nova' : 'novas'}` : 'há novidades'}`
+    : label;
   return (
     <Menu
       label={label}
@@ -1193,7 +1257,14 @@ export function NotificationsButton({
       sections={sections}
       trigger={(props) => (
         <span className={s.bell} data-unread={fresh || undefined}>
-          <IconButton {...props} label={name} icon={Bell} variant="ghost" size="sm" data-force={force} />
+          <IconButton
+            {...props}
+            label={name}
+            icon={Bell}
+            variant="ghost"
+            size="sm"
+            data-force={force}
+          />
           {fresh && <i className={s.bellDot} aria-hidden="true" />}
         </span>
       )}
@@ -1210,7 +1281,12 @@ export function TopBarAccount({ name, sections }: { name: string; sections: Menu
       width={240}
       sections={sections}
       trigger={(props) => (
-        <button {...props} type="button" className={s.topAccount} aria-label={`${name}. Menu da conta`}>
+        <button
+          {...props}
+          type="button"
+          className={s.topAccount}
+          aria-label={`${name}. Menu da conta`}
+        >
           <Avatar name={name} size="sm" decorative />
         </button>
       )}
@@ -1324,7 +1400,8 @@ export function CommandPanel({
     const top = el.offsetTop - 6;
     const bottom = el.offsetTop + el.offsetHeight + 6;
     if (top < list.scrollTop) list.scrollTop = top;
-    else if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight;
+    else if (bottom > list.scrollTop + list.clientHeight)
+      list.scrollTop = bottom - list.clientHeight;
   }, [active]);
 
   function choose(item: CommandItem) {
@@ -1377,7 +1454,13 @@ export function CommandPanel({
         <Kbd>Esc</Kbd>
       </div>
       <div className={s.cmdResults} style={{ height }}>
-        <div ref={listRef} id={`${baseId}-list`} role="listbox" aria-label="Resultados" className={s.cmdList}>
+        <div
+          ref={listRef}
+          id={`${baseId}-list`}
+          role="listbox"
+          aria-label="Resultados"
+          className={s.cmdList}
+        >
           {shown.map((group) => {
             const groupId = `${baseId}-${group.label}`;
             return (
@@ -1408,11 +1491,17 @@ export function CommandPanel({
                       </span>
                       <span className={s.cmdText}>
                         <span className={s.cmdLabel}>
-                          <Highlight text={item.label} query={term ? query.trim().replace(/^#/, '') : ''} />
+                          <Highlight
+                            text={item.label}
+                            query={term ? query.trim().replace(/^#/, '') : ''}
+                          />
                         </span>
                         {item.description && (
                           <span className={s.cmdDesc}>
-                            <Highlight text={item.description} query={term ? query.trim().replace(/^#/, '') : ''} />
+                            <Highlight
+                              text={item.description}
+                              query={term ? query.trim().replace(/^#/, '') : ''}
+                            />
                           </span>
                         )}
                       </span>

@@ -1,20 +1,13 @@
 import type { Metadata } from 'next';
-import { interV3 } from '../../components/ds-v3/font';
-import { ThemeV3 } from '../../components/ds-v3/theme';
-import { CatalogV3 } from './catalog';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
-  title: 'Design System V3 · MediaOn',
-  description: 'Biblioteca V3 do MediaOn: tokens, componentes, padrões e templates.',
+  title: 'Design System · MediaOn',
+  description: 'Biblioteca oficial de tokens, componentes, padrões e templates do MediaOn.',
   robots: { index: false, follow: false },
 };
 
+/** Rota legada temporária para links que ainda apontam para a nomenclatura V3. */
 export default function DesignSystemV3Page() {
-  return (
-    <div className={interV3.variable}>
-      <ThemeV3>
-        <CatalogV3 />
-      </ThemeV3>
-    </div>
-  );
+  redirect('/design-system');
 }

@@ -540,7 +540,7 @@ button.groupLabel[aria-expanded='false'] svg {
   font: var(--t-caption-strong);
   color: #fff;
   white-space: nowrap;
-  background: var(--g-900);
+  background: var(--tooltip-bg);
   box-shadow: var(--shadow-md);
   pointer-events: none;
   translate: 0 -50%;
@@ -562,7 +562,7 @@ button.groupLabel[aria-expanded='false'] svg {
   translate: 50% -50%;
   rotate: 45deg;
   border-radius: 0 0 0 2px;
-  background: var(--g-900);
+  background: var(--tooltip-bg);
 }
 .tipDetail {
   font-weight: 400;
@@ -678,7 +678,7 @@ button.groupLabel[aria-expanded='false'] svg {
   z-index: var(--z-sticky);
   height: var(--topbar-h);
   border-bottom: 1px solid var(--line);
-  background: rgb(255 255 255 / 0.94);
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }

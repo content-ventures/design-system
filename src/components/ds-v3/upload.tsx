@@ -144,7 +144,7 @@ export function Dropzone({
   return (
     <div className={s.dropzone}>
       <div
-        id={id}
+        id={id ? `${id}-dropzone` : undefined}
         role="button"
         tabIndex={disabled ? -1 : 0}
         aria-disabled={disabled || undefined}
@@ -167,6 +167,7 @@ export function Dropzone({
         }}
       >
         <input
+          id={id}
           ref={inputRef}
           type="file"
           tabIndex={-1}

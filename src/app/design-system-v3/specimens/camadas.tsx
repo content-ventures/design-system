@@ -27,7 +27,7 @@ import {
   type ComponentType,
   type ReactNode,
 } from 'react';
-import { CreatingDialog, type CreationRun } from '@/app/dashboardv3/builder/creating';
+import { CreatingDialog, type CreationRun } from '../../dashboardv3/builder/creating';
 import {
   Avatar,
   Badge,
@@ -49,19 +49,19 @@ import {
   Tooltip,
   type Column,
   type Tone,
-} from '@/components/ds-v3';
-import { BottomSheet, BottomSheetFrame } from '@/components/ds-v3/bottom-sheet';
-import { ConfirmDialog, ConfirmFrame } from '@/components/ds-v3/confirm-dialog';
-import { Drawer, DrawerFrame } from '@/components/ds-v3/drawer';
-import { HoverCard } from '@/components/ds-v3/hover-card';
-import { LinkButton, TextLink } from '@/components/ds-v3/link';
-import { NumberField } from '@/components/ds-v3/number-field';
-import { Popover, PopoverHeader } from '@/components/ds-v3/popover';
-import { ResponsiveDialog } from '@/components/ds-v3/responsive-dialog';
-import { Select } from '@/components/ds-v3/select';
-import { DescriptionList } from '@/components/ds-v3/structure';
-import { Toaster, toast } from '@/components/ds-v3/toast';
-import toastStyles from '@/components/ds-v3/toast.module.css';
+} from '@mediaon/design-system/v3';
+import { BottomSheet, BottomSheetFrame } from '@mediaon/design-system/v3/bottom-sheet';
+import { ConfirmDialog, ConfirmFrame } from '@mediaon/design-system/v3/confirm-dialog';
+import { Drawer, DrawerFrame } from '@mediaon/design-system/v3/drawer';
+import { HoverCard } from '@mediaon/design-system/v3/hover-card';
+import { LinkButton, TextLink } from '@mediaon/design-system/v3/link';
+import { NumberField } from '@mediaon/design-system/v3/number-field';
+import { Popover, PopoverHeader } from '@mediaon/design-system/v3/popover';
+import { ResponsiveDialog } from '@mediaon/design-system/v3/responsive-dialog';
+import { Select } from '@mediaon/design-system/v3/select';
+import { DescriptionList } from '@mediaon/design-system/v3/structure';
+import { Toaster, toast } from '@mediaon/design-system/v3/toast';
+import toastStyles from '@mediaon/design-system/v3/toast.module.css';
 import { Shot, Shots, State } from '../stage';
 import x from './camadas.module.css';
 

@@ -2,7 +2,7 @@
 
 import { ChartSpline, Table2 } from 'lucide-react';
 import { useEffect, useRef, useState, type ComponentType, type ReactNode } from 'react';
-import { Badge, BrandMark, IconButton, Segmented, type SegmentOption } from '@/components/ds-v3';
+import { Badge, BrandMark, IconButton, Segmented, type SegmentOption } from '@mediaon/design-system/v3';
 import {
   BarChart,
   ChartCard,
@@ -27,8 +27,8 @@ import {
   type DonutDatum,
   type FunnelStage,
   type LegendItem,
-} from '@/components/ds-v3/charts';
-import { LinkButton } from '@/components/ds-v3/link';
+} from '@mediaon/design-system/v3/charts';
+import { LinkButton } from '@mediaon/design-system/v3/link';
 import { Shot, Shots, State, States } from '../stage';
 import g from './graficos.module.css';
 

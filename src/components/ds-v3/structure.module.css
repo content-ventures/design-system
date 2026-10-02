@@ -6,6 +6,15 @@
  */
 
 /* ——————————————————————————— PageHeader ——————————————————————————— */
+.pageStack {
+  display: grid;
+  gap: var(--s-6);
+  min-width: 0;
+}
+.pageStack > [data-part='page-header'] {
+  margin-bottom: 0;
+}
+
 .ph {
   container: dsv3-page-header / inline-size;
   display: grid;

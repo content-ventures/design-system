@@ -19,10 +19,10 @@ import {
   SidebarAccount,
   SidebarItem,
   type Portal,
-} from '@/components/ds-v3/app-shell';
-import { AttachmentChip, AttachmentPreview, AttachmentRow } from '@/components/ds-v3/attachment';
-import { Button, ButtonGroup, IconButton } from '@/components/ds-v3/button';
-import { Carousel, Gallery, type GalleryItem } from '@/components/ds-v3/gallery';
+} from '@mediaon/design-system/v3/app-shell';
+import { AttachmentChip, AttachmentPreview, AttachmentRow } from '@mediaon/design-system/v3/attachment';
+import { Button, ButtonGroup, IconButton } from '@mediaon/design-system/v3/button';
+import { Carousel, Gallery, type GalleryItem } from '@mediaon/design-system/v3/gallery';
 import {
   Avatar,
   AvatarGroup,
@@ -30,13 +30,13 @@ import {
   BrandMark,
   MadeWith,
   MediaOnMark,
-} from '@/components/ds-v3/identity';
-import { LinkButton } from '@/components/ds-v3/link';
-import { MediaFrame, formatBytes } from '@/components/ds-v3/media';
-import type { MenuSection } from '@/components/ds-v3/overlays';
-import { Checkbox, Segmented } from '@/components/ds-v3/selection';
-import { Dropzone, FileRow } from '@/components/ds-v3/upload';
-import { VideoPlayer, type VideoCue } from '@/components/ds-v3/video';
+} from '@mediaon/design-system/v3/identity';
+import { LinkButton } from '@mediaon/design-system/v3/link';
+import { MediaFrame, formatBytes } from '@mediaon/design-system/v3/media';
+import type { MenuSection } from '@mediaon/design-system/v3/overlays';
+import { Checkbox, Segmented } from '@mediaon/design-system/v3/selection';
+import { Dropzone, FileRow } from '@mediaon/design-system/v3/upload';
+import { VideoPlayer, type VideoCue } from '@mediaon/design-system/v3/video';
 import { Shot, Shots, State, States } from '../stage';
 import x from './midia.module.css';
 

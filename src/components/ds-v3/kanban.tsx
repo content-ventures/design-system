@@ -40,7 +40,8 @@ import s from './kanban.module.css';
 
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 const reducedMotion = () =>
-  typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+  typeof window !== 'undefined' &&
+  Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 
 /* ——————————————————————————— Ícone de etapa ——————————————————————————— */
 
@@ -82,24 +83,48 @@ export function StageIcon({
       aria-hidden={label ? undefined : true}
     >
       {kind === 'todo' && (
-        <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="2.2 2.1" />
+        <circle
+          cx="8"
+          cy="8"
+          r="6.25"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeDasharray="2.2 2.1"
+        />
       )}
       {kind === 'progress' && (
         <>
           <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.5" />
-          <path d={`M8 8V${8 - r}A${r} ${r} 0 ${large} 1 ${x.toFixed(3)} ${y.toFixed(3)}Z`} fill="currentColor" />
+          <path
+            d={`M8 8V${8 - r}A${r} ${r} 0 ${large} 1 ${x.toFixed(3)} ${y.toFixed(3)}Z`}
+            fill="currentColor"
+          />
         </>
       )}
       {kind === 'done' && (
         <>
           <circle cx="8" cy="8" r="7" fill="currentColor" />
-          <path d="m5.2 8.2 1.9 1.9 3.8-4" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="m5.2 8.2 1.9 1.9 3.8-4"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </>
       )}
       {kind === 'lost' && (
         <>
           <circle cx="8" cy="8" r="7" fill="currentColor" />
-          <path d="m5.8 5.8 4.4 4.4m0-4.4-4.4 4.4" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
+          <path
+            d="m5.8 5.8 4.4 4.4m0-4.4-4.4 4.4"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
         </>
       )}
     </svg>
@@ -159,7 +184,9 @@ const SETTLE_MS = 180;
 const EXIT_MS = 280;
 const EDGE = 56;
 
-const cardsIn = (column: Element) => [...column.querySelectorAll<HTMLElement>('[data-kanban-card]')];
+const cardsIn = (column: Element) => [
+  ...column.querySelectorAll<HTMLElement>('[data-kanban-card]'),
+];
 
 /**
  * Arrastar e soltar entre colunas, com ponteiro (mouse, toque com toque longo) e teclado.
@@ -215,7 +242,10 @@ export function useKanbanDrag<C extends string>({
     if (prev && motion === 'enter') {
       const gone = { ...prev, at: Date.now() };
       setLeaving((list) => [...list, gone]);
-      window.setTimeout(() => setLeaving((list) => list.filter((item) => item.key !== gone.key)), EXIT_MS + 20);
+      window.setTimeout(
+        () => setLeaving((list) => list.filter((item) => item.key !== gone.key)),
+        EXIT_MS + 20,
+      );
     }
     seq.current += 1;
     const value: Slot<C> = { ...next, key: `slot-${seq.current}`, motion };
@@ -386,7 +416,9 @@ export function useKanbanDrag<C extends string>({
           latest.current.onMove(move);
           latest.current.onDrop?.({ ...move, from });
           const lane = latest.current.lanes?.find((item) => item.id === target.column);
-          announce(`${latest.current.labelOf(current.id)} solto em ${lane?.label ?? target.column}.`);
+          announce(
+            `${latest.current.labelOf(current.id)} solto em ${lane?.label ?? target.column}.`,
+          );
         } else {
           announce('Movimento cancelado.');
         }
@@ -461,7 +493,8 @@ export function useKanbanDrag<C extends string>({
   function onPointerDown(event: ReactPointerEvent<HTMLElement>, id: string, column: C) {
     if (event.button !== 0 || session.current || picked) return;
     const target = event.target as HTMLElement;
-    if (target.closest('button, a, input, textarea, select, label, [role="menu"], [data-no-drag]')) return;
+    if (target.closest('button, a, input, textarea, select, label, [role="menu"], [data-no-drag]'))
+      return;
     const el = event.currentTarget;
     boardRef.current = el.closest<HTMLElement>('[data-kanban-board]');
     session.current = {
@@ -495,7 +528,9 @@ export function useKanbanDrag<C extends string>({
   const focusCard = useCallback((id: string) => {
     window.requestAnimationFrame(() => {
       const scope = boardRef.current ?? document;
-      scope.querySelector<HTMLElement>(`[data-kanban-card="${CSS.escape(id)}"]`)?.focus({ preventScroll: false });
+      scope
+        .querySelector<HTMLElement>(`[data-kanban-card="${CSS.escape(id)}"]`)
+        ?.focus({ preventScroll: false });
     });
   }, []);
 
@@ -536,7 +571,10 @@ export function useKanbanDrag<C extends string>({
       const rest = ids.filter((item) => item !== id);
       const nextAt = event.key === 'ArrowUp' ? Math.max(0, at - 1) : Math.min(rest.length, at + 1);
       if (nextAt === at) return;
-      move({ column: lane.id, beforeId: rest[nextAt] ?? null }, `Posição ${nextAt + 1} de ${ids.length}.`);
+      move(
+        { column: lane.id, beforeId: rest[nextAt] ?? null },
+        `Posição ${nextAt + 1} de ${ids.length}.`,
+      );
       return;
     }
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
@@ -557,7 +595,13 @@ export function useKanbanDrag<C extends string>({
       event.preventDefault();
       setPicked(null);
       announce(`${name} solto em ${lane.label}, posição ${at + 1}.`);
-      if (lane.id !== picked.from) latest.current.onDrop?.({ id, column: lane.id, beforeId: ids[at + 1] ?? null, from: picked.from });
+      if (lane.id !== picked.from)
+        latest.current.onDrop?.({
+          id,
+          column: lane.id,
+          beforeId: ids[at + 1] ?? null,
+          from: picked.from,
+        });
       return;
     }
     if (event.key === 'Escape' || event.key === 'Tab') {
@@ -601,15 +645,22 @@ export function useKanbanDrag<C extends string>({
     const slots: { beforeId: string | null; entry: KanbanEntry }[] = [];
     for (const item of leaving)
       if (item.column === column)
-        slots.push({ beforeId: item.beforeId, entry: { kind: 'slot', key: item.key, height: drag.height, motion: 'exit' } });
+        slots.push({
+          beforeId: item.beforeId,
+          entry: { kind: 'slot', key: item.key, height: drag.height, motion: 'exit' },
+        });
     if (slot && slot.column === column)
-      slots.push({ beforeId: slot.beforeId, entry: { kind: 'slot', key: slot.key, height: drag.height, motion: slot.motion } });
+      slots.push({
+        beforeId: slot.beforeId,
+        entry: { kind: 'slot', key: slot.key, height: drag.height, motion: slot.motion },
+      });
     const out: KanbanEntry[] = [];
     for (const id of visible) {
       for (const item of slots) if (item.beforeId === id) out.push(item.entry);
       out.push({ kind: 'card', id });
     }
-    for (const item of slots) if (item.beforeId === null || !visible.includes(item.beforeId)) out.push(item.entry);
+    for (const item of slots)
+      if (item.beforeId === null || !visible.includes(item.beforeId)) out.push(item.entry);
     return out;
   }
 
@@ -629,7 +680,8 @@ export function useKanbanDrag<C extends string>({
     region: (
       <>
         <VisuallyHidden id={hintId}>
-          Espaço pega o cartão. Setas movem entre colunas e posições. Espaço solta, Esc cancela. Enter abre.
+          Espaço pega o cartão. Setas movem entre colunas e posições. Espaço solta, Esc cancela.
+          Enter abre.
         </VisuallyHidden>
         {region}
       </>
@@ -647,7 +699,13 @@ export function KanbanBoard({
   ...props
 }: ComponentProps<'div'> & { label: string }) {
   return (
-    <div {...props} role="region" aria-label={label} className={`${s.board} ${className}`} data-kanban-board="">
+    <div
+      {...props}
+      role="region"
+      aria-label={label}
+      className={`${s.board} ${className}`}
+      data-kanban-board=""
+    >
       <div className={s.boardTrack}>{children}</div>
     </div>
   );
@@ -671,6 +729,7 @@ export function KanbanColumn({
   title,
   icon,
   count,
+  countNoun = { singular: 'lead', plural: 'leads' },
   total,
   totalHint,
   actions,
@@ -687,6 +746,8 @@ export function KanbanColumn({
   title: string;
   icon?: ReactNode;
   count: number;
+  /** Nome do registro anunciado junto à contagem (ex.: campanha/campanhas). */
+  countNoun?: { singular: string; plural: string };
   /** Valor somado da coluna, já formatado. */
   total?: ReactNode;
   totalHint?: ReactNode;
@@ -702,7 +763,7 @@ export function KanbanColumn({
   'data-kanban-column'?: string;
 }) {
   const headingId = useId();
-  const noun = count === 1 ? 'lead' : 'leads';
+  const noun = count === 1 ? countNoun.singular : countNoun.plural;
   if (collapsed) {
     return (
       <section
@@ -815,7 +876,12 @@ export function KanbanEmpty({
   compact?: boolean;
 }) {
   return (
-    <div className={s.empty} data-active={active || undefined} data-compact={compact || undefined} role="listitem">
+    <div
+      className={s.empty}
+      data-active={active || undefined}
+      data-compact={compact || undefined}
+      role="listitem"
+    >
       <span className={s.emptyTitle}>{active ? 'Solte aqui' : title}</span>
       {description && !active && <span className={s.emptyDesc}>{description}</span>}
       {action && !active && action}
@@ -824,8 +890,17 @@ export function KanbanEmpty({
 }
 
 /** Botão só-ícone compacto (24 px) para cabeçalhos de coluna e cartão. */
-export function KanbanIconButton(props: Omit<ComponentProps<typeof IconButton>, 'variant' | 'size'>) {
-  return <IconButton {...props} variant="ghost" size="sm" className={`${s.mini} ${props.className ?? ''}`} />;
+export function KanbanIconButton(
+  props: Omit<ComponentProps<typeof IconButton>, 'variant' | 'size'>,
+) {
+  return (
+    <IconButton
+      {...props}
+      variant="ghost"
+      size="sm"
+      className={`${s.mini} ${props.className ?? ''}`}
+    />
+  );
 }
 
 /* ——————————————————————————— Próxima ação ——————————————————————————— */
@@ -848,7 +923,12 @@ export function NextAction({
   done?: boolean;
 }) {
   return (
-    <span className={s.nextAction} data-due={due} data-variant={variant} data-done={done || undefined}>
+    <span
+      className={s.nextAction}
+      data-due={due}
+      data-variant={variant}
+      data-done={done || undefined}
+    >
       <Clock aria-hidden="true" />
       <span className={s.nextActionText}>{label}</span>
       {!done && due === 'overdue' && <VisuallyHidden>, atrasada</VisuallyHidden>}
@@ -859,6 +939,136 @@ export function NextAction({
 
 /* ——————————————————————————— Cartão de lead ——————————————————————————— */
 
+/** Base do cartão aprovada no funil de leads, compartilhada pelos demais pipelines. */
+export type KanbanCardProps = Omit<ComponentProps<'article'>, 'title'> & {
+  title: string;
+  leading?: ReactNode;
+  code?: string;
+  summary?: ReactNode;
+  menu?: ReactNode;
+  density?: 'default' | 'compact';
+  selected?: boolean;
+  lifted?: boolean;
+  ghost?: boolean;
+  onOpen?: () => void;
+  'data-force'?: string;
+  'data-outcome'?: 'won' | 'lost';
+};
+
+export function KanbanCard({
+  title,
+  leading,
+  code,
+  summary,
+  menu,
+  density = 'default',
+  selected = false,
+  lifted = false,
+  ghost = false,
+  onOpen,
+  children,
+  className = '',
+  onClick,
+  onKeyDown,
+  ...props
+}: KanbanCardProps) {
+  const nameId = useId();
+  const summaryId = useId();
+  const describedBy = [summary ? summaryId : undefined, props['aria-describedby']]
+    .filter(Boolean)
+    .join(' ');
+
+  return (
+    <article
+      {...props}
+      className={`${s.card} ${className}`}
+      data-density={density}
+      data-selected={selected || undefined}
+      data-lifted={lifted || undefined}
+      data-ghost={ghost || undefined}
+      data-open={onOpen ? true : undefined}
+      tabIndex={props.tabIndex ?? (onOpen ? 0 : undefined)}
+      aria-labelledby={nameId}
+      aria-describedby={describedBy || undefined}
+      aria-current={selected ? 'true' : undefined}
+      role={props.role ?? 'listitem'}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) onOpen?.();
+      }}
+      onKeyDown={(event) => {
+        onKeyDown?.(event);
+        if (
+          !event.defaultPrevented &&
+          event.key === 'Enter' &&
+          event.target === event.currentTarget
+        )
+          onOpen?.();
+      }}
+    >
+      <div className={s.cardHead}>
+        {leading}
+        <h4 id={nameId} className={s.company} title={title}>
+          {title}
+        </h4>
+        {code && (
+          <span className={s.code}>
+            <span aria-hidden="true">#</span>
+            {code}
+          </span>
+        )}
+        {menu && (
+          <span
+            className={s.cardMenu}
+            data-no-drag=""
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => event.stopPropagation()}
+          >
+            {menu}
+          </span>
+        )}
+      </div>
+      {children}
+      {summary && (
+        <VisuallyHidden>
+          <span id={summaryId}>{summary}</span>
+        </VisuallyHidden>
+      )}
+    </article>
+  );
+}
+
+/** Linhas e papéis tipográficos do mesmo cartão, sem estilos avulsos nas telas. */
+export function KanbanCardRow({
+  start = false,
+  className = '',
+  ...props
+}: ComponentProps<'div'> & { start?: boolean }) {
+  return <div {...props} className={`${s.cardRow} ${className}`} data-start={start || undefined} />;
+}
+
+export function KanbanCardValue({
+  value,
+  emptyText = 'Sem valor',
+}: {
+  value?: number | null;
+  emptyText?: string;
+}) {
+  return value != null ? (
+    <span className={s.value}>{money(value)}</span>
+  ) : (
+    <span className={s.valueMissing}>{emptyText}</span>
+  );
+}
+
+export function KanbanCardMeta({
+  caption = false,
+  className = '',
+  ...props
+}: ComponentProps<'span'> & { caption?: boolean }) {
+  return <span {...props} className={`${caption ? s.age : s.origin} ${className}`} />;
+}
+
 export type LeadInterest = { label: string; tone?: Tone };
 export type LeadNote = {
   tone: 'orange' | 'green' | 'red' | 'amber' | 'blue';
@@ -868,7 +1078,12 @@ export type LeadNote = {
 export type LeadOutcome = { kind: 'won'; date: string } | { kind: 'lost'; reason: string };
 
 const money = (value: number) =>
-  value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  value.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
 export type LeadCardProps = Omit<ComponentProps<'article'>, 'children'> & {
   company: string;
@@ -949,16 +1164,18 @@ export function LeadCard({
   onKeyDown,
   ...props
 }: LeadCardProps) {
-  const nameId = useId();
-  const summaryId = useId();
   const from = origin ?? source?.label;
   const next =
     nextAction ??
-    (nextStep ? { label: `${nextStep.label} · ${nextStep.date}`, due: nextStep.overdue ? 'overdue' : 'later' } : null);
+    (nextStep
+      ? {
+          label: `${nextStep.label} · ${nextStep.date}`,
+          due: nextStep.overdue ? 'overdue' : 'later',
+        }
+      : null);
   const shown = interests.slice(0, Math.max(0, maxInterests));
   const rest = interests.slice(shown.length);
   const stale = age !== undefined && age > 7;
-  const describedBy = [summaryId, props['aria-describedby']].filter(Boolean).join(' ');
 
   const valueNode =
     value != null ? (
@@ -967,52 +1184,24 @@ export function LeadCard({
       <span className={s.valueMissing}>Sem valor</span>
     );
 
-  const menuNode = menu && (
-    <span
-      className={s.cardMenu}
-      data-no-drag=""
-      onClick={(event) => event.stopPropagation()}
-      onKeyDown={(event) => event.stopPropagation()}
-    >
-      {menu}
-    </span>
-  );
-
   return (
-    <article
+    <KanbanCard
       {...props}
-      className={`${s.card} ${className}`}
-      data-density={density}
-      data-selected={selected || undefined}
-      data-lifted={lifted || undefined}
-      data-ghost={ghost || undefined}
+      title={company}
+      leading={<BrandMark name={company} size="xs" variant="soft" decorative />}
+      code={code}
+      menu={menu}
+      className={className}
+      density={density}
+      selected={selected}
+      lifted={lifted}
+      ghost={ghost}
       data-outcome={outcome?.kind}
-      data-open={onOpen ? true : undefined}
-      tabIndex={props.tabIndex ?? (onOpen ? 0 : undefined)}
-      aria-labelledby={nameId}
-      aria-describedby={describedBy}
-      aria-current={selected ? 'true' : undefined}
-      role={props.role ?? 'listitem'}
-      onClick={(event) => {
-        onClick?.(event);
-        if (!event.defaultPrevented) onOpen?.();
-      }}
-      onKeyDown={(event) => {
-        onKeyDown?.(event);
-        if (!event.defaultPrevented && event.key === 'Enter' && event.target === event.currentTarget) onOpen?.();
-      }}
+      onOpen={onOpen}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      summary={`Lead ${code}. Responsável ${owner}. ${value != null ? `Valor ${money(value)}. ` : ''}${from ? `Origem ${from}. ` : ''}${age !== undefined ? `${age} dias na etapa. ` : ''}`}
     >
-      <div className={s.cardHead}>
-        <BrandMark name={company} size="xs" variant="soft" decorative />
-        <h4 id={nameId} className={s.company} title={company}>
-          {company}
-        </h4>
-        <span className={s.code}>
-          <span aria-hidden="true">#</span>
-          {code}
-        </span>
-        {menuNode}
-      </div>
       {density === 'compact' ? (
         <div className={s.cardRow}>
           {valueNode}
@@ -1036,7 +1225,11 @@ export function LeadCard({
               <span className={s.ownerName}>{owner}</span>
             </span>
             {outcome ? null : age !== undefined ? (
-              <span className={s.age} data-stale={stale || undefined} title={`${age} ${age === 1 ? 'dia' : 'dias'} na etapa`}>
+              <span
+                className={s.age}
+                data-stale={stale || undefined}
+                title={`${age} ${age === 1 ? 'dia' : 'dias'} na etapa`}
+              >
                 {age} d<VisuallyHidden>{age === 1 ? 'ia na etapa' : 'ias na etapa'}</VisuallyHidden>
               </span>
             ) : (
@@ -1058,7 +1251,11 @@ export function LeadCard({
               {rest.length > 0 && (
                 <Tooltip content={rest.map((item) => item.label).join(', ')}>
                   <span className={s.more} tabIndex={-1}>
-                    <Count label={`Mais ${rest.length}: ${rest.map((item) => item.label).join(', ')}`}>+{rest.length}</Count>
+                    <Count
+                      label={`Mais ${rest.length}: ${rest.map((item) => item.label).join(', ')}`}
+                    >
+                      +{rest.length}
+                    </Count>
                   </span>
                 </Tooltip>
               )}
@@ -1078,15 +1275,7 @@ export function LeadCard({
           <span>{note.text}</span>
         </div>
       )}
-      <VisuallyHidden>
-        <span id={summaryId}>
-          {`Lead ${code}. Responsável ${owner}. `}
-          {value != null ? `Valor ${money(value)}. ` : ''}
-          {from ? `Origem ${from}. ` : ''}
-          {age !== undefined ? `${age} dias na etapa. ` : ''}
-        </span>
-      </VisuallyHidden>
-    </article>
+    </KanbanCard>
   );
 }
 
@@ -1094,7 +1283,12 @@ export function LeadCard({
 
 export type ActivityKind = 'call' | 'email' | 'meeting' | 'note';
 
-export const activityKinds: { value: ActivityKind; label: string; icon: LucideIcon; verb: string }[] = [
+export const activityKinds: {
+  value: ActivityKind;
+  label: string;
+  icon: LucideIcon;
+  verb: string;
+}[] = [
   { value: 'call', label: 'Ligação', icon: Phone, verb: 'registrou uma ligação' },
   { value: 'email', label: 'E-mail', icon: Mail, verb: 'registrou um e-mail' },
   { value: 'meeting', label: 'Reunião', icon: Users, verb: 'registrou uma reunião' },
@@ -1187,14 +1381,17 @@ export function ActivityComposer({
       return;
     }
     setBusy(true);
-    timer.current = window.setTimeout(() => {
-      onSubmit?.({ kind, text: text.trim(), date, time, owner });
-      setBusy(false);
-      setText('');
-      setDate('');
-      setTime('');
-      textRef.current?.focus();
-    }, reducedMotion() ? 0 : 400);
+    timer.current = window.setTimeout(
+      () => {
+        onSubmit?.({ kind, text: text.trim(), date, time, owner });
+        setBusy(false);
+        setText('');
+        setDate('');
+        setTime('');
+        textRef.current?.focus();
+      },
+      reducedMotion() ? 0 : 400,
+    );
   }
 
   return (
@@ -1213,7 +1410,12 @@ export function ActivityComposer({
         size="sm"
         value={kind}
         onChange={setKind}
-        options={activityKinds.map((item) => ({ value: item.value, label: item.label, icon: item.icon, iconOnly: narrow }))}
+        options={activityKinds.map((item) => ({
+          value: item.value,
+          label: item.label,
+          icon: item.icon,
+          iconOnly: narrow,
+        }))}
       />
       <div className={s.composerText}>
         <Textarea
@@ -1250,18 +1452,42 @@ export function ActivityComposer({
         </span>
         <div className={s.composerNext} role="group" aria-labelledby={`${id}-next`}>
           <span className={s.composerDate}>
-            <DatePicker value={date} onChange={setDate} size="sm" aria-label="Data da próxima ação" placeholder="Data" />
+            <DatePicker
+              value={date}
+              onChange={setDate}
+              size="sm"
+              aria-label="Data da próxima ação"
+              placeholder="Data"
+            />
           </span>
           <span className={s.composerTime}>
-            <TimeField value={time} onChange={setTime} size="sm" label="Hora da próxima ação" placeholder="Hora" />
+            <TimeField
+              value={time}
+              onChange={setTime}
+              size="sm"
+              label="Hora da próxima ação"
+              placeholder="Hora"
+            />
           </span>
           {owners && owners.length > 0 && (
             <span className={s.composerOwner}>
-              <Select value={owner} onChange={setOwner} options={owners} size="sm" label="Responsável" />
+              <Select
+                value={owner}
+                onChange={setOwner}
+                options={owners}
+                size="sm"
+                label="Responsável"
+              />
             </span>
           )}
         </div>
-        <Button type="submit" variant="primary" size="sm" loading={sending} className={s.composerSubmit}>
+        <Button
+          type="submit"
+          variant="primary"
+          size="sm"
+          loading={sending}
+          className={s.composerSubmit}
+        >
           {submitLabel}
         </Button>
       </div>
@@ -1329,7 +1555,14 @@ export function ActivityFeed({
                       width={160}
                       sections={sections}
                       trigger={(trigger) => (
-                        <IconButton {...trigger} label="Ações do registro" icon={MoreHorizontal} variant="ghost" size="sm" className={s.mini} />
+                        <IconButton
+                          {...trigger}
+                          label="Ações do registro"
+                          icon={MoreHorizontal}
+                          variant="ghost"
+                          size="sm"
+                          className={s.mini}
+                        />
                       )}
                     />
                   </span>
@@ -1339,7 +1572,12 @@ export function ActivityFeed({
                 </div>
                 {item.next && (
                   <div className={s.entryNext} data-done={item.next.done || undefined}>
-                    <NextAction label={item.next.label} due={item.next.due} variant="chip" done={item.next.done} />
+                    <NextAction
+                      label={item.next.label}
+                      due={item.next.due}
+                      variant="chip"
+                      done={item.next.done}
+                    />
                     <Checkbox
                       label="Concluir"
                       checked={Boolean(item.next.done)}

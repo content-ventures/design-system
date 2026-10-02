@@ -63,13 +63,13 @@ import {
   type Column,
   type MenuSection,
   type Tone,
-} from '@/components/ds-v3';
-import { SplitButton } from '@/components/ds-v3/button';
-import { LinkButton, TextLink } from '@/components/ds-v3/link';
-import { RowActions, type RowAction } from '@/components/ds-v3/row-actions';
-import { Select } from '@/components/ds-v3/select';
-import { Toaster, toast } from '@/components/ds-v3/toast';
-import { ToggleButton, ToggleGroup } from '@/components/ds-v3/toggle';
+} from '@mediaon/design-system/v3';
+import { SplitButton } from '@mediaon/design-system/v3/button';
+import { LinkButton, TextLink } from '@mediaon/design-system/v3/link';
+import { RowActions, type RowAction } from '@mediaon/design-system/v3/row-actions';
+import { Select } from '@mediaon/design-system/v3/select';
+import { Toaster, toast } from '@mediaon/design-system/v3/toast';
+import { ToggleButton, ToggleGroup } from '@mediaon/design-system/v3/toggle';
 import { Shot, Shots, State, States } from '../stage';
 import x from './acoes.module.css';
 

@@ -2,9 +2,10 @@
 
 import { Columns3, List as ListIcon, MoreHorizontal, Plus } from 'lucide-react';
 import { useMemo, useState, type ComponentType, type ReactNode } from 'react';
-import { Button } from '@/components/ds-v3/button';
-import { SearchField } from '@/components/ds-v3/fields';
-import { Avatar, BrandMark } from '@/components/ds-v3/identity';
+import { Button } from '@mediaon/design-system/v3/button';
+import { SearchField } from '@mediaon/design-system/v3/fields';
+import { Avatar, BrandMark } from '@mediaon/design-system/v3/identity';
+import { CampaignKanbanCard } from '@mediaon/design-system/v3/campaign-kanban-card';
 import {
   KanbanBoard,
   KanbanColumn,
@@ -12,16 +13,27 @@ import {
   KanbanIconButton,
   KanbanPlaceholder,
   LeadCard,
+  StageIcon,
   useKanbanDrag,
   type LeadOutcome,
-} from '@/components/ds-v3/kanban';
-import { List, ListGroup, ListItem } from '@/components/ds-v3/list-item';
-import { Menu, type MenuSection } from '@/components/ds-v3/menu';
-import { Select } from '@/components/ds-v3/select';
-import { Segmented } from '@/components/ds-v3/selection';
-import { toast } from '@/components/ds-v3/toast';
+} from '@mediaon/design-system/v3/kanban';
+import { List, ListGroup, ListItem } from '@mediaon/design-system/v3/list-item';
+import { Menu, type MenuSection } from '@mediaon/design-system/v3/menu';
+import { Select } from '@mediaon/design-system/v3/select';
+import { Segmented } from '@mediaon/design-system/v3/selection';
+import { toast } from '@mediaon/design-system/v3/toast';
 import { Shot, Shots, State, States } from '../stage';
-import { EnsureToaster, LEADS, LeadDrawer, STAGES, StageGlyph, brl, stageOf, type Lead, type StageId } from './detalhe';
+import {
+  EnsureToaster,
+  LEADS,
+  LeadDrawer,
+  STAGES,
+  StageGlyph,
+  brl,
+  stageOf,
+  type Lead,
+  type StageId,
+} from './detalhe';
 import k from './kanban.module.css';
 
 /* ——————————————————————————— Peças ——————————————————————————— */
@@ -70,7 +82,15 @@ function cardOf(lead: Lead, stage: StageId) {
   };
 }
 
-function CardMenu({ lead, stage, onMove }: { lead: Lead; stage: StageId; onMove?: (to: StageId) => void }) {
+function CardMenu({
+  lead,
+  stage,
+  onMove,
+}: {
+  lead: Lead;
+  stage: StageId;
+  onMove?: (to: StageId) => void;
+}) {
   const sections: MenuSection[] = [
     { items: [{ label: 'Abrir lead' }, { label: 'Registrar atividade' }] },
     {
@@ -92,22 +112,31 @@ function CardMenu({ lead, stage, onMove }: { lead: Lead; stage: StageId; onMove?
       align="end"
       width={196}
       sections={sections}
-      trigger={(trigger) => <KanbanIconButton {...trigger} label="Ações do lead" icon={MoreHorizontal} />}
+      trigger={(trigger) => (
+        <KanbanIconButton {...trigger} label="Ações do lead" icon={MoreHorizontal} />
+      )}
     />
   );
 }
 
 type Columns = Record<StageId, string[]>;
 const initialColumns = (): Columns =>
-  Object.fromEntries(STAGES.map((stage) => [stage.id, LEADS.filter((lead) => lead.stage === stage.id).map((lead) => lead.id)])) as Columns;
+  Object.fromEntries(
+    STAGES.map((stage) => [
+      stage.id,
+      LEADS.filter((lead) => lead.stage === stage.id).map((lead) => lead.id),
+    ]),
+  ) as Columns;
 
 const OWNER_OPTIONS = [
   { value: 'todos', label: 'Responsável: Todos' },
-  ...['Rafael Dias', 'Marina Lopes', 'Clara Souto', 'Tiago Rezende', 'Juliana Prates'].map((name) => ({
-    value: name,
-    label: name,
-    leading: <Avatar name={name} size="xs" decorative />,
-  })),
+  ...['Rafael Dias', 'Marina Lopes', 'Clara Souto', 'Tiago Rezende', 'Juliana Prates'].map(
+    (name) => ({
+      value: name,
+      label: name,
+      leading: <Avatar name={name} size="xs" decorative />,
+    }),
+  ),
 ];
 
 /* ——————————————————————————— Quadro vivo ——————————————————————————— */
@@ -127,9 +156,13 @@ function LeadPipeline({ narrow = false }: { narrow?: boolean }) {
       const lead = leadOf(id);
       if (owner !== 'todos' && lead.owner !== owner) return false;
       if (!needle) return true;
-      return `${lead.company} ${lead.contact} ${lead.code}`.toLocaleLowerCase('pt-BR').includes(needle);
+      return `${lead.company} ${lead.contact} ${lead.code}`
+        .toLocaleLowerCase('pt-BR')
+        .includes(needle);
     };
-    return Object.fromEntries(STAGES.map((stage) => [stage.id, columns[stage.id].filter(keep)])) as Columns;
+    return Object.fromEntries(
+      STAGES.map((stage) => [stage.id, columns[stage.id].filter(keep)]),
+    ) as Columns;
   }, [columns, query, owner]);
 
   function move(id: string, column: StageId, beforeId: string | null) {
@@ -175,10 +208,22 @@ function LeadPipeline({ narrow = false }: { narrow?: boolean }) {
     <div className={k.pipeline} data-narrow={narrow || undefined}>
       <div className={k.toolbar}>
         <div className={k.search}>
-          <SearchField size="sm" value={query} onValueChange={setQuery} label="Buscar lead" placeholder="Empresa ou contato" />
+          <SearchField
+            size="sm"
+            value={query}
+            onValueChange={setQuery}
+            label="Buscar lead"
+            placeholder="Empresa ou contato"
+          />
         </div>
         <div className={k.owner}>
-          <Select size="sm" value={owner} onChange={setOwner} options={OWNER_OPTIONS} label="Responsável" />
+          <Select
+            size="sm"
+            value={owner}
+            onChange={setOwner}
+            options={OWNER_OPTIONS}
+            label="Responsável"
+          />
         </div>
         <Segmented
           label="Visualização"
@@ -256,20 +301,29 @@ function LeadPipeline({ narrow = false }: { narrow?: boolean }) {
                           items: [
                             {
                               label: 'Recolher coluna',
-                              onSelect: () => setCollapsed((current) => new Set(current).add(stage.id)),
+                              onSelect: () =>
+                                setCollapsed((current) => new Set(current).add(stage.id)),
                             },
                             {
                               label: 'Ordenar por valor',
                               onSelect: () =>
                                 setColumns((current) => ({
                                   ...current,
-                                  [stage.id]: [...current[stage.id]].sort((a, b) => leadOf(b).value - leadOf(a).value),
+                                  [stage.id]: [...current[stage.id]].sort(
+                                    (a, b) => leadOf(b).value - leadOf(a).value,
+                                  ),
                                 })),
                             },
                           ],
                         },
                       ]}
-                      trigger={(trigger) => <KanbanIconButton {...trigger} label={`Ações de ${stage.label}`} icon={MoreHorizontal} />}
+                      trigger={(trigger) => (
+                        <KanbanIconButton
+                          {...trigger}
+                          label={`Ações de ${stage.label}`}
+                          icon={MoreHorizontal}
+                        />
+                      )}
                     />
                   </>
                 }
@@ -282,7 +336,12 @@ function LeadPipeline({ narrow = false }: { narrow?: boolean }) {
               >
                 {entries.map((entry) =>
                   entry.kind === 'slot' ? (
-                    <KanbanPlaceholder key={entry.key} slotKey={entry.key} height={entry.height} motion={entry.motion} />
+                    <KanbanPlaceholder
+                      key={entry.key}
+                      slotKey={entry.key}
+                      height={entry.height}
+                      motion={entry.motion}
+                    />
                   ) : (
                     <LeadCard
                       key={entry.id}
@@ -321,7 +380,9 @@ function LeadPipeline({ narrow = false }: { narrow?: boolean }) {
                     return (
                       <ListItem
                         key={id}
-                        leading={<BrandMark name={lead.company} size="xs" variant="soft" decorative />}
+                        leading={
+                          <BrandMark name={lead.company} size="xs" variant="soft" decorative />
+                        }
                         title={lead.company}
                         description={`${lead.owner} · ${lead.origin}`}
                         meta={<span className={k.money}>{brl(lead.value)}</span>}
@@ -337,7 +398,12 @@ function LeadPipeline({ narrow = false }: { narrow?: boolean }) {
       )}
       {drag.region}
       {openLead && (
-        <LeadDrawer key={openLead.id} lead={openLead} open={Boolean(openId)} onClose={() => setOpenId(null)} />
+        <LeadDrawer
+          key={openLead.id}
+          lead={openLead}
+          open={Boolean(openId)}
+          onClose={() => setOpenId(null)}
+        />
       )}
     </div>
   );
@@ -388,6 +454,49 @@ function Kanban() {
       <Shot title="Em contexto" tone="white" align="stretch" pad="md">
         <LeadPipeline />
       </Shot>
+      <Shot title="Campanhas" tone="white" align="stretch" pad="md">
+        <KanbanBoard label="Pipeline de campanhas de exemplo">
+          <KanbanColumn
+            title="Aguardando aprovação"
+            icon={<StageIcon kind="progress" tone="violet" />}
+            count={1}
+            countNoun={{ singular: 'campanha', plural: 'campanhas' }}
+            total="R$ 18.000,00"
+            totalHint="em verba"
+          >
+            <CampaignKanbanCard
+              name="Francal 2026"
+              advertiser="Aurora Calçados"
+              portal="Francal"
+              budget={18000}
+              period="05/10/2026 – 31/10/2026"
+            />
+          </KanbanColumn>
+          <KanbanColumn
+            title="Veiculando"
+            icon={<StageIcon kind="done" tone="green" />}
+            count={1}
+            countNoun={{ singular: 'campanha', plural: 'campanhas' }}
+            total="R$ 7.500,00"
+            totalHint="em verba"
+          >
+            <CampaignKanbanCard
+              name="Destaque na vitrine"
+              advertiser="Estúdio Norte"
+              portal="Francal"
+              budget={7500}
+              period="01/10/2026 – 31/10/2026"
+            />
+          </KanbanColumn>
+          <KanbanColumn
+            title="Concluída"
+            icon={<StageIcon kind="done" tone="gray" />}
+            count={0}
+            countNoun={{ singular: 'campanha', plural: 'campanhas' }}
+            empty={<KanbanEmpty title="Sem campanhas" compact />}
+          />
+        </KanbanBoard>
+      </Shot>
       <Shot title="Celular" align="center" pad="lg">
         <div className={k.phone}>
           <LeadPipeline narrow />
@@ -397,24 +506,40 @@ function Kanban() {
         <div className={k.states}>
           <State label="Repouso">
             <StaticColumn stage="qualificado" ids={[HORIZONTE.id, NORTE.id]}>
-              <LeadCard {...cardOf(HORIZONTE, 'qualificado')} menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
-              <LeadCard {...cardOf(NORTE, 'qualificado')} menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+              <LeadCard
+                {...cardOf(HORIZONTE, 'qualificado')}
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
+              <LeadCard
+                {...cardOf(NORTE, 'qualificado')}
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
             </StaticColumn>
           </State>
           <State label="Arrastando">
             <StaticColumn stage="contato" ids={[ATELIE.id]}>
-              <LeadCard {...cardOf(ATELIE, 'contato')} menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+              <LeadCard
+                {...cardOf(ATELIE, 'contato')}
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
               <div className={k.liftedWrap}>
                 <KanbanPlaceholder height={148} />
                 <div className={k.lifted}>
-                  <LeadCard {...cardOf(LADEIRA, 'contato')} lifted menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+                  <LeadCard
+                    {...cardOf(LADEIRA, 'contato')}
+                    lifted
+                    menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+                  />
                 </div>
               </div>
             </StaticColumn>
           </State>
           <State label="Sobre coluna">
             <StaticColumn stage="proposta" ids={[LEADS[9]!.id]} drop>
-              <LeadCard {...cardOf(LEADS[9]!, 'proposta')} menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+              <LeadCard
+                {...cardOf(LEADS[9]!, 'proposta')}
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
               <KanbanPlaceholder height={112} />
             </StaticColumn>
           </State>
@@ -466,34 +591,55 @@ function CardLead() {
           })}
         </KanbanColumn>
         {openLead && (
-          <LeadDrawer key={openLead.id} lead={openLead} open={Boolean(openId)} onClose={() => setOpenId(null)} />
+          <LeadDrawer
+            key={openLead.id}
+            lead={openLead}
+            open={Boolean(openId)}
+            onClose={() => setOpenId(null)}
+          />
         )}
       </Shot>
       <Shot title="Variantes" align="stretch" pad="lg">
         <States min={260}>
           <State label="Detalhado">
             <div className={k.cell}>
-              <LeadCard {...cardOf(LADEIRA, 'contato')} menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+              <LeadCard
+                {...cardOf(LADEIRA, 'contato')}
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
             </div>
           </State>
           <State label="Compacto">
             <div className={k.cell}>
-              <LeadCard {...cardOf(HORIZONTE, 'qualificado')} density="compact" menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+              <LeadCard
+                {...cardOf(HORIZONTE, 'qualificado')}
+                density="compact"
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
             </div>
           </State>
           <State label="Atrasado">
             <div className={k.cell}>
-              <LeadCard {...cardOf(ATELIE, 'contato')} menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+              <LeadCard
+                {...cardOf(ATELIE, 'contato')}
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
             </div>
           </State>
           <State label="Ganho">
             <div className={k.cell}>
-              <LeadCard {...cardOf(leadOf('l-1250'), 'ganho')} menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+              <LeadCard
+                {...cardOf(leadOf('l-1250'), 'ganho')}
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
             </div>
           </State>
           <State label="Perdido">
             <div className={k.cell}>
-              <LeadCard {...cardOf(leadOf('l-1244'), 'perdido')} menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+              <LeadCard
+                {...cardOf(leadOf('l-1244'), 'perdido')}
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
             </div>
           </State>
         </States>
@@ -502,27 +648,46 @@ function CardLead() {
         <States min={220}>
           <State label="Repouso">
             <div className={k.cell}>
-              <LeadCard {...cardOf(NORTE, 'qualificado')} menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+              <LeadCard
+                {...cardOf(NORTE, 'qualificado')}
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
             </div>
           </State>
           <State label="Hover">
             <div className={k.cell}>
-              <LeadCard {...cardOf(NORTE, 'qualificado')} data-force="hover" menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+              <LeadCard
+                {...cardOf(NORTE, 'qualificado')}
+                data-force="hover"
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
             </div>
           </State>
           <State label="Foco">
             <div className={k.cell}>
-              <LeadCard {...cardOf(NORTE, 'qualificado')} data-force="focus" menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+              <LeadCard
+                {...cardOf(NORTE, 'qualificado')}
+                data-force="focus"
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
             </div>
           </State>
           <State label="Selecionado">
             <div className={k.cell}>
-              <LeadCard {...cardOf(NORTE, 'qualificado')} selected menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+              <LeadCard
+                {...cardOf(NORTE, 'qualificado')}
+                selected
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
             </div>
           </State>
           <State label="Arrastando">
             <div className={k.cell} data-lift="">
-              <LeadCard {...cardOf(NORTE, 'qualificado')} lifted menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />} />
+              <LeadCard
+                {...cardOf(NORTE, 'qualificado')}
+                lifted
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
             </div>
           </State>
         </States>

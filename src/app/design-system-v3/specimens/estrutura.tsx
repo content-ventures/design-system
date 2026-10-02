@@ -44,11 +44,11 @@ import {
   Segmented,
   Tabs,
   type Column,
-} from '@/components/ds-v3';
-import { Pagination } from '@/components/ds-v3/pagination';
-import { LinkButton } from '@/components/ds-v3/link';
-import { Menu } from '@/components/ds-v3/menu';
-import { ActionBar, Stepper, StepperCompact, type StepItem } from '@/components/ds-v3/stepper';
+} from '@mediaon/design-system/v3';
+import { Pagination } from '@mediaon/design-system/v3/pagination';
+import { LinkButton } from '@mediaon/design-system/v3/link';
+import { Menu } from '@mediaon/design-system/v3/menu';
+import { ActionBar, Stepper, StepperCompact, type StepItem } from '@mediaon/design-system/v3/stepper';
 import {
   Accordion,
   DescriptionList,
@@ -61,7 +61,7 @@ import {
   Section,
   type AccordionItem,
   type DescriptionItem,
-} from '@/components/ds-v3/structure';
+} from '@mediaon/design-system/v3/structure';
 import {
   AppShell,
   PortalSwitcher,
@@ -69,7 +69,7 @@ import {
   SidebarAccount,
   TopBar,
   type NavGroup,
-} from '@/components/ds-v3/app-shell';
+} from '@mediaon/design-system/v3/app-shell';
 import {
   Card,
   CardHeader,
@@ -77,7 +77,7 @@ import {
   Divider,
   MetaList,
   type MetaItem,
-} from '@/components/ds-v3/surfaces';
+} from '@mediaon/design-system/v3/surfaces';
 import { Shot, Shots, State, States } from '../stage';
 import x from './estrutura.module.css';
 

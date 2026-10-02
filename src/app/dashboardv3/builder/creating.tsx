@@ -2,7 +2,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ds-v3';
+import { Button } from '@mediaon/design-system/v3';
 import c from './creating.module.css';
 
 /**

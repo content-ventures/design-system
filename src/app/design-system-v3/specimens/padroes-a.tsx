@@ -26,17 +26,17 @@ import {
   type KeyboardEvent,
   type PointerEvent as ReactPointerEvent,
 } from 'react';
-import { Button, IconButton } from '@/components/ds-v3/button';
-import { Input } from '@/components/ds-v3/fields';
-import { LinkButton } from '@/components/ds-v3/link';
-import { List, ListItem } from '@/components/ds-v3/list-item';
-import { Menu } from '@/components/ds-v3/menu';
-import { Tooltip } from '@/components/ds-v3/overlays';
-import { Select } from '@/components/ds-v3/select';
-import { Switch } from '@/components/ds-v3/selection';
-import { Meter } from '@/components/ds-v3/stat';
-import { toast } from '@/components/ds-v3/toast';
-import { ToggleGroup } from '@/components/ds-v3/toggle';
+import { Button, IconButton } from '@mediaon/design-system/v3/button';
+import { Input } from '@mediaon/design-system/v3/fields';
+import { LinkButton } from '@mediaon/design-system/v3/link';
+import { List, ListItem } from '@mediaon/design-system/v3/list-item';
+import { Menu } from '@mediaon/design-system/v3/menu';
+import { Tooltip } from '@mediaon/design-system/v3/overlays';
+import { Select } from '@mediaon/design-system/v3/select';
+import { Switch } from '@mediaon/design-system/v3/selection';
+import { Meter } from '@mediaon/design-system/v3/stat';
+import { toast } from '@mediaon/design-system/v3/toast';
+import { ToggleGroup } from '@mediaon/design-system/v3/toggle';
 import { Shot, Shots, State, States } from '../stage';
 import { EnsureToaster, specimens as detalhe } from './detalhe';
 import { specimens as kanban } from './kanban';

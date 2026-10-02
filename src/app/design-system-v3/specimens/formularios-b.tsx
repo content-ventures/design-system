@@ -11,10 +11,10 @@ import {
   type CSSProperties,
   type ReactNode,
 } from 'react';
-import { Badge, type Tone } from '@/components/ds-v3/badge';
-import { Button, IconButton } from '@/components/ds-v3/button';
-import { ColorField } from '@/components/ds-v3/color-picker';
-import { Combobox, searchOptions } from '@/components/ds-v3/combobox';
+import { Badge, type Tone } from '@mediaon/design-system/v3/badge';
+import { Button, IconButton } from '@mediaon/design-system/v3/button';
+import { ColorField } from '@mediaon/design-system/v3/color-picker';
+import { Combobox, searchOptions } from '@mediaon/design-system/v3/combobox';
 import {
   Calendar,
   DatePicker,
@@ -22,15 +22,15 @@ import {
   DayPreview,
   type CalendarEvent,
   type DateRange,
-} from '@/components/ds-v3/date-picker';
-import { Field, FieldGroup, Input, SearchField, useNotice } from '@/components/ds-v3/fields';
-import f from '@/components/ds-v3/fields.module.css';
-import { BrandMark } from '@/components/ds-v3/identity';
-import { LinkButton } from '@/components/ds-v3/link';
-import { MoneyField, moneyBRL } from '@/components/ds-v3/money-field';
-import { MultiSelect } from '@/components/ds-v3/multiselect';
-import { Dialog, Tooltip } from '@/components/ds-v3/overlays';
-import { Select, type SelectOption } from '@/components/ds-v3/select';
+} from '@mediaon/design-system/v3/date-picker';
+import { Field, FieldGroup, Input, SearchField, useNotice } from '@mediaon/design-system/v3/fields';
+import f from '@mediaon/design-system/v3/fields.module.css';
+import { BrandMark } from '@mediaon/design-system/v3/identity';
+import { LinkButton } from '@mediaon/design-system/v3/link';
+import { MoneyField, moneyBRL } from '@mediaon/design-system/v3/money-field';
+import { MultiSelect } from '@mediaon/design-system/v3/multiselect';
+import { Dialog, Tooltip } from '@mediaon/design-system/v3/overlays';
+import { Select, type SelectOption } from '@mediaon/design-system/v3/select';
 import {
   Checkbox,
   CheckboxGroup,
@@ -38,10 +38,10 @@ import {
   Radio,
   RadioGroup,
   Switch,
-} from '@/components/ds-v3/selection';
-import { RangeSlider, Slider } from '@/components/ds-v3/slider';
-import { TimeField } from '@/components/ds-v3/time-field';
-import { Toaster, toast } from '@/components/ds-v3/toast';
+} from '@mediaon/design-system/v3/selection';
+import { RangeSlider, Slider } from '@mediaon/design-system/v3/slider';
+import { TimeField } from '@mediaon/design-system/v3/time-field';
+import { Toaster, toast } from '@mediaon/design-system/v3/toast';
 import { Shot, Shots, State, States } from '../stage';
 import x from './formularios-b.module.css';
 

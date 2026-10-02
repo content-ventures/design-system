@@ -967,6 +967,7 @@ export function NotificationItem({
   onOpen,
   onMarkRead,
   markLabel = 'Marcar como lida',
+  marking = false,
   'data-force': force,
 }: {
   leading?: ReactNode;
@@ -977,6 +978,8 @@ export function NotificationItem({
   onOpen?: () => void;
   onMarkRead?: () => void;
   markLabel?: string;
+  /** Ação de leitura em andamento: evita uma segunda solicitação para o mesmo item. */
+  marking?: boolean;
   /** Prancha: `hover`, `focus`, `active`. */
   'data-force'?: string;
 }) {
@@ -1037,7 +1040,8 @@ export function NotificationItem({
           aria-describedby={titleId}
           title={markLabel}
           tabIndex={unread ? undefined : -1}
-          disabled={!unread}
+          disabled={!unread || marking}
+          aria-busy={marking || undefined}
           onClick={() => {
             onMarkRead();
             // O botão some com a leitura: o foco fica na própria notificação.
@@ -1066,6 +1070,7 @@ export type NotificationEntry = {
   title: ReactNode;
   meta?: ReactNode;
   unread?: boolean;
+  marking?: boolean;
   href?: string;
 };
 
@@ -1139,6 +1144,7 @@ export function NotificationList({
                     title={item.title}
                     meta={item.meta}
                     unread={item.unread}
+                    marking={item.marking}
                     href={item.href}
                     onOpen={onOpen ? () => onOpen(item.id) : undefined}
                     onMarkRead={onMarkRead ? () => onMarkRead(item.id) : undefined}

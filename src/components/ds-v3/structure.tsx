@@ -17,6 +17,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type ComponentProps,
   type KeyboardEvent,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
@@ -54,6 +55,11 @@ function assignRef<T>(ref: Ref<T> | undefined, value: T | null) {
 }
 
 /* ——————————————————————————— PageHeader ——————————————————————————— */
+
+/** Composição de página do V3: ritmo de 24 px, sem somar a margem do cabeçalho ao gap. */
+export function PageStack({ className = '', ...props }: ComponentProps<'div'>) {
+  return <div className={`${s.pageStack} ${className}`} data-part="page-stack" {...props} />;
+}
 
 /**
  * Cabeçalho de página: título (24; 22 em ≤760), status na mesma linha, meta em “·” sem separador

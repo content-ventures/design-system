@@ -20,7 +20,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type RefObject,
 } from 'react';
-import { BrandMark, Button, ButtonGroup, Checkbox, IconButton, SearchField, Segmented } from '@/components/ds-v3';
+import { BrandMark, Button, ButtonGroup, Checkbox, IconButton, SearchField, Segmented } from '@mediaon/design-system/v3';
 import { inventory, normalizeSearch } from '../inventory';
 import { catalogItems, familyOf, type CatalogItem } from './families';
 import { specimens } from './specimens';

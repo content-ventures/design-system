@@ -2,7 +2,7 @@
  * Dados fictícios do catálogo V3. Nomes de marcas e pessoas são inventados; nenhum dado real.
  * Domínio: Ad Manager de feiras B2B (portal da feira, expositores, anunciantes, mídia).
  */
-import type { Tone } from '@/components/ds-v3';
+import type { Tone } from '@mediaon/design-system/v3';
 
 export type CampaignStatus = 'veiculando' | 'agendada' | 'aprovacao' | 'ajustes' | 'pausada' | 'rascunho' | 'concluida';
 

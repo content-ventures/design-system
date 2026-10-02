@@ -46,21 +46,21 @@ import {
   Tooltip,
   VisuallyHidden,
   type Tone,
-} from '@/components/ds-v3';
-import { Sidebar } from '@/components/ds-v3/app-shell';
+} from '@mediaon/design-system/v3';
+import { Sidebar } from '@mediaon/design-system/v3/app-shell';
 import {
   ActiveFilters,
   FilterBand,
   FilterBar,
   FilterField,
   type ActiveFilter,
-} from '@/components/ds-v3/filter-bar';
-import { LinkButton } from '@/components/ds-v3/link';
-import { List, ListGroup, ListItem, ListItemSkeleton } from '@/components/ds-v3/list-item';
-import { Metric, MetricStrip, type MetricProps } from '@/components/ds-v3/metric-strip';
-import { Pagination } from '@/components/ds-v3/pagination';
-import { RowActions } from '@/components/ds-v3/row-actions';
-import { Select } from '@/components/ds-v3/select';
+} from '@mediaon/design-system/v3/filter-bar';
+import { LinkButton } from '@mediaon/design-system/v3/link';
+import { List, ListGroup, ListItem, ListItemSkeleton } from '@mediaon/design-system/v3/list-item';
+import { Metric, MetricStrip, type MetricProps } from '@mediaon/design-system/v3/metric-strip';
+import { Pagination } from '@mediaon/design-system/v3/pagination';
+import { RowActions } from '@mediaon/design-system/v3/row-actions';
+import { Select } from '@mediaon/design-system/v3/select';
 import {
   BulkBar,
   ColumnsMenu,
@@ -68,10 +68,10 @@ import {
   SelectAllBand,
   type Column,
   type SortState,
-} from '@/components/ds-v3/table';
-import { TagInput } from '@/components/ds-v3/tag-input';
-import { Timeline, type TimelineEntry } from '@/components/ds-v3/timeline';
-import { toast, Toaster } from '@/components/ds-v3/toast';
+} from '@mediaon/design-system/v3/table';
+import { TagInput } from '@mediaon/design-system/v3/tag-input';
+import { Timeline, type TimelineEntry } from '@mediaon/design-system/v3/timeline';
+import { toast, Toaster } from '@mediaon/design-system/v3/toast';
 import { Col, Row, Shot, Shots, State, States } from '../stage';
 import x from './dados.module.css';
 
