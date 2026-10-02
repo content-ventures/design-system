@@ -245,6 +245,13 @@
     white-space: normal;
   }
 }
+/* Três células em celular ficariam com ~119 px e cortariam o rótulo; duas deixariam uma sobrando.
+   Viram uma coluna, cada indicador numa linha. */
+@container metrics (max-width: 480px) {
+  .strip[data-cols='3'] {
+    --cols: 1;
+  }
+}
 @container metrics (max-width: 340px) {
   .strip[data-size='figure'] .metric {
     padding: 10px 10px 11px 12px;
