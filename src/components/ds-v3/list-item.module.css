@@ -80,6 +80,16 @@
 .item[data-selected][data-interactive] .row:is(:hover, [data-force~='hover']) {
   background: var(--b-50);
 }
+.actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  padding-right: 12px;
+}
+.item[data-actions] .row {
+  padding-right: 8px;
+}
 .item[data-disabled] .row {
   cursor: not-allowed;
 }

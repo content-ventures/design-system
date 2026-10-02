@@ -2,6 +2,7 @@
 
 import {
   BarChart3,
+  Check,
   CircleAlert,
   Download,
   FileSignature,
@@ -2382,6 +2383,25 @@ function Lista() {
               ))}
             </List>
           </Col>
+        </div>
+      </Shot>
+      <Shot title="Linha clicável com ação ao lado" tone="white" align="stretch" pad="md">
+        <div className={x.fill}>
+          <List label="Avisos">
+            <ListItem
+              href="#lista"
+              title="Campanha aprovada · Aurora Calçados"
+              description="A campanha entra no ar em 12/10"
+              meta="há 2 h"
+              actions={<IconButton size="sm" variant="ghost" icon={Check} label="Marcar como lida" />}
+            />
+            <ListItem
+              href="#lista"
+              title="P.I. 2026-0400 rejeitado pelo anunciante"
+              description="Valor acima do combinado"
+              meta="ontem"
+            />
+          </List>
         </div>
       </Shot>
 

@@ -249,7 +249,9 @@ export function ListGroup({ label, meta, children }: { label: string; meta?: Rea
  * Linha de lista: 56 px com descrição, 44 sem (`sm`: 48/36). Título 13/500, descrição 12
  * `--muted` com reticências, meta em legenda à direita, `trailing` para Switch ou IconButton.
  * `href` vira link com chevron; `onClick`, botão; `checkbox`, caixa de seleção na frente.
- * Linha clicável não leva controle no `trailing` (nada de botão dentro de botão).
+ * Linha clicável não leva controle no `trailing` (nada de botão dentro de botão): o controle de
+ * uma linha clicável vai em `actions`, ao lado da linha e fora dela. Com `href`, `onClick` também
+ * roda (ex.: marcar como lida ao abrir).
  */
 export function ListItem({
   leading,
@@ -257,6 +259,7 @@ export function ListItem({
   description,
   meta,
   trailing,
+  actions,
   href,
   onClick,
   selected = false,
@@ -272,6 +275,8 @@ export function ListItem({
   description?: ReactNode;
   meta?: ReactNode;
   trailing?: ReactNode;
+  /** Controles ao lado da linha e fora dela (a linha pode ser link ou botão). */
+  actions?: ReactNode;
   href?: string;
   onClick?: () => void;
   selected?: boolean;
@@ -323,7 +328,12 @@ export function ListItem({
     onKeyDown,
   };
   const row = href ? (
-    <a {...common} href={disabled ? undefined : href} aria-disabled={disabled || undefined}>
+    <a
+      {...common}
+      href={disabled ? undefined : href}
+      aria-disabled={disabled || undefined}
+      onClick={disabled ? undefined : onClick}
+    >
       {content}
     </a>
   ) : onClick || checkbox ? (
@@ -357,6 +367,7 @@ export function ListItem({
       data-disabled={disabled || undefined}
       data-interactive={interactive || checkbox || undefined}
       data-reorder={(draggable && reorder) || undefined}
+      data-actions={actions ? '' : undefined}
     >
       {draggable && reorder && (
         <button
@@ -372,6 +383,7 @@ export function ListItem({
         </button>
       )}
       {row}
+      {actions && <span className={s.actions}>{actions}</span>}
     </li>
   );
 }
