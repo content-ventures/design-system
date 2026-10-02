@@ -15,6 +15,33 @@
   margin-bottom: 0;
 }
 
+/* ——— Principal + lateral ——— */
+.mainAside {
+  container: dsv3-main-aside / inline-size;
+  min-width: 0;
+}
+.mainAsideGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--aside-w);
+  gap: var(--s-6);
+  align-items: start;
+}
+.mainAsideMain,
+.mainAsideSide {
+  display: grid;
+  gap: var(--s-6);
+  align-content: start;
+  min-width: 0;
+}
+@container dsv3-main-aside (max-width: 999px) {
+  .mainAsideGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mainAsideSide {
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  }
+}
+
 .ph {
   container: dsv3-page-header / inline-size;
   display: grid;

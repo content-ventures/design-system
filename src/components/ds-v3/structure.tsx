@@ -54,6 +54,35 @@ function assignRef<T>(ref: Ref<T> | undefined, value: T | null) {
   else (ref as { current: T | null }).current = value;
 }
 
+/**
+ * Principal + lateral (contrato §12): `minmax(0,1fr) var(--aside-w)`, vão 24. Responde à própria
+ * largura: abaixo de 1000 px a lateral desce para baixo do principal e os blocos dela dividem a
+ * linha (mín. 320). Os dois lados empilham os filhos com o mesmo ritmo de 24.
+ */
+export function SplitLayout({
+  main,
+  aside,
+  asideLabel = 'Resumo',
+  className = '',
+}: {
+  main: ReactNode;
+  aside: ReactNode;
+  /** Nome da região lateral para leitor de tela. */
+  asideLabel?: string;
+  className?: string;
+}) {
+  return (
+    <div className={`${s.mainAside} ${className}`} data-part="main-aside">
+      <div className={s.mainAsideGrid}>
+        <div className={s.mainAsideMain}>{main}</div>
+        <aside className={s.mainAsideSide} aria-label={asideLabel}>
+          {aside}
+        </aside>
+      </div>
+    </div>
+  );
+}
+
 /* ——————————————————————————— PageHeader ——————————————————————————— */
 
 /** Composição de página do V3: ritmo de 24 px, sem somar a margem do cabeçalho ao gap. */

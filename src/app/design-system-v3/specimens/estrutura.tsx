@@ -59,6 +59,7 @@ import {
   ResizablePanels,
   ScrollArea,
   Section,
+  SplitLayout,
   type AccordionItem,
   type DescriptionItem,
 } from '@mediaon/design-system/v3/structure';
@@ -1811,6 +1812,25 @@ function MiniSplit({ force, collapsed = false }: { force?: string; collapsed?: b
 function Splits() {
   return (
     <Shots>
+      <Shot title="Principal e lateral" tone="white" align="stretch" pad="lg">
+        <SplitLayout
+          main={
+            <Section title="Campanhas" variant="panel">
+              <DescriptionList
+                items={[
+                  { label: 'Aguardando aprovação', value: '5', numeric: true },
+                  { label: 'Veiculando', value: '6', numeric: true },
+                ]}
+              />
+            </Section>
+          }
+          aside={
+            <Section title="Precisa de atenção" variant="panel">
+              <DescriptionList items={[{ label: 'P.I. vencendo', value: '2', numeric: true }]} />
+            </Section>
+          }
+        />
+      </Shot>
       <Shot title="Em contexto" tone="white" align="stretch" pad="none">
         <LeadsSplit />
       </Shot>

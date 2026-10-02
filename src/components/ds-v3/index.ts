@@ -196,6 +196,7 @@ export { ContextMenu } from './context-menu';
 export {
   PageHeader,
   PageStack,
+  SplitLayout,
   Panel,
   Section,
   Accordion,
