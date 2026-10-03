@@ -59,6 +59,8 @@ import {
   type ReactNode,
 } from 'react';
 import {
+  AuthShowcase,
+  AuthSplit,
   Avatar,
   Badge,
   BrandMark,
@@ -662,19 +664,60 @@ function CodeSignIn({ onFlow }: { onFlow: (flow: AccessFlow) => void }) {
   );
 }
 
+const ACCESS_WEEKS: ChartDatum[] = [
+  { label: 'S1', values: { leads: 182 } },
+  { label: 'S2', values: { leads: 214 } },
+  { label: 'S3', values: { leads: 198 } },
+  { label: 'S4', values: { leads: 260 } },
+  { label: 'S5', values: { leads: 311 } },
+  { label: 'S6', values: { leads: 296 } },
+  { label: 'S7', values: { leads: 354 } },
+  { label: 'S8', values: { leads: 402 } },
+];
+
+/** Recorte do produto no painel da marca: dados fictícios, só para mostrar a cara da plataforma. */
+function AccessPreview() {
+  return (
+    <div className={t.accessPreview}>
+      <MetricStrip
+        items={[
+          { label: 'Receita do mês', value: 'R$ 182,4 mil' },
+          { label: 'Campanhas veiculando', value: '14' },
+          { label: 'Leads no mês', value: '1.286' },
+        ]}
+      />
+      <LineChart
+        label="Leads por semana"
+        data={ACCESS_WEEKS}
+        series={[{ key: 'leads', label: 'Leads' }]}
+        height={180}
+        area
+      />
+    </div>
+  );
+}
+
 function AccessScreen({ flow, onFlow }: { flow: AccessFlow; onFlow: (flow: AccessFlow) => void }) {
   return (
-    <div className={t.auth}>
-      <div className={t.authCard}>
-        <BrandLockup name="Francal 2026" detail="Portal do organizador" size="sm" cobrand />
-        <div className={t.authBody} key={flow}>
-          {flow === 'entrar' && <SignIn onFlow={onFlow} />}
-          {flow === 'convite' && <Invite />}
-          {flow === 'recuperar' && <Recover onFlow={onFlow} />}
-          {flow === 'codigo' && <CodeSignIn onFlow={onFlow} />}
-        </div>
+    <AuthSplit
+      fill="container"
+      brand={<BrandLockup name="Francal 2026" detail="Portal do organizador" size="sm" cobrand />}
+      aside={
+        <AuthShowcase
+          eyebrow="MediaOn · Ad Manager"
+          title="Campanhas, mídia e leads das suas feiras"
+          highlight="em um só lugar."
+          preview={<AccessPreview />}
+        />
+      }
+    >
+      <div className={t.authBody} key={flow}>
+        {flow === 'entrar' && <SignIn onFlow={onFlow} />}
+        {flow === 'convite' && <Invite />}
+        {flow === 'recuperar' && <Recover onFlow={onFlow} />}
+        {flow === 'codigo' && <CodeSignIn onFlow={onFlow} />}
       </div>
-    </div>
+    </AuthSplit>
   );
 }
 

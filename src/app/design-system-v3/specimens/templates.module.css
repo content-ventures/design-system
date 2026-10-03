@@ -1903,3 +1903,10 @@
     transition: none;
   }
 }
+
+/* Recorte do produto no painel da página de acesso. */
+.accessPreview {
+  display: grid;
+  gap: var(--s-5);
+  padding: var(--s-5);
+}

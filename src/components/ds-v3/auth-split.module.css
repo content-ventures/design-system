@@ -1,0 +1,180 @@
+/* ——— Página de acesso dividida ——— */
+
+/* O contêiner das container queries: o layout responde à largura disponível, não à janela. */
+.page {
+  container-type: inline-size;
+  min-height: 100dvh;
+  background: var(--canvas);
+}
+
+/* Dentro de uma moldura (catálogo): ocupa o contêiner, não a altura da janela. */
+.page[data-fill='container'] {
+  min-height: 100%;
+}
+
+.pad {
+  display: grid;
+  place-items: center;
+  min-height: inherit;
+  padding: var(--s-8);
+}
+
+.frame {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  max-width: 1200px;
+  min-height: min(720px, calc(100dvh - var(--s-8) * 2));
+  padding: var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: calc(var(--r-lg) * 2);
+  background: var(--paper);
+}
+
+.page[data-fill='container'] .frame {
+  min-height: 640px;
+}
+
+.frame[data-aside] {
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+}
+
+.main {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--s-8);
+  min-width: 0;
+  padding: var(--s-10) var(--s-12);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+/* O formulário fica no meio da altura, numa coluna de leitura. */
+.body {
+  align-self: center;
+  width: 100%;
+  max-width: 380px;
+  min-width: 0;
+}
+
+.footer {
+  color: var(--muted);
+  font: var(--t-small);
+}
+
+.aside {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-xl);
+  background:
+    radial-gradient(120% 80% at 100% 0%, var(--b-50), transparent 62%),
+    radial-gradient(90% 70% at 0% 100%, var(--b-25), transparent 70%),
+    var(--g-25);
+}
+
+/* ——— Painel da marca ——— */
+
+.showcase {
+  position: relative;
+  height: 100%;
+  min-height: 560px;
+}
+
+.pitch {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: var(--s-3);
+  max-width: 460px;
+  padding: var(--s-12) var(--s-10) 0;
+}
+
+.eyebrow {
+  padding: 2px var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  color: var(--muted);
+  font: var(--t-caption-strong);
+}
+
+.headline {
+  margin: 0;
+  color: var(--ink);
+  font: var(--t-title-1);
+  letter-spacing: var(--track-title);
+}
+
+.headline em {
+  color: var(--accent);
+  font-style: normal;
+}
+
+/* A prévia sangra pela direita e some no pé: é um recorte do produto, não a tela inteira. */
+.preview {
+  position: absolute;
+  top: 210px;
+  left: var(--s-10);
+  width: 880px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  background: var(--paper);
+  pointer-events: none;
+  user-select: none;
+  mask-image: linear-gradient(to bottom, black 58%, transparent 96%);
+}
+
+/* Até 960 px de largura disponível o painel sai: a coluna do formulário vira a página. */
+@container (max-width: 960px) {
+  .frame,
+  .page[data-fill='container'] .frame {
+    max-width: 520px;
+    min-height: 0;
+  }
+
+  .frame[data-aside] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .main {
+    padding: var(--s-10);
+  }
+
+  .aside {
+    display: none;
+  }
+}
+
+/* Celular: sem moldura, o formulário é a página. */
+@container (max-width: 560px) {
+  .pad {
+    place-items: stretch;
+    padding: 0;
+    background: var(--paper);
+  }
+
+  .frame {
+    min-height: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  /* O formulário sobe para logo abaixo da marca: o teclado não cobre o botão. */
+  .main {
+    grid-template-rows: auto auto 1fr;
+    gap: var(--s-10);
+    padding: var(--s-8) var(--s-6);
+  }
+
+  .body {
+    align-self: start;
+    max-width: none;
+  }
+}
