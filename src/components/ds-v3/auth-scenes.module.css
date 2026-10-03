@@ -1,0 +1,360 @@
+/* ——— Peças comuns ——— */
+
+.noticeText {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.noticeText strong {
+  overflow: hidden;
+  color: var(--ink);
+  font: var(--t-small-strong);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.noticeText span {
+  color: var(--muted);
+  font: var(--t-caption);
+}
+
+.time {
+  color: var(--subtle);
+  font: var(--t-caption);
+  white-space: nowrap;
+}
+
+.rowLabel {
+  color: var(--muted);
+  font: var(--t-caption);
+}
+
+.fine {
+  color: var(--muted);
+  font: var(--t-caption);
+}
+
+/* ——— Entrar: a janela do produto ——— */
+
+.app {
+  display: grid;
+  grid-template-columns: 196px minmax(0, 1fr);
+  min-height: 500px;
+}
+
+.side {
+  display: grid;
+  align-content: start;
+  gap: var(--s-4);
+  padding: var(--s-4) var(--s-3);
+  border-right: 1px solid var(--line-soft);
+  background: var(--g-25);
+}
+
+.portal {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  color: var(--ink);
+  font: var(--t-small-strong);
+}
+
+.nav {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  height: 30px;
+  padding: 0 var(--s-2);
+  border-radius: var(--r-md);
+  color: var(--text);
+  font: var(--t-small);
+}
+
+.nav li svg {
+  width: 15px;
+  height: 15px;
+  color: var(--muted);
+}
+
+.nav li[data-active] {
+  background: var(--select-bg);
+  color: var(--select-ink);
+  font: var(--t-small-strong);
+}
+
+.nav li[data-active] svg {
+  color: currentcolor;
+}
+
+.content {
+  display: grid;
+  align-content: start;
+  gap: var(--s-5);
+  padding: var(--s-5) var(--s-6);
+}
+
+.head {
+  display: grid;
+  gap: 2px;
+}
+
+.head strong {
+  color: var(--ink);
+  font: var(--t-title-2);
+}
+
+.head span {
+  color: var(--muted);
+  font: var(--t-small);
+}
+
+.chart {
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.chart strong {
+  color: var(--ink);
+  font: var(--t-small-strong);
+}
+
+/* Cartões que flutuam: aviso e lead. */
+.notice,
+.lead,
+.chip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+}
+
+.chip {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+/* ——— Convite ——— */
+
+.invite {
+  display: grid;
+  gap: var(--s-4);
+  padding: var(--s-5);
+}
+
+.inviteHead {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding-bottom: var(--s-4);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.inviteRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+.person {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  color: var(--ink);
+  font: var(--t-small-strong);
+}
+
+.access {
+  display: grid;
+  gap: var(--s-2);
+  margin: 0;
+  padding: var(--s-3);
+  border-radius: var(--r-lg);
+  background: var(--g-25);
+  list-style: none;
+}
+
+.access li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  color: var(--text);
+  font: var(--t-small);
+}
+
+.access li svg {
+  width: 15px;
+  height: 15px;
+  color: var(--accent);
+}
+
+.steps {
+  padding: var(--s-4) var(--s-5);
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+}
+
+/* ——— Código ——— */
+
+.inbox {
+  min-height: 360px;
+}
+
+.inboxHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: var(--s-4) var(--s-5);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.inboxHead strong {
+  color: var(--ink);
+  font: var(--t-small-strong);
+}
+
+.inboxHead span {
+  color: var(--muted);
+  font: var(--t-caption);
+}
+
+.mails {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mails li {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-5);
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--text);
+  font: var(--t-small);
+}
+
+.mails li[data-unread] {
+  background: var(--b-25);
+}
+
+.mails li[data-unread] .mailFrom,
+.mails li[data-unread] .mailSubject {
+  color: var(--ink);
+  font: var(--t-small-strong);
+}
+
+.mailFrom,
+.mailSubject {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mail,
+.mailFull {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-4);
+  padding: var(--s-5);
+}
+
+.mailFull {
+  min-height: 300px;
+  align-content: start;
+}
+
+.code {
+  display: grid;
+  grid-template-columns: repeat(6, 40px);
+  gap: var(--s-2);
+}
+
+.code span {
+  display: grid;
+  place-items: center;
+  height: 48px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--g-25);
+  color: var(--ink);
+  font: var(--t-title-1);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ——— Recuperação ——— */
+
+.strength {
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-4) var(--s-5);
+}
+
+.dots {
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  color: var(--ink);
+  font: var(--t-body-strong);
+  letter-spacing: 2px;
+}
+
+.meter {
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--r-full);
+  background: var(--g-50);
+}
+
+.meter i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--green-dot);
+}
+
+.checks {
+  display: grid;
+  gap: 4px;
+  margin: var(--s-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checks li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  color: var(--text);
+  font: var(--t-caption);
+}
+
+.checks li svg {
+  width: 14px;
+  height: 14px;
+  color: var(--green-ink);
+}

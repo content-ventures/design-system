@@ -239,7 +239,8 @@ export { FilterBar, FilterBand, FilterField, ActiveFilters, type ActiveFilter } 
 export { List, ListGroup, ListItem, ListItemSkeleton } from './list-item';
 export { StatCard, Delta, Meter, Sparkline } from './stat';
 export { Metric, MetricStrip, type MetricDelta, type MetricProps } from './metric-strip';
-export { AuthShowcase, AuthSplit } from './auth-split';
+export { AuthShowcase, AuthSplit, ShowcaseLayer } from './auth-split';
+export { AuthScene, type AuthSceneVariant } from './auth-scenes';
 export { Timeline, type TimelineEntry, type TimelineState } from './timeline';
 
 /* Gráficos */
