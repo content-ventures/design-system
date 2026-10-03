@@ -23,6 +23,7 @@ import {
   Legend,
   LineChart,
   MeterList,
+  SankeyChart,
   formatBRL,
   formatBRLCompact,
   formatDelta,
@@ -33,6 +34,8 @@ import {
   type DonutDatum,
   type FunnelStage,
   type LegendItem,
+  type SankeyLink,
+  type SankeyNode,
 } from '@mediaon/design-system/v3/charts';
 import { LinkButton } from '@mediaon/design-system/v3/link';
 import { Shot, Shots, State, States } from '../stage';
@@ -985,6 +988,129 @@ export function GraficoFunil() {
   );
 }
 
+/* ——————————————————————————— Sankey ——————————————————————————— */
+
+/** Jornada dos leads: de onde vieram, até onde chegaram no contato e como terminaram. */
+const LEAD_NODES: SankeyNode[] = [
+  { key: 'vitrine', label: 'Vitrine' },
+  { key: 'portal', label: 'Portal da feira' },
+  { key: 'landing', label: 'Formulário' },
+  { key: 'import', label: 'Importação' },
+  { key: 'contato', label: 'Em contato' },
+  { key: 'qualificado', label: 'Qualificado' },
+  { key: 'sem-contato', label: 'Sem contato' },
+  { key: 'ganho', label: 'Ganho', color: 'green' },
+  { key: 'aberto', label: 'Em aberto', color: 'gray' },
+  { key: 'perdido', label: 'Perdido', color: 'red' },
+];
+const LEAD_LINKS: SankeyLink[] = [
+  { source: 'vitrine', target: 'contato', value: 260 },
+  { source: 'vitrine', target: 'sem-contato', value: 160 },
+  { source: 'portal', target: 'contato', value: 170 },
+  { source: 'portal', target: 'qualificado', value: 90 },
+  { source: 'portal', target: 'sem-contato', value: 50 },
+  { source: 'landing', target: 'contato', value: 80 },
+  { source: 'landing', target: 'qualificado', value: 70 },
+  { source: 'landing', target: 'sem-contato', value: 30 },
+  { source: 'import', target: 'contato', value: 40 },
+  { source: 'import', target: 'sem-contato', value: 50 },
+  { source: 'contato', target: 'ganho', value: 90 },
+  { source: 'contato', target: 'aberto', value: 180 },
+  { source: 'contato', target: 'perdido', value: 280 },
+  { source: 'qualificado', target: 'ganho', value: 110 },
+  { source: 'qualificado', target: 'aberto', value: 20 },
+  { source: 'qualificado', target: 'perdido', value: 30 },
+  { source: 'sem-contato', target: 'aberto', value: 80 },
+  { source: 'sem-contato', target: 'perdido', value: 210 },
+];
+
+/** Verba das campanhas: do pacote contratado ao canal onde ela veicula. */
+const BUDGET_NODES: SankeyNode[] = [
+  { key: 'ouro', label: 'Pacote Ouro' },
+  { key: 'prata', label: 'Pacote Prata' },
+  { key: 'avulso', label: 'Avulso' },
+  { key: 'portal', label: 'Portal da feira' },
+  { key: 'app', label: 'App Francal' },
+  { key: 'vitrine', label: 'Vitrine' },
+  { key: 'news', label: 'Newsletter' },
+];
+const BUDGET_LINKS: SankeyLink[] = [
+  { source: 'ouro', target: 'portal', value: 60_000 },
+  { source: 'ouro', target: 'app', value: 35_000 },
+  { source: 'ouro', target: 'news', value: 25_000 },
+  { source: 'prata', target: 'portal', value: 40_000 },
+  { source: 'prata', target: 'vitrine', value: 25_000 },
+  { source: 'prata', target: 'news', value: 15_000 },
+  { source: 'avulso', target: 'app', value: 20_000 },
+  { source: 'avulso', target: 'vitrine', value: 25_000 },
+];
+
+export function GraficoSankey() {
+  return (
+    <Shots>
+      <Shot title="Em contexto" tone="white" align="stretch">
+        <ChartCard title="Jornada dos leads" description="Setembro · 1.000 leads">
+          <SankeyChart label="Jornada dos leads" nodes={LEAD_NODES} links={LEAD_LINKS} height={320} />
+        </ChartCard>
+      </Shot>
+      <Shot title="Verba por canal" tone="white" align="stretch">
+        <ChartCard title="Verba das campanhas" description="Do pacote ao canal · R$ 245 mil">
+          <SankeyChart
+            label="Verba das campanhas"
+            nodes={BUDGET_NODES}
+            links={BUDGET_LINKS}
+            height={240}
+            format={formatBRLCompact}
+          />
+        </ChartCard>
+      </Shot>
+      <Shot title="Estados" tone="white" align="stretch">
+        <States min={9999}>
+          <State label="Repouso">
+            <div className={g.frame}>
+              <SankeyChart label="Jornada dos leads" nodes={LEAD_NODES} links={LEAD_LINKS} height={220} />
+            </div>
+          </State>
+          <State label="Hover">
+            <div className={g.frame}>
+              <SankeyChart
+                label="Jornada dos leads"
+                nodes={LEAD_NODES}
+                links={LEAD_LINKS}
+                height={220}
+                forceActive={3}
+              />
+            </div>
+          </State>
+          <State label="Foco">
+            <div className={g.frame}>
+              <SankeyChart
+                label="Jornada dos leads"
+                nodes={LEAD_NODES}
+                links={LEAD_LINKS}
+                height={220}
+                data-force="focus"
+              />
+            </div>
+          </State>
+          <State label="Celular">
+            <div className={g.phone}>
+              <ChartCard title="Verba das campanhas">
+                <SankeyChart
+                  label="Verba das campanhas"
+                  nodes={BUDGET_NODES}
+                  links={BUDGET_LINKS}
+                  format={formatBRLCompact}
+                />
+              </ChartCard>
+            </div>
+          </State>
+        </States>
+      </Shot>
+    </Shots>
+  );
+}
+
 /* ——————————————————————————— Legendas e tooltips ——————————————————————————— */
 
 const FOUR_SERIES: ChartSeries[] = [
@@ -1537,6 +1663,7 @@ export const specimens: Record<string, ComponentType> = {
   'grafico-rosca': GraficoRosca,
   'grafico-empilhado': GraficoEmpilhado,
   'grafico-funil': GraficoFunil,
+  'grafico-sankey': GraficoSankey,
   'grafico-legenda': GraficoLegenda,
   'grafico-eixos': GraficoEixos,
   'grafico-estados': GraficoEstados,

@@ -1532,3 +1532,107 @@
     animation: none;
   }
 }
+
+/* ——— Sankey ——— */
+.sroot {
+  min-width: 0;
+}
+.sankey {
+  position: relative;
+  min-width: 0;
+  border-radius: var(--r-md);
+}
+.sankey:focus-visible,
+.sankey[data-force~='focus'],
+.slist:focus-visible,
+.slist[data-force~='focus'] {
+  outline-offset: 2px;
+}
+.ssvg {
+  display: block;
+  overflow: visible;
+  user-select: none;
+}
+.slink {
+  fill-opacity: 0.28;
+  transition: fill-opacity var(--dur-2) var(--ease-out);
+}
+.sankey[data-active] .slink {
+  fill-opacity: 0.1;
+}
+.sankey[data-active] .slink[data-active] {
+  fill-opacity: 0.5;
+}
+.snode {
+  transition: opacity var(--dur-2) var(--ease-out);
+}
+.slabel {
+  position: absolute;
+  display: grid;
+  gap: 1px;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.slabel[data-side='left'] {
+  justify-items: end;
+  text-align: right;
+  transform: translate(-100%, -50%);
+}
+.slabel[data-side='mid'] {
+  padding: 1px 6px;
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+}
+.slabel > span {
+  color: var(--muted);
+  font: var(--t-caption);
+}
+.slabel > b {
+  color: var(--ink);
+  font: var(--t-small-strong);
+  font-variant-numeric: tabular-nums;
+}
+/* Lista (largura estreita): um fluxo por linha, barra na cor do fluxo. */
+.slist {
+  border-radius: var(--r-md);
+}
+.slistRows {
+  display: grid;
+  gap: var(--s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.slistRow {
+  display: grid;
+  gap: 6px;
+}
+.slistText {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-3);
+  color: var(--text);
+  font: var(--t-small);
+}
+.slistText b {
+  color: var(--ink);
+  font: var(--t-small-strong);
+  font-variant-numeric: tabular-nums;
+}
+.slistTrack {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--r-full);
+  background: var(--g-50);
+}
+.slistTrack i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  opacity: 0.75;
+}
+.slist[data-active] .slistRow:not([data-active]) {
+  opacity: 0.5;
+}

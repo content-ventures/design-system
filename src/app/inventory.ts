@@ -423,6 +423,12 @@ export const inventory: readonly InventoryGroup[] = [
       ),
       item('grafico-funil', 'Funil', 'Volume e conversão entre etapas comerciais.', 'funnel chart'),
       item(
+        'grafico-sankey',
+        'Sankey',
+        'Fluxos entre origens, etapas e destinos, com o volume de cada caminho.',
+        'sankey diagram flow',
+      ),
+      item(
         'grafico-legenda',
         'Legendas e tooltips',
         'Identificação das séries, valores e contexto ao explorar dados.',

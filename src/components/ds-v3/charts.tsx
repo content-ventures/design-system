@@ -3361,3 +3361,461 @@ export function FunnelChart({
     </div>
   );
 }
+
+/* ——————————————————————————— Sankey ——————————————————————————— */
+
+export type SankeyNode = {
+  key: string;
+  label: string;
+  /** Cor do nó. Sem ela: série da paleta na primeira coluna, cinza nas demais. */
+  color?: ChartColor;
+  /** Coluna fixa (0 = origem). Sem ela, a profundidade do nó no fluxo. */
+  column?: number;
+};
+
+export type SankeyLink = { source: string; target: string; value: number };
+
+export type SankeyChartProps = {
+  label: string;
+  nodes: SankeyNode[];
+  links: SankeyLink[];
+  /** Altura da área dos fluxos, em px. */
+  height?: number;
+  format?: (value: number) => string;
+  summary?: string;
+  /** Fluxo desenhado como em hover (pranchas): índice em `links`. */
+  forceActive?: number;
+  /** Estado parado para pranchas (`focus`). */
+  'data-force'?: string;
+};
+
+type SankeyLayoutNode = SankeyNode & {
+  index: number;
+  col: number;
+  value: number;
+  in: number;
+  out: number;
+  x: number;
+  y: number;
+  h: number;
+  tone: ChartColor;
+  explicit: boolean;
+};
+
+type SankeyLayoutLink = SankeyLink & {
+  index: number;
+  d: string;
+  t: number;
+  mid: { x: number; y: number };
+  tone: ChartColor;
+};
+
+const SANKEY_NODE_W = 10;
+const SANKEY_GAP = 12;
+
+/** Coluna de cada nó: a informada, senão o caminho mais longo desde uma origem. */
+function sankeyColumns(nodes: SankeyNode[], links: SankeyLink[]) {
+  const col = new Map(nodes.map((nd) => [nd.key, nd.column ?? 0]));
+  for (let pass = 0; pass < nodes.length; pass += 1) {
+    let changed = false;
+    for (const lk of links) {
+      const target = nodes.find((nd) => nd.key === lk.target);
+      if (!target || target.column !== undefined) continue;
+      const next = (col.get(lk.source) ?? 0) + 1;
+      if (next > (col.get(lk.target) ?? 0)) {
+        col.set(lk.target, next);
+        changed = true;
+      }
+    }
+    if (!changed) break;
+  }
+  return col;
+}
+
+/**
+ * Diagrama de Sankey: o volume que sai de cada origem e chega a cada destino, em faixas de
+ * espessura proporcional. Complementa o funil quando a perda não é linear — o lead que sai do
+ * Portal e vira Ganho, o que vem da Vitrine e se perde no contato. Hover num fluxo destaca só ele
+ * (dica com volume e participação na origem e no destino); hover num nó destaca os fluxos dele.
+ * Setas percorrem os fluxos pelo teclado. Estreito demais para as colunas, vira lista de fluxos.
+ */
+export function SankeyChart({
+  label,
+  nodes,
+  links,
+  height = 300,
+  format = formatInt,
+  summary,
+  forceActive,
+  'data-force': force,
+}: SankeyChartProps) {
+  const [ref, width, node] = useWidth<HTMLDivElement>();
+  useReady(node);
+  const [svgEl, setSvgEl] = useState<SVGSVGElement | null>(null);
+  const [nodeHover, setNodeHover] = useState<string | null>(null);
+
+  const valid = links.filter(
+    (lk) =>
+      lk.value > 0 &&
+      nodes.some((nd) => nd.key === lk.source) &&
+      nodes.some((nd) => nd.key === lk.target),
+  );
+  const explorer = useExplorer(valid.length, 0, {
+    force: forceActive,
+    keys: valid.map((lk) => `${lk.source}→${lk.target}`),
+    root: node,
+  });
+  const active = explorer.current;
+
+  const cols = sankeyColumns(nodes, valid);
+  const colCount = Math.max(1, ...[...cols.values()].map((c) => c + 1));
+  const byKey = new Map(nodes.map((nd) => [nd.key, nd]));
+  const labelOf = (key: string) => byKey.get(key)?.label ?? key;
+  const sumIn = (key: string) =>
+    valid.filter((lk) => lk.target === key).reduce((acc, lk) => acc + lk.value, 0);
+  const sumOut = (key: string) =>
+    valid.filter((lk) => lk.source === key).reduce((acc, lk) => acc + lk.value, 0);
+
+  /* Cada coluna precisa de largura para o rótulo: abaixo disso, a lista. */
+  const mode = width > 0 && width / colCount < 150 ? 'list' : 'flow';
+
+  const used = nodes.filter((nd) => sumIn(nd.key) + sumOut(nd.key) > 0);
+  const firstCol = used.filter((nd) => (cols.get(nd.key) ?? 0) === 0);
+  const leftPad = Math.min(
+    180,
+    Math.max(
+      0,
+      ...firstCol.map((nd) => Math.max(textWidth(nd.label, 12), textWidth(format(sumOut(nd.key)), 13))),
+    ) + 16,
+  );
+  const lastColIndex = colCount - 1;
+  const lastCol = used.filter((nd) => (cols.get(nd.key) ?? 0) === lastColIndex);
+  const rightPad = Math.min(
+    180,
+    Math.max(
+      0,
+      ...lastCol.map((nd) => Math.max(textWidth(nd.label, 12), textWidth(format(sumIn(nd.key)), 13))),
+    ) + 16,
+  );
+  const x0 = leftPad;
+  const x1 = Math.max(x0 + SANKEY_NODE_W, width - rightPad - SANKEY_NODE_W);
+  const xOf = (col: number) => (colCount <= 1 ? x0 : x0 + ((x1 - x0) * col) / (colCount - 1));
+
+  /* Escala única: a coluna mais cheia ocupa a altura toda. */
+  const columns = Array.from({ length: colCount }, (_, c) =>
+    used.filter((nd) => (cols.get(nd.key) ?? 0) === c),
+  );
+  const valueOf = (key: string) => Math.max(sumIn(key), sumOut(key));
+  const ky = Math.min(
+    ...columns
+      .filter((list) => list.length > 0)
+      .map((list) => {
+        const total = list.reduce((acc, nd) => acc + valueOf(nd.key), 0);
+        return total > 0 ? (height - SANKEY_GAP * (list.length - 1)) / total : Infinity;
+      }),
+  );
+  const scale = Number.isFinite(ky) ? ky : 0;
+
+  let paletteIndex = 0;
+  const layout = new Map<string, SankeyLayoutNode>();
+  columns.forEach((list, c) => {
+    const total =
+      list.reduce((acc, nd) => acc + Math.max(2, valueOf(nd.key) * scale), 0) +
+      SANKEY_GAP * Math.max(0, list.length - 1);
+    let y = (height - total) / 2;
+    for (const nd of list) {
+      const h = Math.max(2, valueOf(nd.key) * scale);
+      const tone: ChartColor =
+        nd.color ?? (c === 0 ? (chartPalette[paletteIndex++ % chartPalette.length] ?? 'blue') : 'gray');
+      layout.set(nd.key, {
+        ...nd,
+        index: nodes.indexOf(nd),
+        col: c,
+        value: valueOf(nd.key),
+        in: sumIn(nd.key),
+        out: sumOut(nd.key),
+        x: xOf(c),
+        y,
+        h,
+        tone,
+        explicit: nd.color !== undefined || c === 0,
+      });
+      y += h + SANKEY_GAP;
+    }
+  });
+
+  /* Faixas empilhadas na ordem vertical do outro lado: nenhum fluxo cruza à toa. */
+  const outOffset = new Map<string, number>();
+  const inOffset = new Map<string, number>();
+  const order = valid
+    .map((lk, index) => ({ lk, index }))
+    .sort((a, b) => {
+      const ta = layout.get(a.lk.target)?.y ?? 0;
+      const tb = layout.get(b.lk.target)?.y ?? 0;
+      return ta - tb;
+    });
+  const linkLayout: SankeyLayoutLink[] = [];
+  for (const { lk, index } of order) {
+    const src = layout.get(lk.source);
+    const tgt = layout.get(lk.target);
+    if (!src || !tgt) continue;
+    const t = lk.value * scale;
+    const so = outOffset.get(lk.source) ?? 0;
+    outOffset.set(lk.source, so + t);
+    linkLayout.push({ ...lk, index, d: '', t, mid: { x: 0, y: 0 }, tone: src.tone });
+  }
+  const inOrder = [...linkLayout].sort(
+    (a, b) => (layout.get(a.source)?.y ?? 0) - (layout.get(b.source)?.y ?? 0),
+  );
+  const tOffsetOf = new Map<number, number>();
+  for (const lk of inOrder) {
+    const to = inOffset.get(lk.target) ?? 0;
+    inOffset.set(lk.target, to + lk.t);
+    tOffsetOf.set(lk.index, to);
+  }
+  const sOffsetOf = new Map<number, number>();
+  outOffset.clear();
+  for (const lk of linkLayout) {
+    const so = outOffset.get(lk.source) ?? 0;
+    outOffset.set(lk.source, so + lk.t);
+    sOffsetOf.set(lk.index, so);
+  }
+  for (const lk of linkLayout) {
+    const src = layout.get(lk.source);
+    const tgt = layout.get(lk.target);
+    if (!src || !tgt) continue;
+    const xs = src.x + SANKEY_NODE_W;
+    const xt = tgt.x;
+    const ys = src.y + (sOffsetOf.get(lk.index) ?? 0);
+    const yt = tgt.y + (tOffsetOf.get(lk.index) ?? 0);
+    const xm = (xs + xt) / 2;
+    lk.d = [
+      `M${f2(xs)} ${f2(ys)}`,
+      `C${f2(xm)} ${f2(ys)} ${f2(xm)} ${f2(yt)} ${f2(xt)} ${f2(yt)}`,
+      `L${f2(xt)} ${f2(yt + lk.t)}`,
+      `C${f2(xm)} ${f2(yt + lk.t)} ${f2(xm)} ${f2(ys + lk.t)} ${f2(xs)} ${f2(ys + lk.t)}Z`,
+    ].join('');
+    lk.mid = { x: xm, y: (ys + yt) / 2 + lk.t / 2 };
+    /* Destino com cor própria (status: Ganho, Perdido) pinta o fluxo que chega nele. */
+    if (!src.explicit && tgt.explicit) lk.tone = tgt.tone;
+  }
+  const linkByIndex = new Map(linkLayout.map((lk) => [lk.index, lk]));
+
+  const pctOf = (part: number, whole: number) => (whole ? (part / whole) * 100 : 0);
+  const summaryText =
+    summary ??
+    `${label}: ${valid
+      .map((lk) => `${labelOf(lk.source)} para ${labelOf(lk.target)}, ${format(lk.value)}`)
+      .join('; ')}.`;
+  const table = {
+    head: ['Origem', 'Destino', 'Volume', 'Da origem'],
+    rows: valid.map((lk) => [
+      labelOf(lk.source),
+      labelOf(lk.target),
+      format(lk.value),
+      formatPct(pctOf(lk.value, sumOut(lk.source)), 1),
+    ]),
+  };
+  const activeLink = active !== null ? valid[active] : undefined;
+  const live =
+    explorer.keyboard && activeLink
+      ? `${labelOf(activeLink.source)} para ${labelOf(activeLink.target)}: ${format(activeLink.value)}`
+      : '';
+
+  function linkTip(index: number) {
+    const lk = valid[index];
+    const lay = linkByIndex.get(index);
+    if (!lk || !lay) return null;
+    return (
+      <ChartTooltip
+        title={`${labelOf(lk.source)} → ${labelOf(lk.target)}`}
+        rows={[
+          { key: 'v', label: 'Volume', value: format(lk.value), color: lay.tone, shape: 'square' },
+          {
+            key: 'o',
+            label: `De ${labelOf(lk.source)}`,
+            value: formatPct(pctOf(lk.value, sumOut(lk.source)), 1),
+          },
+          {
+            key: 'd',
+            label: `Em ${labelOf(lk.target)}`,
+            value: formatPct(pctOf(lk.value, sumIn(lk.target)), 1),
+          },
+        ]}
+      />
+    );
+  }
+
+  function nodeTip(key: string) {
+    const nd = layout.get(key);
+    if (!nd) return null;
+    const rows: TooltipRow[] = [];
+    if (nd.in > 0) rows.push({ key: 'in', label: 'Entrada', value: format(nd.in) });
+    if (nd.out > 0) rows.push({ key: 'out', label: 'Saída', value: format(nd.out) });
+    return <ChartTooltip title={nd.label} rows={rows} />;
+  }
+
+  let tip: ReactNode = null;
+  if (mode === 'flow' && node && svgEl) {
+    if (nodeHover && layout.get(nodeHover)) {
+      const nd = layout.get(nodeHover);
+      tip = nd ? (
+        <FloatingTip
+          root={node}
+          anchor={() => {
+            const r = svgEl.getBoundingClientRect();
+            return {
+              left: r.left + nd.x,
+              right: r.left + nd.x + SANKEY_NODE_W,
+              top: r.top + nd.y + nd.h / 2,
+              bottom: r.top + nd.y + nd.h / 2,
+            };
+          }}
+        >
+          {nodeTip(nodeHover)}
+        </FloatingTip>
+      ) : null;
+    } else if (active !== null && linkByIndex.get(active)) {
+      const lay = linkByIndex.get(active);
+      tip = lay ? (
+        <FloatingTip
+          root={node}
+          anchor={() => {
+            const r = svgEl.getBoundingClientRect();
+            const cx = r.left + lay.mid.x;
+            const cy = r.top + lay.mid.y;
+            return { left: cx - 6, right: cx + 6, top: cy, bottom: cy };
+          }}
+        >
+          {linkTip(active)}
+        </FloatingTip>
+      ) : null;
+    }
+  }
+
+  const isLit = (lk: SankeyLayoutLink) =>
+    nodeHover ? lk.source === nodeHover || lk.target === nodeHover : active === lk.index;
+  const dimmed = nodeHover !== null || active !== null;
+
+  if (mode === 'list') {
+    const max = Math.max(1, ...valid.map((lk) => lk.value));
+    return (
+      <div ref={ref} className={s.sroot}>
+        <div
+          className={s.slist}
+          data-active={active !== null || undefined}
+          role="group"
+          aria-label={`${label}. ${keyboardHint(false)}`}
+          data-force={force}
+          {...explorer.bind}
+        >
+          <ul role="img" aria-label={summaryText} className={s.slistRows}>
+            {valid.map((lk, i) => (
+              <li
+                key={`${lk.source}-${lk.target}`}
+                className={s.slistRow}
+                data-active={active === i || undefined}
+                onPointerEnter={() => explorer.point(i)}
+                aria-hidden="true"
+              >
+                <span className={s.slistText}>
+                  <span>
+                    {labelOf(lk.source)} → {labelOf(lk.target)}
+                  </span>
+                  <b>{format(lk.value)}</b>
+                </span>
+                <span className={s.slistTrack}>
+                  <i
+                    style={{
+                      width: `max(4px, ${f2((lk.value / max) * 100)}%)`,
+                      background: cssColor(linkByIndex.get(i)?.tone ?? 'gray'),
+                    }}
+                  />
+                </span>
+              </li>
+            ))}
+          </ul>
+          <SrTable caption={label} head={table.head} rows={table.rows} />
+          <Live>{live}</Live>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={ref} className={s.sroot}>
+      <div
+        className={s.sankey}
+        style={{ height }}
+        data-active={dimmed || undefined}
+        role="group"
+        aria-label={`${label}. ${keyboardHint(false)}`}
+        data-force={force}
+        {...explorer.bind}
+      >
+        {width > 0 && (
+          <svg
+            ref={setSvgEl}
+            width={width}
+            height={height}
+            role="img"
+            aria-label={summaryText}
+            className={s.ssvg}
+          >
+            {linkLayout.map((lk) => (
+              <path
+                key={`${lk.source}-${lk.target}`}
+                d={lk.d}
+                className={s.slink}
+                style={{ fill: cssColor(lk.tone) }}
+                data-active={isLit(lk) || undefined}
+                onPointerEnter={() => {
+                  setNodeHover(null);
+                  explorer.point(lk.index);
+                }}
+              />
+            ))}
+            {[...layout.values()].map((nd) => (
+              <rect
+                key={nd.key}
+                x={nd.x}
+                y={nd.y}
+                width={SANKEY_NODE_W}
+                height={nd.h}
+                rx={2}
+                className={s.snode}
+                style={{ fill: cssColor(nd.tone) }}
+                data-active={nodeHover === nd.key || undefined}
+                onPointerEnter={() => setNodeHover(nd.key)}
+                onPointerLeave={() => setNodeHover(null)}
+              />
+            ))}
+          </svg>
+        )}
+        {width > 0 &&
+          [...layout.values()].map((nd) => {
+            const side = nd.col === lastColIndex && colCount > 1 ? 'right' : nd.col === 0 ? 'left' : 'mid';
+            const value = nd.col === 0 ? nd.out : nd.in;
+            return (
+              <span
+                key={nd.key}
+                className={s.slabel}
+                data-side={side}
+                style={{
+                  top: nd.y + nd.h / 2,
+                  left: side === 'left' ? nd.x - 8 : nd.x + SANKEY_NODE_W + 8,
+                }}
+                aria-hidden="true"
+              >
+                <span>{nd.label}</span>
+                <b>{format(value)}</b>
+              </span>
+            );
+          })}
+        {tip}
+        <SrTable caption={label} head={table.head} rows={table.rows} />
+        <Live>{live}</Live>
+      </div>
+    </div>
+  );
+}

@@ -250,6 +250,7 @@ export {
   DonutChart,
   DonutMeter,
   FunnelChart,
+  SankeyChart,
   MeterList,
   ChartCard,
   ChartKey,
@@ -286,6 +287,9 @@ export {
   type DonutChartProps,
   type FunnelStage,
   type FunnelChartProps,
+  type SankeyChartProps,
+  type SankeyLink,
+  type SankeyNode,
 } from './charts';
 
 /* Feedback */
