@@ -27,7 +27,7 @@ import {
   type ComponentType,
   type ReactNode,
 } from 'react';
-import { CreatingDialog, type CreationRun } from '../../dashboardv3/builder/creating';
+import { CreatingDialog, type CreationRun } from './creating';
 import {
   Avatar,
   Badge,

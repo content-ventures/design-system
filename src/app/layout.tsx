@@ -1,35 +1,22 @@
 import type { Metadata } from 'next';
-import localFont from 'next/font/local';
 import type { ReactNode } from 'react';
 
+import { interV3 } from '../components/ds-v3/font';
+import { ThemeV3 } from '../components/ds-v3/theme';
 import './globals.css';
-import '../components/ds/tokens.css';
-
-const instrument = localFont({
-  src: [
-    { path: '../fonts/instrument-regular.ttf', weight: '400' },
-    { path: '../fonts/instrument-medium.ttf', weight: '500' },
-    { path: '../fonts/instrument-semibold.ttf', weight: '600' },
-  ],
-  variable: '--font-interface',
-  display: 'swap',
-});
-const mono = localFont({
-  src: '../fonts/plex-mono.ttf',
-  variable: '--font-utility',
-  display: 'swap',
-  preload: false,
-});
 
 export const metadata: Metadata = {
-  title: 'Design System v2 · MediaOn',
-  description: 'Ambiente isolado para a nova biblioteca visual do MediaOn.',
+  title: 'Design System · MediaOn',
+  description: 'Catálogo do DS V3: tokens, componentes, padrões e templates do MediaOn.',
 };
 
+/** Tokens e fonte do V3 valem em todo o app do catálogo, como no app oficial. */
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="pt-BR" className={`${instrument.variable} ${mono.variable}`}>
-      <body>{children}</body>
+    <html lang="pt-BR" className={interV3.variable}>
+      <body>
+        <ThemeV3 style={{ minHeight: '100dvh' }}>{children}</ThemeV3>
+      </body>
     </html>
   );
 }
