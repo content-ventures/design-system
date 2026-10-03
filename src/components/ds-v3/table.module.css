@@ -720,15 +720,21 @@
     font: var(--t-small);
     text-align: left;
   }
-  /* Título do cartão: a primeira coluna de dados, sem rótulo. */
-  .frame[data-stack] .table tbody > tr > td[data-col]:is(:first-child, .check + td) {
+  /* Título do cartão: a coluna fixa (o nome do registro), sem rótulo e sempre no topo — mesmo
+     quando uma coluna de indicador vem antes dela na tabela. */
+  .frame[data-stack] .table tbody > tr > td[data-title] {
+    order: -1;
     justify-content: flex-start;
     color: var(--ink);
     font: var(--t-body-strong);
     text-align: left;
   }
-  .frame[data-stack] .table tbody > tr > td[data-col]:is(:first-child, .check + td)::before {
+  .frame[data-stack] .table tbody > tr > td[data-title]::before {
     content: none;
+  }
+  /* Célula sem nada a mostrar (sem valor e sem `fallback`): no cartão não vira linha só com rótulo. */
+  .frame[data-stack] .table tbody > tr > td[data-blank]:not([data-title]) {
+    display: none;
   }
   /* Seleção: a caixa fica à esquerda do título. */
   .frame[data-stack] .table tbody > tr > td.check {
@@ -736,7 +742,7 @@
     top: var(--s-3);
     left: var(--s-4);
   }
-  .frame[data-stack] .table tbody > tr > td.check + td {
+  .frame[data-stack] .table tbody > tr:has(> td.check) > td[data-title] {
     padding-left: 28px;
   }
   /* Ações (cabeçalho vazio): sobem para o canto do cartão. */
@@ -750,11 +756,7 @@
   .frame[data-stack] .table td[data-actions] [data-slot='empty'] {
     display: none;
   }
-  .frame[data-stack]
-    .table
-    tbody
-    > tr:has(td[data-actions])
-    > td[data-col]:is(:first-child, .check + td) {
+  .frame[data-stack] .table tbody > tr:has(td[data-actions]) > td[data-title] {
     /* Até três ações de 32 px no canto: o título não corre por baixo delas. */
     padding-right: 112px;
   }

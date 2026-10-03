@@ -167,6 +167,12 @@ export function DataTable<Row>({
   }
   const visible = columns.filter((column) => !hidden.has(column.key) || motion[column.key] === 'out');
   const span = visible.length + (selectable ? 1 : 0);
+  // Título do cartão no celular: a coluna fixa (`pinned`) — o nome do registro —, senão a primeira
+  // com cabeçalho. Coluna de indicador antes do nome (o ponto "no ar") não rouba o título.
+  const titleKey = (
+    visible.find((column) => column.pinned && column.header !== '') ??
+    visible.find((column) => column.header !== '')
+  )?.key;
 
   const tableRef = useRef<HTMLTableElement>(null);
   const bodyRef = useRef<HTMLTableSectionElement>(null);
@@ -384,7 +390,7 @@ export function DataTable<Row>({
                   {visible.map((column, colIndex) => {
                     const kind = column.skeleton ?? (column.numeric ? 'short' : 'text');
                     return (
-                      <td key={column.key} data-col={column.key} data-align={column.numeric ? 'end' : column.align}>
+                      <td key={column.key} data-col={column.key} data-title={column.key === titleKey || undefined} data-align={column.numeric ? 'end' : column.align}>
                         {wrap(
                           column.key,
                           kind === 'none' ? null : kind === 'lines' ? (
@@ -475,6 +481,8 @@ export function DataTable<Row>({
                                 (typeof column.header === 'string' ? column.header : undefined))
                           }
                           data-actions={column.header === '' || undefined}
+                          data-title={column.key === titleKey || undefined}
+                          data-blank={isBlank(value) || undefined}
                           data-align={column.numeric ? 'end' : column.align}
                           data-truncate={column.truncate || undefined}
                           className={column.numeric ? s.num : undefined}
