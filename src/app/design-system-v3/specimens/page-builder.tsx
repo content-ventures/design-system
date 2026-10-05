@@ -78,8 +78,8 @@ import {
   Tooltip,
   VisuallyHidden,
   toast,
-} from '@mediaon/design-system/v3';
-import toastStyles from '@mediaon/design-system/v3/toast.module.css';
+} from '@content-ventures/design-system/v3';
+import toastStyles from '@content-ventures/design-system/v3/toast.module.css';
 import { Shot, Shots } from '../stage';
 import { Art, Wireframe } from './page-builder-art';
 import {

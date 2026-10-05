@@ -77,7 +77,7 @@ import {
   type AuthSceneVariant,
   type SegmentOption,
   type Tone,
-} from '@mediaon/design-system/v3';
+} from '@content-ventures/design-system/v3';
 import {
   AppShell,
   Breadcrumb,
@@ -89,7 +89,7 @@ import {
   type Crumb,
   type NavGroup,
   type Portal,
-} from '@mediaon/design-system/v3/app-shell';
+} from '@content-ventures/design-system/v3/app-shell';
 import {
   BarChart,
   ChartCard,
@@ -103,39 +103,39 @@ import {
   type ChartDatum,
   type DonutDatum,
   type MeterItem,
-} from '@mediaon/design-system/v3/charts';
-import { CodeInput, type CodeStatus } from '@mediaon/design-system/v3/code-input';
-import { ColorField, contrastRatio } from '@mediaon/design-system/v3/color-picker';
-import { DateRangePicker, type DateRange } from '@mediaon/design-system/v3/date-picker';
-import { AccessState, Alert, EmptyState, ErrorState, Skeleton } from '@mediaon/design-system/v3/feedback';
-import { Field, FieldGroup, Input, SearchField, Textarea } from '@mediaon/design-system/v3/fields';
-import { ActiveFilters, FilterBand, FilterBar, FilterField, type ActiveFilter } from '@mediaon/design-system/v3/filter-bar';
-import { BottomSheet } from '@mediaon/design-system/v3/bottom-sheet';
-import { Drawer } from '@mediaon/design-system/v3/drawer';
-import { Carousel } from '@mediaon/design-system/v3/gallery';
-import { BrandLockup, IconTile, MadeWith } from '@mediaon/design-system/v3/identity';
-import { LinkButton, TextLink } from '@mediaon/design-system/v3/link';
-import { List, ListItem } from '@mediaon/design-system/v3/list-item';
-import { Menu, type MenuItem, type MenuSection } from '@mediaon/design-system/v3/menu';
-import { MediaFrame } from '@mediaon/design-system/v3/media';
-import { Metric, MetricStrip, type MetricProps } from '@mediaon/design-system/v3/metric-strip';
-import { MoneyField } from '@mediaon/design-system/v3/money-field';
-import { NumberField } from '@mediaon/design-system/v3/number-field';
-import { Pagination } from '@mediaon/design-system/v3/pagination';
-import { PasswordField, type PasswordRequirement } from '@mediaon/design-system/v3/password-field';
-import { RowActions, type RowAction } from '@mediaon/design-system/v3/row-actions';
-import { Select } from '@mediaon/design-system/v3/select';
-import { Radio, RadioGroup } from '@mediaon/design-system/v3/selection';
-import { Meter } from '@mediaon/design-system/v3/stat';
-import { ActionBar, FormRow, StepPipeline, type PipelineStage } from '@mediaon/design-system/v3/stepper';
-import { DescriptionList, PageHeader, Panel, Section, type DescriptionItem } from '@mediaon/design-system/v3/structure';
-import { BulkBar, DataTable, type Column, type SortState } from '@mediaon/design-system/v3/table';
-import { Timeline, type TimelineEntry } from '@mediaon/design-system/v3/timeline';
-import { toast, Toaster } from '@mediaon/design-system/v3/toast';
-import { ToggleGroup } from '@mediaon/design-system/v3/toggle';
-import { Dropzone, FileRow } from '@mediaon/design-system/v3/upload';
-import { VideoPlayer } from '@mediaon/design-system/v3/video';
-import toastStyles from '@mediaon/design-system/v3/toast.module.css';
+} from '@content-ventures/design-system/v3/charts';
+import { CodeInput, type CodeStatus } from '@content-ventures/design-system/v3/code-input';
+import { ColorField, contrastRatio } from '@content-ventures/design-system/v3/color-picker';
+import { DateRangePicker, type DateRange } from '@content-ventures/design-system/v3/date-picker';
+import { AccessState, Alert, EmptyState, ErrorState, Skeleton } from '@content-ventures/design-system/v3/feedback';
+import { Field, FieldGroup, Input, SearchField, Textarea } from '@content-ventures/design-system/v3/fields';
+import { ActiveFilters, FilterBand, FilterBar, FilterField, type ActiveFilter } from '@content-ventures/design-system/v3/filter-bar';
+import { BottomSheet } from '@content-ventures/design-system/v3/bottom-sheet';
+import { Drawer } from '@content-ventures/design-system/v3/drawer';
+import { Carousel } from '@content-ventures/design-system/v3/gallery';
+import { BrandLockup, IconTile, MadeWith } from '@content-ventures/design-system/v3/identity';
+import { LinkButton, TextLink } from '@content-ventures/design-system/v3/link';
+import { List, ListItem } from '@content-ventures/design-system/v3/list-item';
+import { Menu, type MenuItem, type MenuSection } from '@content-ventures/design-system/v3/menu';
+import { MediaFrame } from '@content-ventures/design-system/v3/media';
+import { Metric, MetricStrip, type MetricProps } from '@content-ventures/design-system/v3/metric-strip';
+import { MoneyField } from '@content-ventures/design-system/v3/money-field';
+import { NumberField } from '@content-ventures/design-system/v3/number-field';
+import { Pagination } from '@content-ventures/design-system/v3/pagination';
+import { PasswordField, type PasswordRequirement } from '@content-ventures/design-system/v3/password-field';
+import { RowActions, type RowAction } from '@content-ventures/design-system/v3/row-actions';
+import { Select } from '@content-ventures/design-system/v3/select';
+import { Radio, RadioGroup } from '@content-ventures/design-system/v3/selection';
+import { Meter } from '@content-ventures/design-system/v3/stat';
+import { ActionBar, FormRow, StepPipeline, type PipelineStage } from '@content-ventures/design-system/v3/stepper';
+import { DescriptionList, PageHeader, Panel, Section, type DescriptionItem } from '@content-ventures/design-system/v3/structure';
+import { BulkBar, DataTable, type Column, type SortState } from '@content-ventures/design-system/v3/table';
+import { Timeline, type TimelineEntry } from '@content-ventures/design-system/v3/timeline';
+import { toast, Toaster } from '@content-ventures/design-system/v3/toast';
+import { ToggleGroup } from '@content-ventures/design-system/v3/toggle';
+import { Dropzone, FileRow } from '@content-ventures/design-system/v3/upload';
+import { VideoPlayer } from '@content-ventures/design-system/v3/video';
+import toastStyles from '@content-ventures/design-system/v3/toast.module.css';
 import t from './templates.module.css';
 
 /* ——————————————————————————— Utilidades ——————————————————————————— */

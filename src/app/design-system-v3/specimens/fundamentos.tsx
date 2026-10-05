@@ -78,11 +78,11 @@ import {
   Tabs,
   ToastCard,
   type Tone,
-} from '@mediaon/design-system/v3';
-import { useAnnouncer } from '@mediaon/design-system/v3/a11y';
-import { Drawer } from '@mediaon/design-system/v3/drawer';
-import { KanbanPlaceholder, LeadCard } from '@mediaon/design-system/v3/kanban';
-import { Select } from '@mediaon/design-system/v3/select';
+} from '@content-ventures/design-system/v3';
+import { useAnnouncer } from '@content-ventures/design-system/v3/a11y';
+import { Drawer } from '@content-ventures/design-system/v3/drawer';
+import { KanbanPlaceholder, LeadCard } from '@content-ventures/design-system/v3/kanban';
+import { Select } from '@content-ventures/design-system/v3/select';
 import { Phone } from '../stage';
 import f from './fundamentos.module.css';
 

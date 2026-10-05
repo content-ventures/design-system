@@ -2,10 +2,10 @@
 
 import { Columns3, List as ListIcon, MoreHorizontal, Plus } from 'lucide-react';
 import { useMemo, useState, type ComponentType, type ReactNode } from 'react';
-import { Button } from '@mediaon/design-system/v3/button';
-import { SearchField } from '@mediaon/design-system/v3/fields';
-import { Avatar, BrandMark } from '@mediaon/design-system/v3/identity';
-import { CampaignKanbanCard } from '@mediaon/design-system/v3/campaign-kanban-card';
+import { Button } from '@content-ventures/design-system/v3/button';
+import { SearchField } from '@content-ventures/design-system/v3/fields';
+import { Avatar, BrandMark } from '@content-ventures/design-system/v3/identity';
+import { CampaignKanbanCard } from '@content-ventures/design-system/v3/campaign-kanban-card';
 import {
   KanbanBoard,
   KanbanColumn,
@@ -16,12 +16,12 @@ import {
   StageIcon,
   useKanbanDrag,
   type LeadOutcome,
-} from '@mediaon/design-system/v3/kanban';
-import { List, ListGroup, ListItem } from '@mediaon/design-system/v3/list-item';
-import { Menu, type MenuSection } from '@mediaon/design-system/v3/menu';
-import { Select } from '@mediaon/design-system/v3/select';
-import { Segmented } from '@mediaon/design-system/v3/selection';
-import { toast } from '@mediaon/design-system/v3/toast';
+} from '@content-ventures/design-system/v3/kanban';
+import { List, ListGroup, ListItem } from '@content-ventures/design-system/v3/list-item';
+import { Menu, type MenuSection } from '@content-ventures/design-system/v3/menu';
+import { Select } from '@content-ventures/design-system/v3/select';
+import { Segmented } from '@content-ventures/design-system/v3/selection';
+import { toast } from '@content-ventures/design-system/v3/toast';
 import { Shot, Shots, State, States } from '../stage';
 import {
   EnsureToaster,

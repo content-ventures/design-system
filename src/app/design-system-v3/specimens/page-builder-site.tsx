@@ -40,7 +40,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
 } from 'react';
-import { Avatar, BrandMark, MadeWith } from '@mediaon/design-system/v3';
+import { Avatar, BrandMark, MadeWith } from '@content-ventures/design-system/v3';
 import { Art, FloorPlan } from './page-builder-art';
 import {
   type Img,

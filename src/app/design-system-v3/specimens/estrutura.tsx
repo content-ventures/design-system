@@ -44,11 +44,11 @@ import {
   Segmented,
   Tabs,
   type Column,
-} from '@mediaon/design-system/v3';
-import { Pagination } from '@mediaon/design-system/v3/pagination';
-import { LinkButton } from '@mediaon/design-system/v3/link';
-import { Menu } from '@mediaon/design-system/v3/menu';
-import { ActionBar, Stepper, StepperCompact, type StepItem } from '@mediaon/design-system/v3/stepper';
+} from '@content-ventures/design-system/v3';
+import { Pagination } from '@content-ventures/design-system/v3/pagination';
+import { LinkButton } from '@content-ventures/design-system/v3/link';
+import { Menu } from '@content-ventures/design-system/v3/menu';
+import { ActionBar, Stepper, StepperCompact, type StepItem } from '@content-ventures/design-system/v3/stepper';
 import {
   Accordion,
   DescriptionList,
@@ -62,7 +62,7 @@ import {
   SplitLayout,
   type AccordionItem,
   type DescriptionItem,
-} from '@mediaon/design-system/v3/structure';
+} from '@content-ventures/design-system/v3/structure';
 import {
   AppShell,
   PortalSwitcher,
@@ -70,7 +70,7 @@ import {
   SidebarAccount,
   TopBar,
   type NavGroup,
-} from '@mediaon/design-system/v3/app-shell';
+} from '@content-ventures/design-system/v3/app-shell';
 import {
   Card,
   CardHeader,
@@ -78,7 +78,7 @@ import {
   Divider,
   MetaList,
   type MetaItem,
-} from '@mediaon/design-system/v3/surfaces';
+} from '@content-ventures/design-system/v3/surfaces';
 import { Shot, Shots, State, States } from '../stage';
 import x from './estrutura.module.css';
 

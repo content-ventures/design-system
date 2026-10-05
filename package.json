@@ -1,8 +1,14 @@
 {
-  "name": "@mediaon/design-system",
+  "name": "@content-ventures/design-system",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.19.0",
+  "engines": {
+    "node": "24.x"
+  },
   "exports": {
+    ".": "./src/components/ds-v3/index.ts",
     "./v3": "./src/components/ds-v3/index.ts",
     "./v3/icons": "./src/components/ds-v3/icons.ts",
     "./v3/*.module.css": "./src/components/ds-v3/*.module.css",
@@ -10,21 +16,22 @@
     "./catalog": "./src/app/design-system-v3/catalog.tsx"
   },
   "scripts": {
-    "dev": "next dev --port 3002",
+    "dev": "next dev",
     "build": "next build",
-    "start": "next start --port 3002",
+    "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
-  "dependencies": {
-    "lucide-react": "^0.462.0",
-    "next": "^16.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+  "peerDependencies": {
+    "lucide-react": ">=0.462.0",
+    "next": ">=16.0.0",
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0"
   },
   "devDependencies": {
-    "@mediaon/config": "workspace:*",
+    "@eslint/js": "^9.20.0",
+    "@next/eslint-plugin-next": "^16.0.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.6",
@@ -33,8 +40,24 @@
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^5.2.0",
     "eslint": "^9.20.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.15.0",
     "jsdom": "^26.1.0",
+    "lucide-react": "^0.462.0",
+    "next": "^16.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "prettier": "^3.4.2",
     "typescript": "^5.8.3",
+    "typescript-eslint": "^8.24.0",
     "vitest": "^3.2.7"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
   }
 }

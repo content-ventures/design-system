@@ -49,19 +49,19 @@ import {
   Tooltip,
   type Column,
   type Tone,
-} from '@mediaon/design-system/v3';
-import { BottomSheet, BottomSheetFrame } from '@mediaon/design-system/v3/bottom-sheet';
-import { ConfirmDialog, ConfirmFrame } from '@mediaon/design-system/v3/confirm-dialog';
-import { Drawer, DrawerFrame } from '@mediaon/design-system/v3/drawer';
-import { HoverCard } from '@mediaon/design-system/v3/hover-card';
-import { LinkButton, TextLink } from '@mediaon/design-system/v3/link';
-import { NumberField } from '@mediaon/design-system/v3/number-field';
-import { Popover, PopoverHeader } from '@mediaon/design-system/v3/popover';
-import { ResponsiveDialog } from '@mediaon/design-system/v3/responsive-dialog';
-import { Select } from '@mediaon/design-system/v3/select';
-import { DescriptionList } from '@mediaon/design-system/v3/structure';
-import { Toaster, toast } from '@mediaon/design-system/v3/toast';
-import toastStyles from '@mediaon/design-system/v3/toast.module.css';
+} from '@content-ventures/design-system/v3';
+import { BottomSheet, BottomSheetFrame } from '@content-ventures/design-system/v3/bottom-sheet';
+import { ConfirmDialog, ConfirmFrame } from '@content-ventures/design-system/v3/confirm-dialog';
+import { Drawer, DrawerFrame } from '@content-ventures/design-system/v3/drawer';
+import { HoverCard } from '@content-ventures/design-system/v3/hover-card';
+import { LinkButton, TextLink } from '@content-ventures/design-system/v3/link';
+import { NumberField } from '@content-ventures/design-system/v3/number-field';
+import { Popover, PopoverHeader } from '@content-ventures/design-system/v3/popover';
+import { ResponsiveDialog } from '@content-ventures/design-system/v3/responsive-dialog';
+import { Select } from '@content-ventures/design-system/v3/select';
+import { DescriptionList } from '@content-ventures/design-system/v3/structure';
+import { Toaster, toast } from '@content-ventures/design-system/v3/toast';
+import toastStyles from '@content-ventures/design-system/v3/toast.module.css';
 import { Shot, Shots, State } from '../stage';
 import x from './camadas.module.css';
 

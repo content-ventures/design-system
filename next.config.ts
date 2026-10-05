@@ -1,7 +1,10 @@
 import type { NextConfig } from 'next';
+import { fileURLToPath } from 'node:url';
 
 const nextConfig: NextConfig = {
-  outputFileTracingRoot: new URL('../../', import.meta.url).pathname,
+  turbopack: {
+    root: fileURLToPath(new URL('.', import.meta.url)),
+  },
   typedRoutes: true,
   poweredByHeader: false,
   // O indicador do ambiente local sobrepunha o cartão de conta no rodapé.

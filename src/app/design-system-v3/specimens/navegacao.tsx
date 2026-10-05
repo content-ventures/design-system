@@ -50,7 +50,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react';
-import { Avatar, BrandMark, Button, Count, IconButton, Kbd, type Tone } from '@mediaon/design-system/v3';
+import { Avatar, BrandMark, Button, Count, IconButton, Kbd, type Tone } from '@content-ventures/design-system/v3';
 import {
   AppShell,
   Breadcrumb,
@@ -69,11 +69,11 @@ import {
   type Crumb,
   type NavGroup,
   type Portal,
-} from '@mediaon/design-system/v3/app-shell';
-import { ContextMenu } from '@mediaon/design-system/v3/context-menu';
-import { Menu, MenuPanel, type MenuItem, type MenuSection } from '@mediaon/design-system/v3/menu';
-import { PageArrow, PageButton, Pagination } from '@mediaon/design-system/v3/pagination';
-import { Select } from '@mediaon/design-system/v3/select';
+} from '@content-ventures/design-system/v3/app-shell';
+import { ContextMenu } from '@content-ventures/design-system/v3/context-menu';
+import { Menu, MenuPanel, type MenuItem, type MenuSection } from '@content-ventures/design-system/v3/menu';
+import { PageArrow, PageButton, Pagination } from '@content-ventures/design-system/v3/pagination';
+import { Select } from '@content-ventures/design-system/v3/select';
 import {
   StepList,
   StepMarker,
@@ -83,10 +83,10 @@ import {
   type PipelineStage,
   type StepItem,
   type StepState,
-} from '@mediaon/design-system/v3/stepper';
-import { Tabs, type TabItem } from '@mediaon/design-system/v3/tabs';
-import { toast, Toaster } from '@mediaon/design-system/v3/toast';
-import toastStyles from '@mediaon/design-system/v3/toast.module.css';
+} from '@content-ventures/design-system/v3/stepper';
+import { Tabs, type TabItem } from '@content-ventures/design-system/v3/tabs';
+import { toast, Toaster } from '@content-ventures/design-system/v3/toast';
+import toastStyles from '@content-ventures/design-system/v3/toast.module.css';
 import { Phone, Shot, Shots, State, States } from '../stage';
 import x from './navegacao.module.css';
 

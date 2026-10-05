@@ -8,7 +8,7 @@ import {
   IconButton,
   Segmented,
   type SegmentOption,
-} from '@mediaon/design-system/v3';
+} from '@content-ventures/design-system/v3';
 import {
   BarChart,
   ChartCard,
@@ -36,8 +36,8 @@ import {
   type LegendItem,
   type SankeyLink,
   type SankeyNode,
-} from '@mediaon/design-system/v3/charts';
-import { LinkButton } from '@mediaon/design-system/v3/link';
+} from '@content-ventures/design-system/v3/charts';
+import { LinkButton } from '@content-ventures/design-system/v3/link';
 import { Shot, Shots, State, States } from '../stage';
 import g from './graficos.module.css';
 

@@ -35,14 +35,14 @@ import {
   DatePicker,
   DialogFrame,
   type Tone,
-} from '@mediaon/design-system/v3';
-import { CodeInput, type CodeStatus } from '@mediaon/design-system/v3/code-input';
+} from '@content-ventures/design-system/v3';
+import { CodeInput, type CodeStatus } from '@content-ventures/design-system/v3/code-input';
 import {
   ErrorCount,
   ErrorSummary,
   focusField,
   type FormError,
-} from '@mediaon/design-system/v3/error-summary';
+} from '@content-ventures/design-system/v3/error-summary';
 import {
   ControlButton,
   Counter,
@@ -53,14 +53,14 @@ import {
   SearchField,
   Textarea,
   useNotice,
-} from '@mediaon/design-system/v3/fields';
-import { LinkButton } from '@mediaon/design-system/v3/link';
-import { MoneyField, moneyBRL, type MoneyAdjustReason } from '@mediaon/design-system/v3/money-field';
-import { NumberField } from '@mediaon/design-system/v3/number-field';
-import { PasswordField, type PasswordRequirement } from '@mediaon/design-system/v3/password-field';
-import { Select } from '@mediaon/design-system/v3/select';
-import { Slider } from '@mediaon/design-system/v3/slider';
-import { FormRow } from '@mediaon/design-system/v3/stepper';
+} from '@content-ventures/design-system/v3/fields';
+import { LinkButton } from '@content-ventures/design-system/v3/link';
+import { MoneyField, moneyBRL, type MoneyAdjustReason } from '@content-ventures/design-system/v3/money-field';
+import { NumberField } from '@content-ventures/design-system/v3/number-field';
+import { PasswordField, type PasswordRequirement } from '@content-ventures/design-system/v3/password-field';
+import { Select } from '@content-ventures/design-system/v3/select';
+import { Slider } from '@content-ventures/design-system/v3/slider';
+import { FormRow } from '@content-ventures/design-system/v3/stepper';
 import { Shot, Shots, State } from '../stage';
 import x from './formularios-a.module.css';
 

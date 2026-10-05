@@ -47,21 +47,21 @@ import {
   Tooltip,
   VisuallyHidden,
   type Tone,
-} from '@mediaon/design-system/v3';
-import { Sidebar } from '@mediaon/design-system/v3/app-shell';
+} from '@content-ventures/design-system/v3';
+import { Sidebar } from '@content-ventures/design-system/v3/app-shell';
 import {
   ActiveFilters,
   FilterBand,
   FilterBar,
   FilterField,
   type ActiveFilter,
-} from '@mediaon/design-system/v3/filter-bar';
-import { LinkButton } from '@mediaon/design-system/v3/link';
-import { List, ListGroup, ListItem, ListItemSkeleton } from '@mediaon/design-system/v3/list-item';
-import { Metric, MetricStrip, type MetricProps } from '@mediaon/design-system/v3/metric-strip';
-import { Pagination } from '@mediaon/design-system/v3/pagination';
-import { RowActions } from '@mediaon/design-system/v3/row-actions';
-import { Select } from '@mediaon/design-system/v3/select';
+} from '@content-ventures/design-system/v3/filter-bar';
+import { LinkButton } from '@content-ventures/design-system/v3/link';
+import { List, ListGroup, ListItem, ListItemSkeleton } from '@content-ventures/design-system/v3/list-item';
+import { Metric, MetricStrip, type MetricProps } from '@content-ventures/design-system/v3/metric-strip';
+import { Pagination } from '@content-ventures/design-system/v3/pagination';
+import { RowActions } from '@content-ventures/design-system/v3/row-actions';
+import { Select } from '@content-ventures/design-system/v3/select';
 import {
   BulkBar,
   ColumnsMenu,
@@ -69,10 +69,10 @@ import {
   SelectAllBand,
   type Column,
   type SortState,
-} from '@mediaon/design-system/v3/table';
-import { TagInput } from '@mediaon/design-system/v3/tag-input';
-import { Timeline, type TimelineEntry } from '@mediaon/design-system/v3/timeline';
-import { toast, Toaster } from '@mediaon/design-system/v3/toast';
+} from '@content-ventures/design-system/v3/table';
+import { TagInput } from '@content-ventures/design-system/v3/tag-input';
+import { Timeline, type TimelineEntry } from '@content-ventures/design-system/v3/timeline';
+import { toast, Toaster } from '@content-ventures/design-system/v3/toast';
 import { Col, Row, Shot, Shots, State, States } from '../stage';
 import x from './dados.module.css';
 

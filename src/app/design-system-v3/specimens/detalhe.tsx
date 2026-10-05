@@ -2,10 +2,10 @@
 
 import { Check, MoreHorizontal, X } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type ReactNode } from 'react';
-import { Badge, Count, type Tone } from '@mediaon/design-system/v3/badge';
-import { Button, IconButton } from '@mediaon/design-system/v3/button';
-import { Drawer, DrawerFrame } from '@mediaon/design-system/v3/drawer';
-import { Avatar, BrandMark } from '@mediaon/design-system/v3/identity';
+import { Badge, Count, type Tone } from '@content-ventures/design-system/v3/badge';
+import { Button, IconButton } from '@content-ventures/design-system/v3/button';
+import { Drawer, DrawerFrame } from '@content-ventures/design-system/v3/drawer';
+import { Avatar, BrandMark } from '@content-ventures/design-system/v3/identity';
 import {
   ActivityComposer,
   ActivityFeed,
@@ -15,16 +15,16 @@ import {
   type LeadOutcome,
   type NextActionDue,
   type StageKind,
-} from '@mediaon/design-system/v3/kanban';
-import { TextLink } from '@mediaon/design-system/v3/link';
-import { List, ListItem } from '@mediaon/design-system/v3/list-item';
-import { Menu } from '@mediaon/design-system/v3/menu';
-import { Dialog } from '@mediaon/design-system/v3/overlays';
-import { Select, type SelectOption } from '@mediaon/design-system/v3/select';
-import { DescriptionList } from '@mediaon/design-system/v3/structure';
-import { TagInput } from '@mediaon/design-system/v3/tag-input';
-import { Toaster, toast } from '@mediaon/design-system/v3/toast';
-import toastStyles from '@mediaon/design-system/v3/toast.module.css';
+} from '@content-ventures/design-system/v3/kanban';
+import { TextLink } from '@content-ventures/design-system/v3/link';
+import { List, ListItem } from '@content-ventures/design-system/v3/list-item';
+import { Menu } from '@content-ventures/design-system/v3/menu';
+import { Dialog } from '@content-ventures/design-system/v3/overlays';
+import { Select, type SelectOption } from '@content-ventures/design-system/v3/select';
+import { DescriptionList } from '@content-ventures/design-system/v3/structure';
+import { TagInput } from '@content-ventures/design-system/v3/tag-input';
+import { Toaster, toast } from '@content-ventures/design-system/v3/toast';
+import toastStyles from '@content-ventures/design-system/v3/toast.module.css';
 import { Shot, Shots, State, States } from '../stage';
 import d from './detalhe.module.css';
 

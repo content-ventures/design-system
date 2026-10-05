@@ -1,6 +1,6 @@
 # MediaOn DS V3 — Contrato
 
-Biblioteca: `src/components/ds-v3`. Catálogo: `http://localhost:3002/design-system`.
+Biblioteca: `src/components/ds-v3`. Catálogo: `http://localhost:3000/design-system`.
 **Fonte da verdade visual: o `/dashboardv3` aprovado** (lista, detalhe com Analytics, criação em 6 etapas,
 seletores de data, bloco de verba, diálogo de criação) e `src/app/dashboardv3/docs/auditoria-ui-ux.md`.
 Se este contrato e o dashboard divergirem, vale o dashboard — e o contrato é corrigido.
