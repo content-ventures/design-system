@@ -1016,3 +1016,21 @@
   position: relative;
   min-width: 0;
 }
+/* Encostada no fundo do shell: a altura útil abaixo do topo e do respiro de cima da área de
+   conteúdo, e a margem negativa cancela o respiro de baixo — o rodapé fica colado na janela. */
+.frame[data-docked] {
+  height: calc(100dvh - var(--topbar-h, 52px) - var(--content-pt, 28px));
+  margin-bottom: calc(var(--content-pb, 48px) * -1);
+}
+/* O rodapé encostado é uma faixa própria de 64 px, com fio em cima: as ações não colam na borda. */
+.frame[data-docked] .frameFoot {
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  padding: 10px 32px;
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+}
+.frame[data-docked][data-narrow] .frameFoot {
+  padding: 10px 16px;
+}

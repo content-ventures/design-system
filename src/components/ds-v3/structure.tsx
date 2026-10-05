@@ -1069,6 +1069,7 @@ export function FixedFrame({
   asideDefaultOpen = false,
   footer,
   height = '100%',
+  docked = false,
   stackBelow = 760,
   mainLabel = 'Conteúdo da etapa',
   className = '',
@@ -1085,6 +1086,11 @@ export function FixedFrame({
   /** Rodapé de ações; como função, recebe `narrow` (≤640: [←] [Salvar rascunho] [Principal]). */
   footer?: ReactNode | ((narrow: boolean) => ReactNode);
   height?: number | string;
+  /**
+   * Página de criação no shell: a moldura ocupa a altura útil e encosta no fundo da janela — o
+   * rodapé de ações fica colado embaixo, sem o respiro da área de conteúdo. Ignora `height`.
+   */
+  docked?: boolean;
   stackBelow?: number;
   mainLabel?: string;
   className?: string;
@@ -1097,7 +1103,8 @@ export function FixedFrame({
       className={`${s.frame} ${className}`}
       data-narrow={narrow || undefined}
       data-aside={aside ? true : undefined}
-      style={{ height }}
+      data-docked={docked || undefined}
+      style={docked ? undefined : { height }}
     >
       <div className={s.frameHead}>{typeof header === 'function' ? header(narrow) : header}</div>
       <div className={s.frameBody}>

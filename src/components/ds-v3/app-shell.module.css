@@ -596,7 +596,10 @@ button.groupLabel[aria-expanded='false'] svg {
   min-width: 0;
   max-width: var(--content-max);
   margin-inline: auto;
-  padding: 28px var(--page-gutter) 48px;
+  /* Respiro de cima e de baixo como variáveis: a moldura encostada (`FixedFrame docked`) as lê. */
+  --content-pt: 28px;
+  --content-pb: 48px;
+  padding: var(--content-pt) var(--page-gutter) var(--content-pb);
   container-type: inline-size;
   container-name: page;
 }
@@ -667,7 +670,9 @@ button.groupLabel[aria-expanded='false'] svg {
 }
 @container shell (max-width: 640px) {
   .content {
-    padding: 20px var(--page-gutter-sm) 40px;
+    --content-pt: 20px;
+    --content-pb: 40px;
+    padding: var(--content-pt) var(--page-gutter-sm) var(--content-pb);
   }
 }
 
