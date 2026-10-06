@@ -1,4 +1,4 @@
-# Pins de referência (pasta Pinterest “Media.ON”)
+# Referências visuais · Pinterest “Media.ON”
 
 Imagens em `/private/tmp/claude-501/-Users-joaovitor-Documents-ChatGPT-mediaon--claude-worktrees-design-system-v2-unreviewed-a6cd9b/7ac5858c-f1a7-4c4c-b3d0-4e1926a73131/scratchpad/pins/board/v/NN.jpg` (até 1800 px). Referência de gosto, não para copiar.
 

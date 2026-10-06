@@ -9,6 +9,7 @@
     "tokens": ["src/components/ds-v3/theme.module.css"],
     "components": ["src/components/ds-v3"],
     "assets": ["src/fonts"],
+    "references": [".21st/references/pins.md"],
     "instructions": [
       "AGENTS.md",
       "CLAUDE.md",
