@@ -13,6 +13,7 @@
     "src/components/ds-v3/**/*",
     "!src/components/ds-v3/**/*.test.ts",
     "!src/components/ds-v3/**/*.test.tsx",
+    "!src/components/ds-v3/docs/**/*",
     "src/fonts",
     "README.md",
     "CHANGELOG.md"
