@@ -6,9 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   LayoutDashboard,
-  ListChecks,
   Menu as MenuIcon,
-  PenLine,
   Search,
 } from 'lucide-react';
 import {
@@ -16,11 +14,9 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
-  type KeyboardEvent as ReactKeyboardEvent,
-  type MouseEvent as ReactMouseEvent,
   type RefObject,
 } from 'react';
-import { BrandMark, Button, ButtonGroup, Checkbox, IconButton, SearchField, Segmented } from '@content-ventures/design-system/v3';
+import { BrandMark, ButtonGroup, IconButton } from '@content-ventures/design-system/v3';
 import { inventory, normalizeSearch } from '../inventory';
 import { catalogItems, familyOf, type CatalogItem } from './families';
 import { specimens } from './specimens';
@@ -28,7 +24,7 @@ import c from './catalog.module.css';
 
 /* ——— Rotas por hash ——— */
 
-const PAGES = { 'visao-geral': 'Visão geral', inventario: 'Inventário' } as const;
+const PAGES = { 'visao-geral': 'Visão geral' } as const;
 type Page = keyof typeof PAGES;
 const isPage = (id: string): id is Page => id in PAGES;
 
@@ -49,89 +45,16 @@ const go = (id: string) => {
   window.location.hash = id;
 };
 
-/* ——— Revisão (localStorage 'mediaon-dsv3-item-reviews': { [id]: { reviewed, note } }) ——— */
+/* ——— Estado de implementação de cada item ——— */
 
-const REVIEW_KEY = 'mediaon-dsv3-item-reviews';
-type Review = { reviewed: boolean; note: string };
-type Reviews = Record<string, Review>;
-const NO_REVIEWS: Reviews = {};
-const reviewListeners = new Set<() => void>();
-let memo: { raw: string | null; value: Reviews } = { raw: null, value: NO_REVIEWS };
-/** Sem armazenamento (janela privada, bloqueio): a revisão vale só para esta aba. */
-let volatile: string | null | undefined;
-
-function parseReviews(raw: string | null): Reviews {
-  try {
-    const saved: unknown = JSON.parse(raw ?? '{}');
-    if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return NO_REVIEWS;
-    return Object.fromEntries(
-      Object.entries(saved as Record<string, unknown>).filter(
-        ([, value]) =>
-          typeof value === 'object' &&
-          value !== null &&
-          typeof (value as Review).reviewed === 'boolean' &&
-          typeof (value as Review).note === 'string',
-      ),
-    ) as Reviews;
-  } catch {
-    return NO_REVIEWS;
-  }
-}
-function readRaw(): string | null {
-  if (volatile !== undefined) return volatile;
-  try {
-    return localStorage.getItem(REVIEW_KEY);
-  } catch {
-    return null;
-  }
-}
-function reviewSnapshot(): Reviews {
-  const raw = readRaw();
-  if (raw !== memo.raw) memo = { raw, value: parseReviews(raw) };
-  return memo.value;
-}
-function subscribeReviews(callback: () => void) {
-  reviewListeners.add(callback);
-  const onStorage = (event: StorageEvent) => {
-    if (event.key === REVIEW_KEY || event.key === null) callback();
-  };
-  window.addEventListener('storage', onStorage);
-  return () => {
-    reviewListeners.delete(callback);
-    window.removeEventListener('storage', onStorage);
-  };
-}
-function saveReview(id: string, patch: Partial<Review>) {
-  const current = reviewSnapshot();
-  const next: Reviews = {
-    ...current,
-    [id]: { reviewed: current[id]?.reviewed ?? false, note: current[id]?.note ?? '', ...patch },
-  };
-  const raw = JSON.stringify(next);
-  try {
-    if (volatile !== undefined) throw new Error('volatile');
-    localStorage.setItem(REVIEW_KEY, raw);
-  } catch {
-    volatile = raw;
-  }
-  reviewListeners.forEach((listener) => listener());
-}
-function useReviews() {
-  return useSyncExternalStore(subscribeReviews, reviewSnapshot, () => NO_REVIEWS);
-}
-
-/* ——— Estado de cada item: revisado > pronto (tem prancha) > em desenho ——— */
-
-type ItemState = 'revisado' | 'pronto' | 'desenho';
-const stateOf = (id: string, reviews: Reviews): ItemState =>
-  reviews[id]?.reviewed ? 'revisado' : specimens[id] ? 'pronto' : 'desenho';
+type ItemState = 'pronto' | 'desenho';
+const stateOf = (id: string): ItemState => (specimens[id] ? 'pronto' : 'desenho');
 const STATE_LABEL: Record<ItemState, string> = {
-  revisado: 'Revisado',
   pronto: 'Pronto',
   desenho: 'Em desenho',
 };
 
-/** Marca de estado: aro (pronto), aro tracejado (em desenho), check verde (revisado). */
+/** Marca de estado: aro (pronto) ou aro tracejado (em desenho). */
 function Mark({ state, size = 14, label }: { state: ItemState; size?: number; label?: boolean }) {
   return (
     <svg
@@ -145,7 +68,6 @@ function Mark({ state, size = 14, label }: { state: ItemState; size?: number; la
       aria-hidden={label ? undefined : true}
     >
       <circle cx="7" cy="7" r="5.25" />
-      <path d="M4.6 7.1 6.3 8.8 9.5 5.3" pathLength={1} />
     </svg>
   );
 }
@@ -161,7 +83,6 @@ const isTyping = (target: EventTarget | null) =>
 
 function Sidebar({
   active,
-  reviews,
   query,
   onQuery,
   searchRef,
@@ -169,7 +90,6 @@ function Sidebar({
   onNavigate,
 }: {
   active: string;
-  reviews: Reviews;
   query: string;
   onQuery: (value: string) => void;
   searchRef: RefObject<HTMLInputElement | null>;
@@ -201,17 +121,15 @@ function Sidebar({
         : group.items,
     }))
     .filter((group) => group.items.length > 0);
-  const reviewed = catalogItems.filter((item) => reviews[item.id]?.reviewed).length;
-
   return (
     <>
       <div className={c.identity}>
         <a href="#visao-geral" className={c.brand} onClick={onNavigate}>
-          {/* Semente que desenha os arcos em azul (marca decorativa: o nome não é anunciado). */}
-          <BrandMark name="mediaon · DS" size="md" decorative />
+          {/* Semente estável da marca guarda-chuva (decorativa: o nome ao lado é anunciado). */}
+          <BrandMark name="content ventures · DS" size="md" decorative />
           <span className={c.brandText}>
-            <strong>MediaOn</strong>
-            <span>Design System V3</span>
+            <strong>Content Ventures</strong>
+            <span>Design System</span>
           </span>
         </a>
       </div>
@@ -244,16 +162,6 @@ function Sidebar({
             <LayoutDashboard aria-hidden="true" />
             <span className={c.itemText}>Visão geral</span>
           </a>
-          <a
-            href="#inventario"
-            className={c.item}
-            aria-current={active === 'inventario' ? 'page' : undefined}
-            onClick={onNavigate}
-          >
-            <ListChecks aria-hidden="true" />
-            <span className={c.itemText}>Inventário</span>
-            <span className={c.count}>{catalogItems.length}</span>
-          </a>
         </div>
         <div className={c.group}>
           <span className={c.groupLabel}>Biblioteca</span>
@@ -262,7 +170,6 @@ function Sidebar({
             const Icon = familyOf(group.id).icon;
             const expanded = Boolean(term) || (pinned[group.id] ?? group.id === activeFamily);
             const full = inventory.find((entry) => entry.id === group.id)?.items ?? group.items;
-            const allReviewed = full.every((item) => reviews[item.id]?.reviewed);
             return (
               <div key={group.id} className={c.family}>
                 <button
@@ -275,13 +182,13 @@ function Sidebar({
                 >
                   <Icon aria-hidden="true" />
                   <span className={c.itemText}>{familyOf(group.id).label}</span>
-                  {allReviewed ? <Mark state="revisado" label /> : <span className={c.count}>{full.length}</span>}
+                  <span className={c.count}>{full.length}</span>
                   <ChevronRight className={c.chevron} aria-hidden="true" />
                 </button>
                 <div id={`familia-${group.id}`} className={c.sub} data-open={expanded ? '' : undefined}>
                   <div className={c.subInner} inert={!expanded || undefined}>
                     {group.items.map((item) => {
-                      const state = stateOf(item.id, reviews);
+                      const state = stateOf(item.id);
                       return (
                         <a
                           key={item.id}
@@ -303,48 +210,23 @@ function Sidebar({
           })}
         </div>
       </nav>
-      <div className={c.footer}>
-        <div className={c.progressHead}>
-          <span>Revisados</span>
-          <span className={c.num}>
-            <strong>{reviewed}</strong> de {catalogItems.length}
-          </span>
-        </div>
-        <span
-          className={c.meter}
-          role="progressbar"
-          aria-label="Itens revisados"
-          aria-valuemin={0}
-          aria-valuemax={catalogItems.length}
-          aria-valuenow={reviewed}
-        >
-          <i style={{ width: `${(reviewed / catalogItems.length) * 100}%` }} />
-        </span>
-      </div>
     </>
   );
 }
 
 /* ——— Visão geral ——— */
 
-function Overview({ reviews }: { reviews: Reviews }) {
-  const counts = { revisado: 0, pronto: 0, desenho: 0 };
-  for (const item of catalogItems) counts[stateOf(item.id, reviews)] += 1;
-  const built = counts.revisado + counts.pronto;
+function Overview() {
+  const counts = { pronto: 0, desenho: 0 };
+  for (const item of catalogItems) counts[stateOf(item.id)] += 1;
   const total = catalogItems.length;
   const pct = (value: number) => `${Math.round((value / total) * 100)}%`;
-  const nextUp = catalogItems.find((item) => stateOf(item.id, reviews) === 'pronto');
   return (
     <div className={c.content}>
       <header className={c.pageHead}>
         <h1 id="ds-content" tabIndex={-1} className={c.title}>
           Visão geral
         </h1>
-        {nextUp && (
-          <Button variant="primary" trailingIcon={ArrowRight} onClick={() => go(nextUp.id)}>
-            Continuar revisão
-          </Button>
-        )}
       </header>
       <dl className={c.strip}>
         <div className={c.cell}>
@@ -356,20 +238,8 @@ function Overview({ reviews }: { reviews: Reviews }) {
           <dt>
             <Mark state="pronto" /> Prontos
           </dt>
-          <dd className={c.figure}>{built}</dd>
-          <dd className={c.cellFoot}>{pct(built)}</dd>
-        </div>
-        <div className={c.cell}>
-          <dt>
-            <Mark state="revisado" /> Revisados
-          </dt>
-          <dd className={c.figure}>{counts.revisado}</dd>
-          <dd className={c.cellFoot}>
-            <span className={c.meter} aria-hidden="true">
-              <i style={{ width: `${(counts.revisado / total) * 100}%` }} />
-            </span>
-            {pct(counts.revisado)}
-          </dd>
+          <dd className={c.figure}>{counts.pronto}</dd>
+          <dd className={c.cellFoot}>{pct(counts.pronto)}</dd>
         </div>
         <div className={c.cell}>
           <dt>
@@ -383,23 +253,13 @@ function Overview({ reviews }: { reviews: Reviews }) {
       <div className={c.families}>
         {inventory.map((group) => {
           const Icon = familyOf(group.id).icon;
-          const states = group.items.map((item) => stateOf(item.id, reviews));
-          const done = states.filter((state) => state === 'revisado').length;
-          const target =
-            group.items.find((item) => stateOf(item.id, reviews) === 'pronto') ?? group.items[0];
+          const target = group.items.find((item) => stateOf(item.id) === 'pronto') ?? group.items[0];
           return (
             <a key={group.id} href={`#${target?.id ?? ''}`} className={c.familyCard}>
               <span className={c.familyHead}>
                 <Icon aria-hidden="true" />
                 <strong>{familyOf(group.id).label}</strong>
-                <span className={c.num}>
-                  <b>{done}</b> de {group.items.length}
-                </span>
-              </span>
-              <span className={c.segments} aria-hidden="true">
-                {states.map((state, index) => (
-                  <i key={group.items[index]?.id} data-state={state} />
-                ))}
+                <span className={c.num}>{group.items.length} itens</span>
               </span>
             </a>
           );
@@ -409,177 +269,9 @@ function Overview({ reviews }: { reviews: Reviews }) {
   );
 }
 
-/* ——— Inventário ——— */
-
-type Filter = 'todos' | 'revisar' | 'revisados' | 'desenho';
-
-function InventoryPage({ reviews }: { reviews: Reviews }) {
-  const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState<Filter>('todos');
-  const term = normalizeSearch(query);
-  const rows = catalogItems.filter((item) => {
-    const state = stateOf(item.id, reviews);
-    if (filter === 'revisar' && state !== 'pronto') return false;
-    if (filter === 'revisados' && state !== 'revisado') return false;
-    if (filter === 'desenho' && state !== 'desenho') return false;
-    return (
-      !term ||
-      normalizeSearch(`${item.label} ${item.keywords} ${item.id} ${item.groupLabel}`).includes(term)
-    );
-  });
-  const onRow = (event: ReactMouseEvent<HTMLTableRowElement>, id: string) => {
-    if ((event.target as HTMLElement).closest('a, button, input, label')) return;
-    go(id);
-  };
-  return (
-    <div className={c.content}>
-      <header className={c.pageHead}>
-        <div className={c.pageHeadText}>
-          <h1 id="ds-content" tabIndex={-1} className={c.title}>
-            Inventário
-          </h1>
-          <p className={c.subtitle}>
-            {rows.length === catalogItems.length
-              ? `${catalogItems.length} itens em ${inventory.length} famílias`
-              : `${rows.length} de ${catalogItems.length} itens`}
-          </p>
-        </div>
-      </header>
-      <div className={c.toolbar}>
-        <div className={c.toolbarSearch}>
-          <SearchField
-            size="sm"
-            value={query}
-            onValueChange={setQuery}
-            placeholder="Item ou família"
-            label="Filtrar inventário"
-          />
-        </div>
-        <Segmented
-          size="sm"
-          label="Recorte"
-          value={filter}
-          onChange={setFilter}
-          options={[
-            { value: 'todos', label: 'Todos' },
-            { value: 'revisar', label: 'A revisar' },
-            { value: 'revisados', label: 'Revisados' },
-            { value: 'desenho', label: 'Em desenho' },
-          ]}
-        />
-      </div>
-      <div className={c.tableFrame}>
-        <table className={c.table}>
-          <colgroup>
-            <col />
-            <col className={c.colFamily} />
-            <col className={c.colStatus} />
-            <col className={c.checkCol} />
-          </colgroup>
-          <thead>
-            <tr>
-              <th scope="col">Item</th>
-              <th scope="col">Família</th>
-              <th scope="col">Status</th>
-              <th scope="col" className={c.checkCol}>
-                Revisado
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.length === 0 && (
-              <tr className={c.emptyRow}>
-                <td colSpan={4}>
-                  <span>{term ? `Nada encontrado para “${query.trim()}”` : 'Nenhum item neste recorte'}</span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      setQuery('');
-                      setFilter('todos');
-                    }}
-                  >
-                    Limpar filtros
-                  </Button>
-                </td>
-              </tr>
-            )}
-            {rows.map((item) => {
-              const built = Boolean(specimens[item.id]);
-              const review = reviews[item.id];
-              return (
-                <tr key={item.id} onClick={(event) => onRow(event, item.id)}>
-                  <td className={c.cellItem}>
-                    <a href={`#${item.id}`}>{item.label}</a>
-                  </td>
-                  <td className={c.cellFamily}>{item.groupLabel}</td>
-                  <td className={c.cellStatus}>
-                    <span className={c.status} data-built={built ? '' : undefined}>
-                      {built ? 'Pronto' : 'Em desenho'}
-                    </span>
-                  </td>
-                  <td className={c.checkCol}>
-                    <Checkbox
-                      aria-label={`Revisado: ${item.label}`}
-                      checked={Boolean(review?.reviewed)}
-                      onChange={(event) => saveReview(item.id, { reviewed: event.target.checked })}
-                    />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
 /* ——— Página do item ——— */
 
-function NoteField({ value, onSave }: { value: string; onSave: (note: string) => void }) {
-  const [draft, setDraft] = useState(value);
-  const [base, setBase] = useState(value);
-  const cancel = useRef(false);
-  // A nota mudou fora daqui (outra aba): acompanha enquanto não há edição em curso.
-  if (value !== base) {
-    setBase(value);
-    if (draft === base) setDraft(value);
-  }
-  const commit = () => {
-    if (cancel.current) {
-      cancel.current = false;
-      setDraft(value);
-      return;
-    }
-    const note = draft.trim();
-    setDraft(note);
-    if (note !== value) onSave(note);
-  };
-  return (
-    <label className={c.note} data-filled={draft ? '' : undefined}>
-      <PenLine aria-hidden="true" />
-      <input
-        value={draft}
-        maxLength={200}
-        placeholder="Adicionar nota"
-        aria-label="Nota da revisão"
-        onChange={(event) => setDraft(event.target.value)}
-        onBlur={commit}
-        onKeyDown={(event: ReactKeyboardEvent<HTMLInputElement>) => {
-          if (event.key === 'Enter') event.currentTarget.blur();
-          if (event.key === 'Escape') {
-            event.stopPropagation();
-            cancel.current = true;
-            event.currentTarget.blur();
-          }
-        }}
-      />
-    </label>
-  );
-}
-
-function ItemPage({ item, review }: { item: CatalogItem; review?: Review }) {
+function ItemPage({ item }: { item: CatalogItem }) {
   const Specimen = specimens[item.id];
   const index = catalogItems.findIndex((entry) => entry.id === item.id);
   const prev = catalogItems[index - 1];
@@ -587,18 +279,9 @@ function ItemPage({ item, review }: { item: CatalogItem; review?: Review }) {
   return (
     <div className={c.content}>
       <header className={c.itemHead}>
-        <div className={c.itemTitleRow}>
-          <h1 id="ds-content" tabIndex={-1} className={c.title}>
-            {item.label}
-          </h1>
-          <Checkbox
-            className={c.reviewToggle}
-            label="Revisado"
-            checked={Boolean(review?.reviewed)}
-            onChange={(event) => saveReview(item.id, { reviewed: event.target.checked })}
-          />
-        </div>
-        <NoteField value={review?.note ?? ''} onSave={(note) => saveReview(item.id, { note })} />
+        <h1 id="ds-content" tabIndex={-1} className={c.title}>
+          {item.label}
+        </h1>
       </header>
       <div className={c.specimen} data-specimen>
         {Specimen ? (
@@ -642,7 +325,6 @@ function ItemPage({ item, review }: { item: CatalogItem; review?: Review }) {
 
 export function CatalogV3() {
   const active = useSyncExternalStore(subscribeHash, readHash, () => 'visao-geral');
-  const reviews = useReviews();
   const [query, setQuery] = useState('');
   const [navOpen, setNavOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -662,7 +344,7 @@ export function CatalogV3() {
   // Nova página: topo, título da aba e item ativo visível no menu.
   useEffect(() => {
     window.scrollTo({ top: 0 });
-    document.title = `${item?.label ?? (isPage(active) ? PAGES[active] : 'Visão geral')} · Design System V3`;
+    document.title = `${item?.label ?? (isPage(active) ? PAGES[active] : 'Visão geral')} · Content Ventures DS`;
     const nav = navRef.current;
     const reveal = () => {
       const el = nav?.querySelector<HTMLElement>(`[data-nav-item="${active}"]`);
@@ -754,7 +436,6 @@ export function CatalogV3() {
       <aside ref={side} id="ds-nav" className={c.side} aria-label="Navegação do catálogo">
         <Sidebar
           active={active}
-          reviews={reviews}
           query={query}
           onQuery={setQuery}
           searchRef={searchRef}
@@ -815,9 +496,8 @@ export function CatalogV3() {
           )}
         </header>
         <main className={c.page} data-paper>
-          {active === 'visao-geral' && <Overview reviews={reviews} />}
-          {active === 'inventario' && <InventoryPage reviews={reviews} />}
-          {item && <ItemPage key={item.id} item={item} review={reviews[item.id]} />}
+          {active === 'visao-geral' && <Overview />}
+          {item && <ItemPage key={item.id} item={item} />}
         </main>
       </div>
     </div>

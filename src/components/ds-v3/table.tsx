@@ -58,6 +58,13 @@ const reduced = () =>
 const toSet = (value?: ReadonlySet<string> | readonly string[]) =>
   value instanceof Set ? (value as ReadonlySet<string>) : new Set<string>(value ?? []);
 const isBlank = (node: ReactNode) => node === null || node === undefined || node === false || node === '';
+const isInteractiveTarget = (target: EventTarget | null) =>
+  target instanceof Element &&
+  Boolean(
+    target.closest(
+      'a[href], button, input, select, textarea, label, summary, [role="button"], [role="link"], [role="switch"], [role="checkbox"], [role="radio"], [data-row-interactive]',
+    ),
+  );
 
 /** Largura dos blocos do esqueleto: varia por linha e coluna, sem aleatoriedade (SSR estável). */
 const skeletonWidth = (row: number, col: number) => 42 + ((row * 37 + col * 23) % 34);
@@ -445,10 +452,31 @@ export function DataTable<Row>({
                     data-pending={pending?.has(key) || undefined}
                     data-exiting={isExiting || undefined}
                     aria-hidden={isExiting || undefined}
-                    onClick={onRowClick && !isExiting ? () => onRowClick(row) : undefined}
+                    aria-label={onRowClick && rowLabel ? rowLabel(row) : undefined}
+                    tabIndex={onRowClick && !isExiting ? 0 : undefined}
+                    onClick={
+                      onRowClick && !isExiting
+                        ? (event) => {
+                            if (!isInteractiveTarget(event.target)) onRowClick(row);
+                          }
+                        : undefined
+                    }
+                    onKeyDown={
+                      onRowClick && !isExiting
+                        ? (event) => {
+                            if (
+                              event.target !== event.currentTarget ||
+                              (event.key !== 'Enter' && event.key !== ' ')
+                            )
+                              return;
+                            event.preventDefault();
+                            onRowClick(row);
+                          }
+                        : undefined
+                    }
                   >
                     {selectable && (
-                      <td className={s.check} onClick={(event) => event.stopPropagation()}>
+                      <td className={s.check}>
                         {exitWrap(
                           isExiting,
                           <Checkbox
@@ -536,7 +564,6 @@ export function DataTable<Row>({
     </div>
   );
 }
-
 /**
  * Menu “Colunas”: liga e desliga colunas sem fechar o painel (cada item é uma caixa de seleção).
  * Setas percorrem, Espaço/Enter alternam, Escape fecha e devolve o foco ao botão.

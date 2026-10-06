@@ -2907,7 +2907,11 @@ function BlockEditor() {
             />
           </div>
         </aside>
-        <div ref={stageRef} className={p.canvas} onClick={(event) => event.target === event.currentTarget && setSelected('')}>
+        <div
+          ref={stageRef}
+          className={p.canvas}
+          onPointerDown={(event) => event.target === event.currentTarget && setSelected('')}
+        >
           <div ref={pageRef} className={p.page} style={{ width: canvasWidth }} data-narrow={narrow || undefined}>
             {doc.map((block) => {
               const meta = BLOCK_META[block.kind];

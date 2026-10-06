@@ -4,7 +4,8 @@
  * marcada para não virar uma linha só com rótulo.
  */
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 
 import { DataTable, type Column } from './table';
 
@@ -47,5 +48,44 @@ describe('DataTable — título do cartão', () => {
     expect(cellOf('Inverno', 'name')).toHaveAttribute('data-title');
     expect(cellOf('Inverno', 'budget')).not.toHaveAttribute('data-blank');
     expect(cellOf('Inverno', 'actions')).not.toHaveAttribute('data-title');
+  });
+
+  it('abre a linha por clique e teclado, sem capturar controles internos', async () => {
+    const user = userEvent.setup();
+    const onRowClick = vi.fn();
+    const onAction = vi.fn();
+    const columns: Column<Row>[] = [
+      { key: 'name', header: 'Campanha', render: (row) => row.name },
+      {
+        key: 'actions',
+        header: 'Ações',
+        render: () => (
+          <button type="button" onClick={onAction}>
+            Editar
+          </button>
+        ),
+      },
+    ];
+    render(
+      <DataTable
+        label="Campanhas"
+        rows={ROWS}
+        rowKey={(row) => row.id}
+        rowLabel={(row) => `Abrir ${row.name}`}
+        columns={columns}
+        onRowClick={onRowClick}
+      />,
+    );
+
+    const row = screen.getByText('Verão').closest('tr') as HTMLElement;
+    await user.click(screen.getAllByRole('button', { name: 'Editar' })[0]!);
+    expect(onAction).toHaveBeenCalledOnce();
+    expect(onRowClick).not.toHaveBeenCalled();
+
+    await user.click(row);
+    expect(onRowClick).toHaveBeenCalledWith(ROWS[0]);
+    row.focus();
+    await user.keyboard('{Enter}');
+    expect(onRowClick).toHaveBeenCalledTimes(2);
   });
 });

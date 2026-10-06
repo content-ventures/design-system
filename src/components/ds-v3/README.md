@@ -1,9 +1,8 @@
-# MediaOn DS V3 — Contrato
+# Content Ventures DS V3 — Contrato visual
 
 Biblioteca: `src/components/ds-v3`. Catálogo: `http://localhost:3000/design-system`.
-**Fonte da verdade visual: o `/dashboardv3` aprovado** (lista, detalhe com Analytics, criação em 6 etapas,
-seletores de data, bloco de verba, diálogo de criação) e `src/app/dashboardv3/docs/auditoria-ui-ux.md`.
-Se este contrato e o dashboard divergirem, vale o dashboard — e o contrato é corrigido.
+**Fontes da verdade:** os tokens de `theme.module.css`, este contrato e as pranchas aprovadas no
+catálogo. Se uma aplicação divergir deles, a correção começa aqui e depois chega ao produto pelo pacote.
 
 ---
 
@@ -241,9 +240,8 @@ responsável, origem e atividades; `CampaignKanbanCard` usa a mesma base com cam
 portal, verba e período. Não duplicar CSS do cartão nas telas. Status de campanhas só avançam
 pelas regras e ações do produto; o arrasto livre do exemplo de leads não substitui esse fluxo.
 
-- **Página do item:** família (caption `--muted`) → título `--t-page` → à direita, `Checkbox` “Revisado”
-  (chave `mediaon-dsv3-item-reviews`) → pranchas → anterior/próximo. Sem lede, sem abas de uso, sem
-  “Quando usar/Evitar”.
+- **Página do item:** família (caption `--muted`) → título `--t-page` → pranchas → anterior/próximo.
+  Sem lede, sem abas de uso, sem “Quando usar/Evitar”.
 - **Ordem das pranchas:** 1) **Em contexto** (vivo, interativo, copy real); 2) **Variantes**; 3) **Estados** (matriz parada com `data-force`); 4) **Celular** quando o layout muda.
 - `Shot` com `title` de 1–3 palavras e **sem `description`**. Legendas por `Note`/`SpecRows` de 1–3
   palavras: Repouso, Hover, Pressionado, Foco, Selecionado, Indisponível, Carregando, Inválido.

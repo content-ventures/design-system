@@ -329,11 +329,16 @@ export function MultiSelect({
             ))}
             {rest.length > 0 && (
               <Tooltip content={rest.map(labelOf).join(', ')}>
-                <span className={s.more} onClick={() => (open ? close() : show())}>
+                <button
+                  type="button"
+                  className={s.more}
+                  aria-label={`Mostrar mais ${rest.length}: ${rest.map(labelOf).join(', ')}`}
+                  onClick={() => (open ? close() : show())}
+                >
                   <Count label={`Mais ${rest.length}: ${rest.map(labelOf).join(', ')}`}>
                     +{rest.length}
                   </Count>
-                </span>
+                </button>
               </Tooltip>
             )}
           </span>

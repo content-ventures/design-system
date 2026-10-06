@@ -836,7 +836,7 @@ function DeliverySwitch({ row, onChange }: { row: Campaign; onChange: (status: S
         : 'Retomar a veiculação'
     : `${STATUS[row.status].label}: veiculação indisponível`;
   return (
-    <span className={t.switchCell} onClick={(event) => event.stopPropagation()}>
+    <span className={t.switchCell}>
       <Tooltip content={help}>
         <span className={t.switchHit}>
           <Switch
@@ -1226,9 +1226,10 @@ function CampaignListing({
       width: 118,
       skeleton: 'none',
       render: (row) => (
-        <span onClick={(event) => event.stopPropagation()}>
-          <RowActions label={`Ações de ${row.name}`} actions={rowActionsOf(row, (id) => setConfirm([id]))} />
-        </span>
+        <RowActions
+          label={`Ações de ${row.name}`}
+          actions={rowActionsOf(row, (id) => setConfirm([id]))}
+        />
       ),
     },
   ];

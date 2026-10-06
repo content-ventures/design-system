@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "project": {
+    "name": "@content-ventures/design-system",
+    "productType": "design-system",
+    "stack": ["nextjs", "react", "css-modules"]
+  },
+  "sources": {
+    "tokens": ["src/components/ds-v3/theme.module.css"],
+    "components": ["src/components/ds-v3"],
+    "assets": ["src/fonts"],
+    "instructions": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      "CONTRIBUTING.md",
+      "src/AGENTS.md",
+      "src/components/ds-v3/README.md"
+    ]
+  },
+  "design": {
+    "colorMode": "light-dark-system",
+    "colors": {
+      "source": "semantic CSS custom properties scoped by ThemeV3",
+      "accent": "blue",
+      "status": ["green", "teal", "violet", "amber", "orange", "red", "gray"]
+    },
+    "typography": {
+      "family": "Inter",
+      "weights": [400, 500, 600],
+      "source": "src/components/ds-v3/font.ts"
+    },
+    "spacing": { "base": 4, "unit": "px" },
+    "radius": { "controls": "8px", "surfaces": "10px", "layers": "16px" },
+    "shadows": { "rule": "only floating layers use shadows" },
+    "motion": {
+      "duration": "120-280ms",
+      "reducedMotion": true,
+      "rule": "short and functional"
+    },
+    "density": "compact"
+  },
+  "components": {
+    "installed": ["src/components/ds-v3"],
+    "preferredPrimitives": ["@content-ventures/design-system/v3"],
+    "patterns": ["library-first", "catalog-specimen", "semantic-tokens", "public-exports"]
+  },
+  "constraints": {
+    "must": [
+      "Search the public design-system API before creating UI",
+      "Create reusable UI in the library before consuming it in an application",
+      "Use ThemeV3 semantic tokens and public components",
+      "Include accessible keyboard behavior, responsive states, catalog specimen and tests",
+      "Keep applications connected to the package instead of copying source"
+    ],
+    "avoid": [
+      "Application-local visual primitives",
+      "Copied component or CSS source",
+      "Hardcoded product colors, fonts, spacing, radii, shadows or motion",
+      "Undocumented deep imports",
+      "Decorative gradients, glow, glass effects or resting shadows"
+    ]
+  },
+  "decisions": [
+    {
+      "date": "2026-10-06",
+      "decision": "The Content Ventures design system is the single source of truth for reusable visual UI across all products and coding agents.",
+      "reason": "Components, tokens and CSS must evolve once and remain consistent in every consuming application."
+    },
+    {
+      "date": "2026-10-06",
+      "decision": "The repository combines the reusable library with its visual catalog and verification harness.",
+      "reason": "A component is validated in isolation before product pages consume it."
+    },
+    {
+      "date": "2026-10-06",
+      "decision": "The catalog navigates directly through component families and search, without inventory or review-tracking workflows.",
+      "reason": "The harness documents and demonstrates the library; approval tracking belongs outside the design-system interface."
+    }
+  ],
+  "evidence": [
+    { "fact": "design.tokens", "source": "src/components/ds-v3/theme.module.css" },
+    { "fact": "design.contract", "source": "src/components/ds-v3/README.md" },
+    { "fact": "design.components", "source": "src/components/ds-v3/index.ts" },
+    { "fact": "design.harness", "source": "src/app/design-system-v3" },
+    { "fact": "project.instructions", "source": "AGENTS.md" },
+    { "fact": "project.stack:nextjs", "source": "package.json" },
+    { "fact": "project.stack:react", "source": "package.json" }
+  ],
+  "generatedAt": "2026-10-06T00:00:00.000-03:00"
+}

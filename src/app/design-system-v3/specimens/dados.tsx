@@ -454,7 +454,7 @@ function DeliverySwitch({
         : 'Retomar a veiculação'
     : `${STATUS[row.status].label}: veiculação indisponível`;
   return (
-    <span className={x.switchCell} onClick={(event) => event.stopPropagation()}>
+    <span className={x.switchCell}>
       <Tooltip content={help}>
         <span className={x.switchHit}>
           <Switch

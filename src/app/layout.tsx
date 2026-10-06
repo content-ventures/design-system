@@ -6,11 +6,11 @@ import { ThemeV3 } from '../components/ds-v3/theme';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Design System · MediaOn',
-  description: 'Catálogo do DS V3: tokens, componentes, padrões e templates do MediaOn.',
+  title: 'Design System · Content Ventures',
+  description: 'Biblioteca oficial de tokens, componentes e padrões da Content Ventures.',
 };
 
-/** Tokens e fonte do V3 valem em todo o app do catálogo, como no app oficial. */
+/** Tokens e fonte do V3 valem em todo o harness visual. */
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="pt-BR" className={interV3.variable}>

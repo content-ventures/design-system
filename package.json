@@ -1,11 +1,28 @@
 {
   "name": "@content-ventures/design-system",
   "version": "0.1.0",
+  "description": "Biblioteca visual, tokens e harness oficial dos produtos da Content Ventures.",
   "private": true,
   "type": "module",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/content-ventures/design-system.git"
+  },
+  "files": [
+    "src/components/ds-v3/**/*",
+    "!src/components/ds-v3/**/*.test.ts",
+    "!src/components/ds-v3/**/*.test.tsx",
+    "src/fonts",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "packageManager": "pnpm@10.19.0",
   "engines": {
-    "node": "24.x"
+    "node": ">=20.9.0"
   },
   "exports": {
     ".": "./src/components/ds-v3/index.ts",
@@ -13,7 +30,7 @@
     "./v3/icons": "./src/components/ds-v3/icons.ts",
     "./v3/*.module.css": "./src/components/ds-v3/*.module.css",
     "./v3/*": "./src/components/ds-v3/*.tsx",
-    "./catalog": "./src/app/design-system-v3/catalog.tsx"
+    "./package.json": "./package.json"
   },
   "scripts": {
     "dev": "next dev",
@@ -21,7 +38,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "peerDependencies": {
     "lucide-react": ">=0.462.0",

@@ -288,7 +288,7 @@
   bottom: 8px;
 }
 
-/* Marca de estado: aro = pronto · aro tracejado = em desenho · check verde = revisado. */
+/* Marca de estado: aro = pronto · aro tracejado = em desenho. */
 .mark {
   flex-shrink: 0;
   overflow: visible;
@@ -301,60 +301,8 @@
     fill var(--dur-1) var(--ease-out),
     stroke var(--dur-1) var(--ease-out);
 }
-.mark path {
-  fill: none;
-  stroke: var(--on-accent);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  transition: stroke-dashoffset var(--dur-2) var(--ease-out);
-}
 .mark[data-state='desenho'] circle {
   stroke-dasharray: 2.06 2.06;
-}
-.mark[data-state='revisado'] circle {
-  fill: var(--green-dot);
-  stroke: var(--green-dot);
-}
-.mark[data-state='revisado'] path {
-  stroke-dashoffset: 0;
-  transition-delay: 60ms;
-}
-
-.footer {
-  flex-shrink: 0;
-  display: grid;
-  gap: 8px;
-  padding: 14px 19px 16px;
-  border-top: 1px solid var(--line);
-}
-.progressHead {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  font: var(--t-caption-strong);
-  color: var(--muted);
-}
-.progressHead strong {
-  font-weight: 500;
-  color: var(--ink);
-}
-.meter {
-  position: relative;
-  display: block;
-  height: 4px;
-  border-radius: var(--r-full);
-  background: var(--g-100);
-  overflow: hidden;
-}
-.meter i {
-  position: absolute;
-  inset: 0 auto 0 0;
-  border-radius: inherit;
-  background: var(--green-dot);
-  transition: width var(--dur-3) var(--ease-out);
 }
 
 /* ——— Coluna principal e topo ——— */
@@ -471,7 +419,7 @@
 /* ——— Visão geral ——— */
 .strip {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
@@ -512,10 +460,6 @@
   font: var(--t-caption);
   color: var(--muted);
   font-variant-numeric: tabular-nums;
-}
-.cellFoot .meter {
-  flex: 1;
-  max-width: 160px;
 }
 .sectionTitle {
   margin: 32px 0 12px;
@@ -576,248 +520,10 @@
   color: var(--muted);
   white-space: nowrap;
 }
-.familyHead b {
-  font-weight: 500;
-  color: var(--ink);
-}
-.segments {
-  display: flex;
-  gap: 2px;
-  height: 6px;
-}
-.segments i {
-  flex: 1;
-  border-radius: 1.5px;
-  background: var(--g-100);
-  transition: background var(--dur-2) var(--ease-out);
-}
-.segments i[data-state='pronto'] {
-  background: var(--g-300);
-}
-.segments i[data-state='revisado'] {
-  background: var(--green-dot);
-}
-
-/* ——— Inventário ——— */
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-.toolbarSearch {
-  width: 280px;
-}
-.tableFrame {
-  min-width: 0;
-  padding: 6px 6px 2px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--paper);
-}
-.table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: separate;
-  border-spacing: 0;
-  font: var(--t-body);
-  color: var(--text);
-}
-.table th {
-  height: 38px;
-  padding: 0 12px;
-  font: var(--t-caption-strong);
-  color: var(--muted);
-  text-align: left;
-  white-space: nowrap;
-  background: var(--g-50);
-}
-.table th:first-child {
-  border-radius: var(--r-md) 0 0 var(--r-md);
-}
-.table th:last-child {
-  border-radius: 0 var(--r-md) var(--r-md) 0;
-}
-.table td {
-  height: 44px;
-  padding: 0 12px;
-  vertical-align: middle;
-  box-shadow: inset 0 -1px 0 var(--line-soft);
-  transition: background var(--dur-1) var(--ease-out);
-}
-.table tbody tr:last-child td {
-  box-shadow: none;
-}
-.table tbody tr {
-  cursor: pointer;
-}
-.table tbody tr:hover td {
-  background: var(--g-25);
-}
-.table tbody tr:active td {
-  background: var(--g-50);
-}
-.cellItem a {
-  border-radius: var(--r-xs);
-  font: var(--t-body-strong);
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-underline-offset: 3px;
-  transition: text-decoration-color var(--dur-1) var(--ease-out);
-}
-.cellItem a:hover {
-  text-decoration-color: var(--g-300);
-}
-.cellFamily {
-  white-space: nowrap;
-}
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  white-space: nowrap;
-}
-.status::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--gray-dot);
-}
-.status[data-built]::before {
-  background: var(--green-dot);
-}
-.colFamily {
-  width: 24%;
-}
-.colStatus {
-  width: 18%;
-}
-.checkCol {
-  width: 104px;
-}
-.table td.checkCol > label {
-  vertical-align: middle;
-}
-.emptyRow {
-  cursor: default !important;
-}
-.emptyRow td {
-  height: auto;
-  padding: 40px 16px;
-  text-align: center;
-  color: var(--muted);
-}
-.emptyRow:hover td {
-  background: none !important;
-}
-.emptyRow span {
-  display: block;
-  margin-bottom: 8px;
-}
 
 /* ——— Página do item ——— */
 .itemHead {
-  display: grid;
-  gap: 4px;
   margin-bottom: 24px;
-}
-.itemTitleRow {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-}
-.itemTitleRow .title {
-  flex: 1;
-}
-/* “Revisado”: o checkbox da biblioteca num controle de 32 px. Marcado = seleção grande (b-25 + b-300). */
-.reviewToggle.reviewToggle {
-  flex-shrink: 0;
-  align-items: center;
-  gap: 8px;
-  height: var(--h-sm);
-  padding: 0 12px 0 9px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-md);
-  background: var(--paper);
-  box-shadow: var(--shadow-xs);
-  transition:
-    background-color var(--dur-1) var(--ease-out),
-    border-color var(--dur-1) var(--ease-out),
-    transform var(--dur-1) var(--ease-out);
-}
-.reviewToggle.reviewToggle > span {
-  margin-top: 0;
-}
-.reviewToggle.reviewToggle:hover {
-  background: var(--g-25);
-  border-color: var(--line-hover);
-}
-.reviewToggle.reviewToggle:active {
-  transform: scale(var(--press-scale));
-}
-.reviewToggle.reviewToggle:has(input:checked) {
-  background: var(--select-bg);
-  border-color: var(--select-line);
-  box-shadow: none;
-}
-.reviewToggle.reviewToggle:has(input:focus-visible) {
-  outline: 2px solid var(--focus-color);
-  outline-offset: 2px;
-}
-.reviewToggle.reviewToggle input:focus-visible + span {
-  outline: none;
-}
-.note {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: min(560px, calc(100% + 8px));
-  height: 30px;
-  margin-left: -9px;
-  padding: 0 8px;
-  border: 1px solid transparent;
-  border-radius: var(--r-md);
-  color: var(--icon-quiet);
-  cursor: text;
-  transition:
-    background var(--dur-1) var(--ease-out),
-    border-color var(--dur-1) var(--ease-out),
-    box-shadow var(--dur-2) var(--ease-out),
-    color var(--dur-1) var(--ease-out);
-}
-.note:hover {
-  background: var(--paper-hover);
-}
-.note:focus-within {
-  background: var(--paper);
-  border-color: var(--b-500);
-  box-shadow: var(--ring-field);
-  color: var(--icon-rest);
-}
-.note[data-filled] {
-  color: var(--icon-rest);
-}
-.note svg {
-  width: 14px;
-  height: 14px;
-}
-.note input {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  font: var(--t-body);
-  color: var(--text);
-  text-overflow: ellipsis;
-}
-.note input::placeholder {
-  color: var(--subtle);
 }
 .specimen {
   min-width: 0;
@@ -962,6 +668,9 @@
   .cell:nth-child(n + 3) {
     border-top: 1px solid var(--line);
   }
+  .cell:last-child:nth-child(3) {
+    grid-column: 1 / -1;
+  }
 }
 @media (max-width: 760px) {
   .top {
@@ -974,80 +683,6 @@
   .title {
     font-size: 22px;
     line-height: 30px;
-  }
-  .reviewToggle.reviewToggle {
-    margin-top: -1px;
-  }
-  .toolbarSearch {
-    flex: 1 1 100%;
-    width: auto;
-  }
-  /* Tabela vira lista: nome em cima, família e status embaixo, revisão à direita. */
-  .table,
-  .table tbody {
-    display: block;
-  }
-  .table thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-  .table tbody tr {
-    display: grid;
-    grid-template-columns: max-content max-content minmax(0, 1fr) auto;
-    grid-template-areas:
-      'item item item check'
-      'family status . check';
-    column-gap: 10px;
-    row-gap: 2px;
-    padding: 10px 6px 10px 10px;
-    border-radius: var(--r-md);
-    box-shadow: inset 0 -1px 0 var(--line-soft);
-    transition: background var(--dur-1) var(--ease-out);
-  }
-  .table tbody tr:last-child {
-    box-shadow: none;
-  }
-  .table tbody tr:hover {
-    background: var(--g-25);
-  }
-  .table td {
-    display: block;
-    height: auto;
-    padding: 0;
-    box-shadow: none !important;
-    background: none !important;
-  }
-  .cellItem {
-    grid-area: item;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .cellFamily {
-    grid-area: family;
-    font: var(--t-small);
-    color: var(--muted);
-  }
-  .cellStatus {
-    grid-area: status;
-    font: var(--t-small);
-    color: var(--muted);
-  }
-  .table td.checkCol {
-    grid-area: check;
-    align-self: center;
-    width: auto;
-    padding: 0 4px;
-  }
-  .emptyRow {
-    display: block !important;
-  }
-  .emptyRow td {
-    padding: 32px 16px;
   }
 }
 @media (max-width: 640px) {

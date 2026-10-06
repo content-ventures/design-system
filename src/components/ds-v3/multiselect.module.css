@@ -173,6 +173,12 @@
   background: var(--g-75);
 }
 .more {
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  background: transparent;
+  border: 0;
+  appearance: none;
   display: inline-flex;
   flex-shrink: 0;
   pointer-events: auto;
