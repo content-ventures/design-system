@@ -1,0 +1,351 @@
+/*
+ * Toolbar — botões fantasma de 32 (md) ou 28 (sm), raio de controle sm, fio de 1 px entre grupos.
+ * Ligado = azul suave (b-50); menu aberto = g-75; indisponível esmaece a 45% e continua focável.
+ * Foco recuado (−2 px): a barra recorta o que transborda para medir o “Mais”.
+ * Cada :hover / :active / :focus-visible tem o gêmeo [data-force] das pranchas.
+ */
+.toolbar,
+.button {
+  --tb-h: var(--h-sm);
+  --tb-icon: var(--icon-md);
+  --tb-gap: 2px;
+}
+.toolbar[data-size='sm'],
+.button[data-size='sm'] {
+  /* 28 px (32 no toque, que já sobe --h-sm) */
+  --tb-h: calc(var(--h-sm) - 4px);
+  --tb-icon: 15px;
+}
+
+/* ——— Barra ——— */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--tb-gap);
+  min-width: 0;
+  color: var(--text);
+}
+.toolbar[data-overflow='menu'] {
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+.toolbar[data-overflow='wrap'] {
+  flex-wrap: wrap;
+}
+.toolbar[data-orientation='vertical'] {
+  flex-direction: column;
+  align-items: flex-start;
+  width: max-content;
+}
+
+/* Faixa do topo do editor: papel com fio embaixo. */
+.toolbar[data-variant='bar'] {
+  padding: var(--s-1) var(--s-2);
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+/* Barra fixa (§7): fio + papel 94% com desfoque, acima do texto que rola por baixo. */
+.toolbar[data-sticky] {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: var(--tb-gap);
+}
+.toolbar[data-orientation='vertical'] .group {
+  flex-direction: column;
+  align-items: flex-start;
+}
+/* Todos os itens do grupo foram para “Mais”: o grupo não ocupa lugar nem abre vão. */
+.group:has(> [data-toolbar-leaf]):not(:has(> [data-toolbar-leaf]:not([data-overflowed]))) {
+  display: none;
+}
+
+.leaf,
+.more {
+  display: inline-flex;
+  flex: none;
+}
+/* Fim da barra (estado do documento): encostado à direita, nunca vai para o “Mais”. */
+.end {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--s-3);
+  margin-inline-start: auto;
+  padding-inline-start: var(--s-4);
+  font: var(--t-small);
+  color: var(--muted);
+}
+.leaf[data-overflowed],
+.more[data-overflowed],
+.separator[data-overflowed] {
+  display: none;
+}
+
+.separator {
+  flex: none;
+  align-self: center;
+  width: 1px;
+  height: calc(var(--tb-h) - 12px);
+  margin-inline: var(--s-1);
+  background: var(--line);
+}
+.toolbar[data-orientation='vertical'] .separator {
+  width: calc(var(--tb-h) - 12px);
+  height: 1px;
+  margin: var(--s-1) 0;
+}
+
+/* ——— Botão ——— */
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: var(--tb-h);
+  height: var(--tb-h);
+  padding: 0;
+  border-radius: var(--r-sm);
+  font: var(--t-body-strong);
+  letter-spacing: var(--track-tight);
+  white-space: nowrap;
+  color: var(--text);
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out);
+}
+.button[data-size='sm'] {
+  gap: 5px;
+  font: var(--t-small-strong);
+}
+/* Com texto (rótulo ou valor do menu) a largura segue o conteúdo. */
+.button[data-label] {
+  width: auto;
+  padding: 0 var(--s-2);
+}
+.button[data-size='sm'][data-label] {
+  padding: 0 7px;
+}
+/* Menu só com ícone: ícone + seta, mais estreito que dois botões. */
+.button[data-menu]:not([data-label]) {
+  width: auto;
+  padding: 0 var(--s-1) 0 calc((var(--tb-h) - var(--tb-icon)) / 2);
+}
+.button[data-menu][data-label] {
+  justify-content: space-between;
+  padding-right: 6px;
+}
+
+.icon {
+  flex: none;
+  width: var(--tb-icon);
+  height: var(--tb-icon);
+  color: var(--icon-rest);
+  stroke-width: var(--icon-stroke);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.button[data-menu][data-label] .label {
+  flex: 1;
+  text-align: left;
+}
+.chevron {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  margin-left: -2px;
+  color: var(--icon-quiet);
+  stroke-width: var(--icon-stroke);
+  transition:
+    color var(--dur-1) var(--ease-out),
+    rotate var(--dur-2) var(--ease-out);
+}
+
+/* Hover e pressionado (fantasma, §10) */
+.button:where(:hover, [data-force~='hover']):where(:not([aria-disabled='true'])) {
+  color: var(--ink);
+  background: var(--paper-hover);
+}
+.button:where(:hover, [data-force~='hover']):where(:not([aria-disabled='true']))
+  :is(.icon, .chevron) {
+  color: var(--icon-hover);
+}
+.button:where(:active, [data-force~='active']):where(:not([aria-disabled='true'])) {
+  color: var(--ink);
+  background: var(--paper-pressed);
+  transform: scale(var(--press-scale));
+}
+
+/* Menu aberto: o gatilho fica um degrau abaixo; a seta gira. Prancha: data-force="open". */
+.button:is([aria-expanded='true'], [data-force~='open']) {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.button:is([aria-expanded='true'], [data-force~='open']) :is(.icon, .chevron) {
+  color: var(--ink);
+}
+.button:is([aria-expanded='true'], [data-force~='open']) .chevron {
+  rotate: 180deg;
+}
+
+/* Ligado (aria-pressed): azul suave, como o ToggleButton. Só um passo por estado. */
+.button[aria-pressed='true'] {
+  color: var(--b-700);
+  background: var(--b-50);
+}
+.button[aria-pressed='true'] .icon {
+  color: var(--b-600);
+}
+.button[aria-pressed='true']:where(:hover, [data-force~='hover']):where(
+    :not([aria-disabled='true'])
+  ) {
+  color: var(--b-700);
+  background: var(--b-100);
+}
+.button[aria-pressed='true']:where(:hover, [data-force~='hover']):where(
+    :not([aria-disabled='true'])
+  )
+  .icon {
+  color: var(--b-600);
+}
+.button[aria-pressed='true']:where(:active, [data-force~='active']):where(
+    :not([aria-disabled='true'])
+  ) {
+  color: var(--b-800);
+  background: var(--b-200);
+}
+
+/* Destrutivo: neutro em repouso; vermelho só quando a mão chega. */
+.button[data-tone='danger']:where(:hover, [data-force~='hover']):where(
+    :not([aria-disabled='true'])
+  ) {
+  color: var(--red-ink);
+  background: var(--red-bg);
+}
+.button[data-tone='danger']:where(:hover, [data-force~='hover']):where(:not([aria-disabled='true']))
+  .icon {
+  color: var(--red-ink);
+}
+.button[data-tone='danger']:where(:active, [data-force~='active']):where(
+    :not([aria-disabled='true'])
+  ) {
+  color: var(--red-ink);
+  background: var(--danger-soft-hover);
+}
+
+/* Foco: anel do tema, recuado (a barra recorta o que passa da borda). */
+.button:is(:focus-visible, [data-force~='focus']) {
+  outline-offset: var(--focus-offset-inset);
+}
+
+/*
+ * Indisponível: esmaece o conteúdo a 45%, não o botão (o anel de foco fica com a cor cheia).
+ * Continua focável para a dica dizer o motivo.
+ */
+.button[aria-disabled='true']:not([aria-busy='true']) {
+  cursor: not-allowed;
+  color: color-mix(in srgb, var(--text) 45%, transparent);
+}
+.button[aria-disabled='true']:not([aria-busy='true']):not([aria-pressed='true']) {
+  background: none;
+}
+.button[aria-disabled='true']:not([aria-busy='true']) :is(.icon, .chevron) {
+  color: var(--g-400);
+  opacity: 0.45;
+}
+.button[aria-pressed='true'][aria-disabled='true']:not([aria-busy='true']) {
+  color: color-mix(in srgb, var(--b-700) 55%, transparent);
+  background: var(--b-25);
+}
+.button[aria-pressed='true'][aria-disabled='true']:not([aria-busy='true']) .icon {
+  color: var(--b-600);
+  opacity: 0.55;
+}
+
+/*
+ * Carregando: nada muda nos primeiros 300 ms (ação rápida não pisca); depois o ícone sai e o
+ * spinner entra na mesma caixa. Sem ícone, a caixa abre de 0 até o tamanho do ícone.
+ */
+.button[aria-busy='true'] {
+  cursor: progress;
+}
+.spin {
+  --spin-delay: 300ms;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+}
+.spin > svg {
+  grid-area: 1 / 1;
+}
+.spinGlyph {
+  animation: glyphOut var(--dur-1) var(--ease-in) var(--spin-delay) forwards;
+}
+.spinner {
+  animation:
+    spin 0.8s linear infinite,
+    spinIn var(--dur-2) var(--ease-out) var(--spin-delay) backwards;
+}
+.spin:not([data-glyph]) {
+  width: 0;
+  margin-inline-end: -6px;
+  overflow: clip;
+  animation: slotOpen var(--dur-2) var(--ease-out) var(--spin-delay) forwards;
+}
+@keyframes slotOpen {
+  to {
+    width: var(--tb-icon);
+    margin-inline-end: 0;
+  }
+}
+@keyframes glyphOut {
+  to {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes spinIn {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+/* Movimento reduzido: o tema zera as durações (a espera fica); o spinner gira devagar. */
+@media (prefers-reduced-motion: reduce) {
+  .button .spinner {
+    animation:
+      spin 2.4s linear infinite,
+      spinIn 0.01ms linear var(--spin-delay) backwards !important;
+  }
+}
+
+/* Toque: o alvo chega a 40 px sem mudar o desenho. */
+@media (pointer: coarse) {
+  .button::after {
+    content: '';
+    position: absolute;
+    inset: calc((var(--target-min) - var(--tb-h)) / -2) 0;
+  }
+}

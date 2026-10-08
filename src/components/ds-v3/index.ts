@@ -411,6 +411,20 @@ export {
   type EditableTitleSize,
   type EditableTitleLevel,
 } from './editable-title';
+export {
+  Toolbar,
+  ToolbarGroup,
+  ToolbarSeparator,
+  ToolbarButton,
+  ToolbarToggle,
+  ToolbarMenu,
+  type ToolbarProps,
+  type ToolbarSize,
+  type ToolbarOrientation,
+  type ToolbarButtonProps,
+  type ToolbarToggleProps,
+  type ToolbarMenuProps,
+} from './toolbar';
 
 /* Padrões */
 export {
