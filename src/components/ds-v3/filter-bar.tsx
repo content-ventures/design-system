@@ -147,28 +147,52 @@ export function useAnchoredPanel({
 
 /* ——————————————————————————— Barra ——————————————————————————— */
 
+type FilterBarBase = {
+  tabs?: ReactNode;
+  /** Normalmente `SearchField size="sm"`; a largura é da barra (220 lado a lado, até 320 empilhada; sem abas, até 320). */
+  search?: ReactNode;
+  filterCount?: number;
+  /** Modo de exibição (Segmented) e exportar (IconButton). */
+  actions?: ReactNode;
+  /** Id da `FilterBand` controlada pelo botão. */
+  bandId?: string;
+  filtersLabel?: string;
+  /** Prancha: estado do botão “Filtros”. */
+  'data-force'?: string;
+};
+
 /**
- * Largura natural das abas (da borda da primeira à da última), sem depender da largura da faixa:
- * empilhada, a lista de abas estica até a borda e `scrollWidth` nunca mais deixaria desempilhar.
+ * Com faixa de filtros (padrão), o botão “Filtros” é controlado: `filtersOpen` e
+ * `onFiltersOpenChange` são obrigatórios. Com `filters={false}` o botão não aparece e os dois
+ * ficam opcionais.
  */
-function tabsContentWidth(list: HTMLElement | null) {
-  if (!list) return 0;
-  const items = list.querySelectorAll<HTMLElement>('[role="tab"]');
-  const first = items[0];
-  const last = items[items.length - 1];
-  if (!first || !last) return list.scrollWidth;
-  return Math.ceil(last.getBoundingClientRect().right - first.getBoundingClientRect().left);
-}
+export type FilterBarProps = FilterBarBase &
+  (
+    | {
+        /** Com faixa de filtros (padrão): o botão “Filtros” abre e fecha a `FilterBand`. */
+        filters?: true;
+        filtersOpen: boolean;
+        onFiltersOpenChange: (open: boolean) => void;
+      }
+    | {
+        /** Sem faixa de filtros na tela: o botão “Filtros” não aparece (abas e busca bastam). */
+        filters: false;
+        filtersOpen?: boolean;
+        onFiltersOpenChange?: (open: boolean) => void;
+      }
+  );
 
 /**
  * Barra de lista: recortes (abas) à esquerda; busca, “Filtros”, modo de exibição e exportar à
- * direita. Quando as duas partes não cabem lado a lado, as ferramentas descem para baixo das abas
- * (medido, não por largura fixa). Até 640 px a busca ocupa a linha.
+ * direita. Quando as duas partes não cabem lado a lado, as ferramentas descem para baixo das abas.
+ * Quem decide é o CSS (quebra de linha da barra), não uma medida no cliente: o HTML do servidor e a
+ * tela hidratada empilham igual, e as contagens que chegam nas abas cabem na folga da busca (base de
+ * 220 px) sem derrubar a barra. Até 640 px a busca ocupa a linha.
  */
 export function FilterBar({
   tabs,
   search,
-  filtersOpen,
+  filtersOpen = false,
   onFiltersOpenChange,
   filterCount = 0,
   actions,
@@ -176,61 +200,12 @@ export function FilterBar({
   filtersLabel = 'Filtros',
   filters = true,
   'data-force': force,
-}: {
-  tabs?: ReactNode;
-  /** Normalmente `SearchField size="sm"`; a largura é da barra (clamp 220–260 px; sem abas, até 320). */
-  search?: ReactNode;
-  filtersOpen: boolean;
-  onFiltersOpenChange: (open: boolean) => void;
-  filterCount?: number;
-  /** Modo de exibição (Segmented) e exportar (IconButton). */
-  actions?: ReactNode;
-  /** Id da `FilterBand` controlada pelo botão. */
-  bandId?: string;
-  filtersLabel?: string;
-  /** Sem faixa de filtros na tela: o botão “Filtros” não aparece (abas e busca bastam). */
-  filters?: boolean;
-  /** Prancha: estado do botão “Filtros”. */
-  'data-force'?: string;
-}) {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const tabsRef = useRef<HTMLDivElement>(null);
-  const toolsRef = useRef<HTMLDivElement>(null);
-  const [stacked, setStacked] = useState(false);
-  const toolsWidth = useRef(0);
-  useIsoLayoutEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    const measure = () => {
-      const tabsEl = tabsRef.current?.firstElementChild as HTMLElement | null;
-      const tools = toolsRef.current;
-      if (!tools) return;
-      // As ferramentas só são medidas lado a lado; empilhadas, a busca estica e a medida mentiria.
-      if (root.dataset.stacked === undefined) toolsWidth.current = tools.scrollWidth;
-      const need = tabsContentWidth(tabsEl) + 24 + toolsWidth.current;
-      setStacked(Boolean(tabs) && need > root.clientWidth);
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(root);
-    // A fonte muda a largura das abas: mede de novo quando ela chega.
-    document.fonts?.ready.then(measure).catch(() => undefined);
-    return () => observer.disconnect();
-  }, [tabs]);
+}: FilterBarProps) {
   return (
-    <div
-      ref={rootRef}
-      className={s.root}
-      data-stacked={stacked ? '' : undefined}
-      data-tabs={tabs ? '' : undefined}
-    >
+    <div className={s.root} data-tabs={tabs ? '' : undefined}>
       <div className={s.bar}>
-        {tabs && (
-          <div ref={tabsRef} className={s.tabs}>
-            {tabs}
-          </div>
-        )}
-        <div ref={toolsRef} className={s.tools}>
+        {tabs && <div className={s.tabs}>{tabs}</div>}
+        <div className={s.tools}>
           {search && <div className={s.search}>{search}</div>}
           {filters && (
             <ToggleButton
@@ -238,7 +213,7 @@ export function FilterBar({
               size="sm"
               icon={ListFilter}
               pressed={filtersOpen}
-              onPressedChange={onFiltersOpenChange}
+              onPressedChange={(open) => onFiltersOpenChange?.(open)}
               aria-expanded={filtersOpen}
               aria-controls={bandId}
               count={filterCount || undefined}

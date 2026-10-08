@@ -239,7 +239,14 @@ export {
   type SortState,
   type BulkAction,
 } from './table';
-export { FilterBar, FilterBand, FilterField, ActiveFilters, type ActiveFilter } from './filter-bar';
+export {
+  FilterBar,
+  FilterBand,
+  FilterField,
+  ActiveFilters,
+  type ActiveFilter,
+  type FilterBarProps,
+} from './filter-bar';
 export { List, ListGroup, ListItem, ListItemSkeleton } from './list-item';
 export { StatCard, Delta, Meter, Sparkline, type MeterTone } from './stat';
 export { Metric, MetricStrip, type MetricDelta, type MetricProps } from './metric-strip';
