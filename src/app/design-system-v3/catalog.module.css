@@ -322,7 +322,7 @@
   padding: 0 var(--page-gutter);
   padding-inline: max(var(--page-gutter), calc((100% - var(--content-max)) / 2 + var(--page-gutter)));
   border-bottom: 1px solid var(--line);
-  background: rgb(255 255 255 / 0.94);
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
   backdrop-filter: blur(10px);
 }
 .menuButton {
