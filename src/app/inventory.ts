@@ -580,6 +580,18 @@ export const inventory: readonly InventoryGroup[] = [
         'Falas por falante com tempo, busca, filtro de falante, trechos usados e ações sobre a seleção.',
         'transcript fonte falas falante busca citacao entrevista',
       ),
+      item(
+        'faixa-slides',
+        'Faixa de slides',
+        'Sequência de slides: escolher, reordenar, duplicar, excluir e avisos de limite.',
+        'carrossel slides filmstrip reordenar stories',
+      ),
+      item(
+        'slide',
+        'Slide',
+        'Slide desenhado por dados: layouts, temas, escala e transbordo de texto.',
+        'carrossel slide canvas template overflow',
+      ),
     ],
   },
   {
