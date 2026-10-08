@@ -176,6 +176,7 @@ export {
   FormSection,
   FormRow,
   ActionBar,
+  SaveIndicator,
   stepStateAt,
   type StepState,
   type StepItem,

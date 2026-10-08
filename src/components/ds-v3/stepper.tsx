@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from 'react';
 import { VisuallyHidden } from './a11y';
+import { Tooltip } from './overlays';
 import s from './stepper.module.css';
 
 /* useLayoutEffect no cliente (mede antes de pintar), useEffect no servidor. */
@@ -21,8 +22,11 @@ const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayout
 /**
  * `warn` = pendência que não impede seguir (briefing incompleto num rascunho, “!” âmbar);
  * `error` = precisa ser corrigida (“!” vermelho); `blocked` = ainda não liberada (cadeado).
+ * `active` = em andamento: a etapa em que o trabalho está quando a régua mostra outra (quem volta
+ * a uma etapa feita continua vendo onde a jornada parou). Anel azul com número; o disco sólido
+ * continua só na atual.
  */
-export type StepState = 'done' | 'current' | 'upcoming' | 'warn' | 'error' | 'blocked';
+export type StepState = 'done' | 'current' | 'active' | 'upcoming' | 'warn' | 'error' | 'blocked';
 
 export type StepItem = {
   id: string;
@@ -33,13 +37,21 @@ export type StepItem = {
   state?: Exclude<StepState, 'current'>;
   /** Informação curta à direita na lista vertical (ex.: “3 campos”). */
   meta?: ReactNode;
-  /** Estado parado para pranchas: `hover` ou `focus`. */
+  /**
+   * Por que a etapa está assim (bloqueada, com pendência, com erro), curto e sem ponto final:
+   * “Libera quando o artigo for aprovado”. Vai na dica do DS (`Tooltip`) e é a descrição lida pelo
+   * leitor de tela (`aria-describedby`). Numa régua navegável, a etapa fora de alcance com motivo
+   * continua focável (indisponível): teclado e toque também chegam ao porquê. Ignorado na atual.
+   */
+  reason?: string;
+  /** Estado parado para pranchas: `hover`, `focus` e `tip` (dica aberta). */
   force?: string;
 };
 
 const stateText: Record<StepState, string> = {
   done: 'concluída',
   current: 'etapa atual',
+  active: 'em andamento',
   upcoming: 'a seguir',
   warn: 'com pendência',
   error: 'com erro',
@@ -55,13 +67,114 @@ export function stepStateAt(steps: StepItem[], index: number, current: number): 
 }
 
 function defaultSelectable(state: StepState) {
-  return state === 'done' || state === 'error' || state === 'warn';
+  return state === 'done' || state === 'active' || state === 'error' || state === 'warn';
+}
+
+const forced = (force: string | undefined, state: string) =>
+  force?.split(' ').includes(state) ?? false;
+
+/**
+ * Alvo de uma etapa (régua e lista). Selecionável é botão; fora de alcance mas com dica (motivo ou
+ * nome escondido) numa régua navegável vira botão indisponível focável, que não navega; o resto é
+ * texto. O motivo é a descrição do botão; num texto, vai junto do estado para o leitor de tela.
+ * A dica nunca repete para o leitor o que ele já ouve: o nome escondido segue no próprio alvo.
+ */
+function StepTarget({
+  step,
+  state,
+  index,
+  className,
+  selectable,
+  navigable,
+  tip,
+  onSelect,
+  children,
+}: {
+  step: StepItem;
+  state: StepState;
+  index: number;
+  className: string | undefined;
+  selectable: boolean;
+  /** A régua navega (tem `onStepSelect`). */
+  navigable: boolean;
+  /** Texto da dica: o motivo, com o nome antes quando o rótulo está escondido. */
+  tip: string | undefined;
+  onSelect: (index: number) => void;
+  /** Conteúdo, recebendo o texto extra do estado (motivo, quando o alvo é só texto). */
+  children: (stateExtra: string | undefined) => ReactNode;
+}) {
+  const reasonId = useId();
+  const reason = state === 'current' ? undefined : step.reason;
+  const unavailable = !selectable && state !== 'current' && navigable && Boolean(tip);
+  const control = selectable || unavailable;
+  const describedBy = control && reason ? reasonId : undefined;
+  const hit = selectable ? (
+    <button
+      type="button"
+      className={className}
+      data-force={step.force}
+      aria-describedby={describedBy}
+      onClick={() => onSelect(index)}
+    >
+      {children(undefined)}
+    </button>
+  ) : unavailable ? (
+    // Sem clique: Enter, Espaço e toque só mostram a dica.
+    <button
+      type="button"
+      className={className}
+      data-force={step.force}
+      aria-disabled="true"
+      aria-describedby={describedBy}
+    >
+      {children(undefined)}
+    </button>
+  ) : (
+    <span
+      className={className}
+      data-force={step.force}
+      aria-current={state === 'current' ? 'step' : undefined}
+    >
+      {children(reason)}
+    </span>
+  );
+  return (
+    <>
+      {tip ? (
+        <Tooltip bare describe={false} content={tip} open={forced(step.force, 'tip')}>
+          {hit}
+        </Tooltip>
+      ) : (
+        hit
+      )}
+      {describedBy && (
+        <span id={reasonId} hidden>
+          {reason}
+        </span>
+      )}
+    </>
+  );
+}
+
+/** Texto do estado para o leitor de tela; num alvo que é só texto, leva o motivo junto. */
+function stateNote(state: StepState, extra: string | undefined) {
+  return `(${stateText[state]}${extra ? `: ${extra}` : ''})`;
+}
+
+/** Rótulos escondidos pela largura (recolhida ou consulta de contêiner): '1' por etapa sem nome à vista. */
+function hiddenLabels(track: HTMLElement) {
+  // Fora do layout (aba oculta, ambiente de teste): nada conta como escondido.
+  if (!track.clientWidth) return '';
+  return Array.from(track.querySelectorAll<HTMLElement>('[data-step-label]'), (label) =>
+    label.getBoundingClientRect().width < 2 ? '1' : '0',
+  ).join('');
 }
 
 /**
  * Marcador de 20 px. A atual é o único disco sólido (azul, número branco). Feita = azul 50 com
- * check azul desenhado; a seguir = anel cinza com número; pendência “!” âmbar; erro “!” vermelho;
- * bloqueada = cadeado. Ao virar “feita”, o check se desenha em 180 ms.
+ * check azul desenhado; em andamento = anel azul com número azul; a seguir = anel cinza com
+ * número; pendência “!” âmbar; erro “!” vermelho; bloqueada = cadeado. Ao virar “feita”, o check
+ * se desenha em 180 ms.
  */
 export function StepMarker({
   state,
@@ -126,7 +239,7 @@ export function Stepper({
   steps: StepItem[];
   current: number;
   onStepSelect?: (index: number) => void;
-  /** Quais etapas aceitam clique. Padrão: feitas e com pendência. */
+  /** Quais etapas aceitam clique. Padrão: feitas, em andamento e com pendência. */
   canSelect?: (index: number, state: StepState) => boolean;
   label?: string;
   size?: 'sm' | 'md';
@@ -141,6 +254,8 @@ export function Stepper({
   /** Largura mínima com todos os rótulos, medida no momento em que a linha deixou de caber. */
   const needRef = useRef(0);
   const [squeezed, setSqueezed] = useState(false);
+  /** Etapas sem nome à vista ('1' por etapa): ganham a dica com o nome. */
+  const [hidden, setHidden] = useState('');
 
   /* Quando os rótulos não cabem, só a atual mantém o nome — nunca sobrepor conector e marcador. */
   useIsoLayoutEffect(() => {
@@ -154,20 +269,29 @@ export function Stepper({
       const room = track.clientWidth;
       if (nav.dataset.squeezed === 'true') {
         setSqueezed(needRef.current > room + 1);
-        return;
+      } else {
+        /* Os itens não encolhem abaixo do conteúdo: se o último passa da borda, não cabe. */
+        const used = lastItem.getBoundingClientRect().right - first.getBoundingClientRect().left;
+        if (used > room + 1) {
+          needRef.current = used;
+          setSqueezed(true);
+        }
       }
-      /* Os itens não encolhem abaixo do conteúdo: se o último passa da borda, não cabe. */
-      const used = lastItem.getBoundingClientRect().right - first.getBoundingClientRect().left;
-      if (used > room + 1) {
-        needRef.current = used;
-        setSqueezed(true);
-      }
+      // A consulta de contêiner também esconde rótulos sem passar pelo estado recolhido.
+      setHidden(hiddenLabels(track));
     }
     check();
     const observer = new ResizeObserver(check);
     observer.observe(nav);
     return () => observer.disconnect();
   }, [fit, steps.length, current]);
+
+  /* Recolher (ou trocar a atual, ou os nomes) muda quais nomes ficam à vista: mede antes de pintar. */
+  const names = steps.map((step) => step.label).join('\n');
+  useIsoLayoutEffect(() => {
+    const track = navRef.current?.firstElementChild as HTMLElement | null;
+    if (track) setHidden(hiddenLabels(track));
+  }, [squeezed, current, names, size, fit]);
 
   // Régua que rola: a etapa atual fica à vista (scrollTo no trilho, nunca scrollIntoView).
   useEffect(() => {
@@ -197,36 +321,34 @@ export function Stepper({
             Boolean(onStepSelect) &&
             state !== 'current' &&
             (canSelect ? canSelect(index, state) : defaultSelectable(state));
-          const inner = (
-            <>
-              <StepMarker state={state} index={index} size={size} />
-              <span className={s.stepLabel}>
-                {step.label}
-                <VisuallyHidden>{`(${stateText[state]})`}</VisuallyHidden>
-              </span>
-            </>
-          );
+          const reason = state === 'current' ? undefined : step.reason;
+          // Nome escondido pela largura: a dica traz o nome (e o motivo, quando houver).
+          const tip =
+            state !== 'current' && hidden[index] === '1'
+              ? [step.label, reason].filter(Boolean).join(' · ')
+              : reason;
           return (
             <li key={step.id} className={s.step} data-state={state}>
-              {selectable ? (
-                <button
-                  type="button"
-                  className={s.stepHit}
-                  data-force={step.force}
-                  title={squeezed ? step.label : undefined}
-                  onClick={() => onStepSelect?.(index)}
-                >
-                  {inner}
-                </button>
-              ) : (
-                <span
-                  className={s.stepHit}
-                  data-force={step.force}
-                  aria-current={state === 'current' ? 'step' : undefined}
-                >
-                  {inner}
-                </span>
-              )}
+              <StepTarget
+                step={step}
+                state={state}
+                index={index}
+                className={s.stepHit}
+                selectable={selectable}
+                navigable={Boolean(onStepSelect)}
+                tip={tip}
+                onSelect={(target) => onStepSelect?.(target)}
+              >
+                {(extra) => (
+                  <>
+                    <StepMarker state={state} index={index} size={size} />
+                    <span className={s.stepLabel} data-step-label="">
+                      {step.label}
+                      <VisuallyHidden>{stateNote(state, extra)}</VisuallyHidden>
+                    </span>
+                  </>
+                )}
+              </StepTarget>
               {index < last && (
                 <span
                   className={s.connector}
@@ -352,39 +474,33 @@ export function StepList({
             Boolean(onStepSelect) &&
             state !== 'current' &&
             (canSelect ? canSelect(index, state) : defaultSelectable(state));
-          const inner = (
-            <>
-              <StepMarker state={state} index={index} />
-              <span className={s.listText}>
-                <span className={s.listLabel}>
-                  {step.label}
-                  <VisuallyHidden>{`(${stateText[state]})`}</VisuallyHidden>
-                </span>
-                {step.description && <span className={s.listDesc}>{step.description}</span>}
-              </span>
-              {step.meta && <span className={s.listMeta}>{step.meta}</span>}
-            </>
-          );
           return (
             <li key={step.id} className={s.listItem} data-state={state}>
-              {selectable ? (
-                <button
-                  type="button"
-                  className={s.listHit}
-                  data-force={step.force}
-                  onClick={() => onStepSelect?.(index)}
-                >
-                  {inner}
-                </button>
-              ) : (
-                <div
-                  className={s.listHit}
-                  data-force={step.force}
-                  aria-current={state === 'current' ? 'step' : undefined}
-                >
-                  {inner}
-                </div>
-              )}
+              <StepTarget
+                step={step}
+                state={state}
+                index={index}
+                className={s.listHit}
+                selectable={selectable}
+                navigable={Boolean(onStepSelect)}
+                // Na lista o nome está sempre à vista: a dica é só o motivo.
+                tip={state === 'current' ? undefined : step.reason}
+                onSelect={(target) => onStepSelect?.(target)}
+              >
+                {(extra) => (
+                  <>
+                    <StepMarker state={state} index={index} />
+                    <span className={s.listText}>
+                      <span className={s.listLabel}>
+                        {step.label}
+                        <VisuallyHidden>{stateNote(state, extra)}</VisuallyHidden>
+                      </span>
+                      {step.description && <span className={s.listDesc}>{step.description}</span>}
+                    </span>
+                    {step.meta && <span className={s.listMeta}>{step.meta}</span>}
+                  </>
+                )}
+              </StepTarget>
             </li>
           );
         })}
@@ -531,7 +647,13 @@ function PipelinePopover({
       >
         {stages.map((stage, index) => (
           <span key={stage.id} className={s.pipeStage} data-state={stage.state}>
-            {index > 0 && <i className={s.pipeSep} data-done={stages[index - 1]?.state === 'done' || undefined} aria-hidden="true" />}
+            {index > 0 && (
+              <i
+                className={s.pipeSep}
+                data-done={stages[index - 1]?.state === 'done' || undefined}
+                aria-hidden="true"
+              />
+            )}
             <StepMarker state={stage.state} index={index} size="xs" />
             {stage.label}
           </span>
@@ -539,7 +661,13 @@ function PipelinePopover({
         <ChevronDown className={s.pipeChevron} aria-hidden="true" />
       </button>
       {open && (
-        <div id={id} className={s.pop} data-align={align} role="group" aria-label={`${label} em detalhe`}>
+        <div
+          id={id}
+          className={s.pop}
+          data-align={align}
+          role="group"
+          aria-label={`${label} em detalhe`}
+        >
           <ol className={s.popList}>
             {stages.map((stage, index) => (
               <li key={stage.id} className={s.popItem} data-state={stage.state}>
@@ -597,6 +725,7 @@ export function FormSection({
   open,
   onOpenChange,
   labelWidth,
+  titleAs: Heading = 'h3',
   children,
 }: {
   title: string;
@@ -610,6 +739,8 @@ export function FormSection({
   onOpenChange?: (open: boolean) => void;
   /** Largura da coluna de rótulos, em px. Padrão 200. */
   labelWidth?: number;
+  /** Nível do título (o tamanho não muda). Padrão h3; h2 quando a seção vem logo abaixo do h1 da página. */
+  titleAs?: 'h2' | 'h3' | 'h4';
   children?: ReactNode;
 }) {
   const id = useId();
@@ -629,7 +760,7 @@ export function FormSection({
         <VisuallyHidden>{`(${sectionText[state]})`}</VisuallyHidden>
       </span>
       <span className={s.sectionSummary} data-empty={(!open && !summary) || undefined}>
-        {open ? null : summary ?? emptySummary}
+        {open ? null : (summary ?? emptySummary)}
       </span>
       <span className={s.sectionMeta}>{open ? meta : null}</span>
       {collapsible && <ChevronDown className={s.sectionChevron} aria-hidden="true" />}
@@ -643,7 +774,7 @@ export function FormSection({
       style={style}
       aria-labelledby={titleId}
     >
-      <h3 className={s.sectionH}>
+      <Heading className={s.sectionH}>
         {collapsible ? (
           <button
             type="button"
@@ -657,7 +788,7 @@ export function FormSection({
         ) : (
           <div className={s.sectionHead}>{head}</div>
         )}
-      </h3>
+      </Heading>
       {open && (
         <div id={bodyId} className={s.sectionBody}>
           {children}
@@ -686,7 +817,8 @@ export function FormRow({
   optional?: boolean;
   hint?: ReactNode;
   error?: string;
-  children: ReactNode | ((props: { id: string; describedBy?: string; invalid: boolean }) => ReactNode);
+  children:
+    ReactNode | ((props: { id: string; describedBy?: string; invalid: boolean }) => ReactNode);
 }) {
   const id = useId();
   const controlId = `${id}-control`;
@@ -763,6 +895,52 @@ const saveText: Record<SaveStatus, string> = {
 };
 
 /**
+ * Estado do salvamento (ícone + texto + complemento, e “Tentar de novo” no erro), anunciado com
+ * educação a leitores de tela. É o mesmo da `ActionBar`; solto, vai numa linha de status (ex.: sob
+ * o texto de um estúdio, quando as ações sobem para o cabeçalho).
+ */
+export function SaveIndicator({
+  status,
+  label,
+  detail,
+  onRetry,
+  'data-force': force,
+}: {
+  status: SaveStatus;
+  label?: string;
+  /** Complemento discreto do estado (ex.: “há 2 min”). */
+  detail?: ReactNode;
+  onRetry?: () => void;
+  /** Prancha: estado parado de “Tentar de novo” (`hover`, `focus`). Nunca no produto. */
+  'data-force'?: string;
+}) {
+  return (
+    <>
+      <span className={s.barStatus} data-status={status} role="status">
+        <span className={s.barIcon} aria-hidden="true">
+          {status === 'saved' ? (
+            <Check />
+          ) : status === 'saving' ? (
+            <LoaderCircle />
+          ) : status === 'error' ? (
+            <CircleAlert />
+          ) : (
+            <i />
+          )}
+        </span>
+        <span className={s.barLabel}>{label ?? saveText[status]}</span>
+        {detail && <span className={s.barDetail}>{detail}</span>}
+      </span>
+      {status === 'error' && onRetry && (
+        <button type="button" className={s.barRetry} data-force={force} onClick={onRetry}>
+          Tentar de novo
+        </button>
+      )}
+    </>
+  );
+}
+
+/**
  * Rodapé fixo de páginas com etapas: estado do rascunho à esquerda, ações à direita
  * (cancelar, voltar, continuar). O estado é anunciado com educação a leitores de tela.
  */
@@ -789,26 +967,7 @@ export function ActionBar({
     <div className={s.bar} data-position={position}>
       <div className={s.barStart}>
         {status && (
-          <p className={s.barStatus} data-status={status} role="status">
-            <span className={s.barIcon} aria-hidden="true">
-              {status === 'saved' ? (
-                <Check />
-              ) : status === 'saving' ? (
-                <LoaderCircle />
-              ) : status === 'error' ? (
-                <CircleAlert />
-              ) : (
-                <i />
-              )}
-            </span>
-            <span className={s.barLabel}>{statusLabel ?? saveText[status]}</span>
-            {detail && <span className={s.barDetail}>{detail}</span>}
-          </p>
-        )}
-        {status === 'error' && onRetry && (
-          <button type="button" className={s.barRetry} onClick={onRetry}>
-            Tentar de novo
-          </button>
+          <SaveIndicator status={status} label={statusLabel} detail={detail} onRetry={onRetry} />
         )}
         {start}
       </div>
