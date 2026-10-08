@@ -431,6 +431,19 @@ export {
   type FloatingToolbarDismissReason,
 } from './floating-toolbar';
 
+/* IA */
+export {
+  PromptComposer,
+  PromptModelMenu,
+  type PromptComposerProps,
+  type PromptComposerHandle,
+  type PromptStatus,
+  type PromptSubmitKey,
+  type PromptPreset,
+  type PromptSubmission,
+  type PromptModelOption,
+} from './prompt-composer';
+
 /* Revisão */
 export {
   DiffView,
