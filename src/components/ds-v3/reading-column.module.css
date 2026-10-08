@@ -1,0 +1,22 @@
+/*
+ * Coluna de leitura — a medida do texto para o que o acompanha. Só posiciona: sem superfície, sem
+ * fio. A raiz mede 68ch na fonte de leitura (a mesma conta do `Prose` md e do `DiffView` em
+ * leitura), então as bordas coincidem; o miolo volta à fonte da interface.
+ */
+.column {
+  width: 100%;
+  max-width: var(--prose-measure);
+  min-width: 0;
+  margin-inline: auto;
+  font: var(--t-prose-body);
+}
+.column[data-align='start'] {
+  margin-inline: 0;
+}
+.stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-6);
+  min-width: 0;
+  font: var(--t-body);
+}

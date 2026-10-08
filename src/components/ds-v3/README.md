@@ -16,6 +16,9 @@ catálogo. Se uma aplicação divergir deles, a correção começa aqui e depois
 5. **Números tabulares**, alinhados à direita em colunas, no formato pt-BR (§11).
 6. **Nunca iniciais nem monogramas.** Pessoa = `Avatar` (orbe). Organização = `BrandMark` (glifo).
 7. **Sem texto a mais.** O componente aparece vivo; legenda de 1–3 palavras. Nada de parágrafo explicativo.
+   Exceções: o **aviso de tarefa** (1 frase e 1 verbo, `Banner variant="inline"`) e o **motivo visível
+   do bloqueio** (`PageHeader actionsNote`, `ActionBar detail`) — sem eles a tela não diz o que fazer
+   agora.
 8. **Movimento curto e funcional** (120–280 ms, `ease-out`), sempre com `prefers-reduced-motion`.
 
 ## 2. Cor — papéis
@@ -323,6 +326,11 @@ Para mostrar um estado parado, todo componente interativo aceita `data-force="ho
   preferência. Fios de 1 px, sem sombra; nenhum painel ganha barra de título própria. Sem painéis (só a
   tela principal: uma etapa que é página, como Material e Entrega) a moldura dá o mesmo cabeçalho no
   mesmo lugar e não ganha abas no estreito.
+- **Coluna de leitura (`ReadingColumn`):** a medida do texto (`--prose-measure`, 68ch medidos na fonte
+  de leitura) para o que acompanha um texto — a decisão, avisos, `DiffView`, grade de imagens e o próprio
+  `Prose` — com o ritmo de página (24) entre os blocos. Centrada na área por padrão (`align="start"`
+  encosta); as bordas coincidem com as do `Prose` md e do `DiffView` em leitura, e o miolo volta à fonte
+  da interface. Só posiciona: sem superfície, sem fio. Galeria de slides e prévias largas ficam fora dela.
 - **Níveis de título:** `FormSection titleAs` e `Disclosure headingLevel` acertam o nível sem mudar o
   tamanho (h2 logo abaixo do h1 da página). O resumo recolhível do `FixedFrame` no celular já é h2.
 - **Carregando:** cada bloco de `Skeleton` leva `[data-skeleton]` e a `SkeletonRegion`, `aria-busy`; é o
@@ -342,6 +350,26 @@ Para mostrar um estado parado, todo componente interativo aceita `data-force="ho
 - **Etapa em andamento (`StepItem.state: 'active'`):** quando a régua mostra outra etapa (voltar ao
   material, ver a entrega), a etapa em que o trabalho está fica com anel e número azuis e “em andamento”
   para leitor de tela; navega como as feitas. O disco sólido continua só na atual (a que está na tela).
+- **Volta no cabeçalho (`PageHeader back`):** `{ label, href, onNavigate? }` põe “← Produções” antes do
+  título, na mesma linha e fora do h1 — o caminho de volta de uma tela sem o menu do app
+  (`AppShell layout="immersive"`). Discreta como um fantasma pequeno (seta e nome em `--muted`, fundo só
+  no hover), centrada na linha do título; descrição e meta continuam alinhadas ao título. Nome acessível
+  “Voltar para {label}”; em ≤640 px do cabeçalho, só a seta. `onNavigate` recebe o clique (navegação do
+  cliente, guarda de saída). Não combine com `eyebrow`.
+- **Motivo visível do bloqueio (`PageHeader actionsNote`):** `{ id, text }` escreve, logo antes das
+  ações, por que a principal não anda (“Aguarde a IA terminar.”): 12 px em `--muted`, uma linha que corta
+  com reticência (o texto inteiro na dica) e cede antes do título. O botão fica `aria-disabled` e leva
+  `aria-describedby={id}` — o motivo nunca mora só numa dica (§1.7). Em ≤640 px desce para a linha dele,
+  acima das ações, e quebra.
+- **Moldura sem `steps` também numa linha:** em `PageHeader variant="frame"` sem régua (o cabeçalho de
+  uma tela de trabalho: volta · título · status · menu de etapas · motivo · ações · ⋯), o título cede e
+  corta com a dica (até 10rem) antes de qualquer ação; ações e ⋯ não encolhem. Um título longo nunca
+  passa por cima dos botões. Em ≤640 px vale o arranjo do celular.
+- **Motivo visível na barra (`ActionBar detail` sem `status`):** com `detailId`, escreve logo antes dos
+  botões por que a ação não anda (“Quem enviou não aprova o próprio envio.”): `--muted`, quebra em até
+  18rem em vez de cortar e, sem espaço, os botões descem (alinhados ao fim); no celular o motivo ganha a
+  linha dele acima dos botões. O botão fica `aria-disabled` com `aria-describedby={detailId}`. Com
+  `status`, `detail` continua o complemento do estado de salvamento.
 
 ## 13. Pranchas do catálogo
 
@@ -420,7 +448,15 @@ importa TipTap, AI SDK nem código de produto; o produto liga o editor e o model
   com a fonte: ondulado `--red-dot` e “Falta:” para leitor de tela; `used` sem estilo),
   `ins`/`del`/`[data-suggestion]` (papéis `--diff-*`), `[data-stale]` (tracejado âmbar), `[data-block]`,
   `figure > img[data-missing]` (moldura funda no tamanho da imagem com “Imagem indisponível”; o `alt`
-  continua) e `img[data-loading]` (a mesma moldura pulsando; com `src`, só o fundo pulsa).
+  continua), `figure[data-slot]` (imagem sugerida, que o texto pede e ainda não existe: a mesma moldura
+  com ImagePlus e “Imagem sugerida”, o pedido na figcaption em `--muted`; na escrita, a moldura diz
+  “Arraste a imagem aqui ou clique para escolher” e responde ao ponteiro; na leitura e no compacto, é
+  uma faixa baixa 3:1 na largura da coluna), `figure[data-slot][data-display="line"]` (a mesma imagem
+  sugerida numa linha de 40 px em qualquer variante — ImagePlus, “Imagem sugerida:” e o assunto, até
+  duas linhas — no ritmo de um parágrafo, em vez da moldura; na escrita é escolhível, `[data-over]` (o
+  produto põe durante o arrasto) desenha o tracejado de soltar e a seleção do ProseMirror, o anel) e
+  `img[data-loading]` (a mesma moldura pulsando; com `src`, só o fundo pulsa). Figura de tamanho conhecido (`img[width][height]`) abraça a imagem e fica no
+  centro da coluna, com a legenda quebrando na largura dela: vertical e quadrada não encostam na borda.
   Parágrafo nunca vira caixa; citação é recuo + aspas. Marcador da IA só na escrita (`edit`): texto
   final (`read`) e `compact` não marcam. `overscroll` (padrão em `edit`) deixa 60% da altura da janela
   depois do fim, para o último bloco ou o alvo de um salto subir ao terço superior; desligue em editor
@@ -443,6 +479,11 @@ importa TipTap, AI SDK nem código de produto; o produto liga o editor e o model
   título com `EditableTitle size="page"`. Leitura longa e revisão seguem em `md`.
 - **`AppShell bleed`**: tira respiro e largura máxima do conteúdo para áreas de trabalho encostadas
   (`WorkspaceLayout docked`); páginas comuns continuam com respiro.
+- **`AppShell layout="immersive"`**: a tela de trabalho de um documento sem o menu do app — nenhuma
+  coluna de menu, nenhuma gaveta e nenhum botão de menu (nem de recolher), em qualquer largura. O
+  `sidebar` não é desenhado (passe `null`) e o `topbar` é opcional; sem topo, a moldura encostada ocupa a
+  janela até a borda de cima (`--topbar-h` vale 0 dentro do conteúdo). A volta fica no cabeçalho da
+  página (`PageHeader back`); atalhos globais (⌘K) são do produto, ligados fora do `Sidebar`.
 - **`SaveIndicator`**: o estado de salvamento da `ActionBar` (ícone, texto, complemento e “Tentar de novo”),
   para quando as ações sobem ao cabeçalho e o estado fica numa barra ou linha de status. `data-force`
   (`hover`, `focus`) para “Tentar de novo” nas pranchas.
@@ -495,3 +536,7 @@ importa TipTap, AI SDK nem código de produto; o produto liga o editor e o model
 - **`SlideStrip`** + **`SlideCanvas`**: o carrossel. A faixa escolhe, reordena (arrastar ou Alt+setas),
   duplica e exclui com confirmação; o slide é desenhado por dados (`layout`, `theme`, `content`) e avisa
   transbordo por `onOverflow`. Slides fixam a própria paleta (o tema escuro do app não muda a peça).
+- **`ChoiceCard media`**: escolha com miniatura (o modelo de um carrossel, uma capa). A peça é um
+  `MediaFrame` sem legenda e com `alt=""` no topo do cartão: faz parte da área clicável, o cartão empilha e
+  o rádio fica sobre o canto dela. A prévia completa vai no `footer` (“Ver modelo”), fora da área que
+  escolhe. Numa grade, `Grid columns="auto"` com o grupo em `role="radiogroup"`.

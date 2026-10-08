@@ -101,6 +101,7 @@ export {
   History,
   Image,
   ImageOff,
+  ImagePlus,
   Images,
   Inbox,
   Info,

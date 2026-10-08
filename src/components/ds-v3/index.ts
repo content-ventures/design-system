@@ -249,6 +249,8 @@ export {
   type AccordionStatus,
   type AccordionItem,
   type DescriptionItem,
+  type PageHeaderBack,
+  type PageHeaderNote,
 } from './structure';
 export {
   Card,
@@ -271,6 +273,7 @@ export {
   type GridCollapse,
   type GridElement,
 } from './grid';
+export { ReadingColumn, type ReadingColumnProps, type ReadingColumnAlign } from './reading-column';
 export {
   WorkspaceLayout,
   WorkspaceToggle,

@@ -466,7 +466,9 @@ export function Segmented<T extends string>({
 /**
  * Opção rica (título, descrição) com rádio de 18 px no canto superior direito — o cartão de ativo e
  * de envio do construtor. Sem ícone (A-64). `footer` é a nota presa ao cartão (ex.: o que impede
- * a escolha), separada por um fio, fora da área clicável.
+ * a escolha), separada por um fio, fora da área clicável. `media` põe uma peça no topo (a
+ * miniatura de um modelo): o cartão empilha, a peça vai de borda a borda dentro do respiro, faz
+ * parte da área clicável e o rádio fica sobre o canto dela.
  */
 export function ChoiceCard({
   name,
@@ -476,6 +478,7 @@ export function ChoiceCard({
   title,
   description,
   leading,
+  media,
   extra,
   footer,
   disabled,
@@ -491,6 +494,11 @@ export function ChoiceCard({
   description?: ReactNode;
   /** Mantido por compatibilidade; o cartão do produto não leva ícone. */
   leading?: ReactNode;
+  /**
+   * Peça no topo do cartão: um `MediaFrame` sem legenda e com `alt=""` (o título já nomeia a
+   * escolha). Empilha o cartão, como `layout="stacked"`.
+   */
+  media?: ReactNode;
   extra?: ReactNode;
   footer?: ReactNode;
   disabled?: boolean;
@@ -501,7 +509,8 @@ export function ChoiceCard({
   return (
     <div
       className={s.card}
-      data-layout={layout}
+      data-layout={media ? 'stacked' : layout}
+      data-media={media ? true : undefined}
       data-disabled={disabled || undefined}
       data-invalid={invalid || undefined}
       data-footer={footer ? true : undefined}
@@ -517,6 +526,7 @@ export function ChoiceCard({
           aria-invalid={invalid || undefined}
           onChange={() => onChange(value)}
         />
+        {media && <span className={s.cardMedia}>{media}</span>}
         {leading}
         <span className={s.cardBody}>
           <span className={s.cardTitle}>{title}</span>

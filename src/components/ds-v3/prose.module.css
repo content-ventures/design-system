@@ -28,10 +28,11 @@
   --p-gutter: var(--s-4);
   --p-marker: var(--icon-xs);
   --p-marker-hit: var(--s-6);
-  /* Glifos da calha e da figura: Sparkles e ImageOff do lucide (icons.ts), como máscara. A cor vem do
-     papel do ícone (--icon-quiet…); o teste confere os traços com o pacote. */
+  /* Glifos da calha e da figura: Sparkles, ImageOff e ImagePlus do lucide (icons.ts), como máscara. A cor
+     vem do papel do ícone (--icon-quiet…); o teste confere os traços com o pacote. */
   --p-glyph-ai: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z'/%3E%3Cpath d='M20 3v4'/%3E%3Cpath d='M22 5h-4'/%3E%3Cpath d='M4 17v2'/%3E%3Cpath d='M5 18H3'/%3E%3C/svg%3E");
   --p-glyph-image-off: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='2' x2='22' y1='2' y2='22'/%3E%3Cpath d='M10.41 10.41a2 2 0 1 1-2.83-2.83'/%3E%3Cline x1='13.5' x2='6' y1='13.5' y2='21'/%3E%3Cline x1='18' x2='21' y1='12' y2='15'/%3E%3Cpath d='M3.59 3.59A1.99 1.99 0 0 0 3 5v14a2 2 0 0 0 2 2h14c.55 0 1.052-.22 1.41-.59'/%3E%3Cpath d='M21 15V5a2 2 0 0 0-2-2H9'/%3E%3C/svg%3E");
+  --p-glyph-image-plus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 5h6'/%3E%3Cpath d='M19 2v6'/%3E%3Cpath d='M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3C/svg%3E");
   /* Coluna */
   --p-measure: var(--prose-measure);
   --p-pad-x: 0px;
@@ -238,6 +239,20 @@
 /* Figura e imagem */
 .flow :where(figure) {
   margin: 0;
+}
+/*
+ * Figura de tamanho conhecido (`img[width][height]`, inclusive a moldura de uma que falta): a figura
+ * abraça a imagem e fica no centro da coluna, então uma vertical ou quadrada não encosta na borda da
+ * coluna centrada. A legenda quebra na largura da imagem (`contain: inline-size` a tira da medida); uma
+ * horizontal larga continua na largura da coluna.
+ */
+.flow :where(figure:has(> img[width][height])) {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+.flow :where(figure:has(> img[width][height]) > figcaption) {
+  contain: inline-size;
 }
 .flow :where(img, video) {
   display: block;
@@ -738,6 +753,159 @@
     var(--p-glyph-image-off) 50% 0 / var(--icon-xl) var(--icon-xl) no-repeat,
     linear-gradient(#000 0 0) 0 calc(var(--icon-xl) + var(--s-2)) / 100% 100% no-repeat;
   pointer-events: none;
+}
+/*
+ * Imagem sugerida (`figure[data-slot]`, com `img[data-missing]`): o lugar que o texto reserva para uma
+ * imagem que ainda não existe. A mesma moldura funda, com ImagePlus e “Imagem sugerida”; a figcaption
+ * diz o que a imagem deve mostrar, em `--muted` (é pedido, não legenda). Na escrita, a moldura diz como
+ * preencher (“Arraste a imagem aqui ou clique para escolher”) e responde ao ponteiro; o tamanho vem do
+ * `img` (`width`/`height` para vertical e quadrada; sem eles, 16:9 na largura da coluna). Na leitura e
+ * no compacto, é uma faixa baixa (3:1) na largura da coluna: marca o lugar sem ocupar a altura da foto.
+ */
+.flow :where(figure[data-slot]:has(> img[data-missing]))::after {
+  content: 'Imagem sugerida';
+  -webkit-mask:
+    var(--p-glyph-image-plus) 50% 0 / var(--icon-xl) var(--icon-xl) no-repeat,
+    linear-gradient(#000 0 0) 0 calc(var(--icon-xl) + var(--s-2)) / 100% 100% no-repeat;
+  mask:
+    var(--p-glyph-image-plus) 50% 0 / var(--icon-xl) var(--icon-xl) no-repeat,
+    linear-gradient(#000 0 0) 0 calc(var(--icon-xl) + var(--s-2)) / 100% 100% no-repeat;
+}
+.prose[data-variant='edit'] .flow :where(figure[data-slot]:has(> img[data-missing]))::after {
+  content: 'Imagem sugerida\A Arraste a imagem aqui ou clique para escolher';
+  white-space: pre-line;
+}
+.flow :where(figure[data-slot] > figcaption) {
+  color: var(--muted);
+}
+.prose[data-variant='edit'] .flow :where(figure[data-slot]) {
+  cursor: pointer;
+}
+.prose[data-variant='edit'] .flow :where(figure[data-slot]:has(> img[data-missing]))::before {
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.prose[data-variant='edit']
+  .flow
+  :where(figure[data-slot]:has(> img[data-missing])):is(:hover, [data-force~='hover'])::before {
+  background: color-mix(in srgb, var(--paper-sunken), var(--ink) 5%);
+}
+.prose:is([data-variant='read'], [data-variant='compact'])
+  .flow
+  :where(figure[data-slot]:has(> img[data-missing])) {
+  width: auto;
+}
+.prose:is([data-variant='read'], [data-variant='compact'])
+  .flow
+  :where(figure[data-slot])
+  > :where(img[data-missing]) {
+  width: 100%;
+  height: auto;
+  min-height: calc(var(--s-16) + var(--s-8));
+  aspect-ratio: 3 / 1;
+}
+/*
+ * Imagem sugerida em linha (`figure[data-slot][data-display='line']`): o mesmo pedido numa linha de
+ * 40 px — ImagePlus, “Imagem sugerida:” e o assunto (a figcaption) — em vez da moldura do tamanho da
+ * foto, para o texto não virar uma pilha de blocos cinza. Vale na escrita, na leitura e no compacto,
+ * no ritmo de um parágrafo. Na escrita é escolhível: fio `--choice-hover-line` e fundo `--g-25` no
+ * hover; fio tracejado b-400 sobre b-25 enquanto um arquivo passa por cima (`[data-over]`, que o
+ * produto põe durante o arrasto); anel de foco quando selecionada (`.ProseMirror-selectednode`) ou
+ * focada. Gêmeos `[data-force~='hover' | 'active' | 'over' | 'focus']` para as pranchas.
+ */
+.prose .flow figure[data-slot][data-display='line'] {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  width: auto;
+  max-width: none;
+  min-height: var(--s-10);
+  margin-inline: 0;
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+/* No ritmo de um parágrafo (não no de uma figura); depois de intertítulo, o respiro do intertítulo. */
+.prose .flow :where(:not(h1, h2, h3, h4)) + figure[data-slot][data-display='line'],
+.prose .flow figure[data-slot][data-display='line'] + :where(:not(h1, h2, h3)) {
+  margin-top: var(--p-block);
+}
+.prose .flow figure[data-slot][data-display='line'] > img {
+  display: none;
+}
+/* O ícone é o `::before` (a moldura sai); o rótulo da moldura (`::after`) não aparece. */
+.prose .flow figure[data-slot][data-display='line']::before {
+  content: '';
+  flex: none;
+  width: var(--icon-md);
+  height: var(--icon-md);
+  border-radius: 0;
+  background: var(--icon-rest);
+  -webkit-mask: var(--p-glyph-image-plus) center / contain no-repeat;
+  mask: var(--p-glyph-image-plus) center / contain no-repeat;
+  animation: none;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.prose .flow figure[data-slot][data-display='line']::after {
+  content: none;
+}
+/* O assunto: até duas linhas (no celular quebra em vez de sumir), depois reticência. */
+.prose .flow figure[data-slot][data-display='line'] > figcaption {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  contain: none;
+  font: var(--t-body);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.prose .flow figure[data-slot][data-display='line'] > figcaption::before {
+  content: 'Imagem sugerida: ';
+  font-weight: 500;
+  color: var(--text);
+}
+.prose .flow figure[data-slot][data-display='line'] > figcaption:empty::before {
+  content: 'Imagem sugerida';
+}
+.prose[data-variant='edit'] .flow figure[data-slot][data-display='line'] {
+  cursor: pointer;
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+}
+.prose[data-variant='edit']
+  .flow
+  figure[data-slot][data-display='line']:is(:hover, [data-force~='hover']) {
+  border-color: var(--choice-hover-line);
+  background: var(--g-25);
+}
+.prose[data-variant='edit']
+  .flow
+  figure[data-slot][data-display='line']:is(:hover, [data-force~='hover'])::before {
+  background: var(--icon-hover);
+}
+.prose[data-variant='edit']
+  .flow
+  figure[data-slot][data-display='line']:is(:active, [data-force~='active']) {
+  border-color: var(--choice-hover-line);
+  background: var(--paper-sunken);
+}
+/* Arrastando um arquivo por cima: o tracejado só aparece agora (contrato §2.3), como no `Dropzone`. */
+.prose[data-variant='edit']
+  .flow
+  figure[data-slot][data-display='line']:is([data-over], [data-force~='over']) {
+  border-style: dashed;
+  border-color: var(--b-400);
+  background: var(--b-25);
+}
+.prose[data-variant='edit']
+  .flow
+  figure[data-slot][data-display='line']:is([data-over], [data-force~='over'])::before {
+  background: var(--b-600);
 }
 .flow :where(img[data-loading][src]) {
   background: var(--skeleton);

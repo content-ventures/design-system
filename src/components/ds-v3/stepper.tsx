@@ -943,11 +943,17 @@ export function SaveIndicator({
 /**
  * Rodapé fixo de páginas com etapas: estado do rascunho à esquerda, ações à direita
  * (cancelar, voltar, continuar). O estado é anunciado com educação a leitores de tela.
+ *
+ * Sem `status`, `detail` é o motivo visível de uma ação indisponível (“Aguarde a IA terminar.”,
+ * README §1.7): texto em `--muted` logo antes dos botões, que quebra em vez de sumir e, no celular,
+ * ganha a linha dele acima dos botões. O botão indisponível leva `aria-disabled` e
+ * `aria-describedby={detailId}`: o motivo nunca fica só numa dica.
  */
 export function ActionBar({
   status,
   statusLabel,
   detail,
+  detailId,
   onRetry,
   start,
   position = 'sticky',
@@ -955,14 +961,20 @@ export function ActionBar({
 }: {
   status?: SaveStatus;
   statusLabel?: string;
-  /** Complemento discreto do estado (ex.: “às 14:32”). */
+  /**
+   * Com `status`: complemento discreto do estado (ex.: “às 14:32”). Sem `status`: o motivo visível
+   * de uma ação indisponível, logo antes dos botões.
+   */
   detail?: ReactNode;
+  /** `id` do motivo (sem `status`), para o `aria-describedby` do botão indisponível. */
+  detailId?: string;
   onRetry?: () => void;
   /** Conteúdo extra à esquerda, depois do estado. */
   start?: ReactNode;
   position?: 'sticky' | 'static';
   children: ReactNode;
 }) {
+  const reason = !status && detail ? detail : undefined;
   return (
     <div className={s.bar} data-position={position}>
       <div className={s.barStart}>
@@ -971,6 +983,11 @@ export function ActionBar({
         )}
         {start}
       </div>
+      {reason && (
+        <span className={s.barReason} id={detailId} data-part="action-bar-reason">
+          {reason}
+        </span>
+      )}
       <div className={s.barActions}>{children}</div>
     </div>
   );

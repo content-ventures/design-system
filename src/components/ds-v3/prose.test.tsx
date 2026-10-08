@@ -270,6 +270,131 @@ describe('Prose: ganchos visuais (contrato do CSS)', () => {
     expect(CSS).toMatch(/@media \(prefers-reduced-motion: reduce\)/);
   });
 
+  it('imagem sugerida (`figure[data-slot]`) troca o rótulo e o glifo da moldura; o pedido fica em `--muted`', () => {
+    const slot = all.find((rule) =>
+      rule.selector.includes('figure[data-slot]:has(> img[data-missing]))::after'),
+    );
+    expect(slot?.body).toContain("content: 'Imagem sugerida'");
+    expect(slot?.body).toMatch(/mask:\s*var\(--p-glyph-image-plus\)/);
+    const shapes = lucideShapes('image-plus.js');
+    expect(shapes.length).toBeGreaterThan(0);
+    for (const shape of shapes)
+      expect(glyph('image-plus')).toContain(`<${shape.tag} ${shape.attrs.join(' ')}`);
+    const caption = all.find(
+      (rule) => rule.selector === '.flow :where(figure[data-slot] > figcaption)',
+    );
+    expect(caption?.body).toMatch(/color:\s*var\(--muted\)/);
+    const pointer = all.find((rule) =>
+      rule.selector.includes("[data-variant='edit'] .flow :where(figure[data-slot])"),
+    );
+    expect(pointer?.body).toMatch(/cursor:\s*pointer/);
+    // Na escrita, a moldura diz como preencher; na leitura, é uma faixa baixa na largura da coluna.
+    const action = all.find(
+      (rule) =>
+        rule.selector.startsWith(".prose[data-variant='edit']") &&
+        rule.selector.endsWith('figure[data-slot]:has(> img[data-missing]))::after'),
+    );
+    expect(action?.body).toContain('Arraste a imagem aqui ou clique para escolher');
+    expect(action?.body).toMatch(/white-space:\s*pre-line/);
+    const band = all.find(
+      (rule) =>
+        rule.selector.includes("[data-variant='read'], [data-variant='compact']") &&
+        rule.selector.includes('> :where(img[data-missing])'),
+    );
+    expect(band?.body).toMatch(/aspect-ratio:\s*3 \/ 1/);
+    expect(band?.body).toMatch(/width:\s*100%/);
+  });
+
+  it('figura de tamanho conhecido abraça a imagem no centro da coluna; a legenda quebra na largura dela', () => {
+    const sized = all.find(
+      (rule) => rule.selector === '.flow :where(figure:has(> img[width][height]))',
+    );
+    expect(sized?.body).toMatch(/width:\s*fit-content/);
+    expect(sized?.body).toMatch(/max-width:\s*100%/);
+    expect(sized?.body).toMatch(/margin-inline:\s*auto/);
+    const caption = all.find(
+      (rule) => rule.selector === '.flow :where(figure:has(> img[width][height]) > figcaption)',
+    );
+    expect(caption?.body).toMatch(/contain:\s*inline-size/);
+  });
+
+  it('imagem sugerida em linha (`data-display="line"`): uma linha de 40 px com ImagePlus, “Imagem sugerida:” e o assunto', () => {
+    const LINE = "figure[data-slot][data-display='line']";
+    const rule = (selector: string) => all.find((entry) => entry.selector === selector);
+    const row = rule(`.prose .flow ${LINE}`);
+    expect(row?.body).toMatch(/display:\s*flex/);
+    expect(row?.body).toMatch(/min-height:\s*var\(--s-10\)/);
+    expect(row?.body).toMatch(/border:\s*1px solid var\(--line\)/);
+    // A moldura sai: o `img` some, o `::after` (rótulo da moldura) também; o ícone é o `::before`.
+    expect(rule(`.prose .flow ${LINE} > img`)?.body).toMatch(/display:\s*none/);
+    expect(rule(`.prose .flow ${LINE}::after`)?.body).toMatch(/content:\s*none/);
+    expect(rule(`.prose .flow ${LINE}::before`)?.body).toMatch(/mask: var\(--p-glyph-image-plus\)/);
+    expect(rule(`.prose .flow ${LINE} > figcaption::before`)?.body).toContain(
+      "content: 'Imagem sugerida: '",
+    );
+    expect(rule(`.prose .flow ${LINE} > figcaption:empty::before`)?.body).toContain(
+      "content: 'Imagem sugerida'",
+    );
+    // No ritmo de um parágrafo, inclusive o bloco seguinte (menos intertítulo).
+    const rhythm = all.find((entry) => entry.selector.includes(`+ ${LINE}`));
+    expect(rhythm?.selector).toContain(`${LINE} + :where(:not(h1, h2, h3))`);
+    expect(rhythm?.body).toMatch(/margin-top:\s*var\(--p-block\)/);
+  });
+
+  it('imagem sugerida em linha só é escolhível na escrita: hover, pressionado, arrasto e os gêmeos `data-force`', () => {
+    const EDIT = ".prose[data-variant='edit'] .flow figure[data-slot][data-display='line']";
+    const rule = (selector: string) => all.find((entry) => entry.selector === selector);
+    expect(rule(EDIT)?.body).toMatch(/cursor:\s*pointer/);
+    const hover = rule(`${EDIT}:is(:hover, [data-force~='hover'])`);
+    expect(hover?.body).toMatch(/border-color:\s*var\(--choice-hover-line\)/);
+    expect(hover?.body).toMatch(/background:\s*var\(--g-25\)/);
+    expect(rule(`${EDIT}:is(:active, [data-force~='active'])`)?.body).toMatch(
+      /background:\s*var\(--paper-sunken\)/,
+    );
+    // Tracejado só durante o arrasto (`[data-over]`), como no Dropzone.
+    const over = rule(`${EDIT}:is([data-over], [data-force~='over'])`);
+    expect(over?.body).toMatch(/border-style:\s*dashed/);
+    expect(over?.body).toMatch(/border-color:\s*var\(--b-400\)/);
+    expect(rule(`${EDIT}:is([data-over], [data-force~='over'])::before`)?.body).toMatch(
+      /background:\s*var\(--b-600\)/,
+    );
+    // Fora da escrita nada responde ao ponteiro.
+    const outside = all.filter(
+      (entry) =>
+        entry.selector.includes("[data-display='line']") &&
+        /:hover|data-over|cursor/.test(entry.selector + entry.body) &&
+        !entry.selector.startsWith(".prose[data-variant='edit']"),
+    );
+    expect(outside).toEqual([]);
+  });
+
+  it('imagem sugerida em linha: o assunto quebra em até duas linhas na figura real', () => {
+    const { container } = render(
+      <Prose variant="edit">
+        <p>Antes.</p>
+        <figure
+          data-slot=""
+          data-missing=""
+          data-display="line"
+          aria-roledescription="Sugestão de imagem"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- moldura vazia: o Prose desenha o pedido */}
+          <img data-missing="" alt="" />
+          <figcaption>Peças impressas na bancada</figcaption>
+        </figure>
+      </Prose>,
+    );
+    const figure = container.querySelector('figure[data-display="line"]');
+    expect(figure).toHaveAttribute('aria-roledescription', 'Sugestão de imagem');
+    expect(figure?.querySelector('figcaption')).toHaveTextContent('Peças impressas na bancada');
+    const caption = all.find(
+      (entry) =>
+        entry.selector === ".prose .flow figure[data-slot][data-display='line'] > figcaption",
+    );
+    expect(caption?.body).toMatch(/-webkit-line-clamp:\s*2/);
+    expect(caption?.body).toMatch(/font:\s*var\(--t-body\)/);
+  });
+
   it('`data-bar-space="below"` abre embaixo do bloco o vão da barra flutuante, sem movimento reduzido', () => {
     const space = all.find((rule) => rule.selector === ".flow :where(*)[data-bar-space='below']");
     // Altura da FloatingToolbar (controle sm + padding 4 + fio) com 8 px de cada lado: só tokens.

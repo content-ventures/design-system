@@ -350,11 +350,12 @@
   flex-wrap: wrap;
   margin-left: calc(var(--meta-gap) * -1);
 }
+/* O separador fica no recuo do item (pendurado): um fato mais longo que a linha quebra dentro dele e
+   as linhas seguintes começam na borda, nunca embaixo do “·” recortado. */
 .metaItem {
   max-width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  padding-left: var(--meta-gap);
+  overflow-wrap: break-word;
 }
 .metaItem[data-num] {
   font-variant-numeric: tabular-nums;
@@ -365,6 +366,9 @@
 }
 .meta[data-wrap='false'] .metaItem {
   flex: none;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .meta[data-wrap='false'] .metaItem:first-child {
   flex: 0 1 auto;
@@ -374,6 +378,7 @@
   content: var(--meta-sep, '·');
   display: inline-block;
   width: var(--meta-gap);
+  margin-left: calc(var(--meta-gap) * -1);
   text-align: center;
   color: var(--g-300);
 }

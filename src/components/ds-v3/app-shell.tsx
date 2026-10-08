@@ -58,6 +58,8 @@ type ShellState = {
   collapsed: boolean;
   /** Largura até 1199 px: a barra vira gaveta. */
   drawer: boolean;
+  /** `layout="immersive"`: sem menu do app; o topo não mostra botão de menu nem de recolher. */
+  immersive: boolean;
   navOpen: boolean;
   openNav: () => void;
   closeNav: () => void;
@@ -69,6 +71,7 @@ const noop = () => undefined;
 const ShellContext = createContext<ShellState>({
   collapsed: false,
   drawer: false,
+  immersive: false,
   navOpen: false,
   openNav: noop,
   closeNav: noop,
@@ -96,6 +99,10 @@ const SHELL_BREAKPOINT = 1200;
  * altura do contêiner (o conteúdo rola por dentro); sem `fill`, a página cresce com o conteúdo.
  * `bleed` tira o respiro e a largura máxima do conteúdo: para áreas de trabalho encostadas
  * (`WorkspaceLayout docked`, `FixedFrame docked`) que ocupam a tela de ponta a ponta.
+ * `layout="immersive"` é a tela de trabalho sem o menu do app (o texto de uma produção, o
+ * documento de um editor): nenhuma coluna de menu, nenhuma gaveta, nenhum botão de menu, em qualquer
+ * largura — o `sidebar` nem é desenhado (pode ser `null`) e o `topbar` é opcional. A volta fica no
+ * cabeçalho da página (`PageHeader back`). Sem `topbar`, a moldura encostada ocupa a altura toda.
  */
 export function AppShell({
   sidebar,
@@ -113,7 +120,8 @@ export function AppShell({
   layout = 'auto',
   breakpoint = SHELL_BREAKPOINT,
 }: {
-  sidebar: ReactNode;
+  /** O menu lateral. Ignorado em `layout="immersive"` (passe `null`). */
+  sidebar?: ReactNode;
   topbar?: ReactNode;
   children: ReactNode;
   collapsed?: boolean;
@@ -128,8 +136,11 @@ export function AppShell({
   defaultNavOpen?: boolean;
   navOpen?: boolean;
   onNavOpenChange?: (open: boolean) => void;
-  /** `auto`: gaveta até 1199 px de largura. `desktop`/`drawer` fixam o modo (pranchas, molduras pequenas). */
-  layout?: 'auto' | 'desktop' | 'drawer';
+  /**
+   * `auto`: gaveta até 1199 px de largura. `desktop`/`drawer` fixam o modo (pranchas, molduras
+   * pequenas). `immersive`: sem menu do app em nenhuma largura (tela de trabalho de um documento).
+   */
+  layout?: 'auto' | 'desktop' | 'drawer' | 'immersive';
   /**
    * Largura do shell abaixo da qual, em `auto`, o menu vira gaveta. O padrão (1200) é decidido no
    * CSS; outro valor é medido no cliente (a primeira pintura do servidor sai com a barra).
@@ -146,6 +157,9 @@ export function AppShell({
   const restoreFocus = useRef(false);
   const focusOnOpen = useRef(false);
   const open = drawer && navOpen;
+  // Imersivo: nenhum menu do app — nem coluna, nem gaveta, nem botão. A volta fica na página.
+  const immersive = layout === 'immersive';
+  const hasTopbar = topbar !== undefined && topbar !== null && topbar !== false;
 
   const setNavOpen = useCallback(
     (value: boolean) => {
@@ -195,10 +209,12 @@ export function AppShell({
 
   const value = useMemo<ShellState>(
     () => ({
-      collapsed: collapsed && !drawer,
+      collapsed: collapsed && !drawer && !immersive,
       drawer,
+      immersive,
       navOpen: open,
-      navId,
+      // Sem menu, nada para o topo abrir ou controlar.
+      navId: immersive ? '' : navId,
       menuButtonRef,
       openNav: () => {
         focusOnOpen.current = true;
@@ -210,7 +226,7 @@ export function AppShell({
         setNavOpen(false);
       },
     }),
-    [collapsed, drawer, open, navId, setNavOpen],
+    [collapsed, drawer, immersive, open, navId, setNavOpen],
   );
 
   return (
@@ -219,24 +235,27 @@ export function AppShell({
         ref={rootRef}
         className={`${s.shell} ${className}`}
         style={style}
-        data-collapsed={(collapsed && !drawer) || undefined}
+        data-collapsed={(collapsed && !drawer && !immersive) || undefined}
         data-drawer={drawer || undefined}
         data-layout={layout === 'auto' && breakpoint !== SHELL_BREAKPOINT ? 'measured' : layout}
         data-fill={fill || undefined}
         data-bleed={bleed || undefined}
         data-nav-open={open || undefined}
+        data-no-topbar={!hasTopbar || undefined}
         data-part="shell"
       >
         <div className={s.frame}>
-          {sidebar}
-          <button
-            type="button"
-            className={s.veil}
-            aria-label="Fechar menu"
-            tabIndex={-1}
-            aria-hidden={!open || undefined}
-            onClick={value.closeNav}
-          />
+          {!immersive && sidebar}
+          {!immersive && (
+            <button
+              type="button"
+              className={s.veil}
+              aria-label="Fechar menu"
+              tabIndex={-1}
+              aria-hidden={!open || undefined}
+              onClick={value.closeNav}
+            />
+          )}
           <div className={s.main} inert={open || undefined} data-part="main">
             {topbar}
             <Content className={s.content} data-part="content">
@@ -637,12 +656,15 @@ function NavSection({
   const [open, setOpen] = useState(group.defaultOpen ?? true);
   const listId = useId();
   const labelId = `${listId}-label`;
-  const showItems = collapsed || open || Boolean(query);
+  // Recolhida, um grupo recolhível fechado (“Em breve”) não desenha os ícones dele: o trilho não
+  // abre grupos, e a fileira de ícones de um grupo fechado encheria o trilho de itens que a barra
+  // larga esconde.
+  const showItems = open || Boolean(query) || (collapsed && !group.collapsible);
   return (
     <div className={s.group}>
       {group.label &&
         (collapsed ? (
-          <hr className={s.groupRule} aria-hidden="true" />
+          showItems && <hr className={s.groupRule} aria-hidden="true" />
         ) : group.collapsible ? (
           <button
             type="button"
@@ -1289,7 +1311,9 @@ export function TopBar({
   sticky?: boolean;
 }) {
   const shell = useShell();
-  const openMenu = onOpenMenu ?? (shell.navId ? shell.openNav : undefined);
+  const openMenu = shell.immersive
+    ? undefined
+    : (onOpenMenu ?? (shell.navId ? shell.openNav : undefined));
   return (
     <header
       className={s.topbar}
@@ -1311,7 +1335,7 @@ export function TopBar({
             onClick={openMenu}
           />
         )}
-        {onToggleSidebar && (
+        {onToggleSidebar && !shell.immersive && (
           <>
             <IconButton
               className={s.toggle}

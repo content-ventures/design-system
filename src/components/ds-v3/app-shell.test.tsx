@@ -15,7 +15,7 @@ import { FileText, LayoutList, Newspaper, Radio } from 'lucide-react';
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
-import { AppShell, Sidebar, SidebarItem, TopBar, type NavGroup } from './app-shell';
+import { AppShell, Sidebar, SidebarItem, TopBar, useShell, type NavGroup } from './app-shell';
 
 const css = readFileSync(resolve(__dirname, 'app-shell.module.css'), 'utf8');
 
@@ -121,6 +121,89 @@ function roadmapShell(
     </AppShell>
   );
 }
+
+describe('AppShell · imersivo (sem menu do app)', () => {
+  it('servidor: nenhuma coluna de menu, nenhuma gaveta, nenhum véu — mesmo com `sidebar` e `collapsed`', () => {
+    const html = root(renderToString(shell({ layout: 'immersive', collapsed: true })));
+    expect(html).toHaveAttribute('data-layout', 'immersive');
+    expect(html).not.toHaveAttribute('data-drawer');
+    expect(html).not.toHaveAttribute('data-collapsed');
+    expect(html.querySelector('[data-part="sidebar"]')).toBeNull();
+    expect(html.querySelector('button[aria-label="Fechar menu"]')).toBeNull();
+    expect(html.querySelector('[data-part="content"]')).toHaveTextContent('Conteúdo');
+  });
+
+  it('`sidebar` pode ser `null`; sem topo, a moldura encostada sabe que não há topo', () => {
+    const { container, rerender } = render(
+      <AppShell layout="immersive" sidebar={null} bleed>
+        <p>Texto do artigo</p>
+      </AppShell>,
+    );
+    const host = container.querySelector('[data-part="shell"]');
+    expect(host).toHaveAttribute('data-no-topbar');
+    expect(screen.getByRole('main')).toHaveTextContent('Texto do artigo');
+    rerender(
+      <AppShell layout="immersive" topbar={<TopBar breadcrumb={[{ label: 'Produções' }]} />}>
+        <p>Texto do artigo</p>
+      </AppShell>,
+    );
+    expect(host).not.toHaveAttribute('data-no-topbar');
+  });
+
+  it('o topo não oferece abrir nem recolher o menu (nem com `menuButton="always"`)', () => {
+    render(
+      <AppShell
+        layout="immersive"
+        topbar={
+          <TopBar
+            breadcrumb={[{ label: 'Produções' }]}
+            menuButton="always"
+            onToggleSidebar={() => undefined}
+          />
+        }
+      >
+        <p>Conteúdo</p>
+      </AppShell>,
+    );
+    expect(screen.queryByRole('button', { name: 'Abrir menu' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /Recolher menu|Expandir menu/ })).toBeNull();
+  });
+
+  it('`useShell` diz imersivo, sem gaveta e sem menu aberto', () => {
+    let state: ReturnType<typeof useShell> | undefined;
+    function Probe() {
+      state = useShell();
+      return null;
+    }
+    render(
+      <AppShell layout="immersive" defaultNavOpen collapsed>
+        <Probe />
+      </AppShell>,
+    );
+    expect(state).toMatchObject({
+      immersive: true,
+      drawer: false,
+      navOpen: false,
+      collapsed: false,
+    });
+    expect(state?.navId).toBe('');
+  });
+
+  it('o CSS: uma coluna só, sem botões de menu, e o topo vale 0 quando não há topo', () => {
+    expect(css).toMatch(
+      /\.shell\[data-layout='immersive'\] \.frame \{\s*grid-template-columns: minmax\(0, 1fr\);/,
+    );
+    expect(css).toMatch(
+      /\.shell\[data-layout='immersive'\] \.topbar \.menuButton,[^{]*\{\s*display: none;/,
+    );
+    expect(css).toMatch(/\.shell\[data-no-topbar\] \.main \{\s*--topbar-h: 0px;/);
+    // As regras da gaveta em `auto` não alcançam o imersivo.
+    const narrow = css.slice(css.indexOf('@container shell (max-width: 1199px)'));
+    expect(narrow.slice(0, narrow.indexOf('@container shell (max-width: 640px)'))).not.toContain(
+      'immersive',
+    );
+  });
+});
 
 describe('Sidebar · item “Em breve”', () => {
   it('não é link: botão indisponível com selo, nome e motivo na descrição', () => {
@@ -260,6 +343,40 @@ describe('Sidebar · item “Em breve”', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Abrir menu' }));
     expect(screen.getByRole('link', { name: 'Produções' })).toHaveFocus();
+  });
+
+  it('recolhida: grupo recolhível fechado não desenha os ícones (nem a régua); aberto, desenha', () => {
+    const main: NavGroup = {
+      id: 'main',
+      items: [{ id: 'producoes', label: 'Produções', icon: LayoutList, href: '#' }],
+    };
+    const soon: NavGroup = {
+      id: 'soon',
+      label: 'Em breve',
+      collapsible: true,
+      defaultOpen: false,
+      items: [{ id: 'pautas', label: 'Pautas', icon: FileText, soon: true }],
+    };
+    const closed = [main, soon];
+    const { container, unmount } = render(
+      <AppShell layout="desktop" collapsed sidebar={<Sidebar groups={closed} />}>
+        <p>Conteúdo</p>
+      </AppShell>,
+    );
+    expect(within(nav()).getByRole('link', { name: 'Produções' })).toBeInTheDocument();
+    expect(within(nav()).queryByRole('button', { name: /Pautas/ })).toBeNull();
+    expect(container.querySelectorAll('hr')).toHaveLength(0);
+    unmount();
+    render(
+      <AppShell
+        layout="desktop"
+        collapsed
+        sidebar={<Sidebar groups={[main, { ...soon, defaultOpen: true }]} />}
+      >
+        <p>Conteúdo</p>
+      </AppShell>,
+    );
+    expect(within(nav()).getByRole('button', { name: /Pautas/ })).toBeInTheDocument();
   });
 
   it('funciona dentro de grupo recolhível', async () => {
