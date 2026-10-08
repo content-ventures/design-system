@@ -462,6 +462,13 @@ export {
   type AgentTraceStep,
   type AgentTraceStepState,
 } from './agent-trace';
+export {
+  SourceChip,
+  sourceKindLabel,
+  type SourceChipProps,
+  type SourceChipState,
+  type SourceKind,
+} from './source-chip';
 
 /* Revisão */
 export {

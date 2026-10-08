@@ -1,0 +1,311 @@
+/*
+ * SourceChip — chip de 28 px com fio de 1 px (raio `--r-sm`, como o AttachmentChip) e marca de
+ * citação de 18 px dentro do texto corrido. Sem sombra em repouso, sem fio lateral. Status só em
+ * duas marcas: check verde (usada) e “Falta” vermelho (faltante).
+ */
+
+/* ——— Chip ——— */
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-width: 0;
+  height: 28px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  font: var(--t-small-strong);
+  color: var(--ink);
+  vertical-align: middle;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+/* O invólucro da prévia (HoverCard) ocupa a altura toda: o chip inteiro é área de clique. */
+.chip > :not(.remove) {
+  align-self: stretch;
+}
+.hit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  height: 100%;
+  padding: 0 var(--s-2);
+  border-radius: calc(var(--r-sm) - 1px);
+  color: inherit;
+  text-align: left;
+  white-space: nowrap;
+  /* O anel é desenhado no chip inteiro (abaixo). */
+  outline: none;
+}
+.chip[data-variant='chip']:has(.remove) .hit {
+  padding-right: var(--s-1);
+}
+.icon {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--icon-rest);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.chipIndex {
+  flex: none;
+  font: var(--t-caption-strong);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.label {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* A meta cede primeiro; o rótulo só corta quando ela já sumiu. */
+.meta {
+  flex: 0 10 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.missing {
+  flex: none;
+  font: var(--t-caption-strong);
+  color: var(--red-ink);
+}
+.used {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--green-ink);
+  stroke-width: var(--icon-stroke-mark);
+}
+
+/* Hover e pressionado: degrau do secundário (fio `--line-hover` + `--g-25` → `--g-75`). */
+.chip[data-variant='chip'][data-interactive]:not([data-disabled]):is(
+    :hover,
+    [data-force~='hover']
+  ) {
+  border-color: var(--line-hover);
+  background: var(--g-25);
+}
+.chip[data-variant='chip'][data-interactive]:not([data-disabled]):is(
+    :has(.hit:active),
+    [data-force~='active']
+  ) {
+  background: var(--g-75);
+}
+.chip[data-interactive]:not([data-disabled]):is(:hover, [data-force~='hover']) .icon {
+  color: var(--g-600);
+}
+.chip:has(.hit:focus-visible) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+
+/* Selecionada (contexto do compositor): seleção grande da pílula. */
+.chip[data-variant='chip'][data-state='selected'] {
+  border-color: var(--select-line);
+  background: var(--select-bg);
+  color: var(--select-ink);
+}
+.chip[data-variant='chip'][data-state='selected'] .icon {
+  color: var(--b-600);
+}
+.chip[data-variant='chip'][data-state='selected'] .meta,
+.chip[data-variant='chip'][data-state='selected'] .chipIndex {
+  color: var(--select-ink);
+}
+.chip[data-variant='chip'][data-state='selected'][data-interactive]:not([data-disabled]):is(
+    :hover,
+    [data-force~='hover']
+  ) {
+  border-color: var(--b-400);
+  background: var(--b-50);
+}
+.chip[data-variant='chip'][data-state='selected'][data-interactive]:not([data-disabled]):is(
+    :has(.hit:active),
+    [data-force~='active']
+  ) {
+  background: var(--b-100);
+}
+
+/* Falta: a citação não bate com a fonte. */
+.chip[data-variant='chip'][data-state='missing'] {
+  border-color: var(--red-line);
+}
+.chip[data-variant='chip'][data-state='missing'][data-interactive]:not([data-disabled]):is(
+    :hover,
+    [data-force~='hover']
+  ) {
+  border-color: var(--red-dot);
+}
+
+/* Indisponível. */
+.chip[data-disabled] {
+  border-color: var(--disabled-line);
+  background: var(--disabled-bg);
+  color: var(--disabled-ink);
+  cursor: not-allowed;
+}
+.chip[data-disabled] .hit {
+  cursor: not-allowed;
+}
+.chip[data-disabled] :is(.icon, .meta, .chipIndex, .used, .missing) {
+  color: var(--disabled-icon);
+}
+
+/* ——— Remover ——— */
+.remove {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-right: 3px;
+  border-radius: var(--r-xs);
+  color: var(--g-400);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.remove svg {
+  width: 13px;
+  height: 13px;
+}
+.remove:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.remove:active:not(:disabled) {
+  background: var(--g-100);
+}
+.remove:focus-visible {
+  outline-offset: 0;
+}
+.remove:disabled {
+  color: var(--disabled-icon);
+  cursor: not-allowed;
+}
+@media (pointer: coarse) {
+  .remove {
+    position: relative;
+  }
+  .remove::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
+}
+
+/* ——— Citação no texto corrido ——— */
+.chip[data-variant='inline'] {
+  height: 18px;
+  margin-inline: 2px;
+  border: 0;
+  border-radius: var(--r-xs);
+  background: var(--g-75);
+  font: var(--t-caption-strong);
+  color: var(--text);
+  /* Levemente elevada, sem mexer na entrelinha do parágrafo. */
+  vertical-align: 0.2em;
+}
+.chip[data-variant='inline'] .hit {
+  justify-content: center;
+  gap: 3px;
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: var(--r-xs);
+}
+.chip[data-variant='inline'] .icon {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+.chip[data-variant='inline'] .label {
+  max-width: 160px;
+}
+.index {
+  font-variant-numeric: tabular-nums;
+}
+.chip[data-variant='inline'][data-interactive]:not([data-disabled]):is(
+    :hover,
+    [data-force~='hover']
+  ) {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+.chip[data-variant='inline'][data-interactive]:not([data-disabled]):is(
+    :hover,
+    [data-force~='hover']
+  )
+  .icon {
+  color: var(--b-600);
+}
+.chip[data-variant='inline'][data-interactive]:not([data-disabled]):is(
+    :has(.hit:active),
+    [data-force~='active']
+  ) {
+  background: var(--accent-soft-hover);
+}
+.chip[data-variant='inline'][data-state='selected'] {
+  border: 1px solid var(--select-line);
+  background: var(--select-bg);
+  color: var(--select-ink);
+}
+.chip[data-variant='inline'][data-state='selected'] .hit {
+  padding-inline: var(--s-1);
+}
+.chip[data-variant='inline'][data-state='selected'] .icon {
+  color: var(--b-600);
+}
+.chip[data-variant='inline'][data-state='missing'] {
+  background: var(--red-bg);
+  color: var(--red-ink);
+}
+.chip[data-variant='inline'][data-state='missing'] .icon {
+  color: var(--red-ink);
+}
+.chip[data-variant='inline'][data-state='missing'] .index::after {
+  content: '·';
+  margin-left: 3px;
+}
+.chip[data-variant='inline'][data-state='missing'][data-interactive]:not([data-disabled]):is(
+    :hover,
+    [data-force~='hover']
+  ) {
+  background: var(--red-line);
+  color: var(--red-ink);
+}
+.chip[data-variant='inline'][data-disabled] {
+  background: var(--disabled-bg);
+}
+.chip[data-variant='inline']:has(.hit:focus-visible) {
+  outline-offset: 1px;
+}
+
+/* ——— Prévia (HoverCard e Popover) ——— */
+.preview {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-3);
+  min-width: 0;
+  font: var(--t-body);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .icon,
+  .remove {
+    transition: none;
+  }
+}
