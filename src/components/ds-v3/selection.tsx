@@ -11,6 +11,7 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
+import { Tooltip } from './overlays';
 import s from './selection.module.css';
 
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
@@ -428,25 +429,34 @@ export function Segmented<T extends string>({
           style={{ width: box.w, transform: `translateX(${box.x}px)` }}
         />
       )}
-      {options.map(({ value: optionValue, label: optionLabel, icon: Icon, iconOnly }) => (
-        <button
-          key={optionValue}
-          ref={(node) => {
-            refs.current[optionValue] = node;
-          }}
-          type="button"
-          role="radio"
-          aria-checked={optionValue === value}
-          aria-label={iconOnly ? optionLabel : undefined}
-          title={iconOnly ? optionLabel : undefined}
-          tabIndex={optionValue === value ? 0 : -1}
-          className={s.segment}
-          onClick={() => onChange(optionValue)}
-        >
-          {Icon && <Icon aria-hidden="true" />}
-          {!iconOnly && optionLabel}
-        </button>
-      ))}
+      {options.map(({ value: optionValue, label: optionLabel, icon: Icon, iconOnly }) => {
+        const segment = (
+          <button
+            key={optionValue}
+            ref={(node) => {
+              refs.current[optionValue] = node;
+            }}
+            type="button"
+            role="radio"
+            aria-checked={optionValue === value}
+            aria-label={iconOnly ? optionLabel : undefined}
+            tabIndex={optionValue === value ? 0 : -1}
+            className={s.segment}
+            onClick={() => onChange(optionValue)}
+          >
+            {Icon && <Icon aria-hidden="true" />}
+            {!iconOnly && optionLabel}
+          </button>
+        );
+        // Só ícone: o nome aparece na dica do DS (nunca no `title` nativo).
+        return iconOnly ? (
+          <Tooltip key={optionValue} bare content={optionLabel}>
+            {segment}
+          </Tooltip>
+        ) : (
+          segment
+        );
+      })}
     </div>
   );
 }

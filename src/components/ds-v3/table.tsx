@@ -20,7 +20,7 @@ import {
   type ReactNode,
 } from 'react';
 import { Button } from './button';
-import { Tooltip } from './overlays';
+import { Tooltip, TruncatedText } from './overlays';
 import { Checkbox } from './selection';
 import s from './table.module.css';
 
@@ -57,7 +57,8 @@ const reduced = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const toSet = (value?: ReadonlySet<string> | readonly string[]) =>
   value instanceof Set ? (value as ReadonlySet<string>) : new Set<string>(value ?? []);
-const isBlank = (node: ReactNode) => node === null || node === undefined || node === false || node === '';
+const isBlank = (node: ReactNode) =>
+  node === null || node === undefined || node === false || node === '';
 const isInteractiveTarget = (target: EventTarget | null) =>
   target instanceof Element &&
   Boolean(
@@ -172,7 +173,9 @@ export function DataTable<Row>({
     setPrevHidden(hiddenKey);
     setMotion(next);
   }
-  const visible = columns.filter((column) => !hidden.has(column.key) || motion[column.key] === 'out');
+  const visible = columns.filter(
+    (column) => !hidden.has(column.key) || motion[column.key] === 'out',
+  );
   const span = visible.length + (selectable ? 1 : 0);
   // Título do cartão no celular: a coluna fixa (`pinned`) — o nome do registro —, senão a primeira
   // com cabeçalho. Coluna de indicador antes do nome (o ponto "no ar") não rouba o título.
@@ -194,7 +197,9 @@ export function DataTable<Row>({
     const animations: Animation[] = [];
     Object.entries(motion).forEach(([key, dir]) => {
       const cells = [...table.querySelectorAll<HTMLElement>(`[data-col="${CSS.escape(key)}"]`)];
-      const head = cells.find((cell) => cell.tagName === 'TH' && cell.parentElement?.parentElement?.tagName === 'THEAD');
+      const head = cells.find(
+        (cell) => cell.tagName === 'TH' && cell.parentElement?.parentElement?.tagName === 'THEAD',
+      );
       const width = head?.getBoundingClientRect().width ?? 0;
       const frames = (from: Keyframe, to: Keyframe) => (dir === 'out' ? [from, to] : [to, from]);
       const timing: KeyframeAnimationOptions = {
@@ -330,7 +335,11 @@ export function DataTable<Row>({
                   : sort?.direction === 'asc'
                     ? ArrowUp
                     : ArrowDown;
-                const text = column.hint ? <span className={s.term}>{column.header}</span> : column.header;
+                const text = column.hint ? (
+                  <span className={s.term}>{column.header}</span>
+                ) : (
+                  column.header
+                );
                 let content: ReactNode = text;
                 if (column.sortable && onSort) {
                   const button = (
@@ -349,7 +358,11 @@ export function DataTable<Row>({
                       <SortIcon aria-hidden="true" />
                     </button>
                   );
-                  content = column.hint ? <Tooltip content={column.hint}>{button}</Tooltip> : button;
+                  content = column.hint ? (
+                    <Tooltip content={column.hint}>{button}</Tooltip>
+                  ) : (
+                    button
+                  );
                 } else if (column.hint) {
                   content = (
                     <Tooltip content={column.hint}>
@@ -376,7 +389,12 @@ export function DataTable<Row>({
               })}
             </tr>
           </thead>
-          <tbody ref={bodyRef} key={`${mode}:${transitionKey ?? ''}`} className={s.body} data-mode={mode}>
+          <tbody
+            ref={bodyRef}
+            key={`${mode}:${transitionKey ?? ''}`}
+            className={s.body}
+            data-mode={mode}
+          >
             {banner && mode === 'rows' && (
               <tr className={s.bannerRow}>
                 <td colSpan={span}>
@@ -397,19 +415,35 @@ export function DataTable<Row>({
                   {visible.map((column, colIndex) => {
                     const kind = column.skeleton ?? (column.numeric ? 'short' : 'text');
                     return (
-                      <td key={column.key} data-col={column.key} data-title={column.key === titleKey || undefined} data-align={column.numeric ? 'end' : column.align}>
+                      <td
+                        key={column.key}
+                        data-col={column.key}
+                        data-title={column.key === titleKey || undefined}
+                        data-align={column.numeric ? 'end' : column.align}
+                      >
                         {wrap(
                           column.key,
                           kind === 'none' ? null : kind === 'lines' ? (
                             <span className={s.skelLines}>
-                              <span className={s.skel} style={{ width: `${skeletonWidth(rowIndex, colIndex) + 14}%` }} />
-                              <span className={s.skel} data-kind="sub" style={{ width: `${skeletonWidth(rowIndex + 3, colIndex)}%` }} />
+                              <span
+                                className={s.skel}
+                                style={{ width: `${skeletonWidth(rowIndex, colIndex) + 14}%` }}
+                              />
+                              <span
+                                className={s.skel}
+                                data-kind="sub"
+                                style={{ width: `${skeletonWidth(rowIndex + 3, colIndex)}%` }}
+                              />
                             </span>
                           ) : (
                             <span
                               className={s.skel}
                               data-kind={kind}
-                              style={kind === 'text' ? { width: `${skeletonWidth(rowIndex, colIndex)}%` } : undefined}
+                              style={
+                                kind === 'text'
+                                  ? { width: `${skeletonWidth(rowIndex, colIndex)}%` }
+                                  : undefined
+                              }
                             />
                           ),
                         )}
@@ -496,7 +530,8 @@ export function DataTable<Row>({
                           rendered
                         );
                       const title = column.truncate
-                        ? (column.title?.(row) ?? (typeof rendered === 'string' ? rendered : undefined))
+                        ? (column.title?.(row) ??
+                          (typeof rendered === 'string' ? rendered : undefined))
                         : undefined;
                       return (
                         <td
@@ -520,9 +555,14 @@ export function DataTable<Row>({
                             wrap(
                               column.key,
                               column.truncate ? (
-                                <span className={s.truncate} title={title}>
-                                  {value}
-                                </span>
+                                // O texto inteiro numa dica do DS, só quando a célula cortou.
+                                title !== undefined ? (
+                                  <TruncatedText className={s.truncate} text={title}>
+                                    {value}
+                                  </TruncatedText>
+                                ) : (
+                                  <span className={s.truncate}>{value}</span>
+                                )
                               ) : (
                                 value
                               ),
@@ -541,7 +581,12 @@ export function DataTable<Row>({
                 {selectable && <td className={s.check} />}
                 {visible.map((column, index) =>
                   index === 0 ? (
-                    <th key={column.key} scope="row" data-col={column.key} data-align={column.numeric ? 'end' : column.align}>
+                    <th
+                      key={column.key}
+                      scope="row"
+                      data-col={column.key}
+                      data-align={column.numeric ? 'end' : column.align}
+                    >
                       {wrap(column.key, totalRow[column.key] ?? 'Total')}
                     </th>
                   ) : (
@@ -786,7 +831,11 @@ export function BulkBar({
               aria-busy={running || undefined}
               onClick={onSelect}
             >
-              {running ? <LoaderCircle className={s.bulkSpin} aria-hidden="true" /> : <Icon aria-hidden="true" />}
+              {running ? (
+                <LoaderCircle className={s.bulkSpin} aria-hidden="true" />
+              ) : (
+                <Icon aria-hidden="true" />
+              )}
               <span className={s.bulkLabel}>{label}</span>
             </button>
           );

@@ -2,6 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 import { isValidElement } from 'react';
 import type { ComponentProps, CSSProperties, MouseEvent, ReactNode } from 'react';
 import type { Tone } from './badge';
+import { TruncatedText } from './overlays';
 import s from './surfaces.module.css';
 
 /* ——————————————————————————— Card ——————————————————————————— */
@@ -340,16 +341,21 @@ export function MetaList({
       style={{ '--meta-sep': JSON.stringify(separator) } as CSSProperties}
     >
       <span className={s.metaTrack}>
-        {visible.map((item, index) => (
-          <span
-            key={index}
-            className={s.metaItem}
-            data-num={item.numeric ? '' : undefined}
-            title={!wrap && index === 0 && typeof item.value === 'string' ? item.value : undefined}
-          >
-            {item.value}
-          </span>
-        ))}
+        {visible.map((item, index) =>
+          // Numa linha só, o primeiro item é o que cede: o texto inteiro vai na dica do DS quando corta.
+          !wrap && index === 0 && typeof item.value === 'string' ? (
+            <TruncatedText
+              key={index}
+              className={s.metaItem}
+              data-num={item.numeric ? '' : undefined}
+              text={item.value}
+            />
+          ) : (
+            <span key={index} className={s.metaItem} data-num={item.numeric ? '' : undefined}>
+              {item.value}
+            </span>
+          ),
+        )}
       </span>
     </div>
   );

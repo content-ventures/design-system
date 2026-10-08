@@ -1,10 +1,19 @@
 'use client';
 
 import { X, type LucideIcon } from 'lucide-react';
-import { useLayoutEffect, useRef, type KeyboardEvent, type MouseEvent, type ReactNode, type Ref } from 'react';
+import {
+  useLayoutEffect,
+  useRef,
+  type KeyboardEvent,
+  type MouseEvent,
+  type ReactNode,
+  type Ref,
+} from 'react';
+import { Tooltip, useClipped } from './overlays';
 import s from './badge.module.css';
 
-export type Tone = 'gray' | 'blue' | 'green' | 'amber' | 'orange' | 'red' | 'violet' | 'teal' | 'pink';
+export type Tone =
+  'gray' | 'blue' | 'green' | 'amber' | 'orange' | 'red' | 'violet' | 'teal' | 'pink';
 
 const reduced = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -40,12 +49,14 @@ export function Badge({
   /** Pulso discreto no ponto, para o que está acontecendo agora (veiculando). */
   live?: boolean;
   icon?: LucideIcon;
+  /** Texto inteiro numa dica do DS (`Tooltip`) quando o selo corta — nunca o `title` nativo. */
   title?: string;
   /** `text` em célula de tabela: quebra em até duas linhas em vez de estourar a coluna. */
   wrap?: boolean;
 }) {
   const showDot = Boolean(dot) || variant === 'text' || live;
-  return (
+  const [labelRef, clipped] = useClipped<HTMLSpanElement>([children]);
+  const badge = (
     <span
       className={s.badge}
       data-tone={tone}
@@ -54,15 +65,25 @@ export function Badge({
       data-shape={shape}
       data-live={live || undefined}
       data-wrap={wrap || undefined}
-      title={title}
     >
       {Icon ? (
         <Icon aria-hidden="true" />
       ) : (
-        showDot && <i className={s.dot} data-hollow={dot === 'hollow' || undefined} aria-hidden="true" />
+        showDot && (
+          <i className={s.dot} data-hollow={dot === 'hollow' || undefined} aria-hidden="true" />
+        )
       )}
-      <span className={s.label}>{children}</span>
+      <span ref={labelRef} className={s.label}>
+        {children}
+      </span>
     </span>
+  );
+  return title ? (
+    <Tooltip content={title} bare describe={false} disabled={!clipped}>
+      {badge}
+    </Tooltip>
+  ) : (
+    badge
   );
 }
 
@@ -114,6 +135,7 @@ export function Chip({
   removing?: boolean;
   /** Marcado para sair (1º Backspace num campo de etiquetas) ou repetido (destaque breve). */
   highlighted?: boolean;
+  /** Texto inteiro numa dica do DS quando o valor corta — nunca o `title` nativo. */
   title?: string;
   'data-force'?: string;
   /** Prancha: estado forçado do X (`hover`, `focus`). */
@@ -121,6 +143,7 @@ export function Chip({
   ref?: Ref<HTMLSpanElement>;
 }) {
   const ref = useRef<HTMLSpanElement | null>(null);
+  const [valueRef, clipped] = useClipped<HTMLSpanElement>([children]);
   const setRef = (node: HTMLSpanElement | null) => {
     ref.current = node;
     if (typeof outerRef === 'function') outerRef(node);
@@ -157,10 +180,14 @@ export function Chip({
       {Icon && <Icon aria-hidden="true" />}
       {leading && <span className={s.chipLeading}>{leading}</span>}
       {label && <span className={s.label}>{label}</span>}
-      {children !== undefined && <span className={s.value}>{children}</span>}
+      {children !== undefined && (
+        <span ref={valueRef} className={s.value}>
+          {children}
+        </span>
+      )}
     </>
   );
-  return (
+  const chip = (
     <span
       ref={setRef}
       className={s.chip}
@@ -175,7 +202,6 @@ export function Chip({
       data-highlighted={highlighted || undefined}
       data-force={onClick ? undefined : force}
       aria-hidden={leaving || undefined}
-      title={title}
       onKeyDown={onKeyDown}
     >
       {onClick ? (
@@ -205,6 +231,13 @@ export function Chip({
         </button>
       )}
     </span>
+  );
+  return title ? (
+    <Tooltip content={title} bare describe={false} disabled={!clipped}>
+      {chip}
+    </Tooltip>
+  ) : (
+    chip
   );
 }
 

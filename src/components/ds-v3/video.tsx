@@ -21,6 +21,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { MediaFrame } from './media';
+import { Tooltip } from './overlays';
 import s from './video.module.css';
 
 export type VideoState = 'poster' | 'playing' | 'paused' | 'loading' | 'ended' | 'error';
@@ -321,16 +322,17 @@ function Ctrl({
   pressed?: boolean;
 }) {
   return (
-    <button
-      type="button"
-      className={s.ctrl}
-      aria-label={label}
-      title={label}
-      aria-pressed={pressed}
-      onClick={onClick}
-    >
-      <Icon aria-hidden="true" />
-    </button>
+    <Tooltip bare content={label}>
+      <button
+        type="button"
+        className={s.ctrl}
+        aria-label={label}
+        aria-pressed={pressed}
+        onClick={onClick}
+      >
+        <Icon aria-hidden="true" />
+      </button>
+    </Tooltip>
   );
 }
 
