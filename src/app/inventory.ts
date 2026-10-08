@@ -607,6 +607,24 @@ export const inventory: readonly InventoryGroup[] = [
     ],
   },
   {
+    id: 'ia',
+    label: 'IA',
+    items: [
+      item(
+        'compositor',
+        'Compositor de pedido',
+        'Campo do copiloto: contexto, pedidos prontos, modelo, enviar e parar.',
+        'prompt composer chat input modelo copiloto',
+      ),
+      item(
+        'conversa',
+        'Conversa',
+        'Linha do tempo do copiloto: turnos, artefato, voto e ir para o fim.',
+        'conversation chat thread mensagem turno feedback copiloto',
+      ),
+    ],
+  },
+  {
     id: 'padroes',
     label: 'Padrões do MediaOn',
     items: [

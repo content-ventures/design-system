@@ -10,6 +10,7 @@ import {
   MousePointerClick,
   Palette,
   PenLine,
+  Sparkles,
   Table2,
   TextCursorInput,
   type LucideIcon,
@@ -31,6 +32,7 @@ export const families: Record<string, FamilyMeta> = {
   camadas: { icon: Layers, label: 'Modais e camadas' },
   midia: { icon: Images, label: 'Mídia e arquivos' },
   editor: { icon: PenLine, label: 'Editor' },
+  ia: { icon: Sparkles, label: 'IA' },
   padroes: { icon: Blocks, label: 'Padrões' },
   templates: { icon: LayoutTemplate, label: 'Templates' },
 };

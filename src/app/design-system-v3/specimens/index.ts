@@ -12,6 +12,7 @@ import { specimens as formulariosB } from './formularios-b';
 import { specimens as fundamentos } from './fundamentos';
 import { specimens as fundamentosLeitura } from './fundamentos-leitura';
 import { specimens as graficos } from './graficos';
+import { specimens as iaCopiloto } from './ia-copiloto';
 import { specimens as midia } from './midia';
 import { specimens as navegacao } from './navegacao';
 import { specimens as padroesA } from './padroes-a';
@@ -36,6 +37,7 @@ export const specimens: Record<string, ComponentType> = {
   ...midia,
   ...editorProse,
   ...editorToolbar,
+  ...iaCopiloto,
   ...padroesA,
   ...padroesB,
   ...templates,
