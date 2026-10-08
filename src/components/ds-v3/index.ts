@@ -70,6 +70,13 @@ export {
   type TranscriptAction,
   type TranscriptSelectionActions,
 } from './transcript-viewer';
+export {
+  SlideStrip,
+  type SlideStripProps,
+  type SlideStripItem,
+  type SlideStripItemState,
+  type SlideStripOrientation,
+} from './slide-strip';
 
 /* Status e marcadores */
 export { Badge, Chip, Kbd, Count, type Tone } from './badge';

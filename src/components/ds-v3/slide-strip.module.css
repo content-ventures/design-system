@@ -1,0 +1,336 @@
+/* ——— SlideStrip ———
+ * Vertical (painel lateral): linhas com número, miniatura e nome; aviso em ponto + texto.
+ * Horizontal (coluna estreita, celular): miniaturas lado a lado com número e ponto; rola no eixo.
+ * Miniatura com altura fixa de 96 px: a largura sai da proporção da peça. */
+.strip {
+  --thumb-h: calc(var(--s-12) * 2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  width: 100%;
+  min-width: 0;
+}
+.list {
+  display: grid;
+  gap: var(--s-1);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ——— Item ——— */
+.item {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+.tile {
+  display: grid;
+  grid-template-columns: var(--s-5) auto minmax(0, 1fr);
+  column-gap: var(--s-3);
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+  padding: var(--s-2);
+  border-radius: var(--r-md);
+  color: var(--text);
+  text-align: left;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.item[data-actions] .tile {
+  padding-right: var(--s-10);
+}
+.tile:is(:hover, [data-force~='hover']):not(:disabled) {
+  background: var(--g-25);
+}
+.tile:is(:active, [data-force~='active']):not(:disabled) {
+  background: var(--g-50);
+}
+.tile:is(:focus-visible, [data-force~='focus']) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset-inset);
+}
+.item[data-selected] .tile {
+  background: var(--select-bg);
+}
+.item[data-selected] .tile:is(:hover, [data-force~='hover']):not(:disabled) {
+  background: var(--b-50);
+}
+
+.num {
+  font: var(--t-caption-strong);
+  line-height: var(--s-5);
+  color: var(--muted);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  transition: color var(--dur-1) var(--ease-out);
+}
+.item[data-selected] .num {
+  color: var(--select-ink);
+}
+
+/* Miniatura: fio interno por cima da arte; escolhida ganha anel de 2 px b-600 com 2 px de respiro. */
+.thumb {
+  position: relative;
+  display: block;
+  height: var(--thumb-h);
+  overflow: clip;
+  border-radius: var(--r-sm);
+  background: var(--g-50);
+  transition: outline-color var(--dur-1) var(--ease-out);
+}
+.thumb > * {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.thumb > img {
+  object-fit: cover;
+}
+.thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--line);
+  border-radius: inherit;
+  pointer-events: none;
+  transition: border-color var(--dur-1) var(--ease-out);
+}
+.tile:is(:hover, [data-force~='hover']):not(:disabled) .thumb::after {
+  border-color: var(--line-hover);
+}
+.item[data-selected] .thumb {
+  outline: 2px solid var(--b-600);
+  outline-offset: 2px;
+}
+
+.text {
+  display: grid;
+  gap: var(--s-1);
+  min-width: 0;
+}
+.label {
+  display: -webkit-box;
+  min-width: 0;
+  overflow: hidden;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.meta {
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Alça: sempre à vista na vertical (é ela que diz que a faixa reordena), sob o número. */
+.grip {
+  position: absolute;
+  top: 50%;
+  left: var(--s-2);
+  display: inline-grid;
+  place-items: center;
+  width: var(--s-5);
+  height: var(--s-8);
+  translate: 0 -50%;
+  border-radius: var(--r-sm);
+  color: var(--icon-quiet);
+  cursor: grab;
+  touch-action: none;
+  transition:
+    color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out),
+    opacity var(--dur-1) var(--ease-out);
+}
+.grip svg {
+  width: var(--icon-md);
+  height: var(--icon-md);
+}
+.item:is(:hover, :focus-within) .grip {
+  color: var(--g-600);
+}
+.grip:hover {
+  color: var(--ink);
+  background: var(--g-75);
+}
+
+.actions {
+  position: absolute;
+  top: var(--s-2);
+  right: var(--s-2);
+  display: inline-flex;
+  transition: opacity var(--dur-1) var(--ease-out);
+}
+
+/* Aviso só com ponto (horizontal); o texto vai para o leitor de tela e para a dica do DS. */
+.dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--r-full);
+  background: var(--amber-dot);
+}
+.dot[data-tone='red'] {
+  background: var(--red-dot);
+}
+
+/* ——— Arrasto ——— */
+.item[data-dragging] {
+  z-index: 2;
+  box-shadow: var(--shadow-drag);
+}
+.item[data-dragging] .grip {
+  color: var(--g-700);
+  cursor: grabbing;
+}
+
+/* ——— Indisponível ——— */
+.tile:disabled {
+  cursor: not-allowed;
+}
+.tile:disabled :is(.num, .label, .meta) {
+  color: var(--disabled-ink);
+}
+.tile:disabled .thumb > * {
+  opacity: 0.5;
+}
+.strip[data-disabled] .item[data-selected] .tile {
+  background: var(--disabled-bg);
+}
+.strip[data-disabled] .item[data-selected] .thumb {
+  outline-color: var(--disabled-icon);
+}
+.strip[data-disabled] .item[data-selected] .num {
+  color: var(--disabled-ink);
+}
+
+/* ——— Adicionar ——— */
+.addRow {
+  justify-self: start;
+  align-self: flex-start;
+}
+.addTile {
+  display: grid;
+  flex: none;
+  padding: var(--s-2);
+  border-radius: var(--r-md);
+  color: var(--icon-rest);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.addBox {
+  display: grid;
+  place-items: center;
+  height: var(--thumb-h);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  box-shadow: var(--shadow-xs);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out),
+    scale var(--dur-1) var(--ease-out);
+}
+.addBox svg {
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+}
+.addTile:is(:hover, [data-force~='hover']):not(:disabled, [aria-disabled='true']) {
+  color: var(--ink);
+}
+.addTile:is(:hover, [data-force~='hover']):not(:disabled, [aria-disabled='true']) .addBox {
+  border-color: var(--line-hover);
+  background: var(--g-25);
+}
+.addTile:is(:active, [data-force~='active']):not(:disabled, [aria-disabled='true']) .addBox {
+  background: var(--g-75);
+  scale: var(--press-scale);
+}
+.addTile:is(:focus-visible, [data-force~='focus']) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset-inset);
+}
+.addTile:is(:disabled, [aria-disabled='true']) {
+  color: var(--disabled-icon);
+  cursor: not-allowed;
+}
+.addTile:is(:disabled, [aria-disabled='true']) .addBox {
+  border-color: var(--disabled-line);
+  background: var(--disabled-bg);
+  box-shadow: none;
+}
+
+.empty {
+  padding: var(--s-3) var(--s-2);
+  font: var(--t-small);
+  color: var(--muted);
+}
+
+/* ——— Horizontal ——— */
+.strip[data-orientation='horizontal'] {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--s-1);
+  padding: var(--s-1);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+.strip[data-orientation='horizontal'] .list {
+  flex: none;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+}
+.strip[data-orientation='horizontal'] .tile {
+  grid-template-columns: auto;
+  row-gap: var(--s-1);
+  padding: var(--s-2);
+}
+.strip[data-orientation='horizontal'] .item[data-actions] .tile {
+  padding-right: var(--s-2);
+}
+.cap {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  height: var(--s-8);
+  padding-left: var(--s-5);
+}
+.cap .num {
+  min-width: var(--s-2);
+}
+.strip[data-orientation='horizontal'] .grip {
+  top: auto;
+  bottom: var(--s-2);
+  left: var(--s-2);
+  translate: none;
+}
+.strip[data-orientation='horizontal'] .actions {
+  top: auto;
+  right: var(--s-1);
+  bottom: var(--s-2);
+}
+/* Na horizontal, alça e menu ficam na escolhida (e no hover/foco): a miniatura é estreita. */
+.strip[data-orientation='horizontal']
+  .item:not([data-selected], :hover, :focus-within)
+  :is(.grip, .actions) {
+  opacity: 0;
+  pointer-events: none;
+}
+.strip[data-orientation='horizontal'] .empty {
+  padding: var(--s-4);
+}
+
+@media (pointer: coarse) {
+  .grip {
+    width: var(--target-min);
+    height: var(--target-min);
+  }
+  .strip[data-orientation='vertical'] .grip {
+    left: 0;
+  }
+}
