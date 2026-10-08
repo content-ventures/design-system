@@ -9,12 +9,14 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type FocusEvent as ReactFocusEvent,
   type HTMLAttributes,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
   type ReactElement,
   type ReactNode,
+  type Ref,
   type RefObject,
   type SyntheticEvent,
 } from 'react';
@@ -487,15 +489,80 @@ export function Dialog({
   );
 }
 
+/* ——————————————————————————— Texto cortado ——————————————————————————— */
+
+/**
+ * O elemento corta o próprio texto (reticência numa linha ou `line-clamp`)? Relido quando ele muda
+ * de tamanho e quando `deps` mudam. Serve às peças que trocam o `title` nativo pela `Tooltip`.
+ */
+export function useClipped<T extends HTMLElement>(deps: readonly unknown[] = []) {
+  const ref = useRef<T | null>(null);
+  const [clipped, setClipped] = useState(false);
+  useIsoLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () =>
+      setClipped(el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1);
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, deps);
+  return [ref, clipped] as const;
+}
+
+type TruncatedTag = 'span' | 'p' | 'dd' | 'h1' | 'h2' | 'h3' | 'h4';
+
+/**
+ * Texto que corta com reticência (o CSS de `className` corta) e, só quando cortou, mostra o texto
+ * inteiro numa `Tooltip` do DS ao passar o ponteiro — no lugar do `title` nativo. O texto inteiro
+ * continua no DOM: o leitor de tela já lê tudo, então a dica não vira descrição. `children` troca o
+ * conteúdo mostrado (ex.: com marca antes); `text` é o que a dica diz.
+ */
+export function TruncatedText({
+  text,
+  children,
+  as: Tag = 'span',
+  className = '',
+  ...props
+}: Omit<HTMLAttributes<HTMLElement>, 'title' | 'children'> & {
+  text: string;
+  children?: ReactNode;
+  as?: TruncatedTag;
+}) {
+  const [ref, clipped] = useClipped<HTMLElement>([text, children]);
+  return (
+    <Tooltip content={text} bare describe={false} disabled={!clipped}>
+      <Tag
+        {...props}
+        ref={ref as RefObject<never>}
+        className={className}
+        data-clipped={clipped || undefined}
+      >
+        {children ?? text}
+      </Tag>
+    </Tooltip>
+  );
+}
+
 /* ——————————————————————————— Tooltip ——————————————————————————— */
 
 type TipPosition = { top: number; left: number; arrow: number; below: boolean };
+type TipHandler<E> = (event: E) => void;
 type Describable = {
   'aria-describedby'?: string;
   'aria-label'?: string;
   label?: string;
   title?: string;
+  ref?: Ref<HTMLElement>;
+  onPointerEnter?: TipHandler<ReactPointerEvent<HTMLElement>>;
+  onPointerLeave?: TipHandler<ReactPointerEvent<HTMLElement>>;
+  onPointerDown?: TipHandler<ReactPointerEvent<HTMLElement>>;
+  onFocus?: TipHandler<ReactFocusEvent<HTMLElement>>;
+  onBlur?: TipHandler<ReactFocusEvent<HTMLElement>>;
 };
+const UNAVAILABLE = ':disabled, [aria-disabled="true"]';
 
 const TIP_GAP = 8;
 const TIP_EDGE = 8;
@@ -522,6 +589,7 @@ function tipDelay(anchor: Element | null) {
  * escrito. Abre depois de `--tip-delay` (250 ms) no hover e na hora com foco de teclado; entre
  * gatilhos vizinhos (300 ms) a segunda abre sem espera. Fixa na janela, vira para baixo perto do
  * topo, 240 px no máximo. No toque, tocar um controle indisponível mostra o motivo por 1,5 s.
+ * Clicar fecha a dica, salvo num controle indisponível (ali o clique pergunta “por quê?”).
  */
 export function Tooltip({
   content,
@@ -529,6 +597,9 @@ export function Tooltip({
   children,
   open: pinned = false,
   side = 'top',
+  bare = false,
+  describe: describeProp,
+  disabled = false,
 }: {
   content: string;
   shortcut?: string;
@@ -537,8 +608,28 @@ export function Tooltip({
   open?: boolean;
   /** Lado preferido. Vira sozinho quando não cabe. */
   side?: 'top' | 'bottom';
+  /**
+   * Sem caixa própria: a âncora é o próprio filho, que precisa repassar `ref` e eventos ao DOM
+   * (IconButton, alvos do DS posicionados no layout). Um filho `disabled` não recebe ponteiro: use
+   * `aria-disabled` para o motivo aparecer.
+   */
+  bare?: boolean;
+  /**
+   * Liga a dica ao gatilho como descrição (`aria-describedby`). Padrão: sim, salvo quando o gatilho
+   * já tem esse nome. `false` quando o gatilho já diz isso ao leitor de tela por conta própria.
+   */
+  describe?: boolean;
+  /**
+   * Desligada: o filho fica igual (mesma árvore, mesma referência) e nada abre. Para a dica que só
+   * existe às vezes (o texto que cortou, `TruncatedText`).
+   */
+  disabled?: boolean;
 }) {
-  const anchorRef = useRef<HTMLSpanElement>(null);
+  const anchorRef = useRef<HTMLElement | null>(null);
+  const off = useRef(disabled);
+  useIsoLayoutEffect(() => {
+    off.current = disabled;
+  });
   const tipRef = useRef<HTMLSpanElement>(null);
   const timer = useRef<number | undefined>(undefined);
   const [open, setOpen] = useState(false);
@@ -561,6 +652,7 @@ export function Tooltip({
   }
   function show(source: 'pointer' | 'keyboard') {
     window.clearTimeout(timer.current);
+    if (off.current) return;
     const skip = performance.now() - lastTipHide < SKIP_MS;
     if (skip || source === 'keyboard') {
       reveal(skip);
@@ -576,6 +668,13 @@ export function Tooltip({
   }
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
+  useEffect(() => {
+    if (disabled) {
+      window.clearTimeout(timer.current);
+      setOpen(false);
+      setPos(null);
+    }
+  }, [disabled]);
 
   useEffect(() => {
     if (!open) return;
@@ -619,12 +718,81 @@ export function Tooltip({
     });
   }, [open, host, content, shortcut, side]);
 
+  function unavailable() {
+    const anchor = anchorRef.current;
+    return Boolean(anchor && (anchor.matches(UNAVAILABLE) || anchor.querySelector(UNAVAILABLE)));
+  }
+  const handlers = {
+    onPointerEnter: (event: ReactPointerEvent<HTMLElement>) => {
+      if (event.pointerType !== 'touch') show('pointer');
+    },
+    onPointerLeave: (event: ReactPointerEvent<HTMLElement>) => {
+      if (event.pointerType !== 'touch') hide();
+    },
+    onPointerDown: (event: ReactPointerEvent<HTMLElement>) => {
+      if (event.pointerType !== 'touch') {
+        // Clicar não deixa a dica pendurada sobre o que o clique abriu (nem durante um arraste).
+        if (!unavailable()) hide();
+        return;
+      }
+      if (!unavailable()) return;
+      reveal(false);
+      window.clearTimeout(timer.current);
+      timer.current = window.setTimeout(hide, TOUCH_MS);
+    },
+    onFocus: (event: ReactFocusEvent<HTMLElement>) => {
+      // Só foco de teclado: o clique já mostrou a dica pelo hover.
+      if (event.target instanceof HTMLElement && event.target.matches(':focus-visible'))
+        show('keyboard');
+    },
+    onBlur: () => hide(),
+  };
+
   const child = isValidElement<Describable>(children)
     ? (children as ReactElement<Describable>)
     : null;
   // Botão de ícone que já tem esse nome: repetir a dica como descrição faria o leitor falar duas vezes.
   const describe =
-    child !== null && child.props['aria-label'] !== content && child.props.label !== content;
+    !disabled &&
+    child !== null &&
+    (describeProp ?? (child.props['aria-label'] !== content && child.props.label !== content));
+  // Sem caixa: os gatilhos e a referência vão no próprio filho, somados aos dele.
+  const own = bare && !pinned ? child?.props : undefined;
+  const anchorProps = own && {
+    // Soma a referência do filho (ex.: a do Menu no gatilho), respeitando a limpeza do React 19.
+    ref: (node: HTMLElement | null) => {
+      anchorRef.current = node;
+      const ref = own.ref;
+      const cleanup = typeof ref === 'function' ? ref(node) : undefined;
+      if (ref && typeof ref !== 'function') (ref as RefObject<HTMLElement | null>).current = node;
+      return () => {
+        anchorRef.current = null;
+        if (typeof cleanup === 'function') cleanup();
+        else if (typeof ref === 'function') ref(null);
+        else if (ref) (ref as RefObject<HTMLElement | null>).current = null;
+      };
+    },
+    onPointerEnter: (event: ReactPointerEvent<HTMLElement>) => {
+      own.onPointerEnter?.(event);
+      handlers.onPointerEnter(event);
+    },
+    onPointerLeave: (event: ReactPointerEvent<HTMLElement>) => {
+      own.onPointerLeave?.(event);
+      handlers.onPointerLeave(event);
+    },
+    onPointerDown: (event: ReactPointerEvent<HTMLElement>) => {
+      own.onPointerDown?.(event);
+      handlers.onPointerDown(event);
+    },
+    onFocus: (event: ReactFocusEvent<HTMLElement>) => {
+      own.onFocus?.(event);
+      handlers.onFocus(event);
+    },
+    onBlur: (event: ReactFocusEvent<HTMLElement>) => {
+      own.onBlur?.(event);
+      handlers.onBlur();
+    },
+  };
   const trigger = child
     ? cloneElement(child, {
         // A bolha substitui o `title` nativo, que apareceria por cima dela um segundo depois.
@@ -632,6 +800,7 @@ export function Tooltip({
         ...(describe && {
           'aria-describedby': [child.props['aria-describedby'], id].filter(Boolean).join(' '),
         }),
+        ...anchorProps,
       })
     : children;
   const description = describe && (
@@ -676,39 +845,32 @@ export function Tooltip({
     '--arrow-x': pos ? `${pos.arrow}px` : undefined,
   } as CSSProperties;
 
+  const portal =
+    open &&
+    host &&
+    createPortal(bubble(style, pos?.below, { 'data-instant': instant || undefined }), host);
+
+  if (anchorProps) {
+    return (
+      <>
+        {trigger}
+        {description}
+        {portal}
+      </>
+    );
+  }
+
   return (
     <span
-      ref={anchorRef}
+      ref={(node) => {
+        anchorRef.current = node;
+      }}
       className={s.tipAnchor}
-      onPointerEnter={(event) => {
-        if (event.pointerType !== 'touch') show('pointer');
-      }}
-      onPointerLeave={(event) => {
-        if (event.pointerType !== 'touch') hide();
-      }}
-      onPointerDown={(event) => {
-        if (event.pointerType !== 'touch') {
-          // Clicar não deve deixar a dica pendurada sobre o que o clique abriu.
-          window.clearTimeout(timer.current);
-          return;
-        }
-        if (!anchorRef.current?.querySelector(':disabled, [aria-disabled="true"]')) return;
-        reveal(false);
-        window.clearTimeout(timer.current);
-        timer.current = window.setTimeout(hide, TOUCH_MS);
-      }}
-      onFocus={(event) => {
-        // Só foco de teclado: o clique já mostrou a dica pelo hover.
-        if (event.target instanceof HTMLElement && event.target.matches(':focus-visible'))
-          show('keyboard');
-      }}
-      onBlur={hide}
+      {...handlers}
     >
       {trigger}
       {description}
-      {open &&
-        host &&
-        createPortal(bubble(style, pos?.below, { 'data-instant': instant || undefined }), host)}
+      {portal}
     </span>
   );
 }

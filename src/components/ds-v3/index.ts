@@ -336,6 +336,7 @@ export {
   Dialog,
   DialogFrame,
   Tooltip,
+  TruncatedText,
   ContainedLayer,
   useModalLayer,
   type DialogSize,

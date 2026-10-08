@@ -219,6 +219,9 @@ dialog.dialog[data-contained] {
 .tipAnchor {
   position: relative;
   display: inline-flex;
+  /* Nunca mais larga que a coluna: um filho que corta o texto (reticências) continua cortando. */
+  max-width: 100%;
+  min-width: 0;
 }
 /* Controle desabilitado não recebe ponteiro: o hover cai na âncora e o motivo aparece. */
 .tipAnchor :disabled {
@@ -235,11 +238,13 @@ dialog.dialog[data-contained] {
   padding: 6px 9px;
   border-radius: var(--r-md);
   font: var(--t-caption-strong);
-  color: #fff;
+  color: var(--ink);
   white-space: normal;
   /* pretty, não balance: balance divide as linhas mas não encolhe a caixa, sobra vazio à direita. */
   text-wrap: pretty;
-  background: var(--tooltip-bg);
+  /* Claro (§7): papel, fio e sombra média — nenhuma camada usa fundo escuro. */
+  background: var(--paper);
+  border: 1px solid var(--line);
   box-shadow: var(--shadow-md);
   pointer-events: none;
   animation: tipIn var(--dur-2) var(--ease-out);
@@ -273,13 +278,18 @@ dialog.dialog[data-contained] {
   translate: -50% -50%;
   rotate: 45deg;
   border-radius: 0 0 2px 0;
-  background: var(--tooltip-bg);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
 }
 .tip[data-below]::after {
   top: auto;
   bottom: 100%;
   translate: -50% 50%;
   border-radius: 2px 0 0 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
 }
 .tip kbd {
   display: inline-block;
@@ -288,8 +298,8 @@ dialog.dialog[data-contained] {
   border-radius: 4px;
   font: 500 11px/14px var(--font);
   letter-spacing: 0.02em;
-  color: rgb(255 255 255 / 0.76);
-  background: rgb(255 255 255 / 0.14);
+  color: var(--muted);
+  background: var(--g-75);
 }
 
 /* Prancha: dica parada no fluxo, sobre (ou sob) o gatilho. */
@@ -298,6 +308,7 @@ dialog.dialog[data-contained] {
   flex-direction: column-reverse;
   align-items: center;
   gap: 8px;
+  max-width: 100%;
 }
 .tipPinned[data-side='bottom'] {
   flex-direction: column;
