@@ -16,6 +16,7 @@ import { specimens as iaAgent } from './ia-agent';
 import { specimens as iaCopiloto } from './ia-copiloto';
 import { specimens as iaSugestao } from './ia-sugestao';
 import { specimens as midia } from './midia';
+import { specimens as midiaTranscricao } from './midia-transcricao';
 import { specimens as navegacao } from './navegacao';
 import { specimens as padroesA } from './padroes-a';
 import { specimens as padroesB } from './padroes-b';
@@ -38,6 +39,7 @@ export const specimens: Record<string, ComponentType> = {
   ...feedback,
   ...camadas,
   ...midia,
+  ...midiaTranscricao,
   ...editorProse,
   ...editorToolbar,
   ...iaCopiloto,

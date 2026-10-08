@@ -574,6 +574,12 @@ export const inventory: readonly InventoryGroup[] = [
         'Identificação de arquivo, tamanho, tipo e ações de download.',
       ),
       item('video', 'Vídeo', 'Apresentação e controles para conteúdo audiovisual.'),
+      item(
+        'transcricao',
+        'Transcrição',
+        'Falas por falante com tempo, busca, filtro de falante, trechos usados e ações sobre a seleção.',
+        'transcript fonte falas falante busca citacao entrevista',
+      ),
     ],
   },
   {

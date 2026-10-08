@@ -1,0 +1,48 @@
+/* Prancha “Transcrição”: só arranjo. O componente vem da biblioteca; aqui ficam painéis e grade. */
+
+/* ——— Estúdio: Fonte (painel com fio) + Texto ——— */
+.studio {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  gap: var(--s-8);
+  min-width: 0;
+}
+.source {
+  height: 600px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: clip;
+}
+.text {
+  display: grid;
+  align-content: start;
+  gap: var(--s-6);
+  min-width: 0;
+}
+.context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--line-soft);
+}
+
+@media (max-width: 760px) {
+  .studio {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-6);
+  }
+  .source {
+    height: 480px;
+  }
+}
+
+/* ——— Painel de exemplo nas variantes e estados ——— */
+.frame {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: clip;
+}
