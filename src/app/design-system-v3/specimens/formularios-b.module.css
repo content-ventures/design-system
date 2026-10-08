@@ -790,6 +790,46 @@
   transition: background-color var(--dur-2) var(--ease-out);
 }
 
+/* ——— Cartão de escolha com miniatura (capa de modelo de carrossel: peça, não UI) ——— */
+.templates {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+  gap: var(--s-2);
+}
+.tplThumb {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: end;
+  gap: 6px;
+  padding: 10%;
+  background: #f7f5f2;
+  color: #1c1c1a;
+}
+.tplThumb[data-tone='night'] {
+  background: #15161b;
+  color: #ffffff;
+}
+.tplThumb[data-tone='forest'] {
+  align-content: center;
+  background: #12322a;
+  color: #ffffff;
+}
+.tplKicker {
+  font: 600 9px/1.2 var(--font);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b5472b;
+}
+.tplThumb[data-tone='night'] .tplKicker,
+.tplThumb[data-tone='forest'] .tplKicker {
+  color: #e8b04b;
+}
+.tplTitle {
+  font: 700 15px/1.15 var(--font);
+  letter-spacing: var(--track-tight);
+}
+
 /* ——— Celular ——— */
 @media (max-width: 1100px) {
   .radioContext,

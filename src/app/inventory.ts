@@ -353,6 +353,12 @@ export const inventory: readonly InventoryGroup[] = [
         'Moldura de estúdio com painéis laterais redimensionáveis e recolhíveis.',
         'workspace studio estudio resizable paineis foco',
       ),
+      item(
+        'coluna-de-leitura',
+        'Coluna de leitura',
+        'A medida do texto para o que o acompanha: avisos, decisão, diferenças e imagens na mesma borda.',
+        'reading column medida leitura centralizada revisao artigo',
+      ),
     ],
   },
   {

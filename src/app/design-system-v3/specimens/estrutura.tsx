@@ -8,6 +8,7 @@ import {
   Bold,
   Boxes,
   Building2,
+  ChevronDown,
   Download,
   FileText,
   Gift,
@@ -457,6 +458,94 @@ function StageLineHeader({
   );
 }
 
+/** Jornada da produção num menu (a etapa vista · posição): cada etapa com o estado em uma linha. */
+function JourneyMenu() {
+  return (
+    <Menu
+      label="Etapas da produção"
+      width={260}
+      sections={[
+        {
+          items: [
+            { label: 'Material', description: 'Concluída' },
+            { label: 'Artigo', description: 'Em andamento', checked: true },
+            {
+              label: 'Aprovação',
+              description: 'Libera quando o artigo for enviado',
+              disabled: true,
+            },
+            {
+              label: 'Carrossel',
+              description: 'Libera quando o artigo for aprovado',
+              disabled: true,
+            },
+            {
+              label: 'Entrega',
+              description: 'Libera quando o carrossel for aprovado',
+              disabled: true,
+            },
+          ],
+        },
+      ]}
+      trigger={(props) => (
+        <Button {...props} variant="ghost" size="sm" trailingIcon={ChevronDown}>
+          Artigo · 2 de 5
+        </Button>
+      )}
+    />
+  );
+}
+
+/**
+ * Cabeçalho de uma tela sem o menu do app (`AppShell layout="immersive"`): a volta antes do título
+ * (`back`), o título inteiro, status, jornada, motivo visível de um bloqueio (`actionsNote`), uma
+ * principal e ⋯.
+ */
+function ProductionLineHeader({
+  title = 'Estúdio Norte: impressão 3D no protótipo',
+  blocked = false,
+  backForce,
+  notice,
+}: {
+  title?: string;
+  blocked?: boolean;
+  backForce?: string;
+  notice?: ReactNode;
+}) {
+  return (
+    <PageHeader
+      variant="frame"
+      back={{ label: 'Produções', href: '#cabecalho-pagina', force: backForce }}
+      title={title}
+      notice={notice}
+      status={
+        blocked ? (
+          <Badge variant="text" tone="gray" dot>
+            A IA está escrevendo
+          </Badge>
+        ) : (
+          <Badge variant="text" tone="gray" dot>
+            Rascunho
+          </Badge>
+        )
+      }
+      steps={<JourneyMenu />}
+      actionsNote={blocked ? { id: 'motivo-enviar', text: 'Aguarde a IA terminar.' } : undefined}
+      actions={
+        <Button
+          variant="primary"
+          size="sm"
+          aria-disabled={blocked || undefined}
+          aria-describedby={blocked ? 'motivo-enviar' : undefined}
+        >
+          Enviar para aprovação
+        </Button>
+      }
+      more={<IconButton label="Mais ações" icon={MoreHorizontal} variant="ghost" size="sm" />}
+    />
+  );
+}
+
 /** Rodapé da moldura: quatro slots fixos; no celular, [←] [Salvar rascunho] [Principal]. */
 function FrameFooter({ narrow }: { narrow: boolean }) {
   if (narrow) {
@@ -520,9 +609,63 @@ function PageHeaders() {
           }
         />
       </Shot>
+      <Shot title="Volta" tone="white" align="stretch" pad="lg">
+        <ProductionLineHeader />
+      </Shot>
+      <Shot title="Motivo do bloqueio" tone="white" align="stretch" pad="lg">
+        <ProductionLineHeader title="Ateliê Sul: couro vegetal na feira" blocked />
+      </Shot>
+      <Shot title="Volta · estados" tone="white" align="stretch">
+        <States min={660}>
+          {(
+            [
+              ['Repouso', undefined],
+              ['Hover', 'hover'],
+              ['Pressionado', 'active'],
+              ['Foco', 'focus'],
+            ] as const
+          ).map(([label, force]) => (
+            <State key={label} label={label}>
+              <div className={x.fill}>
+                <PageHeader
+                  variant="frame"
+                  className={x.flush}
+                  back={{ label: 'Produções', href: '#cabecalho-pagina', force }}
+                  title="Casa Forma"
+                />
+              </div>
+            </State>
+          ))}
+        </States>
+      </Shot>
       <Shot title="Linha de etapas · título longo" align="stretch" pad="lg">
         <div className={x.sheet} style={{ maxWidth: 1000 }}>
           <StageLineHeader title="Casa Forma: o estande que vende antes da feira e os pedidos que chegam depois" />
+        </div>
+      </Shot>
+      <Shot title="Sem régua · título longo" tone="white" align="stretch" pad="lg">
+        <div className={x.sheet} style={{ maxWidth: 1000 }}>
+          <PageHeader
+            variant="frame"
+            back={{ label: 'Produções', href: '#cabecalho-pagina' }}
+            title="Estúdio Norte: impressão 3D no protótipo de saltos, custos de ferramental e o que muda para as fábricas"
+            status={
+              <>
+                <Badge variant="text" tone="gray" dot>
+                  Rascunho
+                </Badge>
+                <Button size="sm" variant="ghost" trailingIcon={ChevronDown}>
+                  Artigo · 2 de 5
+                </Button>
+              </>
+            }
+            actions={
+              <Button variant="primary" size="sm">
+                Enviar para aprovação
+              </Button>
+            }
+            more={<IconButton label="Mais ações" icon={MoreHorizontal} variant="ghost" size="sm" />}
+          />
         </div>
       </Shot>
       <Shot title="Título longo" align="stretch" pad="lg">
@@ -550,6 +693,11 @@ function PageHeaders() {
           <Phone label="Linha de etapas no celular">
             <div className={x.phonePad}>
               <StageLineHeader />
+            </div>
+          </Phone>
+          <Phone label="Volta e motivo no celular">
+            <div className={x.phonePad}>
+              <ProductionLineHeader title="Ateliê Sul: couro vegetal na feira" blocked />
             </div>
           </Phone>
         </div>
@@ -2490,6 +2638,102 @@ function BleedShell() {
   );
 }
 
+/**
+ * Imersivo (`layout="immersive"`): a tela de trabalho de um documento sem o menu do app — nenhuma
+ * coluna, nenhuma gaveta, nenhum topo. A volta (“← Produções”) fica no cabeçalho; um painel só, à
+ * direita e fechado; a imagem que o texto pede é uma linha, não um bloco.
+ */
+function ImmersiveShell() {
+  const [stageRef, available] = useAvailable();
+  const narrow = available < 640;
+  const [panelCollapsed, setPanelCollapsed] = useState(true);
+  return (
+    <div className={x.shellStage} ref={stageRef}>
+      <div className={x.shellFrame} style={{ width: '100%' }}>
+        <AppShell fill bleed contentAs="div" layout="immersive" sidebar={null}>
+          <WorkspaceLayout
+            height="100%"
+            narrowBelow={640}
+            mainLabel="Texto do artigo"
+            header={<ProductionLineHeader />}
+            end={{
+              label: 'Painel',
+              defaultSize: 320,
+              min: 280,
+              max: 400,
+              collapsible: true,
+              collapsed: panelCollapsed,
+              onCollapsedChange: setPanelCollapsed,
+              content: (
+                <DescriptionList
+                  items={[
+                    { label: 'Entrevista', value: '36 falas · 2 falantes' },
+                    { label: 'Duração', value: '16:48', numeric: true },
+                    { label: 'Tamanho', value: 'Padrão · 2 laudas' },
+                  ]}
+                />
+              ),
+            }}
+            mainHeader={
+              <Toolbar
+                label="Formatação do artigo"
+                end={<SaveIndicator status="saved" label="Salvo" />}
+              >
+                <ToolbarButton label="Desfazer" icon={Undo2} />
+                <ToolbarButton label="Refazer" icon={Redo2} />
+                <ToolbarSeparator />
+                <ToolbarToggle
+                  label="Negrito"
+                  icon={Bold}
+                  pressed={false}
+                  onPressedChange={() => {}}
+                />
+                <ToolbarToggle
+                  label="Itálico"
+                  icon={Italic}
+                  pressed={false}
+                  onPressedChange={() => {}}
+                />
+              </Toolbar>
+            }
+            mainFooter={
+              narrow ? undefined : (
+                <MetaList
+                  size="sm"
+                  items={['1,6 de 2 laudas · 3.360 caracteres', 'Pronto para enviar']}
+                />
+              )
+            }
+          >
+            <Prose variant="edit" size="sm" label="Texto do artigo" overscroll={false}>
+              <p>
+                A Estúdio Norte trocou o molde de madeira pela impressora 3D e encurtou de três
+                semanas para quatro dias o caminho entre o desenho e o primeiro par de teste.
+              </p>
+              <figure
+                data-slot=""
+                data-missing=""
+                data-display="line"
+                aria-roledescription="Sugestão de imagem"
+                aria-label="Imagem sugerida: peças impressas na bancada. Arraste uma imagem ou pressione Enter para escolher."
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- imagem que ainda não existe: o Prose desenha o pedido */}
+                <img data-missing="" alt="" />
+                <figcaption>Peças impressas na bancada</figcaption>
+              </figure>
+              <h2>Errar ficou barato</h2>
+              <p>
+                Cada protótipo custa hoje o filamento e uma tarde de impressão. A equipe testa três
+                formas de salto por semana e só leva ao couro a que passou no teste de caminhada.
+              </p>
+            </Prose>
+          </WorkspaceLayout>
+        </AppShell>
+      </div>
+    </div>
+  );
+}
+
 type ShellDevice = 'desktop' | 'tablet' | 'phone';
 
 /** Largura da moldura por aparelho. Desktop ocupa o palco inteiro (menu lateral fixo). */
@@ -2623,6 +2867,9 @@ function ShellSpecimen() {
       </Shot>
       <Shot title="Sangrado" align="stretch" pad="sm">
         <BleedShell />
+      </Shot>
+      <Shot title="Imersivo" align="stretch" pad="sm">
+        <ImmersiveShell />
       </Shot>
       <Shot title="Moldura fixa" align="stretch" pad="none">
         <div className={x.fixedStage}>
