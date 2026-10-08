@@ -28,6 +28,8 @@
     "typography": {
       "family": "Inter",
       "weights": [400, 500, 600],
+      "styles": ["normal", "italic"],
+      "readingScale": "--t-prose-* (body 16/28, measure 68ch)",
       "source": "src/components/ds-v3/font.ts"
     },
     "spacing": { "base": 4, "unit": "px" },
