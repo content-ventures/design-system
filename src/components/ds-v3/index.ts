@@ -228,6 +228,16 @@ export {
   MetaList,
   Overline,
 } from './surfaces';
+export {
+  Grid,
+  GridItem,
+  type GridProps,
+  type GridItemProps,
+  type GridColumns,
+  type GridGap,
+  type GridCollapse,
+  type GridElement,
+} from './grid';
 
 /* Dados */
 export {

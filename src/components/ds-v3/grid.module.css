@@ -1,0 +1,118 @@
+/*
+ * Grade — colunas em proporção ou automáticas (§12). Sem superfície própria: só posiciona.
+ * A raiz é o contêiner; as colunas respondem à largura dela, não da janela.
+ */
+.root {
+  container: dsv3-grid / inline-size;
+  /* Contêiner não mede o conteúdo: ocupa a largura disponível (também dentro de flex). */
+  width: 100%;
+  min-width: 0;
+}
+
+.grid {
+  --grid-gap: var(--s-4);
+  display: grid;
+  gap: var(--grid-gap);
+  align-items: stretch;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.grid[data-gap='sm'] {
+  --grid-gap: var(--s-2);
+}
+.grid[data-gap='md'] {
+  --grid-gap: var(--s-4);
+}
+.grid[data-align='start'] {
+  align-items: start;
+}
+/* Conteúdo largo (tabela, gráfico) não estoura a coluna. */
+.grid > * {
+  min-width: 0;
+}
+
+.grid[data-columns='1:1'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.grid[data-columns='2:1'] {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+.grid[data-columns='1:2'] {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+}
+.grid[data-columns='3:2'] {
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+}
+.grid[data-columns='1:1:1'] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+/* Cartões (§12): quantas colunas de `--grid-min` couberem; nunca mais largas que o bloco. */
+.grid[data-columns='auto'] {
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--grid-min, 196px), 100%), 1fr));
+}
+
+.item {
+  min-width: 0;
+}
+.item[data-span='2'] {
+  grid-column: span 2;
+}
+.item[data-span='full'] {
+  grid-column: 1 / -1;
+}
+/* Em `auto` o número de colunas varia: só a linha inteira é segura. */
+.grid[data-columns='auto'] > .item[data-span='2'] {
+  grid-column: auto;
+}
+
+/* ——— Empilhada: uma coluna, cada item de volta ao seu lugar ——— */
+@container dsv3-grid (max-width: 1280px) {
+  .grid[data-collapse='1280'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .grid[data-collapse='1280'] > .item[data-span] {
+    grid-column: auto;
+  }
+}
+@container dsv3-grid (max-width: 1024px) {
+  .grid[data-collapse='1024'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .grid[data-collapse='1024'] > .item[data-span] {
+    grid-column: auto;
+  }
+}
+@container dsv3-grid (max-width: 960px) {
+  .grid[data-collapse='960'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .grid[data-collapse='960'] > .item[data-span] {
+    grid-column: auto;
+  }
+}
+@container dsv3-grid (max-width: 760px) {
+  .grid[data-collapse='760'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .grid[data-collapse='760'] > .item[data-span] {
+    grid-column: auto;
+  }
+}
+@container dsv3-grid (max-width: 640px) {
+  .grid[data-collapse='640'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .grid[data-collapse='640'] > .item[data-span] {
+    grid-column: auto;
+  }
+}
+@container dsv3-grid (max-width: 480px) {
+  .grid[data-collapse='480'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .grid[data-collapse='480'] > .item[data-span] {
+    grid-column: auto;
+  }
+}
