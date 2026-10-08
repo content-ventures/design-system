@@ -443,6 +443,18 @@ export {
   type PromptSubmission,
   type PromptModelOption,
 } from './prompt-composer';
+export {
+  Conversation,
+  ConversationTurn,
+  ConversationArtifact,
+  type ConversationProps,
+  type ConversationHandle,
+  type ConversationTurnProps,
+  type ConversationRole,
+  type ConversationArtifactProps,
+  type TurnStatus,
+  type TurnFeedback,
+} from './conversation';
 
 /* Revisão */
 export {
