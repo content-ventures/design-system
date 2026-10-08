@@ -1,0 +1,142 @@
+/*
+ * Prancha do editor (Toolbar, FloatingToolbar): só arruma o palco e o texto de exemplo.
+ * A barra, os botões e a camada flutuante vêm da biblioteca.
+ */
+
+/* ——— Moldura do editor ——— */
+.frame {
+  display: grid;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  overflow: clip;
+}
+.scroll {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+/* ——— Texto de exemplo (escala de leitura, §3.1) ——— */
+.article {
+  display: grid;
+  gap: var(--prose-space-block);
+  max-width: var(--prose-measure);
+  margin-inline: auto;
+  padding: var(--s-8) var(--s-6) var(--s-10);
+  font: var(--t-prose-body);
+  color: var(--text);
+  outline: none;
+}
+.article h2 {
+  margin-top: var(--s-2);
+  font: var(--t-prose-h2);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.article h3 {
+  font: var(--t-prose-h3);
+  color: var(--ink);
+}
+.article blockquote {
+  margin: 0;
+  padding-inline-start: var(--s-6);
+  font: var(--t-prose-quote);
+  color: var(--ink);
+}
+.article :is(ul, ol) {
+  margin: 0;
+  padding-inline-start: var(--s-6);
+}
+.article a {
+  color: var(--b-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.article mark {
+  padding: 0 2px;
+  border-radius: 2px;
+  color: var(--mark-ink);
+  background: var(--mark-yellow-bg);
+}
+.article mark[data-tone='green'] {
+  background: var(--mark-green-bg);
+}
+.article mark[data-tone='pink'] {
+  background: var(--mark-pink-bg);
+}
+.reading {
+  padding-block: var(--s-6) var(--s-8);
+}
+
+/* Seleção simulada: a mesma cor do ::selection do tema. */
+.selection[data-active] {
+  color: var(--ink);
+  background: var(--b-100);
+}
+
+/* Amostra do marca-texto no menu. */
+.swatch {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--r-xs);
+  background: var(--mark-yellow-bg);
+}
+.swatch[data-tone='green'] {
+  background: var(--mark-green-bg);
+}
+.swatch[data-tone='pink'] {
+  background: var(--mark-pink-bg);
+}
+
+/* ——— Variantes ——— */
+.box {
+  flex: 1;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  overflow: clip;
+}
+.box > [role='toolbar'] {
+  border-bottom: 0;
+}
+
+/* ——— Mais: arraste o canto para estreitar ——— */
+.resize {
+  width: min(440px, 100%);
+  min-width: 160px;
+  max-width: 100%;
+  padding: var(--s-1) var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  resize: horizontal;
+  overflow: hidden;
+}
+
+/* ——— Celular ——— */
+.phoneFrame {
+  display: grid;
+  align-content: start;
+  min-height: 100%;
+}
+.phoneFrame .article,
+.phoneReading .article {
+  padding: var(--s-6) var(--s-4) var(--s-8);
+}
+.phoneBar {
+  justify-self: start;
+  min-width: 0;
+  max-width: 100%;
+  margin-bottom: calc(var(--s-3) * -1);
+}
+
+/* ——— Fim da barra, estreita: os itens saem para o “Mais” e o estado fica no fim ——— */
+.narrow {
+  width: min(520px, 100%);
+  padding: var(--s-1) var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+}

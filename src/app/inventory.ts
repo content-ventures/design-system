@@ -592,6 +592,18 @@ export const inventory: readonly InventoryGroup[] = [
         'Título que vira campo ao clicar, com contagem, salvamento e erro.',
         'titulo inline renomear editable title',
       ),
+      item(
+        'barra-ferramentas',
+        'Barra de ferramentas',
+        'Barra do editor com foco itinerante, alternáveis, menus e recolhimento em “Mais”.',
+        'toolbar editor negrito formatacao atalho overflow mais',
+      ),
+      item(
+        'barra-flutuante',
+        'Barra flutuante',
+        'Barra sobre o trecho selecionado: formatação e ações de IA sem tirar o foco do texto.',
+        'floating toolbar bubble menu selecao ia reescrever encurtar',
+      ),
     ],
   },
   {
