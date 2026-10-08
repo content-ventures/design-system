@@ -34,10 +34,11 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { VisuallyHidden } from './a11y';
-import { Kbd, type Tone } from './badge';
+import { Badge, Kbd, type Tone } from './badge';
 import { IconButton } from './button';
 import { Avatar, BrandMark } from './identity';
 import { floatingHost, Menu, type MenuItem, type MenuSection } from './menu';
+import { Tooltip, useClipped } from './overlays';
 import s from './app-shell.module.css';
 
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
@@ -82,11 +83,19 @@ export function useShell() {
 
 /* ——————————————————————————— AppShell ——————————————————————————— */
 
+/** Largura padrão do shell abaixo da qual o menu vira gaveta (a do `@container shell` no CSS). */
+const SHELL_BREAKPOINT = 1200;
+
 /**
  * Moldura do app (igual ao /dashboardv3): menu lateral de 236 px em g-25 encostado, com fio à
  * direita; topo de 52 px com fio — um único fio corre do menu ao conteúdo; conteúdo branco direto.
- * Até 1199 px de largura o menu vira gaveta (véu, Escape, conteúdo `inert`). `fill` ocupa a
+ * Até 1199 px de largura o menu vira gaveta (véu, Escape, conteúdo `inert`). Quem decide gaveta ou
+ * barra é o CSS (`@container shell`): o HTML do servidor e a primeira pintura no celular já saem com
+ * a gaveta fechada, sem a barra espremendo a página; o JS só abre, fecha e cuida do foco. Com
+ * `breakpoint` fora do padrão a decisão é medida no cliente. `fill` ocupa a
  * altura do contêiner (o conteúdo rola por dentro); sem `fill`, a página cresce com o conteúdo.
+ * `bleed` tira o respiro e a largura máxima do conteúdo: para áreas de trabalho encostadas
+ * (`WorkspaceLayout docked`, `FixedFrame docked`) que ocupam a tela de ponta a ponta.
  */
 export function AppShell({
   sidebar,
@@ -94,6 +103,7 @@ export function AppShell({
   children,
   collapsed = false,
   fill = false,
+  bleed = false,
   contentAs: Content = 'main',
   className = '',
   style,
@@ -101,13 +111,15 @@ export function AppShell({
   navOpen: navOpenProp,
   onNavOpenChange,
   layout = 'auto',
-  breakpoint = 1200,
+  breakpoint = SHELL_BREAKPOINT,
 }: {
   sidebar: ReactNode;
   topbar?: ReactNode;
   children: ReactNode;
   collapsed?: boolean;
   fill?: boolean;
+  /** Conteúdo sem respiro nem largura máxima (áreas de trabalho encostadas). */
+  bleed?: boolean;
   /** Use `div` quando o shell é exibido dentro de outra página que já tem `<main>`. */
   contentAs?: 'main' | 'div';
   className?: string;
@@ -118,12 +130,16 @@ export function AppShell({
   onNavOpenChange?: (open: boolean) => void;
   /** `auto`: gaveta até 1199 px de largura. `desktop`/`drawer` fixam o modo (pranchas, molduras pequenas). */
   layout?: 'auto' | 'desktop' | 'drawer';
-  /** Largura do shell abaixo da qual, em `auto`, o menu vira gaveta. */
+  /**
+   * Largura do shell abaixo da qual, em `auto`, o menu vira gaveta. O padrão (1200) é decidido no
+   * CSS; outro valor é medido no cliente (a primeira pintura do servidor sai com a barra).
+   */
   breakpoint?: number;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
-  const [drawer, setDrawer] = useState(false);
+  // Modo fixo já vale no servidor; em `auto` o CSS desenha a gaveta antes desta medida chegar.
+  const [drawer, setDrawer] = useState(layout === 'drawer');
   const [navOpenState, setNavOpenState] = useState(defaultNavOpen);
   const navOpen = navOpenProp ?? navOpenState;
   const navId = useId();
@@ -164,7 +180,7 @@ export function AppShell({
       focusOnOpen.current = false;
       rootRef.current
         ?.querySelector<HTMLElement>(
-          `[data-part='sidebar'] :is(a[href], button:not(:disabled), input)`,
+          `[data-part='sidebar'] :is(a[href], button:not(:disabled, [aria-disabled='true']), input)`,
         )
         ?.focus();
     }
@@ -205,7 +221,9 @@ export function AppShell({
         style={style}
         data-collapsed={(collapsed && !drawer) || undefined}
         data-drawer={drawer || undefined}
+        data-layout={layout === 'auto' && breakpoint !== SHELL_BREAKPOINT ? 'measured' : layout}
         data-fill={fill || undefined}
+        data-bleed={bleed || undefined}
         data-nav-open={open || undefined}
         data-part="shell"
       >
@@ -291,12 +309,15 @@ function SideTip({
   content,
   detail,
   shortcut,
+  stack = false,
   open: forced = false,
   children,
 }: {
   content: string;
   detail?: ReactNode;
   shortcut?: string;
+  /** Detalhe numa linha própria, com quebra até 240 px (um motivo, não um número). */
+  stack?: boolean;
   open?: boolean;
   children: ReactNode;
 }) {
@@ -360,7 +381,12 @@ function SideTip({
       {children}
       {place &&
         createPortal(
-          <span className={s.tip} style={{ top: place.top, left: place.left }} aria-hidden="true">
+          <span
+            className={s.tip}
+            style={{ top: place.top, left: place.left }}
+            data-stack={stack || undefined}
+            aria-hidden="true"
+          >
             {content}
             {detail !== undefined && <span className={s.tipDetail}>{detail}</span>}
             {shortcut && <kbd>{shortcut}</kbd>}
@@ -383,9 +409,19 @@ export type NavItem = {
   /** `accent` para o que pede ação (aprovações pendentes); recolhida, vira um ponto azul. */
   countTone?: 'neutral' | 'accent';
   href?: string;
-  /** Estado parado para pranchas: `hover`, `active` ou `focus`. */
+  /**
+   * Está no mapa do produto, mas ainda não abre (roadmap). Ícone e nome esmaecidos, selo “Em breve”
+   * no lugar da contagem; não navega (`href` e `onNavigate` ficam de fora), nunca é o ativo e, na
+   * gaveta, tocar não a fecha. Focável, com `aria-disabled`; o `reason` vai na dica do DS e em
+   * `aria-describedby`.
+   */
+  soon?: NavSoon;
+  /** Estado parado para pranchas: `hover`, `active`, `focus`; `tip` abre a dica de um item `soon`. */
   force?: string;
 };
+
+/** `true` ou o texto do selo (padrão “Em breve”) e o motivo (“Chega com a R2.”). */
+export type NavSoon = boolean | { label?: string; reason?: string };
 
 export type NavGroup = {
   id: string;
@@ -395,6 +431,108 @@ export type NavGroup = {
   collapsible?: boolean;
   defaultOpen?: boolean;
 };
+
+type SoonText = { label: string; reason?: string };
+
+function soonOf(soon: NavSoon | undefined): SoonText | null {
+  if (!soon) return null;
+  const options = soon === true ? {} : soon;
+  return { label: options.label || 'Em breve', reason: options.reason || undefined };
+}
+
+const forcedTip = (force: string | undefined) => Boolean(force?.split(/\s+/).includes('tip'));
+
+function NavGlyph({ item }: { item: NavItem }) {
+  const Icon = item.icon;
+  return (
+    <span className={s.navIcon} aria-hidden="true">
+      {Icon ? (
+        <Icon />
+      ) : item.dot ? (
+        <i className={s.dot} style={{ '--dot': `var(--${item.dot}-dot)` } as CSSProperties} />
+      ) : null}
+    </span>
+  );
+}
+
+/**
+ * Item que ainda não abre. Botão sem ação (`aria-disabled`): o teclado chega nele para ler o motivo,
+ * mas Enter, Espaço e clique não navegam nem fecham a gaveta. Nome “Rótulo, Em breve”; o motivo é a
+ * descrição e aparece na dica do DS (aberta, recolhida, e por 1,5 s no toque). Quando o nome corta,
+ * a dica também o traz.
+ */
+function SoonEntry({
+  item,
+  soon,
+  peek,
+  query,
+}: {
+  item: NavItem;
+  soon: SoonText;
+  peek?: string;
+  query: string;
+}) {
+  const { collapsed } = useShell();
+  const reasonId = useId();
+  const [labelRef, clipped] = useClipped<HTMLSpanElement>([item.label, collapsed]);
+  const control = (
+    <button
+      type="button"
+      className={s.navItem}
+      aria-label={`${item.label}, ${soon.label}`}
+      aria-disabled="true"
+      aria-describedby={soon.reason ? reasonId : undefined}
+      data-soon=""
+      data-plain={item.icon ? undefined : true}
+      data-force={item.force}
+    >
+      <NavGlyph item={item} />
+      {!collapsed && (
+        <>
+          <span ref={labelRef} className={s.navLabel}>
+            <Highlight text={item.label} query={query} />
+          </span>
+          <span className={s.navSoon}>
+            <Badge tone="gray" size="sm">
+              {soon.label}
+            </Badge>
+          </span>
+        </>
+      )}
+    </button>
+  );
+  const tip =
+    [clipped ? item.label : undefined, soon.reason].filter(Boolean).join(' · ') || undefined;
+  return (
+    <li>
+      {collapsed ? (
+        <SideTip
+          content={`${item.label} · ${soon.label}`}
+          detail={soon.reason}
+          stack
+          open={peek === item.id}
+        >
+          {control}
+        </SideTip>
+      ) : (
+        <Tooltip
+          bare
+          describe={false}
+          content={tip ?? ''}
+          disabled={!tip}
+          open={Boolean(tip) && forcedTip(item.force)}
+        >
+          {control}
+        </Tooltip>
+      )}
+      {soon.reason && (
+        <span id={reasonId} hidden>
+          {soon.reason}
+        </span>
+      )}
+    </li>
+  );
+}
 
 function NavEntry({
   item,
@@ -410,19 +548,14 @@ function NavEntry({
   query?: string;
 }) {
   const { collapsed, closeNav } = useShell();
+  const soon = soonOf(item.soon);
+  if (soon) return <SoonEntry item={item} soon={soon} peek={peek} query={query} />;
   const current = item.id === active;
-  const Icon = item.icon;
   const accent = item.countTone === 'accent';
   const countText = item.count !== undefined ? String(item.count) : undefined;
   const inner = (
     <>
-      <span className={s.navIcon} aria-hidden="true">
-        {Icon ? (
-          <Icon />
-        ) : item.dot ? (
-          <i className={s.dot} style={{ '--dot': `var(--${item.dot}-dot)` } as CSSProperties} />
-        ) : null}
-      </span>
+      <NavGlyph item={item} />
       {collapsed ? (
         <>
           <VisuallyHidden>
@@ -953,7 +1086,7 @@ export type Crumb = {
 
 const LONG_CRUMB = 34;
 
-/** Nome completo no `title` quando o nível é longo ou quando a reticência corta o texto. */
+/** Nome completo numa `Tooltip` do DS quando o nível é longo ou quando a reticência corta o texto. */
 function useClippedTitle(label: string) {
   const ref = useRef<HTMLSpanElement>(null);
   const [clipped, setClipped] = useState(false);
@@ -983,32 +1116,24 @@ function CrumbNode({ item, current }: { item: Crumb; current: boolean }) {
       </span>
     </>
   );
-  if (current)
-    return (
-      <span className={s.crumbCurrent} aria-current="page" title={title}>
-        {body}
-      </span>
-    );
-  return item.href ? (
-    <a
-      className={s.crumbLink}
-      href={item.href}
-      onClick={item.onClick}
-      title={title}
-      data-force={item.force}
-    >
+  const node = current ? (
+    <span className={s.crumbCurrent} aria-current="page">
+      {body}
+    </span>
+  ) : item.href ? (
+    <a className={s.crumbLink} href={item.href} onClick={item.onClick} data-force={item.force}>
       {body}
     </a>
   ) : (
-    <button
-      type="button"
-      className={s.crumbLink}
-      onClick={item.onClick}
-      title={title}
-      data-force={item.force}
-    >
+    <button type="button" className={s.crumbLink} onClick={item.onClick} data-force={item.force}>
       {body}
     </button>
+  );
+  // O nome inteiro na dica do DS (nunca o `title` nativo), só quando o nível corta.
+  return (
+    <Tooltip content={item.label} bare side="bottom" describe={false} disabled={!title}>
+      {node}
+    </Tooltip>
   );
 }
 
@@ -1107,16 +1232,17 @@ export function Breadcrumb({
                 },
               ]}
               trigger={(props) => (
-                <button
-                  {...props}
-                  type="button"
-                  className={s.crumbMore}
-                  aria-label={`Mostrar ${hidden.length} ${hidden.length === 1 ? 'nível oculto' : 'níveis ocultos'}`}
-                  title={hidden.map((item) => item.label).join(' › ')}
-                  data-force={moreOpenForce}
-                >
-                  <Ellipsis aria-hidden="true" />
-                </button>
+                <Tooltip content={hidden.map((item) => item.label).join(' › ')} bare side="bottom">
+                  <button
+                    {...props}
+                    type="button"
+                    className={s.crumbMore}
+                    aria-label={`Mostrar ${hidden.length} ${hidden.length === 1 ? 'nível oculto' : 'níveis ocultos'}`}
+                    data-force={moreOpenForce}
+                  >
+                    <Ellipsis aria-hidden="true" />
+                  </button>
+                </Tooltip>
               )}
             />
           </li>

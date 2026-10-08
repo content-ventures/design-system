@@ -160,6 +160,7 @@ export {
   CommandPanel,
   CommandPalette,
   type NavItem,
+  type NavSoon,
   type NavGroup,
   type Portal,
   type Crumb,
