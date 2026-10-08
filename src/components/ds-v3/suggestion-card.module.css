@@ -1,0 +1,222 @@
+/*
+ * Sugestão da IA: cartão do copiloto, barra presa ao trecho no editor e grupo de alternativas.
+ * Chapado: papel, fio de 1px --line, sem sombra (não flutua). Sem fio lateral colorido; o estado é
+ * ponto + palavra no cabeçalho. ✦ (Sparkles) é a marca reservada à IA, em cor de ícone neutra.
+ */
+
+/* ——————————————————————————— Cartão ——————————————————————————— */
+.card {
+  display: grid;
+  gap: var(--s-3);
+  min-width: 0;
+  padding: var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  color: var(--text);
+}
+.card[data-variant='compact'] {
+  gap: var(--s-2);
+  padding: var(--s-3);
+}
+
+.head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.spark {
+  width: var(--icon-md);
+  height: var(--icon-md);
+  margin-top: 2px;
+  color: var(--icon-rest);
+}
+.titles {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.title {
+  font: var(--t-body-strong);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.card[data-variant='compact'] .title {
+  font: var(--t-small-strong);
+}
+.working {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 20px;
+  font: var(--t-small);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  white-space: nowrap;
+}
+
+.body {
+  min-width: 0;
+}
+.proposal {
+  font: var(--t-body);
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+/* Trecho desatualizado: a proposta continua legível, mas recua para o tom de apoio. */
+.card[data-state='stale'] .proposal {
+  color: var(--muted);
+}
+/* Cursor do texto em geração: barra parada (sem piscar — movimento contínuo só no “ao vivo”). */
+.caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.15em;
+  margin-left: 2px;
+  border-radius: 1px;
+  vertical-align: text-bottom;
+  background: var(--ink);
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font: var(--t-caption-strong);
+  color: var(--red-ink);
+}
+.error svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  margin-top: 1px;
+}
+
+/* ——— Rodapé: decisão à esquerda, ferramentas à direita; quebra no estreito ——— */
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+}
+/* Os botões de decisão e as ferramentas quebram juntos: no estreito, o que sobra da decisão divide
+   a segunda linha com as ferramentas, em vez de cada grupo ganhar uma linha própria. */
+.decision {
+  display: contents;
+}
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+.feedback {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.divider {
+  width: 1px;
+  height: var(--s-4);
+  margin: 0 var(--s-1);
+  background: var(--line);
+}
+
+/* Atalho dentro do botão: legenda sem caixa, no tom do rótulo. Some quando não há teclado físico. */
+.hint {
+  margin-left: 2px;
+  font: var(--t-caption);
+  letter-spacing: normal;
+  opacity: 0.72;
+}
+@media (hover: none) {
+  .hint {
+    display: none;
+  }
+}
+
+/* ——— Nota da avaliação (👎) ——— */
+.note {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.note > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ——————————————————————————— Alternativas ——————————————————————————— */
+.group {
+  display: grid;
+  gap: var(--s-2);
+  width: 100%;
+  min-width: 0;
+}
+.optionSkeleton {
+  margin-block: 5px;
+}
+
+/* ——————————————————————————— Barra presa ao trecho ——————————————————————————— */
+.bar {
+  container: sugbar / inline-size;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  min-width: 0;
+  min-height: 44px;
+  padding: 5px 6px 5px var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  overflow: clip;
+}
+.barLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.barLabel .spark {
+  margin-top: 0;
+}
+.barText {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.barActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-1);
+  margin-left: auto;
+}
+/* Progresso da geração: linha de 3 px no pé da barra, sem cabeçalho. */
+.barProgress {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+}
+@container sugbar (max-width: 479px) {
+  .barActions {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+}

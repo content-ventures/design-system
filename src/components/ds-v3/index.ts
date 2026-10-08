@@ -469,6 +469,17 @@ export {
   type SourceChipState,
   type SourceKind,
 } from './source-chip';
+export {
+  SuggestionCard,
+  SuggestionBar,
+  SuggestionGroup,
+  type SuggestionCardProps,
+  type SuggestionBarProps,
+  type SuggestionGroupProps,
+  type SuggestionState,
+  type SuggestionMode,
+  type SuggestionFeedback,
+} from './suggestion-card';
 
 /* Revisão */
 export {
