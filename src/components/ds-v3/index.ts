@@ -60,6 +60,16 @@ export {
   type AttachmentStatus,
 } from './attachment';
 export { VideoPlayer, formatClock, type VideoState, type VideoCue } from './video';
+export {
+  TranscriptViewer,
+  formatTimestamp,
+  type TranscriptViewerProps,
+  type TranscriptSegment,
+  type TranscriptSpeaker,
+  type TranscriptSelection,
+  type TranscriptAction,
+  type TranscriptSelectionActions,
+} from './transcript-viewer';
 
 /* Status e marcadores */
 export { Badge, Chip, Kbd, Count, type Tone } from './badge';
