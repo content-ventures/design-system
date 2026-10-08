@@ -1,0 +1,63 @@
+/* IA · Sugestão — só arranjo da prancha. O componente vem inteiro da biblioteca. */
+
+/* ——— Em contexto: texto à esquerda, copiloto à direita (empilha no estreito) ——— */
+.studio {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: var(--s-8);
+  align-items: start;
+  width: 100%;
+}
+@media (max-width: 1199px) {
+  .studio {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.text {
+  display: grid;
+  gap: var(--prose-space-block);
+  min-width: 0;
+  max-width: var(--prose-measure);
+  font: var(--t-prose-body);
+  color: var(--text);
+}
+.h2 {
+  font: var(--t-prose-h2);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.target {
+  display: grid;
+  gap: var(--s-3);
+}
+.copilot {
+  display: grid;
+  gap: var(--s-3);
+  align-content: start;
+  min-width: 0;
+  padding: var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--g-25);
+}
+.paneTitle {
+  font: var(--t-title-3);
+  color: var(--ink);
+}
+
+/* ——— Variantes ——— */
+.narrow {
+  width: min(400px, 100%);
+}
+.bars {
+  display: grid;
+  gap: var(--s-3);
+  width: min(680px, 100%);
+}
+
+/* ——— Celular ——— */
+.phoneBody {
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-5) var(--s-4) var(--s-6);
+}

@@ -634,6 +634,12 @@ export const inventory: readonly InventoryGroup[] = [
         'Fonte citada: chip com prévia e marca numerada no texto.',
         'source citation citacao referencia',
       ),
+      item(
+        'sugestao',
+        'Sugestão',
+        'Proposta da IA para aceitar, editar ou descartar, com alternativas e voto.',
+        'suggestion aceitar descartar alternativas titulo',
+      ),
     ],
   },
   {
