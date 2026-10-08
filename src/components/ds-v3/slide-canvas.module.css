@@ -1,0 +1,309 @@
+/* ——— SlideCanvas ———
+ * Quadro na proporção da peça, fundo g-50 e fio interno de 1px (como MediaFrame). Dentro, o slide é
+ * composto em 360 px com a escala de leitura e ampliado por `scale` até a largura do quadro. */
+.canvas {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  overflow: clip;
+  border-radius: var(--r-md);
+  background: var(--g-50);
+  isolation: isolate;
+}
+/* Altura que limita (`maxHeight`, `fitHeight`): o quadro estreita na proporção e centra; a escala
+ * acompanha a largura medida. */
+.canvas[data-bound] {
+  --media-h: min(var(--media-max-h, 100svh), var(--media-fit-h, 100svh));
+  width: min(100%, var(--media-h) * var(--media-ar, 1));
+  margin-inline: auto;
+}
+.canvas[data-radius='sm'] {
+  border-radius: var(--r-sm);
+}
+.canvas[data-radius='lg'] {
+  border-radius: var(--r-lg);
+}
+.canvas[data-radius='none'] {
+  border-radius: 0;
+}
+/* Fio por cima da peça: define a borda num slide claro sobre papel. */
+.canvas::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 1px solid var(--line);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.canvas[data-mode='thumb']::after {
+  display: none;
+}
+
+.scaler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+/* Antes da primeira medida (HTML do servidor) o slide não aparece em 360 px cortado. */
+.canvas:not([data-scaled]) .scaler {
+  visibility: hidden;
+}
+
+/* ——— Slide: papéis do tema neutro ———
+ * `ThemeV3` fixa claro ou escuro dentro do slide, então os mesmos papéis valem em qualquer modo. */
+.scaler > .slide {
+  --slide-bg: var(--paper);
+  --slide-ink: var(--ink);
+  --slide-text: var(--text);
+  --slide-muted: var(--muted);
+  --slide-line: var(--line);
+  --slot-hover: var(--choice-hover-line);
+  --slot-select: var(--b-600);
+  --slot-focus: var(--focus-color);
+  --slot-warn: var(--amber-dot);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  color: var(--slide-text);
+  background: var(--slide-bg);
+}
+.scaler > .slide[data-theme='accent'] {
+  --slide-bg: var(--accent);
+  --slide-ink: var(--on-accent);
+  --slide-text: var(--on-accent);
+  --slide-muted: var(--on-accent);
+  --slide-line: var(--b-400);
+  --slot-hover: var(--b-300);
+  --slot-select: var(--on-accent);
+  --slot-focus: var(--on-accent);
+}
+
+.frame {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+  height: 100%;
+  padding: var(--s-8);
+}
+.main {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: var(--s-4);
+  min-height: 0;
+}
+/* Margens automáticas (não `justify-content`): quando o texto não cabe, ele transborda para baixo,
+   nunca para fora do topo. Capa: chapéu no topo, título e texto no pé. */
+.main[data-layout='cover'] > [data-slot='title'] {
+  margin-top: auto;
+}
+.main[data-align='center'] > :first-child {
+  margin-top: auto;
+}
+.main[data-align='center'] > :last-child {
+  margin-bottom: auto;
+}
+
+/* ——— Lugares de texto ——— */
+.slot {
+  position: relative;
+  min-width: 0;
+}
+.text {
+  display: block;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.text[data-clamped] {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--clamp);
+}
+
+.slot[data-slot='eyebrow'] .text {
+  font: var(--t-title-3);
+  color: var(--slide-muted);
+}
+.slot[data-slot='title'] .text {
+  font: var(--t-prose-h2);
+  letter-spacing: var(--track-title);
+  color: var(--slide-ink);
+  text-wrap: balance;
+}
+.main:is([data-layout='cover'], [data-layout='closing']) [data-slot='title'] .text {
+  font: var(--t-prose-title);
+  letter-spacing: var(--track-display);
+}
+.slot[data-slot='body'] .text {
+  font: var(--t-prose-body);
+  color: var(--slide-text);
+  white-space: pre-line;
+  text-wrap: pretty;
+}
+.main:is([data-layout='cover'], [data-layout='closing']) [data-slot='body'] .text {
+  font: var(--t-prose-lead);
+  color: var(--slide-muted);
+}
+.slot[data-slot='quote'] .text {
+  font: var(--t-prose-h2);
+  font-style: italic;
+  color: var(--slide-ink);
+  text-wrap: pretty;
+}
+.slot[data-slot='attribution'] .text {
+  font: var(--t-body-strong);
+  color: var(--slide-muted);
+}
+.slot[data-slot='footer'] {
+  flex: 1;
+}
+.slot[data-slot='footer'] .text {
+  font: var(--t-small);
+  color: var(--slide-muted);
+}
+/* Lugar obrigatório vazio na edição: o nome do lugar em cor apagada. */
+.slot[data-empty] .text[data-empty] {
+  color: var(--slide-muted);
+  font-style: normal;
+}
+
+/* Citação: aspas de abertura como marca do layout (sem fio lateral, sem caixa). */
+.mark {
+  display: block;
+  color: var(--slide-muted);
+}
+.mark svg {
+  display: block;
+  width: var(--s-8);
+  height: var(--s-8);
+}
+
+/* Lista numerada em fios. */
+.items {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.item {
+  display: grid;
+  grid-template-columns: var(--s-6) minmax(0, 1fr);
+  gap: var(--s-2);
+  padding-block: var(--s-3);
+  font: var(--t-prose-body);
+  color: var(--slide-text);
+}
+.item + .item {
+  border-top: 1px solid var(--slide-line);
+}
+.item:first-child {
+  padding-top: 0;
+}
+.item[data-cut] {
+  display: none;
+}
+.itemNum {
+  font-weight: 600;
+  color: var(--slide-ink);
+  font-variant-numeric: tabular-nums;
+}
+.itemText {
+  min-width: 0;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+/* Rodapé: marca, texto de uma linha e posição na sequência. */
+.foot {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: var(--s-5);
+}
+.brand {
+  display: inline-flex;
+  flex: none;
+}
+.spacer {
+  flex: 1;
+}
+.page {
+  flex: none;
+  margin-left: auto;
+  font: var(--t-small);
+  color: var(--slide-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ——— Edição: lugar escolhível, selecionado e transbordando ———
+ * Fio por fora do texto (pseudo-elemento), sem mexer no layout medido. */
+.canvas[data-mode='edit'] .slot {
+  cursor: pointer;
+  outline: none;
+}
+.canvas[data-mode='edit'] .slot::before,
+.canvas[data-mode='edit'] .slot::after {
+  content: '';
+  position: absolute;
+  border-radius: var(--r-sm);
+  pointer-events: none;
+}
+.canvas[data-mode='edit'] .slot::before {
+  inset: calc(var(--s-2) * -1);
+  border: 1px solid transparent;
+  transition: border-color var(--dur-1) var(--ease-out);
+}
+.canvas[data-mode='edit'] .slot:is(:hover, [data-force~='hover'])::before {
+  border-color: var(--slot-hover);
+}
+.canvas[data-mode='edit'] .slot[data-selected]::before {
+  border: 2px solid var(--slot-select);
+}
+.canvas[data-mode='edit'] .slot[data-overflow]::after {
+  inset: calc(var(--s-1) * -1);
+  border: 2px dashed var(--slot-warn);
+}
+.canvas[data-mode='edit'] .slot:is(:focus-visible, [data-force~='focus']) {
+  outline: var(--focus-width) solid var(--slot-focus);
+  outline-offset: var(--s-3);
+  border-radius: var(--r-sm);
+}
+
+/* ——— Carregando: a geometria da capa em esqueleto ——— */
+.skelTitle,
+.skelBody {
+  display: grid;
+  gap: var(--s-2);
+}
+.main[data-layout='cover'] > .skelTitle {
+  margin-top: auto;
+}
+
+/* ——— Erro: igual à imagem indisponível ——— */
+.error {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--s-2);
+  padding: var(--s-4);
+  text-align: center;
+}
+.errorIcon {
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+  color: var(--icon-quiet);
+}
+.canvas[data-mode='thumb'] .errorIcon {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+.errorText {
+  font: var(--t-small);
+  color: var(--muted);
+}

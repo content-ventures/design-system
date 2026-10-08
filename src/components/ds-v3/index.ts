@@ -77,6 +77,22 @@ export {
   type SlideStripItemState,
   type SlideStripOrientation,
 } from './slide-strip';
+export {
+  SlideCanvas,
+  SLIDE_SLOT_LABELS,
+  slideSlots,
+  slideOverflowMessage,
+  type SlideCanvasProps,
+  type SlideCanvasMode,
+  type SlideCanvasState,
+  type SlideContent,
+  type SlideDesign,
+  type SlideLayout,
+  type SlideLimits,
+  type SlideOverflow,
+  type SlideSlot,
+  type SlideTheme,
+} from './slide-canvas';
 
 /* Status e marcadores */
 export { Badge, Chip, Kbd, Count, type Tone } from './badge';
