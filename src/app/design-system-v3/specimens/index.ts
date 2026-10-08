@@ -3,6 +3,7 @@ import { specimens as acoes } from './acoes';
 import { specimens as camadas } from './camadas';
 import { specimens as dados } from './dados';
 import { specimens as estrutura } from './estrutura';
+import { specimens as estruturaLayout } from './estrutura-layout';
 import { specimens as feedback } from './feedback';
 import { specimens as formulariosA } from './formularios-a';
 import { specimens as formulariosB } from './formularios-b';
@@ -25,6 +26,7 @@ export const specimens: Record<string, ComponentType> = {
   ...formulariosB,
   ...navegacao,
   ...estrutura,
+  ...estruturaLayout,
   ...dados,
   ...graficos,
   ...feedback,

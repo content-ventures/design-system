@@ -341,6 +341,18 @@ export const inventory: readonly InventoryGroup[] = [
         'Pares de rótulo e valor, metadados e leitura de detalhes.',
         'description list',
       ),
+      item(
+        'grade',
+        'Grade',
+        'Colunas em proporção ou automáticas que empilham pela largura disponível.',
+        'grid columns colunas',
+      ),
+      item(
+        'area-de-trabalho',
+        'Área de trabalho',
+        'Moldura de estúdio com painéis laterais redimensionáveis e recolhíveis.',
+        'workspace studio estudio resizable paineis foco',
+      ),
     ],
   },
   {
