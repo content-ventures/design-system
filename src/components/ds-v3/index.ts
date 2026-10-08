@@ -386,6 +386,26 @@ export { BottomSheet, BottomSheetFrame, type SheetSnap } from './bottom-sheet';
 export { ResponsiveDialog, type ResponsiveVariant } from './responsive-dialog';
 export { ConfirmDialog, ConfirmFrame, type ConfirmTone } from './confirm-dialog';
 
+/* Editor */
+export {
+  Prose,
+  type ProseProps,
+  type ProseVariant,
+  type ProseSize,
+  type ProseMeasure,
+  type ProseAlign,
+} from './prose';
+export {
+  proseWidgets,
+  PROSE_WIDGET_ATTR,
+  type ProseWidgets,
+  type ProseWidgetKind,
+  type ProseWidgetOptions,
+  type ProseInsertionOptions,
+  type ProseGutterMarkerKind,
+  type ProseGutterMarkerOptions,
+} from './prose-widgets';
+
 /* Padrões */
 export {
   KanbanBoard,
