@@ -172,6 +172,16 @@
   margin-top: -2px;
 }
 
+/* ——— Pilha de campos ———
+   No corpo de `Section` e de `Drawer` (fluxo comum, sem gap), campo ou grupo depois de outro ganha o
+   vão da grade do grupo (20): o rótulo nunca encosta no controle de cima. Em grade ou pilha com gap
+   (`FieldGroup`, `PageStack`, `Grid`), quem manda é o gap. */
+:is([data-part='section-body'], [data-part='drawer-body'])
+  > :is(.field, .group)
+  + :is(.field, .group) {
+  margin-top: var(--s-5);
+}
+
 /* ——— Controle ——— */
 .control {
   --ctl-h: var(--h-md);

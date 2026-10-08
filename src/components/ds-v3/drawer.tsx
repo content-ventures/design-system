@@ -125,6 +125,7 @@ function DrawerLayout({
         ref={bodyRef}
         className={s.body}
         data-padding={padding}
+        data-part="drawer-body"
         onScroll={(event) => {
           const next = event.currentTarget.scrollTop > 0;
           if (next !== scrolled) setScrolled(next);
