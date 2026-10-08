@@ -438,6 +438,11 @@ export type SelectProps = {
   /** Nome acessível quando não há <label for>. */
   label?: string;
   emptyText?: string;
+  /**
+   * O campo que pede a decisão: a gaveta ou o diálogo que abre leva o foco a ele
+   * (`[data-autofocus]`), em vez do primeiro campo de texto.
+   */
+  autoFocus?: boolean;
   /** Prancha: estado parado (`hover`, `active`, `focus`). */
   'data-force'?: string;
 };
@@ -461,6 +466,7 @@ export function Select({
   describedBy,
   label,
   emptyText = 'Nada encontrado.',
+  autoFocus = false,
   'data-force': force,
 }: SelectProps) {
   const pinned = forcedOpen(force);
@@ -599,6 +605,7 @@ export function Select({
         className={s.trigger}
         data-size={size}
         data-invalid={invalid || undefined}
+        data-autofocus={autoFocus || undefined}
         data-force={force}
         disabled={disabled}
         role="combobox"
