@@ -238,6 +238,17 @@ export {
   type GridCollapse,
   type GridElement,
 } from './grid';
+export {
+  WorkspaceLayout,
+  WorkspaceToggle,
+  useWorkspace,
+  type WorkspaceLayoutProps,
+  type WorkspacePane,
+  type WorkspaceSide,
+  type WorkspaceView,
+  type WorkspaceState,
+  type WorkspaceToggleProps,
+} from './workspace-layout';
 
 /* Dados */
 export {
