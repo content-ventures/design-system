@@ -1,0 +1,73 @@
+/*
+ * FloatingToolbar — camada flutuante (§7): papel, fio de 1 px, --shadow-lg, raio de superfície (10).
+ * Padding 4 + botões de raio 6: cantos concêntricos. Entra em 180 ms a partir do lado do trecho
+ * (opacidade, 4 px, escala .98) e sai em --dur-exit. Reposicionar não anima.
+ */
+.floating {
+  position: fixed;
+  z-index: var(--z-popover);
+  display: flex;
+  width: max-content;
+  max-width: calc(100vw - var(--s-4));
+  padding: var(--s-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: var(--text);
+  background: var(--paper);
+  box-shadow: var(--shadow-lg);
+  transform-origin: bottom center;
+}
+.floating[data-side='bottom'] {
+  transform-origin: top center;
+}
+.floating[data-state='open'] {
+  animation: in var(--dur-2) var(--ease-out);
+}
+.floating[data-state='open'][data-side='bottom'] {
+  animation-name: inDown;
+}
+.floating[data-state='closing'] {
+  pointer-events: none;
+  animation: out var(--dur-exit) var(--ease-in) forwards;
+}
+/* O trecho saiu de vista: a barra espera, sem fechar. */
+.floating[data-hidden] {
+  visibility: hidden;
+  pointer-events: none;
+}
+@keyframes in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+@keyframes inDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+@keyframes out {
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+.toolbar {
+  flex: 1 1 auto;
+}
+
+/* ——— Prancha: parada, no fluxo ——— */
+.floating[data-static] {
+  position: relative;
+  z-index: auto;
+  max-width: 100%;
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating[data-state] {
+    animation: none;
+  }
+}

@@ -425,6 +425,11 @@ export {
   type ToolbarToggleProps,
   type ToolbarMenuProps,
 } from './toolbar';
+export {
+  FloatingToolbar,
+  type FloatingToolbarProps,
+  type FloatingToolbarDismissReason,
+} from './floating-toolbar';
 
 /* Padrões */
 export {
