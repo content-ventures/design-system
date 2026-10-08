@@ -454,35 +454,41 @@ function useExplorer(count: number, initial = 0, options: ExplorerOptions = {}) 
   };
 }
 
+/**
+ * Tabela para leitor de tela, dentro de um `div` oculto: a `table` não encolhe a 1 px nem recorta
+ * o conteúdo, e sozinha alargava a página no celular (408 px numa tela de 390).
+ */
 function SrTable({ caption, head, rows }: { caption: string; head: string[]; rows: string[][] }) {
   return (
-    <table className={s.srOnly}>
-      <caption>{caption}</caption>
-      <thead>
-        <tr>
-          {head.map((cell, index) => (
-            <th key={`${cell}-${index}`} scope="col">
-              {cell}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row, index) => (
-          <tr key={index}>
-            {row.map((cell, cellIndex) =>
-              cellIndex === 0 ? (
-                <th key={cellIndex} scope="row">
-                  {cell}
-                </th>
-              ) : (
-                <td key={cellIndex}>{cell}</td>
-              ),
-            )}
+    <div className={s.srOnly}>
+      <table>
+        <caption>{caption}</caption>
+        <thead>
+          <tr>
+            {head.map((cell, index) => (
+              <th key={`${cell}-${index}`} scope="col">
+                {cell}
+              </th>
+            ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {rows.map((row, index) => (
+            <tr key={index}>
+              {row.map((cell, cellIndex) =>
+                cellIndex === 0 ? (
+                  <th key={cellIndex} scope="row">
+                    {cell}
+                  </th>
+                ) : (
+                  <td key={cellIndex}>{cell}</td>
+                ),
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
