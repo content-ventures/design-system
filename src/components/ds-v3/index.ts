@@ -320,6 +320,7 @@ export {
   type BannerTone,
   type ProgressTone,
   type ProgressStep,
+  type ProgressStepState,
   type SkeletonColumn,
   type StateSize,
   type AccessKind,
