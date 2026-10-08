@@ -431,6 +431,22 @@ export {
   type FloatingToolbarDismissReason,
 } from './floating-toolbar';
 
+/* Revisão */
+export {
+  DiffView,
+  diffStats,
+  formatDiffSummary,
+  type DiffViewProps,
+  type DiffBlock,
+  type DiffBlockType,
+  type DiffHunk,
+  type DiffHunkKind,
+  type DiffChange,
+  type DiffVersion,
+  type DiffStats,
+} from './diff-view';
+export { Seal, type SealProps, type SealSize } from './seal';
+
 /* Padrões */
 export {
   KanbanBoard,

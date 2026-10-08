@@ -1,0 +1,278 @@
+/*
+ * Diferença entre versões. Leitura chapada: nenhum fio lateral, nenhuma caixa em volta do bloco.
+ * Inserção = fundo --diff-insert-bg + sublinhado --diff-insert-line; remoção = fundo
+ * --diff-delete-bg + tachado --diff-delete-line, texto --diff-delete-ink (§2.5).
+ */
+.diff {
+  container: diff / inline-size;
+  --diff-gap: var(--prose-space-block);
+  --diff-section: var(--prose-space-section);
+  display: grid;
+  gap: var(--s-4);
+  width: 100%;
+  min-width: 0;
+}
+/* Leitura em uma coluna: cabeçalho e corpo dividem a medida do texto (68ch na fonte de leitura). */
+.diff[data-size='reading'][data-mode='inline'] {
+  max-width: var(--prose-measure);
+  font: var(--t-prose-body);
+}
+.diff[data-size='compact'] {
+  --diff-gap: var(--s-2);
+  --diff-section: var(--s-3);
+  gap: var(--s-3);
+}
+
+/* ——— Cabeçalho: versões à esquerda, resumo à direita ——— */
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-1) var(--s-4);
+  min-width: 0;
+  padding-bottom: var(--s-3);
+  border-bottom: 1px solid var(--line-soft);
+}
+.versions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-1) var(--s-2);
+  min-width: 0;
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.version[data-side='before'] {
+  color: var(--muted);
+}
+.arrow {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--icon-quiet);
+}
+.summary {
+  font: var(--t-small);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-6);
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+
+/* ——— Corpo: medida de leitura ——— */
+.body {
+  display: grid;
+  gap: var(--diff-gap);
+  min-width: 0;
+  max-width: var(--prose-measure);
+  font: var(--t-prose-body);
+  color: var(--text);
+}
+.diff[data-mode='split'] .body {
+  max-width: none;
+}
+.diff[data-size='compact'] .body {
+  max-width: none;
+  font: var(--t-body);
+}
+.empty {
+  font: var(--t-body);
+  color: var(--muted);
+}
+
+.block {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+.block[data-type='title'] {
+  font: var(--t-prose-title);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.block[data-type='lead'] {
+  font: var(--t-prose-lead);
+  color: var(--muted);
+}
+.block[data-type='h2'] {
+  font: var(--t-prose-h2);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+}
+.block[data-type='h3'] {
+  font: var(--t-prose-h3);
+  color: var(--ink);
+}
+/* Citação: recuo, sem fio lateral e sem caixa (§3.1). */
+.block[data-type='quote'] {
+  padding-left: var(--s-6);
+  font: var(--t-prose-quote);
+  color: var(--ink);
+}
+.block[data-type='item'] {
+  position: relative;
+  padding-left: var(--s-5);
+}
+.block[data-type='item']::before {
+  content: '•';
+  position: absolute;
+  left: var(--s-1);
+  color: var(--muted);
+}
+.block[data-type='caption'] {
+  font: var(--t-prose-caption);
+  color: var(--muted);
+}
+/* Respiro antes de intertítulo (o primeiro bloco não ganha). */
+.body > :is(.block, .pair):is([data-type='h2'], [data-type='h3']):not(:first-child),
+.runInner > :is(.block, .pair):is([data-type='h2'], [data-type='h3']):not(:first-child) {
+  margin-top: calc(var(--diff-section) - var(--diff-gap));
+}
+
+/* Compacto: a escala da interface (cartão de sugestão, gaveta estreita). */
+.diff[data-size='compact'] .block:is([data-type='title'], [data-type='h2'], [data-type='h3']) {
+  font: var(--t-title-3);
+  letter-spacing: normal;
+}
+.diff[data-size='compact'] .block[data-type='lead'] {
+  font: var(--t-body);
+}
+.diff[data-size='compact'] .block[data-type='quote'] {
+  padding-left: var(--s-4);
+  font: var(--t-body);
+  font-style: italic;
+}
+.diff[data-size='compact'] .block[data-type='item'] {
+  padding-left: var(--s-4);
+}
+.diff[data-size='compact'] .block[data-type='caption'] {
+  font: var(--t-caption);
+}
+
+/* Bloco inteiro removido: o texto todo fica no tom de remoção. */
+.block[data-change='removed'] {
+  color: var(--diff-delete-ink);
+}
+
+/* ——— Trechos ——— */
+.ins,
+.del {
+  padding: 1px 2px;
+  border-radius: var(--r-xs);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.ins {
+  color: var(--diff-insert-ink);
+  background: var(--diff-insert-bg);
+  text-decoration: underline 1.5px var(--diff-insert-line);
+  text-underline-offset: 3px;
+}
+.del {
+  color: var(--diff-delete-ink);
+  background: var(--diff-delete-bg);
+  text-decoration: line-through 1.5px var(--diff-delete-line);
+}
+.del + .ins {
+  margin-left: 2px;
+}
+
+/* ——— Antes | depois ——— */
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-6);
+  align-items: start;
+}
+.blank {
+  min-height: 1lh;
+}
+@container diff (max-width: 559px) {
+  .pair,
+  .columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-2);
+  }
+  .columns {
+    display: none;
+  }
+  .blank {
+    display: none;
+  }
+}
+
+/* ——— Sequência recolhida ——— */
+.run {
+  display: grid;
+  min-width: 0;
+}
+.runToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  width: 100%;
+  min-height: var(--h-sm);
+  padding: 0 var(--s-3);
+  border-radius: var(--r-md);
+  font: var(--t-small-strong);
+  color: var(--muted);
+  background: var(--paper-sunken);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.runToggle svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--icon-rest);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.runToggle:is(:hover, [data-force~='hover']) {
+  color: var(--ink);
+  background: var(--g-75);
+}
+.runToggle:is(:hover, [data-force~='hover']) svg {
+  color: var(--ink);
+}
+.runToggle:is(:active, [data-force~='active']) {
+  background: var(--paper-pressed);
+}
+.runToggle:is(:focus-visible, [data-force~='focus']) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+/* Altura 0fr → 1fr (§8). O recorte fica num nível próprio para o respiro não vazar fechado. */
+.runBody {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--dur-exit) var(--ease-in);
+}
+.runBody[data-open] {
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--dur-3) var(--ease-out);
+}
+.runClip {
+  min-height: 0;
+  overflow: hidden;
+}
+.runInner {
+  display: grid;
+  gap: var(--diff-gap);
+  padding-top: var(--diff-gap);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .runBody,
+  .runBody[data-open],
+  .runToggle,
+  .runToggle svg {
+    transition: none;
+  }
+}

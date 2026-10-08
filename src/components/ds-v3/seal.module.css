@@ -1,0 +1,79 @@
+/*
+ * Selo de aprovação: disco teal chapado com check. Sem sombra, sem brilho, sem anel.
+ * Tamanhos 16 · 20 · 40. O traço do check compensa a escala do viewBox (20) para ficar
+ * ≈ 2 px em sm/md e 2,5 px em lg.
+ */
+.seal {
+  --seal-size: 20px;
+  --seal-stroke: 2.2;
+  --seal-fill: var(--teal-dot);
+  --seal-ink: var(--on-accent);
+  display: inline-grid;
+  flex: none;
+  width: var(--seal-size);
+  height: var(--seal-size);
+  vertical-align: middle;
+}
+.seal[data-size='sm'] {
+  --seal-size: 16px;
+  --seal-stroke: 2.5;
+}
+.seal[data-size='lg'] {
+  --seal-size: 40px;
+  --seal-stroke: 1.25;
+  --seal-fill: var(--teal-bg);
+  --seal-ring: var(--teal-line);
+  --seal-ink: var(--teal-ink);
+}
+.svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.disc {
+  fill: var(--seal-fill);
+  /* Fio de 1px só no suave (lg): o disco claro não some sobre --g-50. */
+  stroke: var(--seal-ring, none);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sealIn var(--dur-3) var(--ease-spring) both;
+}
+.check {
+  fill: none;
+  stroke: var(--seal-ink);
+  stroke-width: var(--seal-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: draw var(--dur-3) var(--ease-out) 140ms both;
+}
+.seal[data-still] .disc,
+.seal[data-still] .check {
+  animation: none;
+}
+
+@keyframes sealIn {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Movimento reduzido: o selo aparece pronto. */
+@media (prefers-reduced-motion: reduce) {
+  .disc,
+  .check {
+    animation: none;
+  }
+}
