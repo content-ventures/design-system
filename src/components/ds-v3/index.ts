@@ -455,6 +455,13 @@ export {
   type TurnStatus,
   type TurnFeedback,
 } from './conversation';
+export {
+  AgentTrace,
+  type AgentTraceProps,
+  type AgentTraceStatus,
+  type AgentTraceStep,
+  type AgentTraceStepState,
+} from './agent-trace';
 
 /* Revisão */
 export {
