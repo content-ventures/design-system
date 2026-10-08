@@ -405,6 +405,12 @@ export {
   type ProseGutterMarkerKind,
   type ProseGutterMarkerOptions,
 } from './prose-widgets';
+export {
+  EditableTitle,
+  type EditableTitleProps,
+  type EditableTitleSize,
+  type EditableTitleLevel,
+} from './editable-title';
 
 /* Padrões */
 export {
