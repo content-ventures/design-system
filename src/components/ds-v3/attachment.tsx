@@ -12,7 +12,7 @@ import {
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Button, IconButton } from './button';
 import { FileGlyph, MediaFrame, MiddleEllipsis, fileExt, fileKindOf, formatBytes } from './media';
-import { Dialog, Menu, type MenuSection } from './overlays';
+import { Dialog, Menu, Tooltip, type MenuSection } from './overlays';
 import s from './attachment.module.css';
 
 export type AttachmentStatus = 'downloading' | 'done' | 'missing';
@@ -177,15 +177,16 @@ export function AttachmentChip({
       </span>
       <span className={s.chipSize}>{sending ? `${Math.round(progress)}%` : formatBytes(size)}</span>
       {onRemove && (
-        <button
-          type="button"
-          className={s.chipRemove}
-          aria-label={sending ? `Cancelar envio de ${name}` : `Remover ${name}`}
-          title={sending ? 'Cancelar envio' : 'Remover'}
-          onClick={onRemove}
-        >
-          <X aria-hidden="true" />
-        </button>
+        <Tooltip bare describe={false} content={sending ? 'Cancelar envio' : 'Remover'}>
+          <button
+            type="button"
+            className={s.chipRemove}
+            aria-label={sending ? `Cancelar envio de ${name}` : `Remover ${name}`}
+            onClick={onRemove}
+          >
+            <X aria-hidden="true" />
+          </button>
+        </Tooltip>
       )}
       {sending && (
         <span

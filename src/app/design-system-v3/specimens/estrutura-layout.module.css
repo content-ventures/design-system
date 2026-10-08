@@ -1,0 +1,51 @@
+/*
+ * Prancha de layout (Grid, WorkspaceLayout): só arruma a prancha.
+ * O componente vem da biblioteca; cor, tipo e espaço sempre por token.
+ */
+
+/* ——— Peças do estúdio arrumadas na prancha ——— */
+.stack {
+  display: grid;
+  gap: var(--s-6);
+  min-width: 0;
+}
+/* ——— Miniaturas ——— */
+.mini {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: clip;
+}
+.block {
+  display: grid;
+  place-items: center;
+  min-height: var(--s-12);
+  height: 100%;
+  border-radius: var(--r-md);
+  font: var(--t-caption-strong);
+  color: var(--muted);
+  background: var(--g-50);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ——— Grid ——— */
+.page {
+  display: grid;
+  gap: var(--s-6);
+  min-width: 0;
+}
+.rows {
+  display: grid;
+  gap: var(--s-5);
+  min-width: 0;
+}
+.ratioRow {
+  display: grid;
+  grid-template-columns: var(--s-12) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--s-4);
+  min-width: 0;
+}
+.phonePage {
+  padding: var(--s-5) var(--s-4);
+}

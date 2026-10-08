@@ -1,0 +1,248 @@
+/*
+ * Área de trabalho — moldura dos estúdios. Papel, fio de 1px entre regiões, sem sombra.
+ * A raiz é o contêiner: o modo estreito (medido) e a prévia antes da medida respondem à largura dela.
+ * A alça entre as regiões é a de `ResizablePanels` (structure.module.css · `.splitHandle`).
+ */
+.root {
+  container: dsv3-workspace / inline-size;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  /* Contêiner não mede o conteúdo: ocupa a largura disponível (também dentro de flex). */
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: clip;
+  color: var(--text);
+  background: var(--paper);
+}
+/* Encostada no fundo do shell, como a `FixedFrame docked`: a altura útil abaixo do topo e do
+   respiro de cima, e a margem negativa cancela o respiro de baixo. */
+.root[data-docked] {
+  height: calc(100dvh - var(--topbar-h, 52px) - var(--content-pt, 28px));
+  margin-bottom: calc(var(--content-pb, 48px) * -1);
+}
+
+/* Paradas do F6 sem controle próprio: anel por dentro, só no teclado. */
+.head:focus-visible,
+.foot:focus-visible,
+.region:focus-visible {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset-inset, -2px);
+}
+.head,
+.foot,
+.region {
+  outline: none;
+}
+
+/* ——— Cabeçalho ——— */
+/* Uma linha de trabalho: 48 px, como as barras de ferramenta abaixo dela (a altura vai para o texto). */
+.head {
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: var(--s-12);
+  padding: var(--s-2) var(--s-5);
+  border-bottom: 1px solid var(--line);
+}
+.head > * {
+  flex: 1;
+  min-width: 0;
+}
+.root[data-narrow] .head {
+  padding-inline: var(--s-4);
+}
+
+/* ——— Abas do modo estreito: sangram até a borda e o fio delas fecha a faixa ——— */
+.views {
+  --tabs-inset: var(--s-4);
+  grid-row: 2;
+  min-width: 0;
+}
+
+/* ——— Corpo: [início] fio [principal] fio [fim] ——— */
+.body {
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: var(--ws-cols, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+.root[data-animate] .body {
+  transition: grid-template-columns var(--dur-3) var(--ease-move);
+}
+.body[data-dragging] {
+  cursor: col-resize;
+  user-select: none;
+}
+/* A alça é a de `ResizablePanels`; aqui só ocupa a coluna de 1px (posição automática, em ordem). */
+.handle {
+  min-height: 0;
+}
+
+/* ——— Rodapé: sem respiro próprio (a `ActionBar` traz faixa, fio e padding) ——— */
+.foot {
+  grid-row: 4;
+  min-width: 0;
+}
+
+/* ——— Lados: o conteúdo guarda a largura aberta e a coluna recorta (recolher não reflui o texto) ——— */
+.side {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.side[data-side='end'] {
+  justify-content: flex-end;
+}
+.side > .region {
+  flex: none;
+  width: var(--ws-pane-w, 100%);
+}
+.side[data-collapsed] > .region {
+  visibility: hidden;
+}
+/* Recolhendo: o conteúdo some só quando a coluna termina de fechar. */
+.root[data-animate] .side[data-collapsed] > .region {
+  transition: visibility 0s linear var(--dur-3);
+}
+
+/* Trilho recolhido: só o botão de reabrir, encostado na borda de fora. */
+.rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--ws-rail, 40px);
+  padding-top: var(--s-2);
+  background: var(--paper);
+  animation: wsRailIn var(--dur-2) var(--ease-out) both;
+}
+.side[data-side='start'] > .rail {
+  left: 0;
+}
+.side[data-side='end'] > .rail {
+  right: 0;
+}
+.root[data-animate] .rail {
+  animation-delay: var(--dur-3);
+}
+@keyframes wsRailIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ——— Região: faixa fixa em cima, corpo que rola, faixa fixa embaixo ——— */
+.region {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-width: 0;
+  min-height: 0;
+  background: var(--paper);
+}
+/* Faixa fixa com no mínimo a altura das abas e da barra de ferramentas (40): os fios das três
+   regiões ficam na mesma linha. O fio é por dentro, como o das abas. */
+.regionHead {
+  grid-row: 1;
+  display: grid;
+  align-content: end;
+  gap: var(--s-3);
+  min-width: 0;
+  min-height: var(--h-lg);
+  padding: var(--s-1) var(--s-4);
+  box-shadow: inset 0 -1px 0 var(--line);
+}
+/* Abas no topo da faixa sangram até as bordas; quando são a última peça, o fio delas fecha a faixa. */
+.regionHead > [role='tablist'] {
+  --tabs-inset: var(--s-4);
+  margin-inline: calc(-1 * (var(--s-4) + var(--tab-pad, 8px)));
+}
+.regionHead:has(> [role='tablist']:first-child) {
+  padding-top: 0;
+  padding-bottom: var(--s-3);
+}
+.regionHead:has(> [role='tablist']:last-child) {
+  padding-bottom: 0;
+  box-shadow: none;
+}
+.regionFoot {
+  grid-row: 3;
+  display: grid;
+  gap: var(--s-2);
+  min-width: 0;
+  padding: var(--s-3) var(--s-4);
+  border-top: 1px solid var(--line);
+}
+.scroll,
+.fill {
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+}
+.fill {
+  display: grid;
+  overflow: hidden;
+}
+.viewport {
+  padding: var(--s-4);
+}
+.region[data-kind='main'] .viewport {
+  padding: var(--s-6) var(--s-8);
+}
+.region[data-flush] .viewport {
+  padding: 0;
+}
+
+/* ——— Estreito: uma região por vez, todas no mesmo lugar (trocar de aba não perde a rolagem) ——— */
+.root[data-narrow] .body > * {
+  grid-area: 1 / 1;
+}
+.root[data-narrow] .side > .region {
+  width: 100%;
+}
+.root[data-narrow] .region[data-kind='main'] .viewport {
+  padding: var(--s-5) var(--s-4);
+}
+.root[data-narrow] .region[data-flush] .viewport {
+  padding: 0;
+}
+.region[data-inactive] {
+  visibility: hidden;
+}
+/* A coluna lateral inativa empilhada sobre a principal não pode capturar toque nem clique: some
+   inteira (a região escondida sozinha deixava a caixa do lado por cima do texto). */
+.root[data-narrow] .side:has(> .region[data-inactive]) {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Antes da primeira medida (HTML do servidor): moldura estreita mostra só a tela principal. */
+@container dsv3-workspace (max-width: 1024px) {
+  .root:not([data-measured]) .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .root:not([data-measured]) .body > :not([data-kind='main']) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root[data-animate] .body,
+  .root[data-animate] .side[data-collapsed] > .region {
+    transition: none;
+  }
+  .rail,
+  .root[data-animate] .rail {
+    animation: none;
+  }
+}

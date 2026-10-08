@@ -100,11 +100,17 @@ export function Delta({
   );
 }
 
+/**
+ * Tom do medidor. `neutral` (cinza, padrão) é o de prontidão, progresso e participação: azul é ação,
+ * nunca status. Âmbar e vermelho só quando o número pede atenção; verde, concluído.
+ */
+export type MeterTone = 'neutral' | Extract<Tone, 'blue' | 'green' | 'amber' | 'red'>;
+
 export function Meter({
   value,
   max = 100,
   label,
-  tone = 'blue',
+  tone = 'neutral',
   size = 'md',
   start,
   end,
@@ -113,7 +119,8 @@ export function Meter({
   value: number;
   max?: number;
   label: string;
-  tone?: Extract<Tone, 'blue' | 'green' | 'amber' | 'red'>;
+  /** Padrão `neutral`. */
+  tone?: MeterTone;
   size?: 'sm' | 'md' | 'lg';
   start?: ReactNode;
   end?: ReactNode;
@@ -154,17 +161,23 @@ export function Meter({
   );
 }
 
-/** Linha de tendência compacta: traço de 1,5 px chapado e ponto no último valor. Decorativa. */
+/**
+ * Linha de tendência compacta: traço de 1,5 px chapado e ponto no último valor. Decorativa.
+ * `fluid` estica na largura do contêiner (CSS decide a largura) sem engrossar o traço nem achatar o
+ * ponto; `width` vira só a proporção de desenho.
+ */
 export function Sparkline({
   points,
   width = 96,
   height = 36,
   tone = 'blue',
+  fluid = false,
 }: {
   points: number[];
   width?: number;
   height?: number;
   tone?: Extract<Tone, 'blue' | 'green' | 'red' | 'violet' | 'gray'>;
+  fluid?: boolean;
 }) {
   const color = {
     blue: 'var(--b-600)',
@@ -173,16 +186,49 @@ export function Sparkline({
     violet: 'var(--violet-dot)',
     gray: 'var(--g-400)',
   }[tone];
+  // Sem pontos não há linha (Math.min de nada é Infinity e o traço viraria NaN).
+  if (points.length === 0) return null;
   const min = Math.min(...points);
   const max = Math.max(...points);
   const x = (i: number) => (i / Math.max(1, points.length - 1)) * (width - 3);
   const y = (v: number) => height - 3 - ((v - min) / (max - min || 1)) * (height - 6);
   const line = points.map((v, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
   const last = points.length - 1;
+  const end = { x: x(last), y: y(points[last] ?? 0) };
+  if (fluid) {
+    // Escala só na horizontal: traço que não escala e o ponto como segmento nulo de ponta redonda.
+    return (
+      <svg
+        className={s.spark}
+        data-fluid=""
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path
+          d={line}
+          fill="none"
+          stroke={color}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+        />
+        <path
+          d={`M${end.x.toFixed(1)} ${end.y.toFixed(1)}h0`}
+          stroke={color}
+          strokeWidth="4.5"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+    );
+  }
   return (
     <svg className={s.spark} width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden="true">
       <path d={line} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={x(last)} cy={y(points[last] ?? 0)} r="2.25" fill={color} />
+      <circle cx={end.x} cy={end.y} r="2.25" fill={color} />
     </svg>
   );
 }

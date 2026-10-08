@@ -1,0 +1,106 @@
+/* Prancha “Slides”: só arranjo. Cor, raio, tipo e espaço vêm dos tokens; o slide é da biblioteca. */
+
+/* ——— Estúdio: faixa · palco · campos ——— */
+.studio {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr) 300px;
+  min-height: 640px;
+}
+.studioStrip {
+  min-width: 0;
+  max-height: 720px;
+  padding: var(--s-3);
+  overflow-y: auto;
+  border-right: 1px solid var(--line);
+}
+.studioStage {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--s-4);
+  min-width: 0;
+  padding: var(--s-6);
+  background: var(--paper-sunken);
+}
+.stageBar {
+  display: flex;
+  justify-content: center;
+}
+.stageSlide {
+  min-width: 0;
+}
+.studioFields {
+  display: grid;
+  align-content: start;
+  gap: var(--s-5);
+  min-width: 0;
+  padding: var(--s-5);
+  border-left: 1px solid var(--line);
+}
+.fields {
+  display: grid;
+  gap: var(--s-4);
+}
+.fieldActive label {
+  color: var(--select-ink);
+}
+
+@media (max-width: 1199px) {
+  .studio {
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+  .studioFields {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+}
+@media (max-width: 760px) {
+  .studio {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+  .studioStrip {
+    max-height: none;
+    padding: var(--s-2);
+    overflow: visible;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .studioStage {
+    padding: var(--s-4);
+  }
+  .studioFields {
+    padding: var(--s-4);
+  }
+}
+
+/* ——— Faixas horizontais empilhadas ——— */
+.stack {
+  display: grid;
+  gap: var(--s-6);
+  min-width: 0;
+}
+
+/* ——— Sequência: os 5 slides lado a lado; no celular, rolam ——— */
+.sequence {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--s-4);
+  min-width: 0;
+}
+@media (max-width: 1024px) {
+  .sequence {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 200px;
+    padding-bottom: var(--s-2);
+    overflow-x: auto;
+  }
+}
+
+/* ——— Celular ——— */
+.phoneBody {
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-3);
+}

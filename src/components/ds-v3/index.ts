@@ -8,6 +8,7 @@
 export { ThemeV3, type ThemeMode } from './theme';
 export { interV3 } from './font';
 export { VisuallyHidden, LiveRegion, useAnnouncer } from './a11y';
+export { formatRelative, textStats, type TextStats } from './format';
 
 /* Ações */
 export {
@@ -59,6 +60,39 @@ export {
   type AttachmentStatus,
 } from './attachment';
 export { VideoPlayer, formatClock, type VideoState, type VideoCue } from './video';
+export {
+  TranscriptViewer,
+  formatTimestamp,
+  type TranscriptViewerProps,
+  type TranscriptSegment,
+  type TranscriptSpeaker,
+  type TranscriptSelection,
+  type TranscriptAction,
+  type TranscriptSelectionActions,
+} from './transcript-viewer';
+export {
+  SlideStrip,
+  type SlideStripProps,
+  type SlideStripItem,
+  type SlideStripItemState,
+  type SlideStripOrientation,
+} from './slide-strip';
+export {
+  SlideCanvas,
+  SLIDE_SLOT_LABELS,
+  slideSlots,
+  slideOverflowMessage,
+  type SlideCanvasProps,
+  type SlideCanvasMode,
+  type SlideCanvasState,
+  type SlideContent,
+  type SlideDesign,
+  type SlideLayout,
+  type SlideLimits,
+  type SlideOverflow,
+  type SlideSlot,
+  type SlideTheme,
+} from './slide-canvas';
 
 /* Status e marcadores */
 export { Badge, Chip, Kbd, Count, type Tone } from './badge';
@@ -159,6 +193,7 @@ export {
   CommandPanel,
   CommandPalette,
   type NavItem,
+  type NavSoon,
   type NavGroup,
   type Portal,
   type Crumb,
@@ -175,6 +210,7 @@ export {
   FormSection,
   FormRow,
   ActionBar,
+  SaveIndicator,
   stepStateAt,
   type StepState,
   type StepItem,
@@ -209,6 +245,7 @@ export {
   ResizablePanels,
   DescriptionList,
   FixedFrame,
+  CopyButton,
   type AccordionStatus,
   type AccordionItem,
   type DescriptionItem,
@@ -224,6 +261,27 @@ export {
   MetaList,
   Overline,
 } from './surfaces';
+export {
+  Grid,
+  GridItem,
+  type GridProps,
+  type GridItemProps,
+  type GridColumns,
+  type GridGap,
+  type GridCollapse,
+  type GridElement,
+} from './grid';
+export {
+  WorkspaceLayout,
+  WorkspaceToggle,
+  useWorkspace,
+  type WorkspaceLayoutProps,
+  type WorkspacePane,
+  type WorkspaceSide,
+  type WorkspaceView,
+  type WorkspaceState,
+  type WorkspaceToggleProps,
+} from './workspace-layout';
 
 /* Dados */
 export {
@@ -235,9 +293,16 @@ export {
   type SortState,
   type BulkAction,
 } from './table';
-export { FilterBar, FilterBand, FilterField, ActiveFilters, type ActiveFilter } from './filter-bar';
+export {
+  FilterBar,
+  FilterBand,
+  FilterField,
+  ActiveFilters,
+  type ActiveFilter,
+  type FilterBarProps,
+} from './filter-bar';
 export { List, ListGroup, ListItem, ListItemSkeleton } from './list-item';
-export { StatCard, Delta, Meter, Sparkline } from './stat';
+export { StatCard, Delta, Meter, Sparkline, type MeterTone } from './stat';
 export { Metric, MetricStrip, type MetricDelta, type MetricProps } from './metric-strip';
 export { AuthShowcase, AuthSplit, ShowcaseLayer } from './auth-split';
 export { AuthScene, type AuthSceneVariant } from './auth-scenes';
@@ -316,6 +381,7 @@ export {
   type BannerTone,
   type ProgressTone,
   type ProgressStep,
+  type ProgressStepState,
   type SkeletonColumn,
   type StateSize,
   type AccessKind,
@@ -335,6 +401,7 @@ export {
   Dialog,
   DialogFrame,
   Tooltip,
+  TruncatedText,
   ContainedLayer,
   useModalLayer,
   type DialogSize,
@@ -351,6 +418,117 @@ export { Drawer, DrawerFrame, type DrawerSize } from './drawer';
 export { BottomSheet, BottomSheetFrame, type SheetSnap } from './bottom-sheet';
 export { ResponsiveDialog, type ResponsiveVariant } from './responsive-dialog';
 export { ConfirmDialog, ConfirmFrame, type ConfirmTone } from './confirm-dialog';
+
+/* Editor */
+export {
+  Prose,
+  type ProseProps,
+  type ProseVariant,
+  type ProseSize,
+  type ProseMeasure,
+  type ProseAlign,
+} from './prose';
+export {
+  proseWidgets,
+  PROSE_WIDGET_ATTR,
+  type ProseWidgets,
+  type ProseWidgetKind,
+  type ProseWidgetOptions,
+  type ProseInsertionOptions,
+  type ProseGutterMarkerKind,
+  type ProseGutterMarkerOptions,
+} from './prose-widgets';
+export {
+  EditableTitle,
+  type EditableTitleProps,
+  type EditableTitleSize,
+  type EditableTitleLevel,
+} from './editable-title';
+export {
+  Toolbar,
+  ToolbarGroup,
+  ToolbarSeparator,
+  ToolbarButton,
+  ToolbarToggle,
+  ToolbarMenu,
+  type ToolbarProps,
+  type ToolbarSize,
+  type ToolbarOrientation,
+  type ToolbarButtonProps,
+  type ToolbarToggleProps,
+  type ToolbarMenuProps,
+} from './toolbar';
+export {
+  FloatingToolbar,
+  type FloatingToolbarProps,
+  type FloatingToolbarDismissReason,
+} from './floating-toolbar';
+
+/* IA */
+export {
+  PromptComposer,
+  PromptModelMenu,
+  type PromptComposerProps,
+  type PromptComposerHandle,
+  type PromptStatus,
+  type PromptSubmitKey,
+  type PromptPreset,
+  type PromptSubmission,
+  type PromptModelOption,
+} from './prompt-composer';
+export {
+  Conversation,
+  ConversationTurn,
+  ConversationArtifact,
+  type ConversationProps,
+  type ConversationHandle,
+  type ConversationTurnProps,
+  type ConversationRole,
+  type ConversationArtifactProps,
+  type TurnStatus,
+  type TurnFeedback,
+} from './conversation';
+export {
+  AgentTrace,
+  type AgentTraceProps,
+  type AgentTraceStatus,
+  type AgentTraceStep,
+  type AgentTraceStepState,
+} from './agent-trace';
+export {
+  SourceChip,
+  sourceKindLabel,
+  type SourceChipProps,
+  type SourceChipState,
+  type SourceKind,
+} from './source-chip';
+export {
+  SuggestionCard,
+  SuggestionBar,
+  SuggestionGroup,
+  type SuggestionCardProps,
+  type SuggestionBarProps,
+  type SuggestionGroupProps,
+  type SuggestionState,
+  type SuggestionMode,
+  type SuggestionFeedback,
+} from './suggestion-card';
+
+/* Revisão */
+export {
+  DiffView,
+  diffStats,
+  formatDiffSummary,
+  type DiffViewProps,
+  type DiffBlock,
+  type DiffBlockType,
+  type DiffHunk,
+  type DiffHunkKind,
+  type DiffChange,
+  type DiffVersion,
+  type DiffStats,
+} from './diff-view';
+export { Seal, type SealProps, type SealSize } from './seal';
 
 /* Padrões */
 export {

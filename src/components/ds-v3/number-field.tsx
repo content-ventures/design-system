@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type ComponentProps,
+  type CSSProperties,
   type PointerEvent,
   type ReactNode,
 } from 'react';
@@ -27,6 +28,12 @@ export function parseNumber(text: string): number | null {
   return Number.isFinite(value) ? value : null;
 }
 
+/** Dígitos que o campo `fit` reserva: os do máximo (com milhar e decimais), no mínimo 2. */
+function fitDigits(max: number | undefined, decimals: number) {
+  const whole = formatNumber(Math.trunc(Math.abs(max ?? 999)), 0).length;
+  return Math.max(2, whole + (decimals ? decimals + 1 : 0)) + 1;
+}
+
 const editable = (value: number, decimals: number) =>
   decimals ? value.toFixed(decimals).replace('.', ',') : String(Math.round(value));
 
@@ -44,6 +51,11 @@ export type NumberFieldProps = Omit<
   suffix?: ReactNode;
   /** Botões − e + dentro do controle, com fio entre eles; desligam nos limites. */
   stepper?: boolean;
+  /**
+   * Largura do conteúdo: o campo mede os dígitos do máximo (mais os botões), em vez de esticar na
+   * coluna — uma quantidade pequena não vira uma barra de largura inteira.
+   */
+  fit?: boolean;
   size?: 'sm' | 'md' | 'lg';
   invalid?: boolean;
   /** Nome acessível quando não há <label for>. */
@@ -66,6 +78,7 @@ export function NumberField({
   prefix,
   suffix,
   stepper = false,
+  fit = false,
   size = 'md',
   invalid,
   label,
@@ -125,8 +138,13 @@ export function NumberField({
   return (
     <div
       className={`${f.control} ${s.number} ${className}`}
-      style={style}
+      style={
+        fit
+          ? ({ ...style, '--number-ch': `${fitDigits(max, decimals)}ch` } as CSSProperties)
+          : style
+      }
       data-size={size}
+      data-fit={fit || undefined}
       data-stepper={stepper || undefined}
       data-invalid={invalid || undefined}
       data-disabled={props.disabled || undefined}

@@ -50,7 +50,15 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react';
-import { Avatar, BrandMark, Button, Count, IconButton, Kbd, type Tone } from '@content-ventures/design-system/v3';
+import {
+  Avatar,
+  BrandMark,
+  Button,
+  Count,
+  IconButton,
+  Kbd,
+  type Tone,
+} from '@content-ventures/design-system/v3';
 import {
   AppShell,
   Breadcrumb,
@@ -71,10 +79,17 @@ import {
   type Portal,
 } from '@content-ventures/design-system/v3/app-shell';
 import { ContextMenu } from '@content-ventures/design-system/v3/context-menu';
-import { Menu, MenuPanel, type MenuItem, type MenuSection } from '@content-ventures/design-system/v3/menu';
+import {
+  Menu,
+  MenuPanel,
+  type MenuItem,
+  type MenuSection,
+} from '@content-ventures/design-system/v3/menu';
 import { PageArrow, PageButton, Pagination } from '@content-ventures/design-system/v3/pagination';
+import { Tooltip } from '@content-ventures/design-system/v3/overlays';
 import { Select } from '@content-ventures/design-system/v3/select';
 import {
+  SaveIndicator,
   StepList,
   StepMarker,
   StepPipeline,
@@ -87,13 +102,17 @@ import {
 import { Tabs, type TabItem } from '@content-ventures/design-system/v3/tabs';
 import { toast, Toaster } from '@content-ventures/design-system/v3/toast';
 import toastStyles from '@content-ventures/design-system/v3/toast.module.css';
-import { Phone, Shot, Shots, State, States } from '../stage';
+import { Phone, Row, Shot, Shots, State, States } from '../stage';
 import x from './navegacao.module.css';
 
 /* ——————————————————————————— Dados fictícios ——————————————————————————— */
 
 const NAV_GROUPS: NavGroup[] = [
-  { id: 'workspace', label: 'Workspace', items: [{ id: 'visao-geral', label: 'Visão geral', icon: LayoutDashboard }] },
+  {
+    id: 'workspace',
+    label: 'Workspace',
+    items: [{ id: 'visao-geral', label: 'Visão geral', icon: LayoutDashboard }],
+  },
   {
     id: 'configuracao',
     label: 'Configuração',
@@ -129,7 +148,11 @@ const NAV_GROUPS: NavGroup[] = [
 ];
 
 const SHORT_GROUPS: NavGroup[] = [
-  { id: 'workspace', label: 'Workspace', items: [{ id: 'visao-geral', label: 'Visão geral', icon: LayoutDashboard }] },
+  {
+    id: 'workspace',
+    label: 'Workspace',
+    items: [{ id: 'visao-geral', label: 'Visão geral', icon: LayoutDashboard }],
+  },
   {
     id: 'operacao',
     label: 'Operação',
@@ -142,9 +165,27 @@ const SHORT_GROUPS: NavGroup[] = [
 ];
 
 const PORTALS: Portal[] = [
-  { id: 'francal-2026', name: 'Francal 2026', detail: 'Portal do organizador', period: '06/07 – 09/07' },
-  { id: 'francal-2025', name: 'Francal 2025', detail: 'Portal do organizador', period: '07/07 – 10/07', status: 'archived' },
-  { id: 'couro-sul-2027', name: 'Couro Sul 2027', detail: 'Portal do organizador', period: '16/03 – 18/03', status: 'draft', statusLabel: 'Em montagem' },
+  {
+    id: 'francal-2026',
+    name: 'Francal 2026',
+    detail: 'Portal do organizador',
+    period: '06/07 – 09/07',
+  },
+  {
+    id: 'francal-2025',
+    name: 'Francal 2025',
+    detail: 'Portal do organizador',
+    period: '07/07 – 10/07',
+    status: 'archived',
+  },
+  {
+    id: 'couro-sul-2027',
+    name: 'Couro Sul 2027',
+    detail: 'Portal do organizador',
+    period: '16/03 – 18/03',
+    status: 'draft',
+    statusLabel: 'Em montagem',
+  },
 ];
 const MANAGE_PORTALS: MenuItem = { label: 'Gerenciar portais', icon: Settings };
 
@@ -189,23 +230,193 @@ type Campaign = {
  * Códigos de estande levam um “word joiner” (U+2060) depois do hífen: “B-214” nunca quebra.
  */
 const CAMPAIGNS: Campaign[] = [
-  { id: 2041, name: 'Coleção Primavera-Verão no portal', advertiser: 'Aurora Calçados', asset: 'Banner Super Topo — Portal', status: 'Veiculando', tone: 'green', bucket: 'veiculacao', budget: 18000, period: '01/10 – 31/10' },
-  { id: 2038, name: 'Newsletter dos expositores', advertiser: 'Estúdio Norte', asset: 'E-mail marketing dedicado', status: 'Veiculando', tone: 'green', bucket: 'veiculacao', budget: 8000, period: '05/10 – 25/10' },
-  { id: 2035, name: 'Convite para o estande B-\u2060214', advertiser: 'Casa Forma', asset: 'Push no app da feira', status: 'Aguardando assinatura do P.I.', tone: 'amber', bucket: 'aprovacao', budget: 3600, period: '14/10 – 17/10' },
-  { id: 2032, name: 'Destaque couro vegetal', advertiser: 'Lume Acessórios', asset: 'Banner Super Topo — Portal', status: 'Aguardando aprovação', tone: 'violet', bucket: 'aprovacao', budget: 9000, period: '10/10 – 30/10' },
-  { id: 2029, name: 'Retargeting de credenciados', advertiser: 'Grupo Horizonte', asset: 'Banner Super Topo — Portal', status: 'Ajustes solicitados', tone: 'orange', bucket: 'aprovacao', budget: 13500, period: '01/10 – 31/10' },
-  { id: 2026, name: 'Vitrine de lançamentos Aurora', advertiser: 'Aurora Calçados', asset: 'Destaque na vitrine', status: 'Ajustes solicitados', tone: 'orange', bucket: 'aprovacao', budget: 11230, period: '12/10 – 30/10' },
-  { id: 2023, name: 'Rodada de negócios — segunda edição', advertiser: 'Ateliê Sul', asset: 'Painel de LED — Pavilhão Azul', status: 'Pausada', tone: 'gray', bucket: 'veiculacao', budget: 3600, period: '25/09 – 17/10' },
-  { id: 2020, name: 'Guia oficial do visitante', advertiser: 'Pátio Couro', asset: 'E-mail marketing dedicado', status: 'Concluída', tone: 'gray', bucket: 'encerradas', budget: 12000, period: '15/09 – 30/09' },
-  { id: 2017, name: 'Painel de LED — lançamento', advertiser: 'Bella Passo', asset: 'Painel de LED — Pavilhão Azul', status: 'Aprovada', tone: 'teal', bucket: 'veiculacao', budget: 18000, period: '14/10 – 17/10' },
-  { id: 2014, name: 'Carrossel de tendências', advertiser: 'Aurora Calçados', asset: 'Destaque na vitrine', status: 'Rascunho', tone: 'gray', bucket: 'rascunhos', budget: 6500, period: '05/10 – 12/10' },
-  { id: 2011, name: 'Mapa do pavilhão patrocinado', advertiser: 'Couro Nobre', asset: 'Painel de LED — Pavilhão Azul', status: 'Veiculando', tone: 'green', bucket: 'veiculacao', budget: 15000, period: '01/10 – 20/10' },
-  { id: 2009, name: 'Agenda de lançamentos', advertiser: 'Estúdio Norte', asset: 'Push no app da feira', status: 'Aprovada', tone: 'teal', bucket: 'veiculacao', budget: 4500, period: '16/10 – 18/10' },
-  { id: 2005, name: 'Vitrine de verão', advertiser: 'Casa Forma', asset: 'Destaque na vitrine', status: 'Aguardando aprovação', tone: 'violet', bucket: 'aprovacao', budget: 7200, period: '20/10 – 31/10' },
-  { id: 2003, name: 'Lançamento linha infantil', advertiser: 'Bella Passo', asset: 'Banner Super Topo — Portal', status: 'Rascunho', tone: 'gray', bucket: 'rascunhos', budget: 9000, period: '22/10 – 31/10' },
-  { id: 2002, name: 'Esquenta Francal', advertiser: 'Lume Acessórios', asset: 'E-mail marketing dedicado', status: 'Concluída', tone: 'gray', bucket: 'encerradas', budget: 5400, period: '01/09 – 15/09' },
-  { id: 2001, name: 'Credenciamento antecipado', advertiser: 'Grupo Horizonte', asset: 'Push no app da feira', status: 'Cancelada', tone: 'red', bucket: 'encerradas', budget: 2700, period: '05/09 – 10/09' },
-  { id: 1998, name: 'Pré-venda de estandes', advertiser: 'Pátio Couro', asset: 'Banner Super Topo — Portal', status: 'Rejeitada', tone: 'red', bucket: 'encerradas', budget: 6000, period: '01/09 – 30/09' },
+  {
+    id: 2041,
+    name: 'Coleção Primavera-Verão no portal',
+    advertiser: 'Aurora Calçados',
+    asset: 'Banner Super Topo — Portal',
+    status: 'Veiculando',
+    tone: 'green',
+    bucket: 'veiculacao',
+    budget: 18000,
+    period: '01/10 – 31/10',
+  },
+  {
+    id: 2038,
+    name: 'Newsletter dos expositores',
+    advertiser: 'Estúdio Norte',
+    asset: 'E-mail marketing dedicado',
+    status: 'Veiculando',
+    tone: 'green',
+    bucket: 'veiculacao',
+    budget: 8000,
+    period: '05/10 – 25/10',
+  },
+  {
+    id: 2035,
+    name: 'Convite para o estande B-\u2060214',
+    advertiser: 'Casa Forma',
+    asset: 'Push no app da feira',
+    status: 'Aguardando assinatura do P.I.',
+    tone: 'amber',
+    bucket: 'aprovacao',
+    budget: 3600,
+    period: '14/10 – 17/10',
+  },
+  {
+    id: 2032,
+    name: 'Destaque couro vegetal',
+    advertiser: 'Lume Acessórios',
+    asset: 'Banner Super Topo — Portal',
+    status: 'Aguardando aprovação',
+    tone: 'violet',
+    bucket: 'aprovacao',
+    budget: 9000,
+    period: '10/10 – 30/10',
+  },
+  {
+    id: 2029,
+    name: 'Retargeting de credenciados',
+    advertiser: 'Grupo Horizonte',
+    asset: 'Banner Super Topo — Portal',
+    status: 'Ajustes solicitados',
+    tone: 'orange',
+    bucket: 'aprovacao',
+    budget: 13500,
+    period: '01/10 – 31/10',
+  },
+  {
+    id: 2026,
+    name: 'Vitrine de lançamentos Aurora',
+    advertiser: 'Aurora Calçados',
+    asset: 'Destaque na vitrine',
+    status: 'Ajustes solicitados',
+    tone: 'orange',
+    bucket: 'aprovacao',
+    budget: 11230,
+    period: '12/10 – 30/10',
+  },
+  {
+    id: 2023,
+    name: 'Rodada de negócios — segunda edição',
+    advertiser: 'Ateliê Sul',
+    asset: 'Painel de LED — Pavilhão Azul',
+    status: 'Pausada',
+    tone: 'gray',
+    bucket: 'veiculacao',
+    budget: 3600,
+    period: '25/09 – 17/10',
+  },
+  {
+    id: 2020,
+    name: 'Guia oficial do visitante',
+    advertiser: 'Pátio Couro',
+    asset: 'E-mail marketing dedicado',
+    status: 'Concluída',
+    tone: 'gray',
+    bucket: 'encerradas',
+    budget: 12000,
+    period: '15/09 – 30/09',
+  },
+  {
+    id: 2017,
+    name: 'Painel de LED — lançamento',
+    advertiser: 'Bella Passo',
+    asset: 'Painel de LED — Pavilhão Azul',
+    status: 'Aprovada',
+    tone: 'teal',
+    bucket: 'veiculacao',
+    budget: 18000,
+    period: '14/10 – 17/10',
+  },
+  {
+    id: 2014,
+    name: 'Carrossel de tendências',
+    advertiser: 'Aurora Calçados',
+    asset: 'Destaque na vitrine',
+    status: 'Rascunho',
+    tone: 'gray',
+    bucket: 'rascunhos',
+    budget: 6500,
+    period: '05/10 – 12/10',
+  },
+  {
+    id: 2011,
+    name: 'Mapa do pavilhão patrocinado',
+    advertiser: 'Couro Nobre',
+    asset: 'Painel de LED — Pavilhão Azul',
+    status: 'Veiculando',
+    tone: 'green',
+    bucket: 'veiculacao',
+    budget: 15000,
+    period: '01/10 – 20/10',
+  },
+  {
+    id: 2009,
+    name: 'Agenda de lançamentos',
+    advertiser: 'Estúdio Norte',
+    asset: 'Push no app da feira',
+    status: 'Aprovada',
+    tone: 'teal',
+    bucket: 'veiculacao',
+    budget: 4500,
+    period: '16/10 – 18/10',
+  },
+  {
+    id: 2005,
+    name: 'Vitrine de verão',
+    advertiser: 'Casa Forma',
+    asset: 'Destaque na vitrine',
+    status: 'Aguardando aprovação',
+    tone: 'violet',
+    bucket: 'aprovacao',
+    budget: 7200,
+    period: '20/10 – 31/10',
+  },
+  {
+    id: 2003,
+    name: 'Lançamento linha infantil',
+    advertiser: 'Bella Passo',
+    asset: 'Banner Super Topo — Portal',
+    status: 'Rascunho',
+    tone: 'gray',
+    bucket: 'rascunhos',
+    budget: 9000,
+    period: '22/10 – 31/10',
+  },
+  {
+    id: 2002,
+    name: 'Esquenta Francal',
+    advertiser: 'Lume Acessórios',
+    asset: 'E-mail marketing dedicado',
+    status: 'Concluída',
+    tone: 'gray',
+    bucket: 'encerradas',
+    budget: 5400,
+    period: '01/09 – 15/09',
+  },
+  {
+    id: 2001,
+    name: 'Credenciamento antecipado',
+    advertiser: 'Grupo Horizonte',
+    asset: 'Push no app da feira',
+    status: 'Cancelada',
+    tone: 'red',
+    bucket: 'encerradas',
+    budget: 2700,
+    period: '05/09 – 10/09',
+  },
+  {
+    id: 1998,
+    name: 'Pré-venda de estandes',
+    advertiser: 'Pátio Couro',
+    asset: 'Banner Super Topo — Portal',
+    status: 'Rejeitada',
+    tone: 'red',
+    bucket: 'encerradas',
+    budget: 6000,
+    period: '01/09 – 30/09',
+  },
 ];
 
 const money = (value: number) =>
@@ -273,7 +484,11 @@ function CampaignTable({
         <tbody key={swapKey} className={x.rowsIn}>
           {rows.map((row) => {
             const tr = (
-              <tr key={row.id} tabIndex={rowProps ? 0 : undefined} aria-label={rowProps ? `${row.name}, #${row.id}` : undefined}>
+              <tr
+                key={row.id}
+                tabIndex={rowProps ? 0 : undefined}
+                aria-label={rowProps ? `${row.name}, #${row.id}` : undefined}
+              >
                 <td>
                   <span className={x.cellName}>{row.name}</span>
                   <span className={x.cellSub}>
@@ -303,7 +518,13 @@ function CampaignTable({
 }
 
 /** Miolo de página usado dentro das molduras do app. */
-function PagePreview({ title = 'Campanhas', rows = CAMPAIGNS.slice(0, 4) }: { title?: string; rows?: Campaign[] }) {
+function PagePreview({
+  title = 'Campanhas',
+  rows = CAMPAIGNS.slice(0, 4),
+}: {
+  title?: string;
+  rows?: Campaign[];
+}) {
   return (
     <div className={x.page}>
       <div className={x.pageHead}>
@@ -329,12 +550,25 @@ function SidebarReplica() {
     <div className={x.sideFrame}>
       <Sidebar
         label="Navegação do portal"
-        switcher={<PortalSwitcher portals={PORTALS} value={portal} onChange={setPortal} action={MANAGE_PORTALS} />}
+        switcher={
+          <PortalSwitcher
+            portals={PORTALS}
+            value={portal}
+            onChange={setPortal}
+            action={MANAGE_PORTALS}
+          />
+        }
         filter
         groups={NAV_GROUPS}
         active={active}
         onNavigate={setActive}
-        account={<SidebarAccount name="Marina Lopes" detail="Operação · Francal" sections={ACCOUNT_SECTIONS} />}
+        account={
+          <SidebarAccount
+            name="Marina Lopes"
+            detail="Operação · Francal"
+            sections={ACCOUNT_SECTIONS}
+          />
+        }
       />
     </div>
   );
@@ -350,10 +584,18 @@ function CollapsedShell() {
         contentAs="div"
         sidebar={
           <Sidebar
-            switcher={<PortalSwitcher portals={PORTALS} value="francal-2026" onChange={() => undefined} />}
+            switcher={
+              <PortalSwitcher portals={PORTALS} value="francal-2026" onChange={() => undefined} />
+            }
             groups={NAV_GROUPS}
             active="campanhas"
-            account={<SidebarAccount name="Marina Lopes" detail="Operação · Francal" sections={ACCOUNT_SECTIONS} />}
+            account={
+              <SidebarAccount
+                name="Marina Lopes"
+                detail="Operação · Francal"
+                sections={ACCOUNT_SECTIONS}
+              />
+            }
           />
         }
         topbar={<TopBar breadcrumb={[{ label: 'Operação' }, { label: 'Campanhas' }]} />}
@@ -374,11 +616,24 @@ function PhoneShell({ open = false }: { open?: boolean }) {
         sidebar={
           <Sidebar
             label="Navegação do portal"
-            switcher={<PortalSwitcher portals={PORTALS} value="francal-2026" onChange={() => undefined} action={MANAGE_PORTALS} />}
+            switcher={
+              <PortalSwitcher
+                portals={PORTALS}
+                value="francal-2026"
+                onChange={() => undefined}
+                action={MANAGE_PORTALS}
+              />
+            }
             filter
             groups={NAV_GROUPS}
             active="campanhas"
-            account={<SidebarAccount name="Marina Lopes" detail="Operação · Francal" sections={ACCOUNT_SECTIONS} />}
+            account={
+              <SidebarAccount
+                name="Marina Lopes"
+                detail="Operação · Francal"
+                sections={ACCOUNT_SECTIONS}
+              />
+            }
           />
         }
         topbar={
@@ -387,6 +642,155 @@ function PhoneShell({ open = false }: { open?: boolean }) {
             notifications={<NotificationsButton count={3} sections={NOTIFICATIONS} />}
           />
         }
+      >
+        <PagePreview rows={CAMPAIGNS.slice(0, 3)} />
+      </AppShell>
+    </Phone>
+  );
+}
+
+/* ——— Em breve: o mapa inteiro do produto no menu ——— */
+
+const LEADS_SOON = 'Chega em novembro, com o funil de vendas.';
+
+/** O que já existe navega; o que ainda não abre leva “Em breve” e o motivo na dica. */
+const ROADMAP_GROUPS: NavGroup[] = [
+  {
+    id: 'workspace',
+    label: 'Workspace',
+    items: [{ id: 'visao-geral', label: 'Visão geral', icon: LayoutDashboard }],
+  },
+  {
+    id: 'operacao',
+    label: 'Operação',
+    items: [
+      { id: 'campanhas', label: 'Campanhas', icon: Megaphone, count: 5 },
+      { id: 'pedidos', label: 'Pedidos de Inserção', icon: FileText },
+      { id: 'leads', label: 'Leads', icon: UsersRound, soon: { reason: LEADS_SOON } },
+    ],
+  },
+  {
+    id: 'relatorios',
+    label: 'Relatórios',
+    collapsible: true,
+    items: [
+      {
+        id: 'desempenho',
+        label: 'Desempenho',
+        icon: ChartColumn,
+        soon: { reason: 'Chega em dezembro, com os números do portal e do app.' },
+      },
+      { id: 'exportacoes', label: 'Exportações', icon: FileSpreadsheet, soon: true },
+    ],
+  },
+  {
+    id: 'portal',
+    label: 'Portal',
+    items: [
+      { id: 'fornecedores', label: 'Fornecedores', icon: Store },
+      {
+        id: 'categorias',
+        label: 'Categorias da Vitrine',
+        icon: Tags,
+        soon: { reason: 'Chega com a nova vitrine do app.' },
+      },
+      { id: 'configuracoes', label: 'Configurações', icon: Settings },
+    ],
+  },
+];
+
+function RoadmapSidebar() {
+  const [active, setActive] = useState('campanhas');
+  return (
+    <div className={x.sideFrame}>
+      <Sidebar
+        label="Navegação do portal"
+        switcher={
+          <PortalSwitcher
+            portals={PORTALS}
+            value="francal-2026"
+            onChange={() => undefined}
+            action={MANAGE_PORTALS}
+          />
+        }
+        groups={ROADMAP_GROUPS}
+        active={active}
+        onNavigate={setActive}
+        account={
+          <SidebarAccount
+            name="Marina Lopes"
+            detail="Operação · Francal"
+            sections={ACCOUNT_SECTIONS}
+          />
+        }
+      />
+    </div>
+  );
+}
+
+function RoadmapCollapsed() {
+  return (
+    <div className={x.shellFrame} style={{ height: 600 }}>
+      <AppShell
+        fill
+        collapsed
+        layout="desktop"
+        contentAs="div"
+        sidebar={
+          <Sidebar
+            switcher={
+              <PortalSwitcher portals={PORTALS} value="francal-2026" onChange={() => undefined} />
+            }
+            groups={ROADMAP_GROUPS}
+            active="campanhas"
+            peek="desempenho"
+            account={
+              <SidebarAccount
+                name="Marina Lopes"
+                detail="Operação · Francal"
+                sections={ACCOUNT_SECTIONS}
+              />
+            }
+          />
+        }
+        topbar={<TopBar breadcrumb={[{ label: 'Operação' }, { label: 'Campanhas' }]} />}
+      >
+        <PagePreview />
+      </AppShell>
+    </div>
+  );
+}
+
+function RoadmapPhone() {
+  return (
+    <Phone height={700} className={x.phoneFill} label="Celular, 390">
+      <AppShell
+        fill
+        defaultNavOpen
+        contentAs="div"
+        sidebar={
+          <Sidebar
+            label="Navegação do portal"
+            switcher={
+              <PortalSwitcher
+                portals={PORTALS}
+                value="francal-2026"
+                onChange={() => undefined}
+                action={MANAGE_PORTALS}
+              />
+            }
+            groups={ROADMAP_GROUPS}
+            active="campanhas"
+            account={
+              <SidebarAccount
+                name="Marina Lopes"
+                detail="Operação · Francal"
+                sections={ACCOUNT_SECTIONS}
+              />
+            }
+          />
+        }
+        topbar={<TopBar breadcrumb={[{ label: 'Operação' }, { label: 'Campanhas' }]} />}
       >
         <PagePreview rows={CAMPAIGNS.slice(0, 3)} />
       </AppShell>
@@ -418,6 +822,14 @@ function SidebarSpecimen() {
           <CollapsedShell />
         </Shot>
       </WideOnly>
+      <Shot title="Em breve" pad="lg">
+        <RoadmapSidebar />
+      </Shot>
+      <WideOnly below={640}>
+        <Shot title="Em breve · recolhido" align="stretch" pad="sm">
+          <RoadmapCollapsed />
+        </Shot>
+      </WideOnly>
       <Shot title="Estados" tone="white" align="stretch">
         <States min={200}>
           <State label="Repouso">
@@ -427,33 +839,115 @@ function SidebarSpecimen() {
           </State>
           <State label="Hover">
             <NavStrip>
-              <SidebarItem item={{ id: 'pedidos', label: 'Pedidos de Inserção', icon: FileText, force: 'hover' }} />
+              <SidebarItem
+                item={{
+                  id: 'pedidos',
+                  label: 'Pedidos de Inserção',
+                  icon: FileText,
+                  force: 'hover',
+                }}
+              />
             </NavStrip>
           </State>
           <State label="Pressionado">
             <NavStrip>
-              <SidebarItem item={{ id: 'pedidos', label: 'Pedidos de Inserção', icon: FileText, force: 'active' }} />
+              <SidebarItem
+                item={{
+                  id: 'pedidos',
+                  label: 'Pedidos de Inserção',
+                  icon: FileText,
+                  force: 'active',
+                }}
+              />
             </NavStrip>
           </State>
           <State label="Ativo">
             <NavStrip>
-              <SidebarItem item={{ id: 'campanhas', label: 'Campanhas', icon: Megaphone, count: 5 }} active />
+              <SidebarItem
+                item={{ id: 'campanhas', label: 'Campanhas', icon: Megaphone, count: 5 }}
+                active
+              />
             </NavStrip>
           </State>
           <State label="Foco">
             <NavStrip>
-              <SidebarItem item={{ id: 'pedidos', label: 'Pedidos de Inserção', icon: FileText, force: 'focus' }} />
+              <SidebarItem
+                item={{
+                  id: 'pedidos',
+                  label: 'Pedidos de Inserção',
+                  icon: FileText,
+                  force: 'focus',
+                }}
+              />
             </NavStrip>
           </State>
           <State label="Com contagem">
             <NavStrip>
-              <SidebarItem item={{ id: 'leads', label: 'Leads', icon: UsersRound, count: 2, countTone: 'accent' }} />
+              <SidebarItem
+                item={{
+                  id: 'leads',
+                  label: 'Leads',
+                  icon: UsersRound,
+                  count: 2,
+                  countTone: 'accent',
+                }}
+              />
+            </NavStrip>
+          </State>
+          <State label="Em breve">
+            <NavStrip>
+              <SidebarItem
+                item={{
+                  id: 'leads',
+                  label: 'Leads',
+                  icon: UsersRound,
+                  soon: { reason: LEADS_SOON },
+                }}
+              />
+            </NavStrip>
+          </State>
+          <State label="Em breve · hover">
+            <NavStrip>
+              <SidebarItem
+                item={{
+                  id: 'leads',
+                  label: 'Leads',
+                  icon: UsersRound,
+                  soon: { reason: LEADS_SOON },
+                  force: 'hover',
+                }}
+              />
+            </NavStrip>
+          </State>
+          <State label="Em breve · foco e dica">
+            <NavStrip>
+              <SidebarItem
+                item={{
+                  id: 'leads',
+                  label: 'Leads',
+                  icon: UsersRound,
+                  soon: { reason: LEADS_SOON },
+                  force: 'focus tip',
+                }}
+              />
             </NavStrip>
           </State>
         </States>
       </Shot>
       <Shot title="Celular">
-        <PhoneShell open />
+        <div className={x.phones}>
+          {/* Fechada é do CSS (`@container shell`): o HTML do servidor já sai assim, sem a barra
+              espremendo a página; o JS só abre e fecha. */}
+          <State label="Fechada, desde a primeira pintura">
+            <PhoneShell />
+          </State>
+          <State label="Aberta">
+            <PhoneShell open />
+          </State>
+          <State label="Aberta, com itens em breve">
+            <RoadmapPhone />
+          </State>
+        </div>
       </Shot>
     </Shots>
   );
@@ -534,7 +1028,13 @@ function PersonaSelect({ value, onChange }: { value: string; onChange: (value: s
   return (
     <TopBarItem phone="hide">
       <span className={x.persona}>
-        <Select size="sm" label="Visualização" value={value} onChange={onChange} options={PERSONAS} />
+        <Select
+          size="sm"
+          label="Visualização"
+          value={value}
+          onChange={onChange}
+          options={PERSONAS}
+        />
       </span>
     </TopBarItem>
   );
@@ -543,7 +1043,11 @@ function PersonaSelect({ value, onChange }: { value: string; onChange: (value: s
 const crumbsFor = (persona: string): Crumb[] =>
   persona === 'anunciante'
     ? [{ label: 'Campanhas' }, { label: 'Coleção Primavera-Verão no portal' }]
-    : [{ label: 'Operação' }, { label: 'Campanhas' }, { label: 'Coleção Primavera-Verão no portal' }];
+    : [
+        { label: 'Operação' },
+        { label: 'Campanhas' },
+        { label: 'Coleção Primavera-Verão no portal' },
+      ];
 
 function HeaderContext() {
   const [persona, setPersona] = useState('operador');
@@ -561,7 +1065,15 @@ function HeaderContext() {
   );
 }
 
-function FramedShell({ width, height, children }: { width: number; height: number; children: ReactNode }) {
+function FramedShell({
+  width,
+  height,
+  children,
+}: {
+  width: number;
+  height: number;
+  children: ReactNode;
+}) {
   if (width <= 390)
     return (
       <Phone height={height} className={`${x.phoneFill} ${x.fadeMain}`} label="Celular, 390">
@@ -584,11 +1096,19 @@ function ResponsiveHeader({ width, height }: { width: number; height: number }) 
         contentAs="div"
         sidebar={
           <Sidebar
-            switcher={<PortalSwitcher portals={PORTALS} value="francal-2026" onChange={() => undefined} />}
+            switcher={
+              <PortalSwitcher portals={PORTALS} value="francal-2026" onChange={() => undefined} />
+            }
             filter
             groups={NAV_GROUPS}
             active="campanhas"
-            account={<SidebarAccount name="Marina Lopes" detail="Operação · Francal" sections={ACCOUNT_SECTIONS} />}
+            account={
+              <SidebarAccount
+                name="Marina Lopes"
+                detail="Operação · Francal"
+                sections={ACCOUNT_SECTIONS}
+              />
+            }
           />
         }
         topbar={
@@ -608,7 +1128,14 @@ function ResponsiveHeader({ width, height }: { width: number; height: number }) 
 }
 
 function BellState({ unread = false, force }: { unread?: boolean; force?: string }) {
-  return <NotificationsButton unread={unread} count={unread ? 3 : 0} sections={NOTIFICATIONS} force={force} />;
+  return (
+    <NotificationsButton
+      unread={unread}
+      count={unread ? 3 : 0}
+      sections={NOTIFICATIONS}
+      force={force}
+    />
+  );
 }
 
 function HeaderSpecimen() {
@@ -672,7 +1199,11 @@ function BreadcrumbsSpecimen() {
         <div className={x.barFrame}>
           <TopBar
             sticky={false}
-            breadcrumb={[{ label: 'Operação' }, { label: 'Campanhas' }, { label: 'Coleção Primavera-Verão no portal' }]}
+            breadcrumb={[
+              { label: 'Operação' },
+              { label: 'Campanhas' },
+              { label: 'Coleção Primavera-Verão no portal' },
+            ]}
             actions={<PersonaSelect value="operador" onChange={() => undefined} />}
             notifications={<NotificationsButton count={3} sections={NOTIFICATIONS} />}
           />
@@ -681,7 +1212,9 @@ function BreadcrumbsSpecimen() {
               <h2 className={x.pageTitle}>Coleção Primavera-Verão no portal</h2>
               <StatusDot tone="green">Veiculando</StatusDot>
             </div>
-            <Meta items={['#2041', 'Aurora Calçados', 'Banner Super Topo — Portal', '01/10 – 31/10']} />
+            <Meta
+              items={['#2041', 'Aurora Calçados', 'Banner Super Topo — Portal', '01/10 – 31/10']}
+            />
           </div>
         </div>
       </Shot>
@@ -706,7 +1239,10 @@ function BreadcrumbsSpecimen() {
             />
           </State>
           <State label="Compacto">
-            <Breadcrumb variant="compact" items={[{ label: 'Campanhas' }, { label: 'Coleção Primavera-Verão no portal' }]} />
+            <Breadcrumb
+              variant="compact"
+              items={[{ label: 'Campanhas' }, { label: 'Coleção Primavera-Verão no portal' }]}
+            />
           </State>
         </States>
       </Shot>
@@ -743,7 +1279,9 @@ function BreadcrumbsSpecimen() {
               <MenuPanel
                 label="Níveis ocultos"
                 width={200}
-                sections={[{ items: [{ label: 'Vitrine', force: 'hover' }, { label: 'Categorias' }] }]}
+                sections={[
+                  { items: [{ label: 'Vitrine', force: 'hover' }, { label: 'Categorias' }] },
+                ]}
               />
             </div>
           </State>
@@ -752,8 +1290,17 @@ function BreadcrumbsSpecimen() {
       <Shot title="Celular">
         <Phone label="Celular, 390">
           <div className={x.phoneBar}>
-            <Breadcrumb variant="compact" items={[{ label: 'Campanhas' }, { label: 'Coleção Primavera-Verão no portal' }]} />
-            <IconButton label="Mais ações" icon={Ellipsis} variant="ghost" size="sm" className={x.phoneBarAction} />
+            <Breadcrumb
+              variant="compact"
+              items={[{ label: 'Campanhas' }, { label: 'Coleção Primavera-Verão no portal' }]}
+            />
+            <IconButton
+              label="Mais ações"
+              icon={Ellipsis}
+              variant="ghost"
+              size="sm"
+              className={x.phoneBarAction}
+            />
           </div>
           <div className={x.phoneBody}>
             <h2 className={x.pageTitle}>Coleção Primavera-Verão no portal</h2>
@@ -777,7 +1324,10 @@ const BUCKET_TABS: { value: TabKey; label: string }[] = [
   { value: 'encerradas', label: 'Encerradas' },
 ];
 const inBucket = (tab: TabKey) => CAMPAIGNS.filter((row) => tab === 'todas' || row.bucket === tab);
-const STATUS_TABS: TabItem<TabKey>[] = BUCKET_TABS.map((tab) => ({ ...tab, count: inBucket(tab.value).length }));
+const STATUS_TABS: TabItem<TabKey>[] = BUCKET_TABS.map((tab) => ({
+  ...tab,
+  count: inBucket(tab.value).length,
+}));
 
 function ListTabs() {
   const [tab, setTab] = useState<TabKey>('todas');
@@ -805,7 +1355,12 @@ function DetailTabs() {
         ]}
       />
       {tab === 'geral' ? (
-        <div role="tabpanel" id="nav-aba-geral" aria-labelledby="nav-aba-geral-tab" className={x.tabPanel}>
+        <div
+          role="tabpanel"
+          id="nav-aba-geral"
+          aria-labelledby="nav-aba-geral-tab"
+          className={x.tabPanel}
+        >
           <dl className={x.metrics}>
             {[
               ['Impressões', '271.400', 'Entregues no período'],
@@ -822,14 +1377,23 @@ function DetailTabs() {
           </dl>
         </div>
       ) : (
-        <div role="tabpanel" id="nav-aba-analytics" aria-labelledby="nav-aba-analytics-tab" className={x.tabPanel}>
+        <div
+          role="tabpanel"
+          id="nav-aba-analytics"
+          aria-labelledby="nav-aba-analytics-tab"
+          className={x.tabPanel}
+        >
           <div className={x.chartHead}>
             <span>Impressões por dia</span>
             <strong>18,1 mil</strong>
           </div>
           <div className={x.bars} aria-label="Impressões por dia, de 01/10 a 14/10" role="img">
             {DAILY.map((value, index) => (
-              <i key={index} style={{ height: `${(value / 18.1) * 100}%` }} data-last={index === DAILY.length - 1 || undefined} />
+              <i
+                key={index}
+                style={{ height: `${(value / 18.1) * 100}%` }}
+                data-last={index === DAILY.length - 1 || undefined}
+              />
             ))}
           </div>
           <div className={x.chartAxis}>
@@ -849,7 +1413,12 @@ function TabsSizes() {
     <div className={x.sizes}>
       <State label="Padrão">
         <div className={x.sizeTabs} data-top>
-          <Tabs label="Recortes por status, médio" items={STATUS_TABS.slice(0, 4)} value={md} onChange={setMd} />
+          <Tabs
+            label="Recortes por status, médio"
+            items={STATUS_TABS.slice(0, 4)}
+            value={md}
+            onChange={setMd}
+          />
           <ul className={x.panelList} key={md}>
             {inBucket(md)
               .slice(0, 3)
@@ -880,10 +1449,20 @@ function TabsSizes() {
           />
           <ul className={x.panelList} key={sm}>
             {(sm === 'canais'
-              ? [['Portal da feira', '50%'], ['App Francal', '50%']]
+              ? [
+                  ['Portal da feira', '50%'],
+                  ['App Francal', '50%'],
+                ]
               : sm === 'publicos'
-                ? [['Visitantes credenciados', '50%'], ['Lojistas e compradores', '30%'], ['Imprensa', '20%']]
-                : [['Peça criativa', 'Falta'], ['URL de destino', 'Falta']]
+                ? [
+                    ['Visitantes credenciados', '50%'],
+                    ['Lojistas e compradores', '30%'],
+                    ['Imprensa', '20%'],
+                  ]
+                : [
+                    ['Peça criativa', 'Falta'],
+                    ['URL de destino', 'Falta'],
+                  ]
             ).map(([name, value]) => (
               <li key={name}>
                 <span>{name}</span>
@@ -906,7 +1485,12 @@ function PhoneTabs() {
         <p className={x.pageSub}>17 de 17 campanhas do portal.</p>
       </div>
       <div className={x.bleedTabs}>
-        <Tabs label="Recortes por status, celular" items={STATUS_TABS} value={tab} onChange={setTab} />
+        <Tabs
+          label="Recortes por status, celular"
+          items={STATUS_TABS}
+          value={tab}
+          onChange={setTab}
+        />
       </div>
       <ul className={x.cardList} key={tab}>
         {inBucket(tab)
@@ -927,7 +1511,19 @@ function PhoneTabs() {
   );
 }
 
-function TabState({ label, selected, force, disabled, count }: { label: string; selected?: boolean; force?: string; disabled?: boolean; count?: number }) {
+function TabState({
+  label,
+  selected,
+  force,
+  disabled,
+  count,
+}: {
+  label: string;
+  selected?: boolean;
+  force?: string;
+  disabled?: boolean;
+  count?: number;
+}) {
   return (
     <div className={x.tabCell}>
       <Tabs
@@ -1006,7 +1602,14 @@ function LongPagination() {
   const [page, setPage] = useState(5);
   return (
     <div className={x.footFrame}>
-      <Pagination page={page} pageSize={10} total={120} noun="leads" onPageChange={setPage} onPageSizeChange={() => undefined} />
+      <Pagination
+        page={page}
+        pageSize={10}
+        total={120}
+        noun="leads"
+        onPageChange={setPage}
+        onPageSizeChange={() => undefined}
+      />
     </div>
   );
 }
@@ -1028,7 +1631,14 @@ function PhonePagination() {
           </li>
         ))}
       </ul>
-      <Pagination page={page} pageSize={10} total={120} noun="campanhas" onPageChange={setPage} onPageSizeChange={() => undefined} />
+      <Pagination
+        page={page}
+        pageSize={10}
+        total={120}
+        noun="campanhas"
+        onPageChange={setPage}
+        onPageSizeChange={() => undefined}
+      />
     </Phone>
   );
 }
@@ -1092,13 +1702,34 @@ const CREATION_STEPS = [
 
 /** Etapas já preenchidas nesta campanha: voltar a uma delas não apaga as seguintes. */
 const CREATION_REACHED = 2;
+/** Motivo da etapa bloqueada: dica do DS no hover, no foco e no toque; descrição no leitor. */
+const REVIEW_REASON = 'Libera com o briefing completo';
+
+/** Jornada de uma produção vista no Material (feito): o Artigo segue “em andamento”. */
+const VIEWING_STEPS: StepItem[] = [
+  { id: 'material', label: 'Material' },
+  { id: 'artigo', label: 'Artigo', state: 'active' },
+  {
+    id: 'carrossel',
+    label: 'Carrossel',
+    state: 'blocked',
+    reason: 'Libera quando o artigo for aprovado',
+  },
+  {
+    id: 'entrega',
+    label: 'Entrega',
+    state: 'blocked',
+    reason: 'Libera quando o carrossel for aprovado',
+  },
+];
 
 function CreationHeader() {
   const [current, setCurrent] = useState(CREATION_REACHED);
-  const steps: StepItem[] = CREATION_STEPS.map((step, index) => ({
-    ...step,
-    state: index <= CREATION_REACHED && index !== current ? 'done' : undefined,
-  }));
+  const steps: StepItem[] = CREATION_STEPS.map((step, index) =>
+    step.id === 'revisao'
+      ? { ...step, state: 'blocked', reason: REVIEW_REASON }
+      : { ...step, state: index <= CREATION_REACHED && index !== current ? 'done' : undefined },
+  );
   return (
     <div className={x.barFrame}>
       <TopBar
@@ -1142,14 +1773,26 @@ const SIDE_STEPS: StepItem[] = [
   { id: 'precificacao', label: 'Precificação', description: 'R$ 18.000,00 · CPM' },
   { id: 'canal', label: 'Canal + Público', description: '2 canais · 3 públicos' },
   { id: 'briefing', label: 'Briefing', description: '2 de 6 preenchidos', state: 'warn' },
-  { id: 'revisao', label: 'Revisão', description: 'Checagem e envio', state: 'blocked' },
+  {
+    id: 'revisao',
+    label: 'Revisão',
+    description: 'Checagem e envio',
+    state: 'blocked',
+    reason: REVIEW_REASON,
+  },
 ];
 
 function SideList() {
   const [current, setCurrent] = useState(3);
   return (
     <div className={x.sideColumn}>
-      <StepList steps={SIDE_STEPS} current={current} onStepSelect={setCurrent} label="Etapas da campanha" tone="plain" />
+      <StepList
+        steps={SIDE_STEPS}
+        current={current}
+        onStepSelect={setCurrent}
+        label="Etapas da campanha"
+        tone="plain"
+      />
     </div>
   );
 }
@@ -1164,7 +1807,9 @@ function StepChip({ state, index, label }: { state: StepState; index: number; la
 }
 
 function StepperSpecimen() {
-  const phoneSteps: StepItem[] = CREATION_STEPS.map((step) => ({ ...step }));
+  const phoneSteps: StepItem[] = CREATION_STEPS.map((step) =>
+    step.id === 'revisao' ? { ...step, state: 'blocked', reason: REVIEW_REASON } : { ...step },
+  );
   return (
     <Shots>
       <Shot title="Criação" align="stretch" pad="sm">
@@ -1176,6 +1821,15 @@ function StepperSpecimen() {
       <Shot title="Lista lateral">
         <SideList />
       </Shot>
+      <Shot title="Vendo uma etapa feita" tone="white" align="stretch">
+        <Stepper
+          steps={VIEWING_STEPS}
+          current={0}
+          size="sm"
+          label="Etapas da produção, vendo o material"
+          onStepSelect={() => undefined}
+        />
+      </Shot>
       <Shot title="Estados" tone="white" align="stretch">
         <States min={150}>
           <State label="Feita">
@@ -1183,6 +1837,9 @@ function StepperSpecimen() {
           </State>
           <State label="Atual">
             <StepChip state="current" index={2} label="Precificação" />
+          </State>
+          <State label="Em andamento">
+            <StepChip state="active" index={2} label="Precificação" />
           </State>
           <State label="A seguir">
             <StepChip state="upcoming" index={3} label="Canal + Público" />
@@ -1198,6 +1855,57 @@ function StepperSpecimen() {
           </State>
         </States>
       </Shot>
+      <Shot title="Dica" tone="white" align="stretch">
+        <States min={240} align="center">
+          <State label="Bloqueada com motivo">
+            <Tooltip open side="bottom" content={REVIEW_REASON}>
+              <StepChip state="blocked" index={5} label="Revisão" />
+            </Tooltip>
+          </State>
+          <State label="Nome escondido pela largura">
+            <Tooltip open side="bottom" content="Canal + Público">
+              <span className={x.stepChip} data-state="upcoming">
+                <StepMarker state="upcoming" index={3} />
+              </span>
+            </Tooltip>
+          </State>
+          <State label="Nome escondido e motivo">
+            <Tooltip open side="bottom" content={`Revisão · ${REVIEW_REASON}`}>
+              <span className={x.stepChip} data-state="blocked">
+                <StepMarker state="blocked" index={5} />
+              </span>
+            </Tooltip>
+          </State>
+        </States>
+      </Shot>
+      <Shot title="Salvamento" tone="white" align="stretch">
+        <States min={200}>
+          <State label="Salvo">
+            <SaveIndicator status="saved" label="Salvo" detail="há 2 min" />
+          </State>
+          <State label="Salvando">
+            <SaveIndicator status="saving" />
+          </State>
+          <State label="Não salvo">
+            <SaveIndicator status="unsaved" />
+          </State>
+          <State label="Erro">
+            <Row gap={12} wrap={false}>
+              <SaveIndicator status="error" onRetry={() => undefined} />
+            </Row>
+          </State>
+          <State label="Erro · hover">
+            <Row gap={12} wrap={false}>
+              <SaveIndicator status="error" onRetry={() => undefined} data-force="hover" />
+            </Row>
+          </State>
+          <State label="Erro · foco">
+            <Row gap={12} wrap={false}>
+              <SaveIndicator status="error" onRetry={() => undefined} data-force="focus" />
+            </Row>
+          </State>
+        </States>
+      </Shot>
       <Shot title="Celular">
         <div className={x.phones}>
           <State label="Régua">
@@ -1207,7 +1915,13 @@ function StepperSpecimen() {
                   <h3>Nova campanha</h3>
                   <IconButton label="Cancelar" icon={X} variant="ghost" size="sm" />
                 </div>
-                <Stepper steps={phoneSteps} current={2} size="sm" label="Etapas da campanha, celular" onStepSelect={() => undefined} />
+                <Stepper
+                  steps={phoneSteps}
+                  current={2}
+                  size="sm"
+                  label="Etapas da campanha, celular"
+                  onStepSelect={() => undefined}
+                />
               </div>
             </Phone>
           </State>
@@ -1242,7 +1956,13 @@ const DETAIL_MENU: MenuSection[] = [
   {
     items: [
       { label: 'Cancelar campanha', icon: X },
-      { label: 'Excluir', icon: Trash2, danger: true, onSelect: () => toast('Campanha excluída', { action: { label: 'Desfazer', onClick: () => undefined } }) },
+      {
+        label: 'Excluir',
+        icon: Trash2,
+        danger: true,
+        onSelect: () =>
+          toast('Campanha excluída', { action: { label: 'Desfazer', onClick: () => undefined } }),
+      },
     ],
   },
 ];
@@ -1251,10 +1971,23 @@ const EXPORT_MENU: MenuSection[] = [
   {
     items: [
       { label: 'CSV', icon: FileText, onSelect: () => toast('17 campanhas exportadas em CSV') },
-      { label: 'XLSX', icon: FileSpreadsheet, onSelect: () => toast('17 campanhas exportadas em XLSX') },
+      {
+        label: 'XLSX',
+        icon: FileSpreadsheet,
+        onSelect: () => toast('17 campanhas exportadas em XLSX'),
+      },
     ],
   },
-  { items: [{ label: 'Copiar link da lista', icon: Link2, shortcut: '⌘L', onSelect: () => toast('Link copiado') }] },
+  {
+    items: [
+      {
+        label: 'Copiar link da lista',
+        icon: Link2,
+        shortcut: '⌘L',
+        onSelect: () => toast('Link copiado'),
+      },
+    ],
+  },
 ];
 
 const STATE_MENU: MenuSection[] = [
@@ -1270,7 +2003,15 @@ const STATE_MENU: MenuSection[] = [
   },
   { items: [{ label: 'Excluir', icon: Trash2, danger: true }] },
 ];
-const STATE_CAPTIONS = ['Repouso', 'Hover', 'Pressionado', 'Marcado', 'Com atalho', 'Indisponível', 'Destrutivo'];
+const STATE_CAPTIONS = [
+  'Repouso',
+  'Hover',
+  'Pressionado',
+  'Marcado',
+  'Com atalho',
+  'Indisponível',
+  'Destrutivo',
+];
 
 /** Painel parado com a legenda de cada linha alinhada ao centro do item (medido). */
 function CaptionedMenu({ sections, captions }: { sections: MenuSection[]; captions: string[] }) {
@@ -1345,7 +2086,11 @@ function MenuSpecimen() {
           </State>
           <State label="Conta">
             <div className={x.accountStrip}>
-              <SidebarAccount name="Marina Lopes" detail="Operação · Francal" sections={ACCOUNT_SECTIONS} />
+              <SidebarAccount
+                name="Marina Lopes"
+                detail="Operação · Francal"
+                sections={ACCOUNT_SECTIONS}
+              />
             </div>
           </State>
         </div>
@@ -1361,12 +2106,40 @@ function MenuSpecimen() {
 
 const LEAD_STAGES = ['Novo', 'Em contato', 'Qualificado', 'Proposta', 'Ganho'] as const;
 type LeadStage = (typeof LEAD_STAGES)[number];
-type Lead = { id: string; name: string; company: string; meta: string; when: string; stage: LeadStage };
+type Lead = {
+  id: string;
+  name: string;
+  company: string;
+  meta: string;
+  when: string;
+  stage: LeadStage;
+};
 
 const LEADS: Lead[] = [
-  { id: 'l1', name: 'Juliana Prates', company: 'Bella Passo', meta: 'Estande B-\u2060214', when: 'há 2 h', stage: 'Em contato' },
-  { id: 'l2', name: 'Tiago Rezende', company: 'Couro Nobre', meta: 'Rodada de negócios', when: 'há 5 h', stage: 'Em contato' },
-  { id: 'l3', name: 'Clara Souto', company: 'Ateliê Sul', meta: 'Vitrine · Scarpin', when: 'ontem', stage: 'Qualificado' },
+  {
+    id: 'l1',
+    name: 'Juliana Prates',
+    company: 'Bella Passo',
+    meta: 'Estande B-\u2060214',
+    when: 'há 2 h',
+    stage: 'Em contato',
+  },
+  {
+    id: 'l2',
+    name: 'Tiago Rezende',
+    company: 'Couro Nobre',
+    meta: 'Rodada de negócios',
+    when: 'há 5 h',
+    stage: 'Em contato',
+  },
+  {
+    id: 'l3',
+    name: 'Clara Souto',
+    company: 'Ateliê Sul',
+    meta: 'Vitrine · Scarpin',
+    when: 'ontem',
+    stage: 'Qualificado',
+  },
 ];
 const BOARD: LeadStage[] = ['Em contato', 'Qualificado', 'Proposta'];
 
@@ -1388,7 +2161,16 @@ function leadMenu(lead: Lead, move: (stage: LeadStage) => void): MenuSection[] {
         { label: 'Copiar link', icon: Link2, onSelect: () => toast('Link do lead copiado') },
       ],
     },
-    { items: [{ label: 'Arquivar', icon: Archive, danger: true, onSelect: () => toast(`Lead de ${lead.name} arquivado`) }] },
+    {
+      items: [
+        {
+          label: 'Arquivar',
+          icon: Archive,
+          danger: true,
+          onSelect: () => toast(`Lead de ${lead.name} arquivado`),
+        },
+      ],
+    },
   ];
 }
 
@@ -1429,7 +2211,9 @@ function LeadBoard() {
     if (stage === lead.stage) return;
     const before = leads;
     setLeads((list) => list.map((item) => (item.id === lead.id ? { ...item, stage } : item)));
-    toast(`Lead movido para ${stage}`, { action: { label: 'Desfazer', onClick: () => setLeads(before) } });
+    toast(`Lead movido para ${stage}`, {
+      action: { label: 'Desfazer', onClick: () => setLeads(before) },
+    });
   }
   return (
     <div className={x.board}>
@@ -1443,7 +2227,11 @@ function LeadBoard() {
             </header>
             <div className={x.columnBody}>
               {items.map((lead) => (
-                <ContextMenu key={lead.id} label={`Ações do lead ${lead.name}`} sections={leadMenu(lead, (stage) => move(lead, stage))}>
+                <ContextMenu
+                  key={lead.id}
+                  label={`Ações do lead ${lead.name}`}
+                  sections={leadMenu(lead, (stage) => move(lead, stage))}
+                >
                   <LeadCard lead={lead} />
                 </ContextMenu>
               ))}
@@ -1460,14 +2248,24 @@ const rowMenu = (row: Campaign): MenuSection[] => [
     items: [
       { label: 'Abrir', icon: ExternalLink },
       { label: 'Métricas', icon: ChartColumn },
-      { label: 'Duplicar', icon: Copy, onSelect: () => toast(`Cópia de #${row.id} criada como rascunho`) },
+      {
+        label: 'Duplicar',
+        icon: Copy,
+        onSelect: () => toast(`Cópia de #${row.id} criada como rascunho`),
+      },
       { label: 'Copiar link', icon: Link2, onSelect: () => toast('Link da campanha copiado') },
     ],
   },
   {
     items: [
       row.bucket === 'veiculacao'
-        ? { label: 'Excluir', icon: Trash2, danger: true, disabled: true, description: 'Campanha em veiculação' }
+        ? {
+            label: 'Excluir',
+            icon: Trash2,
+            danger: true,
+            disabled: true,
+            description: 'Campanha em veiculação',
+          }
         : { label: 'Excluir', icon: Trash2, danger: true },
     ],
   },
@@ -1502,11 +2300,18 @@ function ContextSpecimen() {
               <Count>2</Count>
             </header>
             <div className={x.phoneLongPress}>
-              <ContextMenu label="Ações do lead Juliana Prates" sections={leadMenu(LEADS[0] as Lead, () => undefined)}>
+              <ContextMenu
+                label="Ações do lead Juliana Prates"
+                sections={leadMenu(LEADS[0] as Lead, () => undefined)}
+              >
                 <LeadCard lead={LEADS[0] as Lead} forceOpen />
               </ContextMenu>
               <div className={x.pressPanel}>
-                <MenuPanel label="Ações do lead" width={232} sections={leadMenu(LEADS[0] as Lead, () => undefined)} />
+                <MenuPanel
+                  label="Ações do lead"
+                  width={232}
+                  sections={leadMenu(LEADS[0] as Lead, () => undefined)}
+                />
               </div>
             </div>
           </div>
@@ -1518,7 +2323,9 @@ function ContextSpecimen() {
 
 /* ——————————————————————————— Paleta de comandos ——————————————————————————— */
 
-const CAMPAIGN_ITEMS: CommandItem[] = CAMPAIGNS.filter((row) => [2041, 2026, 2035, 2014].includes(row.id)).map((row) => ({
+const CAMPAIGN_ITEMS: CommandItem[] = CAMPAIGNS.filter((row) =>
+  [2041, 2026, 2035, 2014].includes(row.id),
+).map((row) => ({
   id: `c-${row.id}`,
   label: row.name,
   description: `#${row.id} · ${row.advertiser}`,
@@ -1549,7 +2356,13 @@ const COMMAND_GROUPS: CommandGroup[] = [
     label: 'Ações',
     showWhenEmpty: true,
     items: [
-      { id: 'x-nova', label: 'Nova campanha', icon: Plus, hint: '⌘N', onSelect: () => toast('Nova campanha') },
+      {
+        id: 'x-nova',
+        label: 'Nova campanha',
+        icon: Plus,
+        hint: '⌘N',
+        onSelect: () => toast('Nova campanha'),
+      },
       { id: 'x-exportar', label: 'Exportar lista de campanhas', icon: Download },
     ],
   },
@@ -1629,7 +2442,12 @@ function CommandSpecimen() {
       </Shot>
       <Shot title="Busca “aurora”" pad="lg">
         <PaletteFrame>
-          <CommandPanel groups={COMMAND_GROUPS} recent={RECENT} defaultQuery="aurora" label="Busca rápida, exemplo" />
+          <CommandPanel
+            groups={COMMAND_GROUPS}
+            recent={RECENT}
+            defaultQuery="aurora"
+            label="Busca rápida, exemplo"
+          />
         </PaletteFrame>
       </Shot>
       <Shot title="Estados" align="stretch">
@@ -1637,21 +2455,35 @@ function CommandSpecimen() {
           <State label="Recentes">
             <Top>
               <PaletteFrame>
-                <CommandPanel groups={COMMAND_GROUPS} recent={RECENT} placeholder="Buscar no portal" label="Busca rápida, recentes" />
+                <CommandPanel
+                  groups={COMMAND_GROUPS}
+                  recent={RECENT}
+                  placeholder="Buscar no portal"
+                  label="Busca rápida, recentes"
+                />
               </PaletteFrame>
             </Top>
           </State>
           <State label="Sem resultado">
             <Top>
               <PaletteFrame>
-                <CommandPanel groups={COMMAND_GROUPS} defaultQuery="pavilhão verde" label="Busca rápida, sem resultado" />
+                <CommandPanel
+                  groups={COMMAND_GROUPS}
+                  defaultQuery="pavilhão verde"
+                  label="Busca rápida, sem resultado"
+                />
               </PaletteFrame>
             </Top>
           </State>
           <State label="Buscando">
             <Top>
               <PaletteFrame>
-                <CommandPanel groups={COMMAND_GROUPS} defaultQuery="2041" loading label="Busca rápida, buscando" />
+                <CommandPanel
+                  groups={COMMAND_GROUPS}
+                  defaultQuery="2041"
+                  loading
+                  label="Busca rápida, buscando"
+                />
               </PaletteFrame>
             </Top>
           </State>
@@ -1666,9 +2498,39 @@ function CommandSpecimen() {
 const PORTAL_ROWS: Record<string, Campaign[]> = {
   'francal-2026': CAMPAIGNS.slice(0, 3),
   'francal-2025': [
-    { id: 1876, name: 'Coleção Outono-Inverno no portal', advertiser: 'Aurora Calçados', asset: 'Banner Super Topo — Portal', status: 'Concluída', tone: 'gray', bucket: 'encerradas', budget: 16000, period: '01/07 – 31/07' },
-    { id: 1862, name: 'Newsletter de lançamentos', advertiser: 'Estúdio Norte', asset: 'E-mail marketing dedicado', status: 'Concluída', tone: 'gray', bucket: 'encerradas', budget: 7500, period: '05/07 – 20/07' },
-    { id: 1840, name: 'Painel de LED — abertura', advertiser: 'Bella Passo', asset: 'Painel de LED — Pavilhão Azul', status: 'Concluída', tone: 'gray', bucket: 'encerradas', budget: 18000, period: '14/07 – 17/07' },
+    {
+      id: 1876,
+      name: 'Coleção Outono-Inverno no portal',
+      advertiser: 'Aurora Calçados',
+      asset: 'Banner Super Topo — Portal',
+      status: 'Concluída',
+      tone: 'gray',
+      bucket: 'encerradas',
+      budget: 16000,
+      period: '01/07 – 31/07',
+    },
+    {
+      id: 1862,
+      name: 'Newsletter de lançamentos',
+      advertiser: 'Estúdio Norte',
+      asset: 'E-mail marketing dedicado',
+      status: 'Concluída',
+      tone: 'gray',
+      bucket: 'encerradas',
+      budget: 7500,
+      period: '05/07 – 20/07',
+    },
+    {
+      id: 1840,
+      name: 'Painel de LED — abertura',
+      advertiser: 'Bella Passo',
+      asset: 'Painel de LED — Pavilhão Azul',
+      status: 'Concluída',
+      tone: 'gray',
+      bucket: 'encerradas',
+      budget: 18000,
+      period: '14/07 – 17/07',
+    },
   ],
   'couro-sul-2027': [],
 };
@@ -1685,7 +2547,9 @@ function navFor(portal: string): NavGroup[] {
   return SHORT_GROUPS.map((group) => ({
     ...group,
     items: group.items.map((item) =>
-      item.id === 'campanhas' || item.id === 'leads' ? { ...item, count: counts[item.id] || undefined } : item,
+      item.id === 'campanhas' || item.id === 'leads'
+        ? { ...item, count: counts[item.id] || undefined }
+        : item,
     ),
   }));
 }
@@ -1693,9 +2557,14 @@ function navFor(portal: string): NavGroup[] {
 function PortalContext() {
   const [portal, setPortal] = useState('francal-2026');
   const [persona, setPersona] = useState('operador');
-  const portals = PORTALS.map((item) => (persona === 'anunciante' ? { ...item, detail: 'Aurora Calçados' } : item));
+  const portals = PORTALS.map((item) =>
+    persona === 'anunciante' ? { ...item, detail: 'Aurora Calçados' } : item,
+  );
   const rows = PORTAL_ROWS[portal] ?? [];
-  const fair = (PORTALS.find((item) => item.id === portal)?.name ?? 'Francal').replace(/\s\d{4}$/, '');
+  const fair = (PORTALS.find((item) => item.id === portal)?.name ?? 'Francal').replace(
+    /\s\d{4}$/,
+    '',
+  );
   return (
     <div className={x.shellFrame} style={{ height: 460 }}>
       <AppShell
@@ -1705,15 +2574,32 @@ function PortalContext() {
         contentAs="div"
         sidebar={
           <Sidebar
-            switcher={<PortalSwitcher portals={portals} value={portal} onChange={setPortal} action={MANAGE_PORTALS} />}
+            switcher={
+              <PortalSwitcher
+                portals={portals}
+                value={portal}
+                onChange={setPortal}
+                action={MANAGE_PORTALS}
+              />
+            }
             groups={navFor(portal)}
             active="campanhas"
-            account={<SidebarAccount name="Marina Lopes" detail={`Operação · ${fair}`} sections={ACCOUNT_SECTIONS} />}
+            account={
+              <SidebarAccount
+                name="Marina Lopes"
+                detail={`Operação · ${fair}`}
+                sections={ACCOUNT_SECTIONS}
+              />
+            }
           />
         }
         topbar={
           <TopBar
-            breadcrumb={persona === 'anunciante' ? [{ label: 'Campanhas' }] : [{ label: 'Operação' }, { label: 'Campanhas' }]}
+            breadcrumb={
+              persona === 'anunciante'
+                ? [{ label: 'Campanhas' }]
+                : [{ label: 'Operação' }, { label: 'Campanhas' }]
+            }
             actions={<PersonaSelect value={persona} onChange={setPersona} />}
           />
         }
@@ -1760,13 +2646,23 @@ function PortalSpecimen() {
           </State>
           <State label="Hover">
             <IdentityStrip>
-              <PortalSwitcher portals={PORTALS} value="francal-2026" onChange={noop} force="hover" />
+              <PortalSwitcher
+                portals={PORTALS}
+                value="francal-2026"
+                onChange={noop}
+                force="hover"
+              />
             </IdentityStrip>
           </State>
           <State label="Aberto">
             <div className={x.portalOpen}>
               <IdentityStrip>
-                <PortalSwitcher portals={PORTALS} value="francal-2026" onChange={noop} force="hover" />
+                <PortalSwitcher
+                  portals={PORTALS}
+                  value="francal-2026"
+                  onChange={noop}
+                  force="hover"
+                />
               </IdentityStrip>
               <MenuPanel
                 label="Trocar de portal"
@@ -1780,7 +2676,9 @@ function PortalSpecimen() {
                       leading: <BrandMark name={portal.name} size="xs" variant="soft" decorative />,
                       checked: portal.id === 'francal-2026',
                       muted: portal.status === 'archived' || undefined,
-                      meta: portal.statusLabel ?? (portal.status === 'archived' ? 'Encerrado' : undefined),
+                      meta:
+                        portal.statusLabel ??
+                        (portal.status === 'archived' ? 'Encerrado' : undefined),
                     })),
                   },
                   { items: [MANAGE_PORTALS] },
@@ -1797,7 +2695,9 @@ function PortalSpecimen() {
                 contentAs="div"
                 sidebar={
                   <Sidebar
-                    switcher={<PortalSwitcher portals={PORTALS} value="francal-2026" onChange={noop} peek />}
+                    switcher={
+                      <PortalSwitcher portals={PORTALS} value="francal-2026" onChange={noop} peek />
+                    }
                     groups={[]}
                   />
                 }

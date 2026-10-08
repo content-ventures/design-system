@@ -5,21 +5,26 @@ import {
   ArrowRight,
   ArrowUpRight,
   BarChart3,
+  Bold,
   Boxes,
   Building2,
   Download,
   FileText,
   Gift,
+  Italic,
   LayoutGrid,
   LayoutList,
+  List as ListIcon,
   Megaphone,
   MoreHorizontal,
   Plus,
   Radio as RadioIcon,
+  Redo2,
   Settings,
   ShieldCheck,
   Store,
   Tags,
+  Undo2,
   UserRound,
   Users,
   X,
@@ -34,23 +39,37 @@ import {
 } from 'react';
 import {
   Badge,
+  Banner,
   BrandMark,
   Button,
   DataTable,
   Field,
   IconButton,
   Input,
+  Prose,
+  SaveIndicator,
   SearchField,
   Segmented,
   Tabs,
+  Toolbar,
+  ToolbarButton,
+  ToolbarSeparator,
+  ToolbarToggle,
+  WorkspaceLayout,
   type Column,
 } from '@content-ventures/design-system/v3';
 import { Pagination } from '@content-ventures/design-system/v3/pagination';
 import { LinkButton } from '@content-ventures/design-system/v3/link';
 import { Menu } from '@content-ventures/design-system/v3/menu';
-import { ActionBar, Stepper, StepperCompact, type StepItem } from '@content-ventures/design-system/v3/stepper';
+import {
+  ActionBar,
+  Stepper,
+  StepperCompact,
+  type StepItem,
+} from '@content-ventures/design-system/v3/stepper';
 import {
   Accordion,
+  CopyButton,
   DescriptionList,
   ExpandableText,
   FixedFrame,
@@ -372,6 +391,72 @@ function FrameHeader({
   );
 }
 
+/** Jornada de uma peça: o artigo em revisão, o carrossel ainda fechado. */
+const STAGE_STEPS: StepItem[] = [
+  { id: 'material', label: 'Material', state: 'done' },
+  { id: 'artigo', label: 'Artigo' },
+  {
+    id: 'carrossel',
+    label: 'Carrossel',
+    state: 'blocked',
+    reason: 'Libera quando o artigo for aprovado',
+  },
+  {
+    id: 'entrega',
+    label: 'Entrega',
+    state: 'blocked',
+    reason: 'Libera quando o carrossel for aprovado',
+  },
+];
+
+/**
+ * Cabeçalho de estúdio numa linha (`steps`): título · status · régua · ações · ⋯. Sem espaço, o
+ * título trunca antes da régua; no celular, a régua compacta desce para a linha dela.
+ */
+function StageLineHeader({
+  title = 'Ateliê Sul: couro vegetal na feira',
+  notice,
+}: {
+  title?: string;
+  notice?: ReactNode;
+}) {
+  return (
+    <PageHeader
+      variant="frame"
+      title={title}
+      notice={notice}
+      status={
+        <Badge variant="text" tone="gray" dot>
+          Em edição
+        </Badge>
+      }
+      steps={
+        <Stepper
+          steps={STAGE_STEPS}
+          current={1}
+          size="sm"
+          label="Etapas da produção"
+          onStepSelect={() => undefined}
+        />
+      }
+      stepsCompact={
+        <StepperCompact
+          steps={STAGE_STEPS}
+          current={1}
+          label="Etapas da produção"
+          showNext={false}
+        />
+      }
+      actions={
+        <Button variant="primary" size="sm">
+          Enviar para aprovação
+        </Button>
+      }
+      more={<IconButton label="Mais ações" icon={MoreHorizontal} variant="ghost" size="sm" />}
+    />
+  );
+}
+
 /** Rodapé da moldura: quatro slots fixos; no celular, [←] [Salvar rascunho] [Principal]. */
 function FrameFooter({ narrow }: { narrow: boolean }) {
   if (narrow) {
@@ -418,6 +503,28 @@ function PageHeaders() {
           </div>
         </div>
       </Shot>
+      <Shot title="Linha de etapas" tone="white" align="stretch" pad="lg">
+        <StageLineHeader />
+      </Shot>
+      <Shot title="Linha de etapas · aviso" tone="white" align="stretch" pad="lg">
+        <StageLineHeader
+          notice={
+            <Banner
+              tone="warning"
+              variant="inline"
+              title="Aberta em outra aba"
+              action={<Button size="sm">Usar esta aba</Button>}
+            >
+              Esta aba ficou só para leitura para não apagar o que foi salvo na outra.
+            </Banner>
+          }
+        />
+      </Shot>
+      <Shot title="Linha de etapas · título longo" align="stretch" pad="lg">
+        <div className={x.sheet} style={{ maxWidth: 1000 }}>
+          <StageLineHeader title="Casa Forma: o estande que vende antes da feira e os pedidos que chegam depois" />
+        </div>
+      </Shot>
       <Shot title="Título longo" align="stretch" pad="lg">
         <div className={x.sheet} style={{ maxWidth: 760 }}>
           <DetailHeader title="Retargeting de visitantes credenciados no portal e no app oficial da Francal 2026 — segunda onda de lançamentos de calçados femininos" />
@@ -438,6 +545,11 @@ function PageHeaders() {
           <Phone label="Moldura no celular">
             <div className={x.frameHead} data-narrow="">
               <FrameHeader current={2} close />
+            </div>
+          </Phone>
+          <Phone label="Linha de etapas no celular">
+            <div className={x.phonePad}>
+              <StageLineHeader />
             </div>
           </Phone>
         </div>
@@ -752,6 +864,34 @@ function Sections() {
               children: (
                 <div className={x.fill}>
                   <BandDemo />
+                </div>
+              ),
+            },
+            {
+              // Campos direto no corpo: a pilha de campos dá 20 px entre um e outro.
+              label: 'Com campos',
+              children: (
+                <div className={x.fill}>
+                  <Section title="Slide 1 · Capa">
+                    <Field label="Chamada" meta="28/32">
+                      {({ id, describedBy }) => (
+                        <Input
+                          id={id}
+                          aria-describedby={describedBy}
+                          defaultValue="Exportação · Lume Acessórios"
+                        />
+                      )}
+                    </Field>
+                    <Field label="Título" required meta="41/70">
+                      {({ id, describedBy }) => (
+                        <Input
+                          id={id}
+                          aria-describedby={describedBy}
+                          defaultValue="Bijuteria artesanal em 64 lojas europeias"
+                        />
+                      )}
+                    </Field>
+                  </Section>
                 </div>
               ),
             },
@@ -1976,6 +2116,36 @@ function Descriptions() {
           ]}
         />
       </Shot>
+      <Shot title="Copiar" tone="white" align="stretch" pad="lg">
+        <States
+          min={120}
+          align="center"
+          items={[
+            {
+              label: 'Repouso',
+              children: <CopyButton text="PI-2026-0142" label="código do P.I." />,
+            },
+            {
+              label: 'Hover',
+              children: (
+                <CopyButton text="PI-2026-0142" label="código do P.I." data-force="hover" />
+              ),
+            },
+            {
+              label: 'Pressionado',
+              children: (
+                <CopyButton text="PI-2026-0142" label="código do P.I." data-force="active" />
+              ),
+            },
+            {
+              label: 'Foco',
+              children: (
+                <CopyButton text="PI-2026-0142" label="código do P.I." data-force="focus" />
+              ),
+            },
+          ]}
+        />
+      </Shot>
     </Shots>
   );
 }
@@ -2209,6 +2379,117 @@ function CampaignCards({
   );
 }
 
+/**
+ * Sangrado (`bleed`): a área de trabalho encostada ocupa o conteúdo de ponta a ponta — sem respiro e
+ * sem largura máxima; os fios do painel continuam os fios do menu e do topo.
+ */
+function BleedShell() {
+  const [stageRef, available] = useAvailable();
+  const [drawer, setDrawer] = useState(false);
+  const [active, setActive] = useState('campanhas');
+  const narrow = available < 760;
+  return (
+    <div className={x.shellStage} ref={stageRef}>
+      <div className={x.shellFrame} style={{ width: '100%' }}>
+        <AppShell
+          fill
+          bleed
+          collapsed
+          contentAs="div"
+          layout={narrow ? 'drawer' : 'desktop'}
+          navOpen={drawer}
+          onNavOpenChange={setDrawer}
+          sidebar={
+            <ShellSidebar
+              active={active}
+              onNavigate={(id) => {
+                setActive(id);
+                setDrawer(false);
+              }}
+            />
+          }
+          topbar={
+            <TopBar
+              breadcrumb={
+                narrow
+                  ? [{ label: 'Briefing' }]
+                  : [
+                      { label: 'Campanhas', onClick: () => undefined },
+                      { label: 'Aurora Calçados · Briefing' },
+                    ]
+              }
+            />
+          }
+        >
+          <WorkspaceLayout
+            height="100%"
+            narrowBelow={640}
+            mainLabel="Briefing"
+            start={{
+              label: 'Campanha',
+              defaultSize: 280,
+              min: 240,
+              max: 360,
+              content: (
+                <DescriptionList
+                  items={[
+                    { label: 'Anunciante', value: 'Aurora Calçados' },
+                    { label: 'Ativo', value: 'Banner Super Topo — Portal' },
+                    { label: 'Verba', value: 'R$ 18.000,00', numeric: true },
+                    { label: 'Período', value: '01/10 – 31/10', numeric: true },
+                  ]}
+                />
+              ),
+            }}
+            mainHeader={
+              <Toolbar
+                label="Formatação do briefing"
+                end={<SaveIndicator status="saved" label="Salvo" />}
+              >
+                <ToolbarButton label="Desfazer" icon={Undo2} />
+                <ToolbarButton label="Refazer" icon={Redo2} />
+                <ToolbarSeparator />
+                <ToolbarToggle
+                  label="Negrito"
+                  icon={Bold}
+                  pressed={false}
+                  onPressedChange={() => {}}
+                />
+                <ToolbarToggle
+                  label="Itálico"
+                  icon={Italic}
+                  pressed={false}
+                  onPressedChange={() => {}}
+                />
+                <ToolbarToggle
+                  label="Lista"
+                  icon={ListIcon}
+                  pressed={false}
+                  onPressedChange={() => {}}
+                />
+              </Toolbar>
+            }
+          >
+            <Prose variant="edit" size="sm" label="Briefing da campanha" overscroll={false}>
+              <h2>Objetivo</h2>
+              <p>
+                Levar visitantes credenciados ao estande da Aurora Calçados no Pavilhão Azul durante
+                os quatro dias da Francal 2026.
+              </p>
+              <h2>Mensagem</h2>
+              <p>A coleção de verão chega às lojas em novembro, com pedido mínimo de 12 pares.</p>
+              <ul>
+                <li>destaque para a linha em couro reaproveitado;</li>
+                <li>chamada para agendar visita com o time comercial.</li>
+              </ul>
+            </Prose>
+          </WorkspaceLayout>
+        </AppShell>
+      </div>
+    </div>
+  );
+}
+
 type ShellDevice = 'desktop' | 'tablet' | 'phone';
 
 /** Largura da moldura por aparelho. Desktop ocupa o palco inteiro (menu lateral fixo). */
@@ -2339,6 +2620,9 @@ function ShellSpecimen() {
             </AppShell>
           </div>
         </div>
+      </Shot>
+      <Shot title="Sangrado" align="stretch" pad="sm">
+        <BleedShell />
       </Shot>
       <Shot title="Moldura fixa" align="stretch" pad="none">
         <div className={x.fixedStage}>

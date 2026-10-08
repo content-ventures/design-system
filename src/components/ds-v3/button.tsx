@@ -2,7 +2,7 @@
 
 import { ChevronDown, LoaderCircle, type LucideIcon } from 'lucide-react';
 import type { ComponentProps, ElementType, MouseEvent, ReactNode } from 'react';
-import { Menu, type MenuSection } from './overlays';
+import { Menu, Tooltip, type MenuSection } from './overlays';
 import s from './button.module.css';
 
 export type ButtonVariant =
@@ -147,11 +147,17 @@ export function ButtonLink({
   );
 }
 
+/**
+ * Botão só de ícone. O nome (`label`) vai no `aria-label` e aparece na dica do DS (`Tooltip`, sem
+ * caixa: o botão continua sendo o item do layout), nunca no `title` nativo. `title` muda o texto da
+ * dica; `title=""` a desliga — é o que um `Tooltip` em volta passa, e então vale a dele.
+ */
 export function IconButton({
   label,
   icon: Icon,
   className = '',
   fillPressed = false,
+  title,
   ...props
 }: Omit<ButtonProps, 'children' | 'aria-label' | 'trailingIcon'> & {
   label: string;
@@ -160,15 +166,20 @@ export function IconButton({
   fillPressed?: boolean;
 }) {
   // O ícone vai como `icon` (não como filho): carregando, o spinner troca com ele na mesma caixa.
-  return (
+  const button = (
     <Button
       {...props}
       icon={Icon}
       aria-label={label}
-      title={props.title ?? label}
       className={`${s.icon} ${className}`}
       data-fill={fillPressed || undefined}
     />
+  );
+  if (title === '') return button;
+  return (
+    <Tooltip bare content={title ?? label}>
+      {button}
+    </Tooltip>
   );
 }
 

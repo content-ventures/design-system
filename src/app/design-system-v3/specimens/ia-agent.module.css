@@ -1,0 +1,125 @@
+/* Prancha IA (agente): só arranjo da prancha e aplicação de tokens. Os componentes vêm da biblioteca. */
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--s-6);
+}
+.stack {
+  display: grid;
+  gap: var(--s-4);
+  min-width: 0;
+}
+.sections {
+  display: grid;
+  gap: var(--s-8);
+  min-width: 0;
+}
+.cell {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+}
+
+/* ——— Copiloto ao vivo ——— */
+.live {
+  display: grid;
+  gap: var(--s-3);
+  min-width: 0;
+}
+.liveActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+  margin-inline: calc(var(--s-2) * -1);
+}
+
+/* ——— Gerando agora: uma linha por run ——— */
+.rows {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.row {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding-block: var(--s-3);
+}
+.row + .row {
+  border-top: 1px solid var(--line-soft);
+}
+.row:first-child {
+  padding-top: 0;
+}
+.row:last-child {
+  padding-bottom: 0;
+}
+.rowTitle {
+  overflow: hidden;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ——— Fontes ——— */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.prose {
+  display: grid;
+  gap: var(--prose-space-block);
+  max-width: var(--prose-measure);
+  font: var(--t-prose-body);
+  color: var(--text);
+}
+.prose p {
+  margin: 0;
+  text-wrap: pretty;
+}
+.pinned {
+  padding-bottom: var(--s-4);
+}
+
+/* ——— Prévia de uma fala ——— */
+.fala {
+  display: grid;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.falaHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.falaName {
+  font: var(--t-body-strong);
+  color: var(--ink);
+}
+.falaText {
+  margin: 0;
+  font: var(--t-body);
+  color: var(--text);
+}
+
+/* ——— Celular ——— */
+.phoneBody {
+  display: grid;
+  gap: var(--s-6);
+  padding: var(--s-4);
+}
+
+@media (max-width: 900px) {
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

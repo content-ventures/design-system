@@ -47,6 +47,12 @@ export const inventory: readonly InventoryGroup[] = [
         'fontes texto',
       ),
       item(
+        'leitura',
+        'Leitura',
+        'Texto corrido de artigo: escala de leitura, itálico, diferença entre versões e marca-texto.',
+        'prose artigo editor italico diff marca-texto tempo relativo palavras',
+      ),
+      item(
         'espacamento',
         'Espaçamento',
         'Escala de distâncias, alinhamentos e densidade das interfaces.',
@@ -335,6 +341,18 @@ export const inventory: readonly InventoryGroup[] = [
         'Pares de rótulo e valor, metadados e leitura de detalhes.',
         'description list',
       ),
+      item(
+        'grade',
+        'Grade',
+        'Colunas em proporção ou automáticas que empilham pela largura disponível.',
+        'grid columns colunas',
+      ),
+      item(
+        'area-de-trabalho',
+        'Área de trabalho',
+        'Moldura de estúdio com painéis laterais redimensionáveis e recolhíveis.',
+        'workspace studio estudio resizable paineis foco',
+      ),
     ],
   },
   {
@@ -556,6 +574,108 @@ export const inventory: readonly InventoryGroup[] = [
         'Identificação de arquivo, tamanho, tipo e ações de download.',
       ),
       item('video', 'Vídeo', 'Apresentação e controles para conteúdo audiovisual.'),
+      item(
+        'transcricao',
+        'Transcrição',
+        'Falas por falante com tempo, busca, filtro de falante, trechos usados e ações sobre a seleção.',
+        'transcript fonte falas falante busca citacao entrevista',
+      ),
+      item(
+        'faixa-slides',
+        'Faixa de slides',
+        'Sequência de slides: escolher, reordenar, duplicar, excluir e avisos de limite.',
+        'carrossel slides filmstrip reordenar stories',
+      ),
+      item(
+        'slide',
+        'Slide',
+        'Slide desenhado por dados: layouts, temas, escala e transbordo de texto.',
+        'carrossel slide canvas template overflow',
+      ),
+    ],
+  },
+  {
+    id: 'editor',
+    label: 'Editor',
+    items: [
+      item(
+        'texto-corrido',
+        'Texto corrido',
+        'Corpo do artigo para edição, revisão e prévia, com marcas de IA, fonte e diferença.',
+        'prose artigo leitura tiptap editor',
+      ),
+      item(
+        'titulo-editavel',
+        'Título editável',
+        'Título que vira campo ao clicar, com contagem, salvamento e erro.',
+        'titulo inline renomear editable title',
+      ),
+      item(
+        'barra-ferramentas',
+        'Barra de ferramentas',
+        'Barra do editor com foco itinerante, alternáveis, menus e recolhimento em “Mais”.',
+        'toolbar editor negrito formatacao atalho overflow mais',
+      ),
+      item(
+        'barra-flutuante',
+        'Barra flutuante',
+        'Barra sobre o trecho selecionado: formatação e ações de IA sem tirar o foco do texto.',
+        'floating toolbar bubble menu selecao ia reescrever encurtar',
+      ),
+    ],
+  },
+  {
+    id: 'ia',
+    label: 'IA',
+    items: [
+      item(
+        'compositor',
+        'Compositor de pedido',
+        'Campo do copiloto: contexto, pedidos prontos, modelo, enviar e parar.',
+        'prompt composer chat input modelo copiloto',
+      ),
+      item(
+        'conversa',
+        'Conversa',
+        'Linha do tempo do copiloto: turnos, artefato, voto e ir para o fim.',
+        'conversation chat thread mensagem turno feedback copiloto',
+      ),
+      item(
+        'etapas-ia',
+        'Etapas da IA',
+        'Passos visíveis de uma geração: em andamento, concluída, falha e parada.',
+        'agent trace reasoning etapas passos',
+      ),
+      item(
+        'fonte',
+        'Fonte',
+        'Fonte citada: chip com prévia e marca numerada no texto.',
+        'source citation citacao referencia',
+      ),
+      item(
+        'sugestao',
+        'Sugestão',
+        'Proposta da IA para aceitar, editar ou descartar, com alternativas e voto.',
+        'suggestion aceitar descartar alternativas titulo',
+      ),
+    ],
+  },
+  {
+    id: 'revisao',
+    label: 'Revisão',
+    items: [
+      item(
+        'diferencas',
+        'Diferenças',
+        'Comparação entre versões em linha ou lado a lado, com resumo e blocos recolhidos.',
+        'diff versoes comparar revisao',
+      ),
+      item(
+        'selo',
+        'Selo',
+        'Confirmação de aprovação em três tamanhos, com animação de entrada.',
+        'seal aprovado aprovacao check',
+      ),
     ],
   },
   {

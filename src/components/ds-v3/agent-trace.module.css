@@ -1,0 +1,214 @@
+/*
+ * AgentTrace — rastro da IA sem caixa e sem fio lateral. Cabeçalho de 36 px que sangra 8 px como o
+ * acordeão simples (hover `--paper-hover`, pressionado `--paper-pressed`); ícone de situação numa
+ * caixa de 20 px alinhada aos marcadores das etapas. Verde só no fim, vermelho só na falha.
+ */
+.trace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  font: var(--t-body);
+  color: var(--text);
+}
+
+/* ——— Cabeçalho ——— */
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  width: calc(100% + var(--s-4));
+  min-width: 0;
+  min-height: var(--h-md);
+  margin-inline: -8px;
+  padding: 6px var(--s-2);
+  border-radius: var(--r-md);
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+button.head:is(:hover, [data-force~='hover']) {
+  background: var(--paper-hover);
+}
+button.head:is(:active, [data-force~='active']) {
+  background: var(--paper-pressed);
+  transition-duration: 0ms;
+}
+button.head:is(:focus-visible, [data-force~='focus']) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: -2px;
+}
+
+.glyph {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--icon-rest);
+}
+.glyph > svg {
+  width: var(--icon-md);
+  height: var(--icon-md);
+}
+.trace[data-status='done'] .glyph {
+  color: var(--green-ink);
+}
+.trace[data-status='error'] .glyph {
+  color: var(--red-ink);
+}
+.trace[data-status='idle'] .glyph {
+  color: var(--icon-quiet);
+}
+
+.title {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* O nome fica; o texto ao lado cede e corta com reticências. */
+.secondary {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  animation: swapIn var(--dur-2) var(--ease-out);
+}
+.dot {
+  margin-right: 6px;
+}
+.failWord {
+  font-weight: 500;
+  color: var(--red-ink);
+}
+.end {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex: none;
+  margin-left: auto;
+}
+.count {
+  font: var(--t-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.chevron {
+  flex: none;
+  width: var(--icon-md);
+  height: var(--icon-md);
+  color: var(--icon-quiet);
+  transition:
+    transform var(--dur-2) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+button.head:is(:hover, [data-force~='hover']) .chevron {
+  color: var(--g-600);
+}
+.trace:not([data-collapsed]) .chevron {
+  transform: rotate(180deg);
+}
+
+/* ——— Etapas ——— */
+.body {
+  padding-top: var(--s-2);
+}
+.detail {
+  max-width: 100%;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.detail[data-state='error'] {
+  color: var(--red-ink);
+}
+.sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  /* Na grade do passo, o mínimo automático seria o chip mais largo: o grupo cabe na coluna e cada
+     chip corta o próprio texto com reticências. */
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* ——— Compacto: uma linha para painéis e listas ——— */
+/* A linha do rastro e, com `preview`, o trecho embaixo dela. */
+.trace[data-variant='compact'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+  font: var(--t-small);
+}
+.compactLine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 24px;
+}
+.trace[data-variant='compact'] .glyph {
+  width: 16px;
+  height: 16px;
+}
+.trace[data-variant='compact'] .glyph > svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+.trace[data-variant='compact'] .title {
+  font: var(--t-small-strong);
+}
+.trace[data-variant='compact'] .count {
+  flex: none;
+  margin-left: auto;
+}
+.compactRetry {
+  flex: none;
+  margin-left: auto;
+}
+/* Ação no fim (“Abrir”): encostada à direita; depois da contagem ou do “Tentar de novo”, só o vão. */
+.compactAction {
+  display: inline-flex;
+  flex: none;
+  margin-left: auto;
+}
+:is(.count, .compactRetry) ~ .compactAction {
+  margin-left: var(--s-2);
+}
+/* O trecho corta no começo: a linha corre da direita (rtl) e o texto dentro dela segue ltr isolado,
+   então as reticências ficam à esquerda e as palavras mais novas, no fim, ficam à vista. */
+.preview {
+  min-width: 0;
+  padding-left: 22px;
+  overflow: hidden;
+  font: var(--t-small);
+  color: var(--muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: left;
+}
+.previewText {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* O texto ao lado troca por esmaecimento (sem contagem animada). */
+@keyframes swapIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .secondary {
+    animation: none;
+  }
+  .chevron {
+    transition: none;
+  }
+}

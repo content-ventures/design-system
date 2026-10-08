@@ -16,7 +16,9 @@ Stack principal: Next.js, React e CSS Modules. O catálogo roda em `/design-syst
 ## Direção
 
 - Tema claro por padrão, com modos escuro e sistema no mesmo conjunto de papéis semânticos.
-- Inter 400/500/600; densidade compacta; escala espacial de 4 px.
+- Inter 400/500/600 com itálico real; densidade compacta; escala espacial de 4 px.
+- Texto corrido (artigo, revisão) usa a escala de leitura `--t-prose-*` (corpo 16/28, medida 68ch).
+- Diferença entre versões usa papéis neutros (`--diff-*`), nunca tons de status; sem fio lateral colorido.
 - Controles com raio de 8 px, superfícies com 10 px e camadas com 16 px.
 - Interfaces chapadas: borda antes de sombra; sombra apenas em elementos flutuantes.
 - Azul representa ação, foco e seleção. Cores de status têm significado semântico próprio.

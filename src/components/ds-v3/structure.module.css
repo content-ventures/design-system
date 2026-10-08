@@ -124,6 +124,10 @@
   display: flex;
   margin-top: -2px;
 }
+/* Aviso no cabeçalho: bloco na largura toda (o Banner é contêiner e não encolhe numa linha flex). */
+.phNotice {
+  min-width: 0;
+}
 .phToolbar {
   display: flex;
   flex-wrap: wrap;
@@ -159,6 +163,46 @@
   margin-top: 0;
 }
 
+/*
+ * Moldura numa linha só (`steps`): título · status · régua · ações · ⋯. O título cede primeiro
+ * (encolhe 1000× mais rápido, até 10rem); a régua pede 27rem (o `sm` mantém os nomes até ~420 px),
+ * estica até 36rem e só depois de o título chegar ao piso encolhe e recolhe os nomes. Ações e ⋯
+ * não encolhem e ficam no fim da linha.
+ */
+.phSteps,
+.phStepsCompact {
+  min-width: 0;
+}
+.phStepsCompact {
+  display: none;
+}
+.ph[data-variant='frame'] .phMain[data-steps] {
+  display: flex;
+  align-items: center;
+  column-gap: var(--s-6);
+}
+.ph[data-variant='frame'] .phMain[data-steps] .phText {
+  flex: 0 1000 auto;
+  min-width: auto;
+}
+.ph[data-variant='frame'] .phMain[data-steps] .phTitleRow {
+  flex-wrap: nowrap;
+}
+.ph[data-variant='frame'] .phMain[data-steps] .phTitle {
+  min-width: min(10rem, 40cqi);
+}
+/* Até 36rem: em telas largas a régua não espicha os conectores; o que sobra fica antes das ações. */
+.ph[data-variant='frame'] .phMain[data-steps] .phSteps {
+  display: flex;
+  align-items: center;
+  flex: 1 1 27rem;
+  max-width: 36rem;
+  margin-right: auto;
+}
+.ph[data-variant='frame'] .phMain[data-steps] :is(.phActions, .phMore) {
+  flex: none;
+}
+
 @container dsv3-page-header (max-width: 760px) {
   .ph[data-variant='page'] .phTitle {
     font-size: 22px;
@@ -188,6 +232,40 @@
   }
   .phActions > :first-child {
     flex: 1 1 auto;
+  }
+  /* Celular: título e ⋯ em cima, a régua (ou a versão compacta) na linha dela, ações embaixo. */
+  .ph[data-variant='frame'] .phMain[data-steps] {
+    display: grid;
+    grid-template-areas:
+      'text more'
+      'steps steps'
+      'actions actions';
+  }
+  .ph[data-variant='frame'] .phMain[data-steps]:not([data-actions]) {
+    grid-template-areas:
+      'text more'
+      'steps steps';
+  }
+  /* O título usa a linha toda e o status fica sempre embaixo: a mesma altura carregando ou não. */
+  .ph[data-variant='frame'] .phMain[data-steps] .phText {
+    min-width: 0;
+  }
+  .ph[data-variant='frame'] .phMain[data-steps] .phTitleRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-1);
+  }
+  .ph[data-variant='frame'] .phMain[data-steps] .phTitle {
+    min-width: 0;
+  }
+  .ph[data-variant='frame'] .phMain[data-steps] :is(.phSteps, .phStepsCompact) {
+    grid-area: steps;
+  }
+  .ph[data-variant='frame'] .phMain[data-steps] .phSteps[data-compact] {
+    display: none;
+  }
+  .ph[data-variant='frame'] .phMain[data-steps] .phStepsCompact {
+    display: block;
   }
 }
 
@@ -589,6 +667,7 @@
 }
 
 /* ——————————————————————————— ResizablePanels ——————————————————————————— */
+/* A alça (`.splitHandle`) é a mesma do `WorkspaceLayout`: estados presos nela, não no pai. */
 .split {
   position: relative;
   display: grid;
@@ -647,7 +726,7 @@
 .splitHandle:is(:hover, [data-force~='hover'])::after {
   background: var(--b-300);
 }
-.split[data-dragging] .splitHandle::after,
+.splitHandle[data-dragging]::after,
 .splitHandle[data-force~='active']::after {
   background: var(--b-500);
   transition-duration: 0ms;
@@ -700,6 +779,10 @@
   .splitShow {
     width: 40px;
     height: 40px;
+  }
+  /* No toque, o alvo invisível da alça cresce para 24 px (o fio continua de 1px). */
+  .splitHandle::before {
+    inset: 0 -12px;
   }
 }
 .split[data-stacked] {
@@ -868,7 +951,7 @@
   }
 }
 
-/* Copiar: aparece no hover/foco da linha; check por 1,2 s. */
+/* Copiar: check por 1,2 s. `data-reveal='hover'` só aparece no hover/foco da linha. */
 .copy {
   position: relative;
   display: grid;
@@ -879,25 +962,27 @@
   margin-block: -2px;
   border-radius: var(--r-sm);
   color: var(--icon-rest);
-  opacity: 0;
   transition:
     opacity var(--dur-1) var(--ease-out),
     background-color var(--dur-1) var(--ease-out),
     color var(--dur-1) var(--ease-out);
 }
+.copy[data-reveal='hover'] {
+  opacity: 0;
+}
 .dlItem:hover .copy,
-.copy:focus-visible,
+.copy:is(:focus-visible, [data-force]),
 .copy[data-done] {
   opacity: 1;
 }
-.copy:hover {
+.copy:is(:hover, [data-force~='hover']) {
   color: var(--ink);
   background: var(--g-75);
 }
-.copy:active {
+.copy:is(:active, [data-force~='active']) {
   background: var(--g-100);
 }
-.copy:focus-visible {
+.copy:is(:focus-visible, [data-force~='focus']) {
   outline-offset: 0;
 }
 .copy svg {
@@ -923,7 +1008,8 @@
   transform: none;
 }
 @media (pointer: coarse) {
-  .copy {
+  .copy,
+  .copy[data-reveal='hover'] {
     width: 32px;
     height: 32px;
     margin-block: -6px;

@@ -4,6 +4,8 @@
  * Nada anima na primeira pintura; o que muda depois se transforma em --dur-3 (280 ms).
  */
 
+/* Só para leitor de tela, sempre num bloco (`div`): uma tabela ignora a largura de 1 px e não
+   recorta, então a tabela acessível vai dentro de um `div.srOnly` e nunca alarga a página. */
 .srOnly {
   position: absolute;
   width: 1px;
@@ -12,6 +14,7 @@
   margin: -1px;
   overflow: hidden;
   clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }

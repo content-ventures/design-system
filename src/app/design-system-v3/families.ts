@@ -2,6 +2,7 @@ import {
   Blocks,
   ChartColumnBig,
   Compass,
+  GitCompareArrows,
   Images,
   LayoutPanelLeft,
   LayoutTemplate,
@@ -9,6 +10,8 @@ import {
   MessageSquareDot,
   MousePointerClick,
   Palette,
+  PenLine,
+  Sparkles,
   Table2,
   TextCursorInput,
   type LucideIcon,
@@ -29,6 +32,9 @@ export const families: Record<string, FamilyMeta> = {
   feedback: { icon: MessageSquareDot, label: 'Feedback' },
   camadas: { icon: Layers, label: 'Modais e camadas' },
   midia: { icon: Images, label: 'Mídia e arquivos' },
+  editor: { icon: PenLine, label: 'Editor' },
+  ia: { icon: Sparkles, label: 'IA' },
+  revisao: { icon: GitCompareArrows, label: 'Revisão' },
   padroes: { icon: Blocks, label: 'Padrões' },
   templates: { icon: LayoutTemplate, label: 'Templates' },
 };
@@ -42,7 +48,7 @@ export function familyOf(groupId: string): FamilyMeta {
   );
 }
 
-/** Os 126 itens em ordem de leitura, com a família de cada um (`groupLabel` = nome curto). */
+/** Os itens em ordem de leitura, com a família de cada um (`groupLabel` = nome curto). */
 export const catalogItems = inventory.flatMap((group) =>
   group.items.map((item) => ({
     ...item,

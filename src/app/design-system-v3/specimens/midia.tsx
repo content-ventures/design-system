@@ -35,6 +35,7 @@ import { LinkButton } from '@content-ventures/design-system/v3/link';
 import { MediaFrame, formatBytes } from '@content-ventures/design-system/v3/media';
 import type { MenuSection } from '@content-ventures/design-system/v3/overlays';
 import { Checkbox, Segmented } from '@content-ventures/design-system/v3/selection';
+import { ScrollArea } from '@content-ventures/design-system/v3/structure';
 import { Dropzone, FileRow } from '@content-ventures/design-system/v3/upload';
 import { VideoPlayer, type VideoCue } from '@content-ventures/design-system/v3/video';
 import { Shot, Shots, State, States } from '../stage';
@@ -849,6 +850,35 @@ function ImagemPage() {
         </States>
       </Shot>
 
+      <Shot title="Altura que limita" tone="white" align="stretch" pad="md">
+        <States columns={3}>
+          <State label="Largura manda">
+            <MediaFrame ratio="4/5" src={PHOTOS.p3} alt="Bota Pátio Couro" fit="contain" />
+          </State>
+          <State label="Teto · 240 px">
+            <MediaFrame
+              ratio="4/5"
+              src={PHOTOS.p3}
+              alt="Bota Pátio Couro"
+              fit="contain"
+              maxHeight={240}
+            />
+          </State>
+          <State label="Cabe no palco">
+            <ScrollArea label="Palco do slide" height={320}>
+              <MediaFrame
+                ratio="4/5"
+                src={PHOTOS.p3}
+                alt="Bota Pátio Couro"
+                fit="contain"
+                fitHeight
+                caption="Slide 1 de 5 · 1080 × 1350 px"
+              />
+            </ScrollArea>
+          </State>
+        </States>
+      </Shot>
+
       <Shot title="Estados" tone="white" align="stretch" pad="md">
         <States columns={3}>
           <State label="Carregando">
@@ -895,8 +925,19 @@ const PIECES: GalleryItem[] = [
   },
 ];
 
+/** Slides 4:5 de um carrossel na revisão: o painel é baixo, e o palco cabe nele (`fitHeight`). */
+const SLIDES: GalleryItem[] = PRODUCTS.slice(0, 4).map((product, index) => ({
+  id: `slide-${product.id}`,
+  src: PHOTOS[product.id],
+  alt: `Slide ${index + 1} de 4`,
+  ratio: '4/5',
+  label: `carrossel-v1-${index + 1}.png`,
+  meta: '1080 × 1350 px · PNG',
+}));
+
 function GaleriaPage() {
   const [index, setIndex] = useState(0);
+  const [slide, setSlide] = useState(0);
   const [a, setA] = useState(0);
   const [b, setB] = useState(1);
   const [c, setC] = useState(2);
@@ -913,6 +954,21 @@ function GaleriaPage() {
             label="Peças da campanha"
             stageRatio="16/10"
           />
+        </div>
+      </Shot>
+
+      <Shot title="Cabe no palco" tone="white" align="stretch" pad="md">
+        <div className={x.galleryScene}>
+          <ScrollArea label="Painel da revisão" height={420} viewportClassName={x.reviewPane}>
+            <Gallery
+              items={SLIDES}
+              index={slide}
+              onIndexChange={setSlide}
+              label="Slides do carrossel"
+              stageRatio="16/10"
+              fitHeight
+            />
+          </ScrollArea>
         </div>
       </Shot>
 

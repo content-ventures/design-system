@@ -18,6 +18,15 @@
   container-type: inline-size;
   isolation: isolate;
 }
+/* Altura que limita (`maxHeight`, `fitHeight`): o elemento de fora (a moldura, ou a figura quando há
+ * legenda) estreita na proporção até a altura caber, e centra. Antes da medida do palco valem o teto
+ * e a altura da janela. */
+.frame[data-bound],
+.figure[data-bound] {
+  --media-h: min(var(--media-max-h, 100svh), var(--media-fit-h, 100svh));
+  width: min(100%, var(--media-h) * var(--media-ar, 1));
+  margin-inline: auto;
+}
 .frame[data-radius='sm'] {
   border-radius: var(--r-sm);
 }

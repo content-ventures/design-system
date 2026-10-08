@@ -1,0 +1,354 @@
+/*
+ * Conversa com a IA. Chapada: turnos sem caixa, sem fio lateral; só o balão da pessoa tem fundo
+ * (`--g-50`) e o artefato tem fio. “Ir para o fim” é o único flutuante: papel, fio e
+ * `--shadow-lg` (§7), dentro da área da conversa.
+ */
+
+/* ——— Conversa: área que rola + rodapé preso ——— */
+.conversation {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+.stage {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+.viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-200) transparent;
+}
+/* Área com rolagem: anel recuado (§9), não é cortado pela moldura. */
+.viewport:focus-visible {
+  outline-offset: var(--focus-offset-inset);
+}
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+  min-width: 0;
+  padding: var(--s-4) var(--s-4) var(--s-6);
+}
+.content[data-empty] {
+  justify-content: center;
+  min-height: 100%;
+}
+.empty {
+  display: grid;
+  place-items: center;
+}
+.footer {
+  flex: none;
+  min-width: 0;
+  padding: 0 var(--s-4) var(--s-4);
+}
+
+/* “Ir para o fim”: pílula secundária que flutua 12 px acima do pé da área. */
+.stage .jump[data-variant] {
+  position: absolute;
+  inset-inline: 0;
+  bottom: var(--s-3);
+  z-index: var(--z-sticky);
+  width: max-content;
+  margin-inline: auto;
+  box-shadow: var(--shadow-lg);
+  animation: jump-in var(--dur-2) var(--ease-out);
+}
+@keyframes jump-in {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+/* ——— Turno ——— */
+.turn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  min-width: 0;
+}
+
+/* Pessoa: balão discreto no fim da linha, chips do que foi junto acima. */
+.turn[data-role='user'] {
+  align-items: flex-end;
+  gap: var(--s-2);
+}
+.userContext {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--s-1) var(--s-2);
+  max-width: 85%;
+}
+.bubble {
+  max-width: 85%;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-lg);
+  background: var(--g-50);
+  font: var(--t-body);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.bubble .plain {
+  color: inherit;
+}
+
+/* IA: cabeçalho 12/500, meta em legenda com separador. */
+.head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.headIcon {
+  flex: none;
+  width: var(--icon-md);
+  height: var(--icon-md);
+  color: var(--icon-rest);
+  stroke-width: var(--icon-stroke);
+}
+.headLabel {
+  flex: none;
+}
+.headMeta {
+  min-width: 0;
+  overflow: hidden;
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.headMeta::before {
+  content: '·';
+  margin-inline-end: 6px;
+}
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  min-width: 0;
+}
+.plain {
+  margin: 0;
+  font: var(--t-body);
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/*
+ * Cursor de chegada: fio de 2 px no fim do último parágrafo (ou no `[data-caret]` dos filhos).
+ * Pisca em 1 s; com movimento reduzido não existe (o texto chegando já basta).
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .body[data-streaming] [data-caret]::after,
+  .body[data-streaming]:not(:has([data-caret])) > :is(p, h2, h3, h4, blockquote):last-child::after,
+  .body[data-streaming]:not(:has([data-caret]))
+    > :last-child
+    > :is(p, h2, h3, h4, blockquote):last-child::after,
+  .body[data-streaming]:not(:has([data-caret]))
+    > :last-child
+    > :is(ul, ol):last-child
+    > li:last-child::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    margin-inline-start: 2px;
+    border-radius: 1px;
+    vertical-align: -0.14em;
+    background: var(--icon-rest);
+    animation: caret 1s steps(1, end) infinite;
+  }
+}
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Erro e interrupção: no pé do turno, ação em texto ao lado. */
+.error,
+.stopped {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-1) var(--s-2);
+  margin: 0;
+  font: var(--t-caption);
+  color: var(--muted);
+}
+.error {
+  align-items: flex-start;
+  gap: var(--s-1) 6px;
+  font: var(--t-caption-strong);
+  color: var(--red-ink);
+}
+.error > svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  margin-top: 1px;
+}
+.statusText {
+  min-width: 0;
+}
+
+/* Ações: fantasmas 32 px; o primeiro ícone alinha com o texto do turno. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  margin-inline-start: -8px;
+  margin-top: calc(var(--s-1) * -1);
+}
+.action[data-done] svg {
+  color: var(--green-dot);
+}
+
+/* Comentário do voto (popover). */
+.noteForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.noteLabel {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.noteActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--s-2);
+}
+
+/* Nota do sistema: legenda centralizada. */
+.turn[data-role='system-note'] {
+  align-items: center;
+}
+.note {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px 6px;
+  max-width: 100%;
+  margin: 0;
+  font: var(--t-caption);
+  color: var(--muted);
+  text-align: center;
+}
+.noteIcon {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--icon-quiet);
+  stroke-width: var(--icon-stroke);
+}
+.noteText {
+  min-width: 0;
+}
+.noteMeta {
+  font-variant-numeric: tabular-nums;
+}
+.noteMeta::before {
+  content: '·';
+  margin-inline-end: 6px;
+}
+
+/* ——— Artefato ——— */
+.artifact {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  min-width: 0;
+  padding: 10px var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out);
+}
+.artifact[data-openable]:is(:hover, :has(.artifactTitle[data-force~='hover'])) {
+  border-color: var(--line-hover);
+  background: var(--g-25);
+}
+.artifact[data-openable]:has(.artifactTitle:is(:active, [data-force~='active'])) {
+  background: var(--g-50);
+}
+.artifact:has(.artifactTitle:is(:focus-visible, [data-force~='focus'])) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+.artifactIcon {
+  flex: none;
+  width: var(--icon-md);
+  height: var(--icon-md);
+  color: var(--icon-rest);
+  stroke-width: var(--icon-stroke);
+}
+.artifactText {
+  display: flex;
+  flex: 1 1 160px;
+  flex-direction: column;
+  min-width: 0;
+}
+.artifactTitle {
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  text-align: left;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* O título cobre o cartão: clique em qualquer ponto abre; o anel fica no cartão. */
+.artifact[data-openable] .artifactTitle {
+  cursor: pointer;
+}
+.artifact[data-openable] .artifactTitle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.artifact .artifactTitle:is(:focus-visible, [data-force~='focus']) {
+  outline: none;
+}
+.artifactMeta {
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.artifactActions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-inline-start: auto;
+}

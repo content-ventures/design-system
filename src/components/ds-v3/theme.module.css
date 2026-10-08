@@ -265,6 +265,43 @@
   /* Rede de segurança: se a regra global do V2 vencer em alguma ordem de carga, ao menos pinta b-500. */
   --ds-focus: var(--focus-color);
 
+  /* Acréscimos editoriais (07/10/2026) — só tokens novos; nenhum valor acima muda. */
+  /* Leitura: texto corrido de artigo, revisão e prévia. Escala própria, maior que a da interface
+     (corpo 16/28 contra 13/20). Itálico é face real (font.ts), nunca sintetizado. */
+  --t-prose-title: 600 28px/36px var(--font);
+  --t-prose-h2: 600 22px/30px var(--font);
+  --t-prose-h3: 600 18px/26px var(--font);
+  --t-prose-lead: 400 18px/28px var(--font);
+  --t-prose-body: 400 16px/28px var(--font);
+  --t-prose-quote: italic 400 18px/30px var(--font);
+  --t-prose-caption: 400 13px/20px var(--font);
+  /* Escala de trabalho (Prose size="sm"): estúdio de escrita, mais linhas por tela, ainda leitura. */
+  --t-prose-title-sm: 600 24px/32px var(--font);
+  --t-prose-h2-sm: 600 19px/26px var(--font);
+  --t-prose-h3-sm: 600 16px/24px var(--font);
+  --t-prose-lead-sm: 400 16px/26px var(--font);
+  --t-prose-body-sm: 400 15px/25px var(--font);
+  --t-prose-quote-sm: italic 400 16px/26px var(--font);
+  /* Largura de leitura (≈68 caracteres) e respiros: entre blocos e antes de um intertítulo. */
+  --prose-measure: 68ch;
+  --prose-space-block: var(--s-5);
+  --prose-space-section: var(--s-10);
+  /* Diferença entre versões: papéis neutros, nunca tons de status. Cor nunca sozinha: inserção leva
+     sublinhado e remoção leva tachado (ambos na cor `-line`), mais texto para leitor de tela.
+     Referem rampas que o modo escuro já remapeia, então valem nos dois modos. */
+  --diff-insert-bg: var(--b-50);
+  --diff-insert-ink: var(--ink);
+  --diff-insert-line: var(--b-400);
+  --diff-delete-bg: var(--g-75);
+  --diff-delete-ink: var(--muted);
+  --diff-delete-line: var(--g-400);
+  /* Marca-texto do editor: três tons nomeados. Sem azul (é a cor da seleção de texto) e sem
+     significado de status. O texto continua em `--mark-ink`. */
+  --mark-yellow-bg: var(--amber-line);
+  --mark-green-bg: var(--green-line);
+  --mark-pink-bg: var(--pink-line);
+  --mark-ink: var(--ink);
+
   color: var(--text);
   background: var(--canvas);
   font: var(--t-body);

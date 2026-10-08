@@ -11,6 +11,7 @@ import {
   type FocusEvent,
   type KeyboardEvent,
 } from 'react';
+import { Tooltip } from './overlays';
 import s from './toast.module.css';
 
 export type ToastTone = 'success' | 'info' | 'error';
@@ -173,16 +174,17 @@ export function ToastCard({
           {action.label}
         </button>
       )}
-      <button
-        type="button"
-        className={s.close}
-        aria-label="Dispensar aviso"
-        title="Dispensar aviso"
-        data-force={action ? undefined : force}
-        onClick={onDismiss}
-      >
-        <X aria-hidden="true" />
-      </button>
+      <Tooltip bare content="Dispensar aviso">
+        <button
+          type="button"
+          className={s.close}
+          aria-label="Dispensar aviso"
+          data-force={action ? undefined : force}
+          onClick={onDismiss}
+        >
+          <X aria-hidden="true" />
+        </button>
+      </Tooltip>
       {progress && <i className={s.progress} aria-hidden="true" />}
     </div>
   );

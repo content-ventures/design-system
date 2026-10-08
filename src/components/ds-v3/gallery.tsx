@@ -12,8 +12,8 @@ import {
   type ReactNode,
 } from 'react';
 import { Button, IconButton } from './button';
-import { MediaFrame, ratioOf, type MediaRatio, type MediaState } from './media';
-import { Dialog } from './overlays';
+import { MediaFrame, ratioOf, useFitHeight, type MediaRatio, type MediaState } from './media';
+import { Dialog, Tooltip } from './overlays';
 import s from './gallery.module.css';
 
 export type GalleryItem = {
@@ -33,7 +33,9 @@ const SWIPE = 48;
 /**
  * Peças lado a lado: imagem principal + faixa de miniaturas, anterior/próximo nas laterais,
  * “2 de 3”, ←/→ no teclado e arrasto no toque. Clicar na principal abre a peça grande.
- * Sem reprodução automática; um item só esconde toda a navegação.
+ * Sem reprodução automática; um item só esconde toda a navegação. Com `fitHeight`, o palco não
+ * passa da altura visível da área que rola em volta: a peça (um slide 4:5) aparece inteira, sem
+ * rolar, num painel largo e baixo.
  */
 export function Gallery({
   items,
@@ -44,6 +46,7 @@ export function Gallery({
   onDownload,
   thumbForce,
   mainState,
+  fitHeight = false,
 }: {
   items: GalleryItem[];
   index: number;
@@ -56,8 +59,18 @@ export function Gallery({
   thumbForce?: { index: number; state: string };
   /** Pranchas: estado parado da peça principal. */
   mainState?: MediaState;
+  /**
+   * Cabe no palco: a altura do palco para na altura visível da área que rola em volta, menos o que
+   * vem antes da galeria e a faixa de miniaturas (piso de 240 px, como no `MediaFrame`). A largura
+   * segue a do contêiner; a peça encolhe por dentro e continua inteira (contain).
+   */
+  fitHeight?: boolean;
 }) {
+  const galleryRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLButtonElement>(null);
   const count = items.length;
+  // Sem peças não há palco: a medida recomeça quando a galeria aparece.
+  useFitHeight(galleryRef, stageRef, fitHeight, count > 0 ? 'stage' : 'empty');
   const current = Math.min(Math.max(index, 0), Math.max(0, count - 1));
   const item = items[current];
   const multiple = count > 1;
@@ -147,14 +160,17 @@ export function Gallery({
 
   return (
     <section
+      ref={galleryRef}
       className={s.gallery}
       aria-roledescription="galeria"
       aria-label={label}
       onKeyDown={onKey}
       data-single={!multiple || undefined}
+      data-fit={fitHeight || undefined}
     >
       <div className={s.stageWrap}>
         <button
+          ref={stageRef}
           type="button"
           className={s.stage}
           style={{ aspectRatio: ratioOf(stageRatio) }}
@@ -223,19 +239,19 @@ export function Gallery({
             aria-label={`Miniaturas · ${label}`}
           >
             {items.map((entry, i) => (
-              <button
-                key={entry.id}
-                type="button"
-                className={s.thumb}
-                aria-current={i === current}
-                tabIndex={i === current ? 0 : -1}
-                aria-label={`${entry.label} (${i + 1} de ${count})`}
-                title={entry.label}
-                onClick={() => go(i)}
-                data-force={thumbForce?.index === i ? thumbForce.state : undefined}
-              >
-                <Piece item={entry} thumb />
-              </button>
+              <Tooltip key={entry.id} bare describe={false} content={entry.label}>
+                <button
+                  type="button"
+                  className={s.thumb}
+                  aria-current={i === current}
+                  tabIndex={i === current ? 0 : -1}
+                  aria-label={`${entry.label} (${i + 1} de ${count})`}
+                  onClick={() => go(i)}
+                  data-force={thumbForce?.index === i ? thumbForce.state : undefined}
+                >
+                  <Piece item={entry} thumb />
+                </button>
+              </Tooltip>
             ))}
           </div>
           <span className={s.counter} aria-live="polite">

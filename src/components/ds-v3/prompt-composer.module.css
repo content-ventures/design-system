@@ -1,0 +1,183 @@
+/*
+ * Compositor de pedido à IA. A moldura é o controle: fio forte, `--shadow-xs` em repouso, hover
+ * `--line-hover`, foco do texto = borda b-500 + `--ring-field` (§9/§10), acima do limite = vermelho.
+ * O `Textarea` da biblioteca vive dentro dela sem a própria caixa (só altura automática e máscara).
+ * Raio da moldura `--r-lg` com respiro 8: botões sm (`--r-sm`) ficam concêntricos o bastante.
+ */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  width: 100%;
+  min-width: 0;
+}
+
+/* ——— Pedidos prontos: pílulas secundárias, sem sombra, numa linha que rola ———
+   Esmaecimento no fim só enquanto há pílula escondida (exceção funcional ao chapado, §1).
+   O respiro de 4 px (anulado pela margem) guarda o anel de foco das pílulas dentro da rolagem. */
+.presets {
+  display: flex;
+  gap: var(--s-2);
+  min-width: 0;
+  margin: -4px;
+  padding: var(--s-1);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.presets::-webkit-scrollbar {
+  display: none;
+}
+.presets[data-overflow]:not([data-end]) {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+}
+.presets .preset {
+  flex: none;
+}
+.presets .preset[data-variant]:not(:disabled) {
+  box-shadow: none;
+  font-weight: 400;
+  color: var(--text);
+}
+
+/* ——— Moldura ——— */
+.frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  min-width: 0;
+  padding: var(--s-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  box-shadow: var(--shadow-xs);
+  cursor: text;
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+}
+.frame:is(:hover, :has(textarea[data-force~='hover'])) {
+  border-color: var(--line-hover);
+}
+.frame:is(:has(textarea:focus), :has(textarea[data-force~='focus'])) {
+  border-color: var(--b-500);
+  box-shadow: var(--ring-field);
+}
+.frame[data-invalid='true'] {
+  border-color: var(--red-dot);
+  box-shadow: var(--ring-invalid);
+}
+.frame[data-disabled='true'] {
+  border-color: var(--disabled-line);
+  background: var(--disabled-bg);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Contexto: chips do pedido, quebram linha. */
+.context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-2);
+  min-width: 0;
+  padding: 2px 2px var(--s-1);
+}
+
+/*
+ * O campo da biblioteca sem a caixa: a moldura acima já desenha fio, foco e erro.
+ * `[data-autosize]` sobe a especificidade acima dos estados de `.control` (0,2,0).
+ */
+.frame .input[data-autosize] {
+  padding: 0 6px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.frame .input[data-autosize] textarea {
+  padding: var(--s-1) 0;
+}
+.frame[data-disabled='true'] .input[data-autosize] textarea {
+  cursor: not-allowed;
+}
+
+/* ——— Rodapé: ferramentas à esquerda; contador, modelo e Enviar à direita ——— */
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  min-width: 0;
+  cursor: default;
+}
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+.end {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  min-width: 0;
+  margin-left: auto;
+}
+.counter {
+  flex: none;
+  padding-inline: var(--s-1);
+}
+.send {
+  flex: none;
+}
+
+/* Modelo: fantasma com nome cortado; 15 px de ícone como todo controle sm. */
+.model {
+  min-width: 0;
+  max-width: 220px;
+}
+.modelLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ——— Erro do envio: no lugar da ajuda, com a ação em texto ——— */
+.error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--s-1) 6px;
+  margin: 0;
+  font: var(--t-caption-strong);
+  color: var(--red-ink);
+  animation: note-in var(--dur-2) var(--ease-out);
+}
+.error > svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin-top: 1px;
+}
+.errorText {
+  min-width: 0;
+}
+.retry {
+  margin-left: auto;
+}
+@keyframes note-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+
+/* Celular: o modelo encolhe antes de Enviar; pílulas seguem quebrando linha. */
+@media (max-width: 480px) {
+  .model {
+    max-width: 150px;
+  }
+}

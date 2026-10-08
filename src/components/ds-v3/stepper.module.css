@@ -64,6 +64,12 @@
   background: var(--b-50);
   border-color: var(--b-200);
 }
+/* Em andamento (a etapa do trabalho quando a régua mostra outra): anel e número azuis. */
+.marker[data-state='active'] {
+  color: var(--b-600);
+  background: var(--paper);
+  border-color: var(--b-600);
+}
 .marker[data-state='warn'] {
   color: var(--amber-ink);
   background: var(--amber-bg);
@@ -140,7 +146,7 @@
 .step[data-state='current'] .stepLabel {
   color: var(--ink);
 }
-.step:is([data-state='done'], [data-state='warn']) .stepLabel {
+.step:is([data-state='done'], [data-state='active'], [data-state='warn']) .stepLabel {
   color: var(--text);
 }
 .step[data-state='error'] .stepLabel {
@@ -149,17 +155,23 @@
 .step[data-state='blocked'] .stepLabel {
   color: var(--subtle);
 }
-/* Feita volta com um clique: o rótulo escurece e sublinha. */
-button.stepHit:is(:hover, [data-force~='hover']) .stepLabel {
+/* Feita volta com um clique: o rótulo escurece e sublinha. Fora de alcance (indisponível, só a
+   dica com o nome ou o motivo) não reage: nada promete navegar. */
+button.stepHit:not([aria-disabled='true']):is(:hover, [data-force~='hover']) .stepLabel {
   color: var(--ink);
   text-decoration-color: var(--g-300);
 }
-.step[data-state='error'] button.stepHit:is(:hover, [data-force~='hover']) .stepLabel {
+.step[data-state='error']
+  button.stepHit:not([aria-disabled='true']):is(:hover, [data-force~='hover'])
+  .stepLabel {
   color: var(--red-ink);
   text-decoration-color: var(--red-line);
 }
-button.stepHit:is(:active, [data-force~='active']) .marker {
+button.stepHit:not([aria-disabled='true']):is(:active, [data-force~='active']) .marker {
   transform: scale(0.94);
+}
+:is(button.stepHit, button.listHit)[aria-disabled='true'] {
+  cursor: default;
 }
 .stepHit .marker {
   transition:
@@ -246,10 +258,18 @@ button.stepHit:is(:active, [data-force~='active']) .marker {
   display: none;
 }
 .stepper[data-squeezed='true'] .track[data-overflow='true'] {
-  mask-image: linear-gradient(to right, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 24px,
+    #000 calc(100% - 24px),
+    transparent
+  );
 }
+/* Sem espaço para todos os rótulos, só a etapa atual mantém o seu (os outros ficam para leitor de
+   tela). O passo `sm` (cabeçalhos de uma linha) cabe com rótulos até ~420 px: rótulo de 12–13 px. */
 @container (max-width: 640px) {
-  .step:not([data-state='current']) .stepLabel {
+  .stepper:not([data-size='sm']) .step:not([data-state='current']) .stepLabel {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -257,13 +277,32 @@ button.stepHit:is(:active, [data-force~='active']) .marker {
     clip: rect(0 0 0 0);
     white-space: nowrap;
   }
-  .step:not([data-state='current']) .stepHit {
+  .stepper:not([data-size='sm']) .step:not([data-state='current']) .stepHit {
     justify-content: center;
     min-width: 40px;
     height: 40px;
     padding: 0;
   }
-  .connector {
+  .stepper:not([data-size='sm']) .connector {
+    min-width: 8px;
+    margin: 0 2px;
+  }
+}
+@container (max-width: 420px) {
+  .stepper[data-size='sm'] .step:not([data-state='current']) .stepLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .stepper[data-size='sm'] .step:not([data-state='current']) .stepHit {
+    justify-content: center;
+    min-width: 32px;
+    padding: 0;
+  }
+  .stepper[data-size='sm'] .connector {
     min-width: 8px;
     margin: 0 2px;
   }
@@ -321,6 +360,9 @@ button.stepHit:is(:active, [data-force~='active']) .marker {
 }
 .segments i[data-state='current'] {
   background: var(--b-600);
+}
+.segments i[data-state='active'] {
+  background: var(--b-400);
 }
 .segments i[data-state='warn'] {
   background: var(--amber-dot);
@@ -401,10 +443,10 @@ button.stepHit:is(:active, [data-force~='active']) .marker {
   text-align: left;
   transition: background-color var(--dur-1) var(--ease-out);
 }
-button.listHit:is(:hover, [data-force~='hover']) {
+button.listHit:not([aria-disabled='true']):is(:hover, [data-force~='hover']) {
   background: var(--g-75);
 }
-button.listHit:is(:active, [data-force~='active']) {
+button.listHit:not([aria-disabled='true']):is(:active, [data-force~='active']) {
   background: var(--g-100);
 }
 button.listHit:is(:focus-visible, [data-force~='focus']) {
@@ -1004,7 +1046,9 @@ button.sectionHead:hover .sectionChevron {
   margin-right: auto;
 }
 .barStatus {
-  display: flex;
+  /* inline-flex: a mesma linha dentro da ActionBar e solto numa linha de status (SaveIndicator). */
+  display: inline-flex;
+  vertical-align: middle;
   align-items: center;
   gap: 8px;
   min-width: 0;
@@ -1082,9 +1126,13 @@ button.sectionHead:hover .sectionChevron {
   border-radius: 6px;
   white-space: nowrap;
 }
-.barRetry:hover {
+.barRetry:is(:hover, [data-force~='hover']) {
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+.barRetry:is(:focus-visible, [data-force~='focus']) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
 }
 .barActions {
   display: flex;

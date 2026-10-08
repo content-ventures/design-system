@@ -1,4 +1,7 @@
-/* ——— Barra: recortes à esquerda, ferramentas à direita, um fio só embaixo ——— */
+/* ——— Barra: recortes à esquerda, ferramentas à direita, um fio só embaixo ———
+ * Quem empilha é a quebra de linha (`flex-wrap`), não uma medida no cliente: as ferramentas descem
+ * quando abas (largura natural) + 24 + ferramentas (busca na base de 220) não cabem. O servidor e a
+ * tela hidratada desenham igual, e a contagem que chega nas abas cabe na folga da busca. */
 .root {
   container: filterbar / inline-size;
   width: 100%;
@@ -6,65 +9,65 @@
 }
 .bar {
   display: flex;
-  align-items: flex-end;
-  gap: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 24px;
   min-width: 0;
+  isolation: isolate;
 }
-.root[data-tabs] .bar {
-  box-shadow: inset 0 -1px 0 var(--line);
-}
+/* Abas: nunca abaixo da largura natural e com quase todo o espaço livre da linha (as ferramentas
+   ficam encostadas à direita). Sozinhas na linha, param na largura da barra e rolam. */
 .tabs {
-  flex: 1;
+  position: relative;
+  flex: 1000 0 auto;
+  max-width: 100%;
   min-width: 0;
 }
-/* Lado a lado, o fio é da barra inteira: as abas não desenham o próprio. */
-.root:not([data-stacked]) .tabs > [role='tablist'] {
-  box-shadow: none;
+/* Um fio só, no pé da linha das abas e da largura da barra: lado a lado passa sob as ferramentas;
+   empilhada, fica só sob as abas e as ferramentas descem sem fio. Por baixo do conteúdo: a barra
+   azul da aba selecionada passa por cima. */
+.tabs::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: -1;
+  width: 100cqw;
+  height: 1px;
+  background: var(--line);
 }
+.tabs > [role='tablist'] {
+  background: none;
+}
+/* Ferramentas: lado a lado, só a largura delas; empilhadas (sozinhas na linha), a linha inteira. */
 .tools {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex: none;
-  padding-bottom: 6px;
+  flex: 1 0 auto;
+  min-width: 0;
 }
 /* Sem abas: busca à esquerda, botões à direita. */
 .root:not([data-tabs]) .tools {
   flex: 1;
-  padding-bottom: 0;
 }
-/* A busca nunca fica abaixo de 220 px (o texto de ajuda inteiro); com abas, a medida da barra
-   empilha antes disso. Sem abas, ela ocupa o espaço livre até 320. */
+/* A busca nunca fica abaixo de 220 px (o texto de ajuda inteiro). É com 220 que a barra decide
+   empilhar (`contain` tira o texto da conta); empilhada, estica até 320. */
 .search {
-  width: clamp(220px, 17vw, 260px);
+  flex: 1 1 220px;
+  min-width: 220px;
+  max-width: 320px;
+  contain: inline-size;
 }
 .root:not([data-tabs]) .search {
   flex: 0 1 320px;
   min-width: 240px;
   margin-right: auto;
 }
-
-/* Empilhada: abas inteiras em cima com o fio delas; ferramentas embaixo, a busca estica até 320. */
-.root[data-stacked] .bar {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0;
-  box-shadow: none;
-}
-.root[data-stacked] .tools {
-  justify-content: flex-start;
-  padding: 10px 0 0;
-}
-.root[data-stacked] .search {
-  flex: 1;
-  width: auto;
-  max-width: 320px;
-}
 @container filterbar (max-width: 640px) {
   .tools {
     flex-wrap: wrap;
   }
-  .root[data-stacked] .search,
   .root:not([data-tabs]) .search,
   .search {
     flex: 1 1 100%;

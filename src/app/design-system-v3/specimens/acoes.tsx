@@ -936,6 +936,12 @@ function BotaoIcone() {
             </Tooltip>
             <span className={x.openCaption}>Motivo</span>
           </div>
+          <div className={x.openRow} inert>
+            <Tooltip open side="bottom" content="Mais ações">
+              <IconButton label="Mais ações" icon={Ellipsis} />
+            </Tooltip>
+            <span className={x.openCaption}>Nome no hover e no foco, nunca no title nativo</span>
+          </div>
         </div>
       </Shot>
     </Shots>

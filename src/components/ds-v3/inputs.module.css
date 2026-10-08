@@ -163,6 +163,16 @@
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+/* Largura do conteúdo (`fit`): os dígitos do máximo, sem esticar na coluna. */
+.number[data-fit] {
+  align-self: start;
+  width: max-content;
+  max-width: 100%;
+}
+.number[data-fit] input {
+  flex: none;
+  width: var(--number-ch);
+}
 .number .steps {
   display: flex;
   align-self: stretch;

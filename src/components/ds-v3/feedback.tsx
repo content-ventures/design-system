@@ -26,6 +26,7 @@ import {
 import { VisuallyHidden } from './a11y';
 import { Button } from './button';
 import { LinkButton } from './link';
+import { Tooltip } from './overlays';
 import s from './feedback.module.css';
 
 /*
@@ -118,16 +119,17 @@ function Dismiss({
   force?: string;
 }) {
   return (
-    <button
-      type="button"
-      className={s.dismiss}
-      aria-label={label}
-      title={label}
-      onClick={onClick}
-      data-force={force}
-    >
-      <X aria-hidden="true" />
-    </button>
+    <Tooltip bare content={label}>
+      <button
+        type="button"
+        className={s.dismiss}
+        aria-label={label}
+        onClick={onClick}
+        data-force={force}
+      >
+        <X aria-hidden="true" />
+      </button>
+    </Tooltip>
   );
 }
 
@@ -435,48 +437,89 @@ export function Progress({
   );
 }
 
+export type ProgressStepState = 'done' | 'current' | 'upcoming' | 'error' | 'skipped';
+
 export type ProgressStep = {
+  /** Chave estável da linha. Padrão: `label`. */
+  id?: string;
   label: string;
-  state: 'done' | 'current' | 'upcoming';
-  /** À direita quando concluída (ex.: “#2041”). */
+  /** `error` “!” vermelho (a operação parou aqui) · `skipped` traço cinza (não precisou rodar). */
+  state: ProgressStepState;
+  /** À direita quando concluída (ex.: “#2041”). Em `variant="trace"`, em todo estado menos “a seguir”. */
   meta?: ReactNode;
+  /** Sob o rótulo: motivo da falha, trechos usados, ação de tentar de novo. */
+  detail?: ReactNode;
+};
+
+const STEP_STATE_TEXT: Record<ProgressStepState, string> = {
+  done: '(concluído)',
+  current: '(em andamento)',
+  upcoming: '',
+  error: '(falhou)',
+  skipped: '(pulado)',
 };
 
 /**
  * Sequência curta de uma operação (a do diálogo de criação): marcador de 20 px — número no que
- * vem, anel girando no atual, check desenhado no feito — em linhas com fio `--line-soft`.
+ * vem, anel girando no atual, check desenhado no feito, “!” vermelho na falha, traço na pulada —
+ * em linhas com fio `--line-soft`. `variant="trace"` é o rastro da IA (`AgentTrace`): sem fio
+ * entre linhas, marcadores ligados por um trilho de 1 px, meta em todo estado e `detail` sob o
+ * rótulo; o rótulo da etapa atual respira devagar (parado com movimento reduzido).
  */
-export function ProgressSteps({ steps, label }: { steps: ProgressStep[]; label: string }) {
+export function ProgressSteps({
+  steps,
+  label,
+  variant = 'rows',
+  className = '',
+}: {
+  steps: ProgressStep[];
+  label: string;
+  /** `rows` linhas com fio (diálogo de criação) · `trace` trilho do rastro da IA. */
+  variant?: 'rows' | 'trace';
+  className?: string;
+}) {
   const running = steps.some((step) => step.state === 'current');
   return (
-    <ol className={s.steps} aria-label={label} aria-busy={running || undefined}>
-      {steps.map((step, index) => (
-        <li key={step.label} className={s.step} data-state={step.state}>
-          <span className={s.marker} aria-hidden="true">
-            {step.state === 'upcoming' && index + 1}
-            {step.state === 'current' && (
-              <svg className={s.markerSpin} viewBox="0 0 20 20">
-                <circle className={s.markerTrack} cx="10" cy="10" r="9" />
-                <circle className={s.markerArc} cx="10" cy="10" r="9" pathLength={1} />
-              </svg>
-            )}
-            {step.state === 'done' && (
-              <svg className={s.tick} viewBox="0 0 24 24">
-                <path d="M4.5 12.5l5 5L19.5 7" pathLength={1} />
-              </svg>
-            )}
-          </span>
-          <span className={s.stepLabel}>{step.label}</span>
-          {step.state === 'done' && step.meta && <span className={s.stepMeta}>{step.meta}</span>}
-          <VisuallyHidden>
-            {step.state === 'done'
-              ? '(concluído)'
-              : step.state === 'current'
-                ? '(em andamento)'
-                : ''}
-          </VisuallyHidden>
-        </li>
-      ))}
+    <ol
+      className={`${s.steps} ${className}`}
+      data-variant={variant}
+      aria-label={label}
+      aria-busy={running || undefined}
+    >
+      {steps.map((step, index) => {
+        const hasMeta =
+          step.meta !== undefined && step.meta !== null && step.meta !== false && step.meta !== '';
+        const showMeta =
+          hasMeta && (variant === 'trace' ? step.state !== 'upcoming' : step.state === 'done');
+        return (
+          <li key={step.id ?? step.label} className={s.step} data-state={step.state}>
+            <span className={s.marker} aria-hidden="true">
+              {step.state === 'upcoming' && index + 1}
+              {step.state === 'current' && (
+                <svg className={s.markerSpin} viewBox="0 0 20 20">
+                  <circle className={s.markerTrack} cx="10" cy="10" r="9" />
+                  <circle className={s.markerArc} cx="10" cy="10" r="9" pathLength={1} />
+                </svg>
+              )}
+              {step.state === 'done' && (
+                <svg className={s.tick} viewBox="0 0 24 24">
+                  <path d="M4.5 12.5l5 5L19.5 7" pathLength={1} />
+                </svg>
+              )}
+              {step.state === 'error' && <b>!</b>}
+              {step.state === 'skipped' && (
+                <svg className={s.skip} viewBox="0 0 24 24">
+                  <path d="M7.5 12h9" />
+                </svg>
+              )}
+            </span>
+            <span className={s.stepLabel}>{step.label}</span>
+            {showMeta && <span className={s.stepMeta}>{step.meta}</span>}
+            <VisuallyHidden>{STEP_STATE_TEXT[step.state]}</VisuallyHidden>
+            {step.detail && <div className={s.stepDetail}>{step.detail}</div>}
+          </li>
+        );
+      })}
     </ol>
   );
 }
@@ -533,6 +576,8 @@ type Size = number | string;
 /**
  * Bloco chapado (`--skeleton`) que pulsa devagar (opacidade 1 → .55), sem brilho correndo.
  * Sempre com a geometria final do conteúdo. `text` 12 px raio 4 · `circle` · `block` raio 8.
+ * Gancho estável para testes do produto: `[data-skeleton]` em cada bloco (e `aria-busy` na
+ * `SkeletonRegion`); “a tela carregou” = nenhum `[data-skeleton]` na página.
  */
 export function Skeleton({
   width,
@@ -558,6 +603,7 @@ export function Skeleton({
     <span
       aria-hidden="true"
       className={`${s.skel} ${className}`}
+      data-skeleton=""
       data-shape={shape}
       style={{
         width: w,
@@ -1033,23 +1079,24 @@ export function NotificationItem({
         </button>
       )}
       {onMarkRead && (
-        <button
-          type="button"
-          className={s.nMark}
-          aria-label={markLabel}
-          aria-describedby={titleId}
-          title={markLabel}
-          tabIndex={unread ? undefined : -1}
-          disabled={!unread || marking}
-          aria-busy={marking || undefined}
-          onClick={() => {
-            onMarkRead();
-            // O botão some com a leitura: o foco fica na própria notificação.
-            mainRef.current?.focus();
-          }}
-        >
-          <Check aria-hidden="true" />
-        </button>
+        <Tooltip bare content={markLabel}>
+          <button
+            type="button"
+            className={s.nMark}
+            aria-label={markLabel}
+            aria-describedby={titleId}
+            tabIndex={unread ? undefined : -1}
+            disabled={!unread || marking}
+            aria-busy={marking || undefined}
+            onClick={() => {
+              onMarkRead();
+              // O botão some com a leitura: o foco fica na própria notificação.
+              mainRef.current?.focus();
+            }}
+          >
+            <Check aria-hidden="true" />
+          </button>
+        </Tooltip>
       )}
     </li>
   );

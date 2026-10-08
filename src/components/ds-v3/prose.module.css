@@ -1,0 +1,855 @@
+/*
+ * Prose — texto corrido. Só tokens: escala --t-prose-*, medida --prose-measure, respiros
+ * --prose-space-*. Os seletores de conteúdo usam :where() para ficar em (0,1,0): o ritmo vertical,
+ * declarado depois dos elementos, sempre vence a margem zerada de cada elemento.
+ * Raiz = contêiner (medida e consultas de largura) · .column = medida e respiro · .flow = texto.
+ */
+.prose {
+  /* Escala (md) */
+  --p-body: var(--t-prose-body);
+  --p-lead: var(--t-prose-lead);
+  --p-h1: var(--t-prose-title);
+  --p-h2: var(--t-prose-h2);
+  --p-h3: var(--t-prose-h3);
+  --p-quote: var(--t-prose-quote);
+  --p-quote-mark: var(--t-prose-title);
+  --p-caption: var(--t-prose-caption);
+  /* Ritmo */
+  --p-block: var(--prose-space-block);
+  --p-feature: var(--s-8);
+  --p-section: var(--prose-space-section);
+  --p-sub: var(--s-8);
+  --p-after-head: var(--s-3);
+  --p-item: var(--s-2);
+  --p-quote-gap: var(--s-3);
+  --p-header-gap: var(--s-6);
+  /* Recuo de lista e citação; calha: o centro do marcador de bloco fica a --p-gutter do texto */
+  --p-indent: var(--s-6);
+  --p-gutter: var(--s-4);
+  --p-marker: var(--icon-xs);
+  --p-marker-hit: var(--s-6);
+  /* Glifos da calha e da figura: Sparkles e ImageOff do lucide (icons.ts), como máscara. A cor vem do
+     papel do ícone (--icon-quiet…); o teste confere os traços com o pacote. */
+  --p-glyph-ai: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z'/%3E%3Cpath d='M20 3v4'/%3E%3Cpath d='M22 5h-4'/%3E%3Cpath d='M4 17v2'/%3E%3Cpath d='M5 18H3'/%3E%3C/svg%3E");
+  --p-glyph-image-off: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='2' x2='22' y1='2' y2='22'/%3E%3Cpath d='M10.41 10.41a2 2 0 1 1-2.83-2.83'/%3E%3Cline x1='13.5' x2='6' y1='13.5' y2='21'/%3E%3Cline x1='18' x2='21' y1='12' y2='15'/%3E%3Cpath d='M3.59 3.59A1.99 1.99 0 0 0 3 5v14a2 2 0 0 0 2 2h14c.55 0 1.052-.22 1.41-.59'/%3E%3Cpath d='M21 15V5a2 2 0 0 0-2-2H9'/%3E%3C/svg%3E");
+  /* Coluna */
+  --p-measure: var(--prose-measure);
+  --p-pad-x: 0px;
+  --p-pad-top: 0px;
+  --p-pad-bottom: 0px;
+  /* Respiro do fim (escrita): os últimos blocos sobem até o terço superior da área de rolagem. */
+  --p-tail: 0px;
+
+  /* Contêiner de largura: ocupa o pai (dentro de flex ou grade não encolhe até sumir). */
+  container: prose / inline-size;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.prose[data-size='lg'] {
+  --p-body: var(--t-prose-lead);
+  --p-block: var(--s-6);
+  --p-feature: var(--s-10);
+  --p-section: var(--s-12);
+  --p-sub: var(--s-10);
+  --p-after-head: var(--s-4);
+  --p-header-gap: var(--s-8);
+}
+/* Trabalho (sm): a escala de leitura um degrau abaixo e respiros menores — o estúdio de escrita
+   mostra mais texto por tela sem cair na escala da interface. */
+.prose[data-size='sm'] {
+  --p-body: var(--t-prose-body-sm);
+  --p-lead: var(--t-prose-lead-sm);
+  --p-h1: var(--t-prose-title-sm);
+  --p-h2: var(--t-prose-h2-sm);
+  --p-h3: var(--t-prose-h3-sm);
+  --p-quote: var(--t-prose-quote-sm);
+  --p-quote-mark: var(--t-prose-title-sm);
+  --p-block: var(--s-4);
+  --p-feature: var(--s-6);
+  --p-section: var(--s-8);
+  --p-sub: var(--s-6);
+  --p-after-head: var(--s-2);
+  --p-header-gap: var(--s-5);
+  --p-indent: var(--s-5);
+}
+.prose[data-size='sm'][data-variant='edit'] {
+  --p-pad-x: var(--s-6);
+  --p-pad-top: var(--s-6);
+  --p-pad-bottom: var(--s-10);
+}
+/* Compacto: a escala da interface (13/20), para cartão, copiloto e gaveta. */
+.prose[data-variant='compact'] {
+  --p-body: var(--t-body);
+  --p-lead: var(--t-body);
+  --p-h1: var(--t-figure-lg);
+  --p-h2: var(--t-title-2);
+  --p-h3: var(--t-title-3);
+  --p-quote: italic var(--t-body);
+  --p-quote-mark: var(--t-title-1);
+  --p-caption: var(--t-caption);
+  --p-block: var(--s-3);
+  --p-feature: var(--s-4);
+  --p-section: var(--s-5);
+  --p-sub: var(--s-4);
+  --p-after-head: var(--s-1);
+  --p-item: var(--s-1);
+  --p-quote-gap: var(--s-2);
+  --p-header-gap: var(--s-3);
+  --p-indent: var(--s-5);
+  --p-gutter: var(--s-3);
+}
+/* Escrita: respiro em volta do documento e cursor de texto em toda a área. */
+.prose[data-variant='edit'] {
+  --p-pad-x: var(--s-6);
+  --p-pad-top: var(--s-8);
+  --p-pad-bottom: var(--s-12);
+  cursor: text;
+}
+/* Rolar além do fim (padrão na escrita): 60% da altura da janela depois do último bloco — ele (ou o
+   alvo de um salto) sobe até o terço superior de qualquer área de rolagem que caiba na janela. */
+.prose[data-overscroll] {
+  --p-tail: 60svh;
+}
+
+.column {
+  width: 100%;
+  max-width: calc(var(--p-measure) + 2 * var(--p-pad-x));
+  margin-inline: auto;
+  padding: var(--p-pad-top) var(--p-pad-x) max(var(--p-pad-bottom), var(--p-tail));
+  font: var(--p-body);
+}
+.prose[data-measure='wide'] .column {
+  max-width: none;
+}
+.prose[data-align='start'] .column {
+  margin-inline: 0;
+}
+.header {
+  display: grid;
+  gap: var(--s-3);
+  min-width: 0;
+}
+.header + .flow {
+  margin-top: var(--p-header-gap);
+}
+
+/* ——— Texto ——— */
+.flow {
+  min-width: 0;
+  font: var(--p-body);
+  color: var(--text);
+  overflow-wrap: break-word;
+}
+/* Leitura: quebra caprichada. Na escrita não, porque reflui as linhas enquanto se digita. */
+.prose:not([data-variant='edit']) .flow {
+  text-wrap: pretty;
+}
+.prose:not([data-variant='edit']) .flow :where(h1, h2, h3) {
+  text-wrap: balance;
+}
+
+.flow :where(h1, h2, h3, h4) {
+  margin: 0;
+  color: var(--ink);
+}
+.flow :where(h1) {
+  font: var(--p-h1);
+  letter-spacing: var(--track-display);
+}
+.flow :where(h2) {
+  font: var(--p-h2);
+  letter-spacing: var(--track-title);
+}
+.flow :where(h3) {
+  font: var(--p-h3);
+  letter-spacing: var(--track-tight);
+}
+.flow :where(h4) {
+  font: var(--p-body);
+  font-weight: 600;
+}
+.flow :where(p) {
+  margin: 0;
+}
+.flow :where(p[data-lead]) {
+  font: var(--p-lead);
+  color: var(--muted);
+}
+
+/* Listas: marcador em --muted, números tabulares; aninhadas trocam o desenho do marcador. */
+.flow :where(ul, ol) {
+  margin: 0;
+  padding-inline-start: var(--p-indent);
+}
+.flow :where(ul) {
+  list-style-type: disc;
+}
+.flow :where(ol) {
+  list-style-type: decimal;
+}
+.flow :where(ul ul, ol ul) {
+  list-style-type: circle;
+}
+.flow :where(ol ol) {
+  list-style-type: lower-alpha;
+}
+.flow :where(li)::marker {
+  color: var(--muted);
+}
+.flow :where(ol > li)::marker {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Citação: recuo e escala maior, aspas na margem do recuo. Sem fio lateral, sem caixa. */
+.flow :where(blockquote) {
+  position: relative;
+  margin: 0;
+  padding-inline-start: var(--p-indent);
+  font: var(--p-quote);
+  color: var(--ink);
+}
+.flow :where(blockquote)::before {
+  content: '\201C';
+  content: '\201C' / '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  font: var(--p-quote-mark);
+  font-style: normal;
+  line-height: inherit;
+  color: var(--icon-quiet);
+  pointer-events: none;
+  user-select: none;
+}
+.flow :where(blockquote) :where(em, i) {
+  font-style: normal;
+}
+.flow :where(blockquote) :where(footer, cite),
+.flow :where(figcaption) {
+  display: block;
+  font: var(--p-caption);
+  color: var(--muted);
+}
+.flow :where(figcaption cite) {
+  display: inline;
+}
+
+/* Figura e imagem */
+.flow :where(figure) {
+  margin: 0;
+}
+.flow :where(img, video) {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--r-md);
+}
+.flow :where(hr) {
+  height: 0;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+/* Em linha */
+.flow :where(strong, b) {
+  font-weight: 600;
+  color: var(--ink);
+}
+.flow :where(em, i) {
+  font-style: italic;
+}
+.flow :where(u) {
+  text-decoration: underline 1px;
+  text-underline-offset: 3px;
+}
+.flow :where(s, strike) {
+  text-decoration: line-through 1px;
+}
+.flow pre {
+  margin: 0;
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper-sunken);
+  font: var(--t-body);
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+.flow pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+}
+
+/* Link: aparência do TextLink; em texto corrido o sublinhado fica, suave, também em repouso. */
+.flow :where(a) {
+  border-radius: var(--r-xs);
+  color: var(--b-600);
+  text-decoration: underline 1px var(--b-200);
+  text-underline-offset: 3px;
+  transition:
+    color var(--dur-1) var(--ease-out),
+    text-decoration-color var(--dur-1) var(--ease-out);
+}
+.flow :where(a):is(:hover, [data-force~='hover']) {
+  color: var(--b-700);
+  text-decoration-color: currentColor;
+}
+.flow :where(a):is(:active, [data-force~='active']) {
+  color: var(--accent-pressed);
+  text-decoration-color: currentColor;
+}
+.prose[data-variant='edit'] .flow :where(a) {
+  cursor: text;
+}
+
+/* Marca-texto: tom nomeado, raio mínimo, respiro que acompanha a quebra de linha. */
+.flow :where(mark) {
+  padding: 1px 2px;
+  border-radius: var(--r-xs);
+  color: var(--mark-ink);
+  background: var(--mark-yellow-bg);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.flow :where(mark[data-tone='green']) {
+  background: var(--mark-green-bg);
+}
+.flow :where(mark[data-tone='pink']) {
+  background: var(--mark-pink-bg);
+}
+
+/* ——— Ritmo vertical: vale em qualquer profundidade (o ProseMirror embrulha o documento) ——— */
+.flow :where(*) + :where(p, ul, ol, pre, table, img, video, h4, [data-block]) {
+  margin-top: var(--p-block);
+}
+.flow :where(*) + :where(blockquote, figure, hr),
+.flow :where(blockquote, figure, hr) + :where(*) {
+  margin-top: var(--p-feature);
+}
+.flow :where(*) + :where(h1, h2) {
+  margin-top: var(--p-section);
+}
+.flow :where(*) + :where(h3) {
+  margin-top: var(--p-sub);
+}
+.flow :where(h1, h2, h3, h4) + :where(*) {
+  margin-top: var(--p-after-head);
+}
+.flow :where(li + li, li > * + *) {
+  margin-top: var(--p-item);
+}
+.flow :where(blockquote > * + *) {
+  margin-top: var(--p-quote-gap);
+}
+.flow :where(figure > * + figcaption) {
+  margin-top: var(--s-2);
+}
+.flow :where(figure:has(> blockquote) > figcaption) {
+  padding-inline-start: var(--p-indent);
+}
+
+/* ——— Ganchos ——— */
+
+/*
+ * Espaço para a barra flutuante sob o bloco (`[data-bar-space='below']`): a altura da
+ * FloatingToolbar (controle sm + padding 4 + fio) com 8 px acima e abaixo. A margem colapsa com a
+ * do bloco seguinte, então o vão é exatamente este.
+ */
+.flow :where(*)[data-bar-space='below'] {
+  margin-bottom: calc(var(--h-sm) + 2 * var(--s-1) + 2px + 2 * var(--s-2));
+  transition: margin-bottom var(--dur-2) var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .flow :where(*)[data-bar-space] {
+    transition: none;
+  }
+}
+
+/*
+ * IA. Só na escrita (`edit`): na leitura (revisão, prévia, texto final) e no compacto nada se desenha.
+ * Bloco `unreviewed`: Sparkles de 12 px na calha, à altura da 1ª linha, sem fio lateral. Bloco
+ * `writing` (o que está sendo escrito agora): o mesmo glifo, respirando. Trecho: pontilhado.
+ * O marcador clicável (`[data-ai-marker]`, da fábrica `proseWidgets.gutterMarker`) substitui o do
+ * atributo no mesmo bloco.
+ */
+.flow
+  :where(p, li, h1, h2, h3, h4, blockquote, ul, ol, figure, [data-block]):is(
+    [data-ai='unreviewed'],
+    [data-ai='writing']
+  ) {
+  position: relative;
+}
+.prose[data-variant='edit']
+  .flow
+  :where(
+    p,
+    li,
+    h1,
+    h2,
+    h3,
+    h4,
+    blockquote,
+    ul,
+    ol,
+    figure:not(:has(> img[data-missing])),
+    [data-block]
+  ):is([data-ai='unreviewed'], [data-ai='writing'])::after {
+  content: '';
+  position: absolute;
+  inset-block-start: calc((1lh - var(--p-marker)) / 2);
+  inset-inline-start: calc(-1 * var(--p-gutter) - var(--p-marker) / 2);
+  width: var(--p-marker);
+  height: var(--p-marker);
+  background: var(--icon-quiet);
+  -webkit-mask: var(--p-glyph-ai) center / contain no-repeat;
+  mask: var(--p-glyph-ai) center / contain no-repeat;
+  pointer-events: none;
+}
+/* Dentro de lista ou citação o bloco começa depois do recuo: o glifo volta para a calha da coluna. */
+.prose[data-variant='edit']
+  .flow
+  :where(li, blockquote)
+  :where(p, li, ul, ol, [data-block]):is([data-ai='unreviewed'], [data-ai='writing'])::after,
+.prose[data-variant='edit']
+  .flow
+  :where(li):is([data-ai='unreviewed'], [data-ai='writing'])::after {
+  inset-inline-start: calc(-1 * (var(--p-indent) + var(--p-gutter)) - var(--p-marker) / 2);
+}
+.prose[data-variant='edit']
+  .flow
+  :where(
+    p,
+    li,
+    h1,
+    h2,
+    h3,
+    h4,
+    blockquote,
+    ul,
+    ol,
+    figure:not(:has(> img[data-missing])),
+    [data-block]
+  )[data-ai='writing']::after {
+  background: var(--icon-rest);
+  animation: breathe var(--skeleton-pulse) ease-in-out infinite;
+}
+.prose[data-variant='edit'] .flow :where(*)[data-ai]:has([data-ai-marker])::after {
+  content: none;
+}
+.prose[data-variant='edit'] .flow :where(span, a, em, strong)[data-ai='unreviewed'] {
+  text-decoration: underline dotted 1.5px var(--icon-quiet);
+  text-underline-offset: 5px;
+}
+
+/* Marcador clicável da calha (`button[data-ai-marker]`): alvo de 24 px, glifo de 12, dica no hover
+   (depois de --tip-delay) e na hora com foco de teclado. Fora da escrita não aparece. */
+.flow [data-ai-marker] {
+  display: none;
+}
+.prose[data-variant='edit'] .flow [data-ai-marker] {
+  position: absolute;
+  inset-block-start: calc((1lh - var(--p-marker-hit)) / 2);
+  inset-inline-start: calc(-1 * var(--p-gutter) - var(--p-marker-hit) / 2);
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--p-marker-hit);
+  height: var(--p-marker-hit);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-sm);
+  font: inherit;
+  font-style: normal;
+  letter-spacing: normal;
+  color: var(--icon-quiet);
+  background: transparent;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+}
+.prose[data-variant='edit'] .flow [data-ai-marker]::before {
+  content: '';
+  width: var(--p-marker);
+  height: var(--p-marker);
+  background: currentColor;
+  -webkit-mask: var(--p-glyph-ai) center / contain no-repeat;
+  mask: var(--p-glyph-ai) center / contain no-repeat;
+}
+.prose[data-variant='edit'] .flow [data-ai-marker]:is(:hover, [data-force~='hover']) {
+  color: var(--ink);
+  background: var(--paper-hover);
+}
+.prose[data-variant='edit'] .flow [data-ai-marker]:is(:active, [data-force~='active']) {
+  color: var(--ink);
+  background: var(--paper-pressed);
+}
+.prose[data-variant='edit'] .flow [data-ai-marker][data-force~='focus'] {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+/* Dica: a mesma da `Tooltip` (papel, fio, sombra média, 11.5/500), acima do marcador, alinhada à
+   borda do glifo — a calha fica à esquerda do texto, a dica abre por cima dele e nunca passa da
+   borda da tela. */
+.prose[data-variant='edit'] .flow [data-ai-marker]::after {
+  content: attr(aria-label);
+  position: absolute;
+  inset-block-end: calc(100% + var(--s-1));
+  inset-inline-start: calc(50% - var(--p-marker) / 2);
+  z-index: var(--z-tooltip);
+  width: max-content;
+  max-width: 240px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  font: var(--t-caption-strong);
+  color: var(--ink);
+  text-align: start;
+  white-space: normal;
+  text-wrap: pretty;
+  background: var(--paper);
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 3px;
+  transition:
+    opacity var(--dur-2) var(--ease-out),
+    translate var(--dur-2) var(--ease-out),
+    visibility 0s linear var(--dur-2);
+}
+.prose[data-variant='edit'] .flow [data-ai-marker]:is(:hover, [data-force~='hover'])::after {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 0;
+  transition-delay: var(--tip-delay), var(--tip-delay), var(--tip-delay);
+}
+.prose[data-variant='edit']
+  .flow
+  [data-ai-marker]:is(:focus-visible, [data-force~='focus'])::after {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 0;
+  transition-delay: 0s;
+}
+/* O marcador fica fora do fluxo: dentro de lista ou citação, o 1º bloco real não ganha o respiro de
+   “bloco seguinte”. */
+.flow :where(li, blockquote, ul, ol) > [data-ai-marker]:first-child + * {
+  margin-top: 0;
+}
+
+/* Citação conferida com a fonte: `missing` (não bate) ganha ondulado vermelho e “Falta:” para leitor
+   de tela; `used` não desenha nada (o trecho da transcrição é que fica marcado). */
+.flow :where([data-source-state='missing']) {
+  text-decoration: underline wavy 1px var(--red-dot);
+  text-decoration-skip-ink: none;
+  text-underline-offset: 4px;
+}
+
+/* Trecho ligado à fala acesa da transcrição: marca-texto azul suave que acompanha as linhas, sem
+   caixa. Só em trecho (`span`, `mark`, `a`): o realce é fundo, não sublinhado grosso — com seleção de
+   texto o navegador repinta sublinhados na cor da seleção e a faixa virava uma barra escura. */
+.flow :where(span, mark, a)[data-source-active] {
+  color: var(--ink);
+  background-color: var(--b-50);
+  border-radius: var(--r-xs);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+
+/* Diferença e sugestão: papéis neutros; cor nunca sozinha (fio + texto para leitor de tela). */
+.flow :where(ins, [data-suggestion='insert']) {
+  padding: 1px 2px;
+  border-radius: var(--r-xs);
+  color: var(--diff-insert-ink);
+  background: var(--diff-insert-bg);
+  text-decoration: underline 1.5px var(--diff-insert-line);
+  text-underline-offset: 3px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.flow :where(del, [data-suggestion='delete']) {
+  padding: 1px 2px;
+  border-radius: var(--r-xs);
+  color: var(--diff-delete-ink);
+  background: var(--diff-delete-bg);
+  text-decoration: line-through 1.5px var(--diff-delete-line);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.flow :where(del, [data-suggestion='delete']) + :where(ins, [data-suggestion='insert']) {
+  margin-inline-start: 2px;
+}
+/* Bloco inteiro inserido/removido: sem fundo (nada de parágrafo em caixa), só cor e fio. */
+.flow :where(p, li, h1, h2, h3, h4, blockquote, ul, ol, figure, [data-block])[data-suggestion] {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+/* Texto só para leitor de tela: o que os ganchos anunciam (conteúdo gerado) e o que os widgets da
+   fábrica trazem no DOM (`[data-prose-sr]`). */
+.flow :where(ins, del, [data-suggestion], [data-source-state='missing'])::before,
+.flow [data-prose-sr] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.flow :where([data-source-state='missing'])::before {
+  content: 'Falta: ';
+}
+.flow :where(ins, [data-suggestion='insert'])::before {
+  content: 'Inserido: ';
+}
+.flow :where(del, [data-suggestion='delete'])::before {
+  content: 'Removido: ';
+}
+
+/* Sem âncora: tracejado âmbar; numa sugestão, o fundo sai e o texto apaga. */
+.flow :where([data-stale]) {
+  text-decoration: underline dashed 1px var(--amber-dot);
+  text-underline-offset: 5px;
+}
+.flow :where(ins, [data-suggestion='insert'])[data-stale] {
+  color: var(--muted);
+  background: none;
+  text-decoration: underline dashed 1.5px var(--diff-insert-line);
+}
+.flow :where(del, [data-suggestion='delete'])[data-stale] {
+  color: var(--muted);
+  background: none;
+  text-decoration: line-through dashed 1.5px var(--diff-delete-line);
+}
+
+/* ——— Widgets da fábrica (`proseWidgets`, prose-widgets.ts) ——— */
+
+/* Inserção proposta: o visual de `[data-suggestion="insert"]`; “Inserido:” já vem no DOM. */
+.flow [data-prose-widget='insertion']::before {
+  content: none;
+}
+/* Cursor parado (não pisca): onde o texto da IA está entrando. */
+.flow [data-prose-widget='caret'] {
+  display: inline-block;
+  width: 2px;
+  height: 1.15em;
+  margin-inline-start: 1px;
+  vertical-align: -0.2em;
+  border-radius: 1px;
+  background: var(--b-600);
+  pointer-events: none;
+}
+/* Esqueleto de bloco: uma barra por linha do texto, na altura da linha; a última mais curta. */
+.flow [data-prose-widget='skeleton'] {
+  display: grid;
+  pointer-events: none;
+  user-select: none;
+}
+.flow [data-prose-widget='skeleton'] > span {
+  display: flex;
+  align-items: center;
+  height: 1lh;
+}
+.flow [data-prose-widget='skeleton'] > span::before {
+  content: '';
+  width: 100%;
+  height: 0.625em;
+  border-radius: var(--r-xs);
+  background: var(--skeleton);
+  animation: pulse var(--skeleton-pulse) ease-in-out infinite;
+}
+.flow [data-prose-widget='skeleton'] > span:nth-child(4n + 2):not(:last-child)::before {
+  width: 94%;
+}
+.flow [data-prose-widget='skeleton'] > span:last-child:not(:first-child)::before {
+  width: 60%;
+}
+/* Linhas vizinhas defasam 80 ms (como `SkeletonText`). */
+.flow [data-prose-widget='skeleton'] > span:nth-child(2)::before {
+  animation-delay: 80ms;
+}
+.flow [data-prose-widget='skeleton'] > span:nth-child(3)::before {
+  animation-delay: 160ms;
+}
+.flow [data-prose-widget='skeleton'] > span:nth-child(n + 4)::before {
+  animation-delay: 240ms;
+}
+
+/*
+ * Figura sem arquivo: `img[data-missing]` (sem `src`) dentro de `figure` vira moldura funda no tamanho
+ * que a imagem teria (atributos `width`/`height`; sem eles, 16:9 na largura da coluna), com ImageOff
+ * e “Imagem indisponível”. Carregando: `img[data-loading]` — sem `src`, a mesma moldura pulsando; com
+ * `src`, o fundo pulsa até a imagem cobrir (tire o atributo no `load`). O `img` continua lá,
+ * transparente: o `alt` segue para o leitor de tela e o espaço não pula quando o arquivo chega.
+ */
+.flow :where(figure:has(> img:is([data-missing], [data-loading]:not([src])))) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.flow :where(figure) > :where(img:is([data-missing], [data-loading]:not([src]))) {
+  grid-area: 1 / 1;
+  min-height: calc(2 * var(--s-16));
+  opacity: 0;
+}
+.flow
+  :where(figure)
+  > :where(img:is([data-missing], [data-loading]:not([src]))):not([width][height]) {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+.flow :where(figure:has(> img:is([data-missing], [data-loading]:not([src]))))::before {
+  content: '';
+  grid-area: 1 / 1;
+  border-radius: var(--r-md);
+  background: var(--paper-sunken);
+}
+.flow :where(figure:has(> img[data-loading]:not([src])))::before {
+  background: var(--skeleton);
+  animation: pulse var(--skeleton-pulse) ease-in-out infinite;
+}
+/* Ícone e texto num só pseudo: o fundo (cor do ícone) só no quadrado de cima, recortado pelo glifo;
+   embaixo, a máscara deixa o texto inteiro. (Figura sem arquivo não leva o marcador de IA.) */
+.flow :where(figure:has(> img[data-missing]))::after {
+  content: 'Imagem indisponível';
+  grid-area: 1 / 1;
+  place-self: center;
+  max-width: 100%;
+  padding: calc(var(--icon-xl) + var(--s-2)) var(--s-4) 0;
+  font: var(--t-small);
+  color: var(--muted);
+  text-align: center;
+  background: linear-gradient(var(--icon-quiet), var(--icon-quiet)) 50% 0 / var(--icon-xl)
+    var(--icon-xl) no-repeat;
+  -webkit-mask:
+    var(--p-glyph-image-off) 50% 0 / var(--icon-xl) var(--icon-xl) no-repeat,
+    linear-gradient(#000 0 0) 0 calc(var(--icon-xl) + var(--s-2)) / 100% 100% no-repeat;
+  mask:
+    var(--p-glyph-image-off) 50% 0 / var(--icon-xl) var(--icon-xl) no-repeat,
+    linear-gradient(#000 0 0) 0 calc(var(--icon-xl) + var(--s-2)) / 100% 100% no-repeat;
+  pointer-events: none;
+}
+.flow :where(img[data-loading][src]) {
+  background: var(--skeleton);
+  animation: pulseFill var(--skeleton-pulse) ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+/* Só o fundo pulsa: a imagem que chega por cima nunca pisca. */
+@keyframes pulseFill {
+  50% {
+    background-color: var(--paper-sunken);
+  }
+}
+@keyframes breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* Placeholder: nó vazio do editor (TipTap) ou elemento vazio com data-placeholder. Uma linha só,
+   com reticências: texto longo nunca invade o bloco seguinte. */
+.flow :global(.is-empty[data-placeholder]),
+.flow :global(.is-editor-empty[data-placeholder]),
+.flow [data-placeholder]:empty {
+  position: relative;
+}
+.flow [data-placeholder]:empty {
+  min-height: 1lh;
+}
+.flow :global(.is-empty[data-placeholder])::before,
+.flow :global(.is-editor-empty[data-placeholder])::before,
+.flow [data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  overflow: hidden;
+  color: var(--subtle);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ——— DOM do ProseMirror ——— */
+.flow :global(.ProseMirror) {
+  outline: none;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  font-variant-ligatures: none;
+  caret-color: var(--b-600);
+}
+.flow :global(.ProseMirror):focus-visible {
+  outline: none;
+}
+.prose[data-variant='edit'] .flow :global(.ProseMirror) {
+  min-height: calc(3 * 1lh);
+}
+.flow :global(.ProseMirror-selectednode) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+.flow :global(.ProseMirror-hideselection) {
+  caret-color: transparent;
+}
+.flow :global(.ProseMirror-hideselection) *::selection {
+  background: transparent;
+}
+.flow :global(.ProseMirror-gapcursor)::after {
+  border-top-color: var(--ink);
+}
+.flow ::selection {
+  background: var(--b-100);
+  color: var(--ink);
+}
+
+/* ——— Coluna estreita (celular, painel): título na escala de página, respiro de 16 ——— */
+@container prose (max-width: 560px) {
+  .prose[data-variant='edit'] .column {
+    --p-pad-x: var(--s-6);
+    --p-pad-top: var(--s-6);
+    /* Calha de 24 px: o glifo de 12 fica no meio dela, 6 px da borda da tela e 6 px do texto;
+       o alvo de 20 cabe inteiro dentro da tela. */
+    --p-gutter: var(--s-3);
+    --p-marker-hit: var(--s-5);
+  }
+  .prose:not([data-variant='compact']) .flow :where(h1) {
+    font: var(--t-page);
+    letter-spacing: var(--track-title);
+  }
+}
+
+/* Movimento reduzido: nada pulsa nem respira; a dica aparece sem deslizar. Seletores com a mesma
+   especificidade das regras que animam (a ordem decide). */
+@media (prefers-reduced-motion: reduce) {
+  .flow :where(p, li, h1, h2, h3, h4, blockquote, a, [data-block]),
+  .prose[data-variant='edit'] .flow [data-ai-marker] {
+    transition: none;
+  }
+  /* A espera da dica fica (não é movimento); o deslize e o esmaecer saem. */
+  .prose[data-variant='edit'] .flow [data-ai-marker]::after {
+    translate: none;
+    transition-duration: 0s;
+  }
+  .prose[data-variant='edit'] .flow :where(*)[data-ai='writing']::after,
+  .flow [data-prose-widget='skeleton'] > span::before,
+  .flow :where(figure)::before,
+  .flow :where(img[data-loading]) {
+    animation: none;
+  }
+}

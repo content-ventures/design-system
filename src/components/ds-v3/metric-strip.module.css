@@ -2,8 +2,9 @@
  * Faixa de indicadores (a mesma régua do Analytics do /dashboardv3): um contorno de 1 px e raio 10,
  * células em papel unidas por fio de 1 px. Sem ícone, sem fundo colorido, sem contagem animada.
  * O fio é um traço à direita e embaixo de cada célula, pintado numa camada acima dos fundos (senão o
- * papel da célula vizinha o cobre); a moldura recorta os da borda, então uma linha incompleta não
- * deixa buraco cinza.
+ * papel da célula vizinha o cobre); a moldura recorta os da borda.
+ * Linhas que quebram: cada célula ocupa 1/cols da linha e cresce para preencher, então a última linha
+ * incompleta se reparte por igual (5 em 3 colunas → 3 + 2; em 2 → 2 + 2 + 1) e nunca sobra célula vazia.
  */
 .root {
   container: metrics / inline-size;
@@ -12,8 +13,8 @@
 }
 .strip {
   --cols: 4;
-  display: grid;
-  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   background: var(--paper);
@@ -36,10 +37,15 @@
   --cols: 6;
 }
 
-/* Célula com dica: o invólucro da dica vira a célula da grade. */
+/* Base de 1/cols menos 1 px: `cols` células sempre cabem na linha, apesar do arredondamento; o
+   crescimento devolve o pixel e reparte por igual a sobra da última linha. */
+.strip > * {
+  flex: 1 1 calc(100% / var(--cols) - 1px);
+  min-width: 0;
+}
+/* Célula com dica: o invólucro da dica vira a célula da faixa. */
 .strip > span {
   display: grid;
-  min-width: 0;
 }
 .metric {
   position: relative;
@@ -68,12 +74,40 @@
   border-bottom: 1px solid var(--line);
   pointer-events: none;
 }
+/* Com tendência: a linha fica à direita do valor, sob a variação. */
+.metric[data-spark] {
+  grid-template-areas:
+    'label change'
+    'value spark'
+    'meter meter'
+    'hint hint';
+}
 /* Célula com comparação na dica: reage ao ponteiro e ao foco. */
 .metric[data-tip] {
   cursor: default;
 }
 .metric[data-tip]:is(:hover, [data-force~='hover']) {
   background: var(--g-25);
+}
+/* Célula clicável (link ou botão): mesmo desenho, um degrau de fundo no hover e outro ao pressionar
+   (como linha de lista, sem escala). */
+.metric[data-interactive] {
+  width: 100%;
+  min-height: 100%;
+  color: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.metric[data-interactive]:is(:hover, [data-force~='hover']) {
+  background: var(--g-25);
+}
+.metric[data-interactive]:is(:active, [data-force~='active']) {
+  background: var(--g-50);
+}
+.metric[data-interactive]:is(:hover, [data-force~='hover']) .label {
+  color: var(--text);
 }
 .metric:is(:focus-visible, [data-force~='focus']) {
   z-index: 2;
@@ -87,6 +121,7 @@
   min-height: 18px;
   font: var(--t-small);
   color: var(--muted);
+  transition: color var(--dur-1) var(--ease-out);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -135,12 +170,36 @@
   background: var(--g-100);
   overflow: hidden;
 }
+/* Tons do `Meter`: cinza por padrão (azul é ação, nunca status); âmbar e vermelho pedem atenção. */
 .meter i {
   position: absolute;
   inset: 0 auto 0 0;
   border-radius: inherit;
-  background: var(--b-600);
+  background: var(--gray-dot);
   transition: width var(--dur-3) var(--ease-out);
+}
+.meter[data-tone='blue'] i {
+  background: var(--b-600);
+}
+.meter[data-tone='green'] i {
+  background: var(--green-dot);
+}
+.meter[data-tone='amber'] i {
+  background: var(--amber-dot);
+}
+.meter[data-tone='red'] i {
+  background: var(--red-dot);
+}
+/* Tendência: 64 × 24 à direita do valor, alinhada embaixo. */
+.spark {
+  grid-area: spark;
+  justify-self: end;
+  align-self: end;
+  display: block;
+  margin-bottom: 2px;
+}
+.metric .spark svg {
+  width: 64px;
 }
 .hint {
   grid-area: hint;
@@ -240,6 +299,24 @@
     justify-self: start;
     align-self: end;
     margin-bottom: 4px;
+  }
+  /* Celular: a célula é estreita para valor, variação e linha lado a lado. A tendência ganha linha
+     própria sob o valor, na largura da célula (o traço e o ponto não deformam). */
+  .strip[data-size='kpi'] .metric[data-spark] {
+    grid-template-areas:
+      'label label'
+      'value change'
+      'spark spark'
+      'meter meter'
+      'hint hint';
+  }
+  .strip[data-size='kpi'] .spark {
+    justify-self: stretch;
+    margin: 4px 0 2px;
+  }
+  .strip[data-size='kpi'] .metric .spark svg {
+    width: 100%;
+    height: 20px;
   }
   .hint {
     white-space: normal;

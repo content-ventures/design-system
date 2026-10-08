@@ -27,6 +27,15 @@
 .stage:hover {
   border-color: var(--line-hover);
 }
+/* Cabe no palco (`fitHeight`): o palco para na altura medida (`--media-fit-h`, escrita pela
+ * galeria); a largura fica a do contêiner e a peça encolhe por dentro, inteira. O respiro de 7 px
+ * embaixo guarda o anel de foco das miniaturas, que senão abriria uma rolagem na área em volta. */
+.gallery[data-fit] {
+  padding-bottom: 7px;
+}
+.gallery[data-fit] .stage {
+  max-height: var(--media-fit-h, 100svh);
+}
 .stage:focus-visible {
   outline: 2px solid var(--focus-color);
   outline-offset: 2px;

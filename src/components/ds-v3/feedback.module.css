@@ -459,9 +459,11 @@
   list-style: none;
 }
 .step {
-  display: flex;
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
+  column-gap: 12px;
   min-height: 40px;
   border-top: 1px solid var(--line-soft);
   font: var(--t-body);
@@ -475,9 +477,60 @@
 .step[data-state='done'] {
   color: var(--text);
 }
+/* Falha: o rótulo segue legível; o vermelho fica no marcador (status = marca + palavra). */
+.step[data-state='error'] {
+  font-weight: 500;
+  color: var(--ink);
+}
 .stepLabel {
-  flex: 1;
   min-width: 0;
+}
+/* Sob o rótulo, alinhado ao texto: motivo, fontes, ação. */
+.stepDetail {
+  grid-column: 2 / -1;
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  min-width: 0;
+  margin-top: 4px;
+  font: var(--t-small);
+  color: var(--muted);
+}
+.steps[data-variant='rows'] .step:has(.stepDetail) {
+  align-items: start;
+  padding-block: 10px;
+}
+
+/* ——— Rastro da IA: trilho de 1 px entre marcadores, sem fio entre linhas ——— */
+.steps[data-variant='trace'] .step {
+  align-items: start;
+  min-height: 0;
+  padding-bottom: 14px;
+  border-top: 0;
+}
+.steps[data-variant='trace'] .step:last-child {
+  padding-bottom: 0;
+}
+.steps[data-variant='trace'] .step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 24px;
+  bottom: 4px;
+  left: 9.5px;
+  width: 1px;
+  background: var(--line);
+}
+.steps[data-variant='trace'] .stepMeta {
+  padding-top: 1px;
+}
+/* A etapa atual respira devagar (só opacidade; sem brilho correndo). */
+.steps[data-variant='trace'] .step[data-state='current'] .stepLabel {
+  animation: breathe var(--skeleton-pulse) ease-in-out infinite;
+}
+@keyframes breathe {
+  50% {
+    opacity: 0.62;
+  }
 }
 .stepMeta {
   font: var(--t-small);
@@ -509,6 +562,29 @@
   color: var(--b-600);
   border-color: var(--b-200);
   background: var(--b-50);
+}
+.step[data-state='error'] .marker {
+  color: var(--red-ink);
+  border-color: var(--red-line);
+  background: var(--red-bg);
+}
+.marker b {
+  font-weight: 600;
+}
+.step[data-state='skipped'] .marker {
+  color: var(--g-400);
+  border-color: var(--line-strong);
+  background: var(--g-50);
+}
+.skip {
+  width: 12px;
+  height: 12px;
+}
+.skip path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.25;
+  stroke-linecap: round;
 }
 .markerSpin {
   width: 20px;
@@ -990,6 +1066,7 @@
   .progressDone svg,
   .tick path,
   .stepMeta,
+  .stepLabel,
   .skel,
   .swapLayer,
   .state,

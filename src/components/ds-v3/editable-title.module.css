@@ -1,0 +1,194 @@
+/*
+ * EditableTitle — título que vira campo. Repouso e edição têm o mesmo tipo e o mesmo respiro, e a
+ * caixa (fio de 1px + respiro) é compensada por margem negativa: o texto fica alinhado à coluna e
+ * não se move ao abrir a edição. Hover = fio de campo (--line-hover) + lápis; edição = b-500 +
+ * --ring-field; inválido = --red-dot + --ring-invalid. Estados com gêmeo [data-force] das pranchas.
+ */
+.root {
+  --et-font: var(--t-page);
+  --et-track: var(--track-title);
+  --et-px: var(--s-2);
+  --et-py: var(--s-1);
+  --et-radius: var(--r-md);
+  --et-icon: var(--icon-md);
+  /* A caixa sai 1px (fio) + respiro para fora do texto. */
+  --et-out-x: calc(var(--et-px) + 1px);
+  --et-out-y: calc(var(--et-py) + 1px);
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+}
+.root[data-size='document'] {
+  --et-font: var(--t-prose-title);
+  --et-track: var(--track-display);
+  --et-icon: var(--icon-lg);
+}
+.root[data-size='card'] {
+  --et-font: var(--t-title-3);
+  --et-track: var(--track-tight);
+  --et-radius: var(--r-sm);
+  --et-icon: var(--icon-sm);
+}
+@media (max-width: 760px) {
+  .root[data-size='page'] {
+    --et-font: var(--t-page-sm);
+  }
+}
+/* O título do artigo responde à largura da própria coluna (canvas estreito, celular): 24/32. */
+.root[data-size='document'] {
+  container: et-document / inline-size;
+  width: 100%;
+}
+@container et-document (max-width: 560px) {
+  .heading,
+  .input {
+    --et-font: var(--t-page);
+    --et-track: var(--track-title);
+  }
+}
+
+/* ——— Repouso ——— */
+.heading {
+  display: flex;
+  min-width: 0;
+  margin: 0;
+  font: var(--et-font);
+  letter-spacing: var(--et-track);
+  color: var(--ink);
+}
+.trigger,
+.static {
+  display: block;
+  min-width: 0;
+  max-width: calc(100% + 2 * var(--et-out-x));
+  margin: calc(-1 * var(--et-out-y)) calc(-1 * var(--et-out-x));
+  padding: var(--et-py) var(--et-px);
+  border: 1px solid transparent;
+  border-radius: var(--et-radius);
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  text-align: start;
+  overflow-wrap: break-word;
+}
+.trigger {
+  cursor: text;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+}
+.trigger:is(:hover, [data-force~='hover']) {
+  border-color: var(--line-hover);
+}
+.trigger:is(:active, [data-force~='active']) {
+  border-color: var(--line-hover);
+  background: var(--paper-hover);
+}
+.root[data-invalid='true'] .trigger {
+  border-color: var(--red-dot);
+}
+.root[data-empty='true'] .text {
+  color: var(--subtle);
+}
+.tail {
+  white-space: nowrap;
+}
+.pencil {
+  display: inline-block;
+  width: var(--et-icon);
+  height: var(--et-icon);
+  margin-inline-start: var(--s-2);
+  vertical-align: middle;
+  color: var(--icon-rest);
+  opacity: 0;
+  transition: opacity var(--dur-1) var(--ease-out);
+}
+.trigger:is(:hover, :focus-visible, [data-force~='hover'], [data-force~='focus']) .pencil {
+  opacity: 1;
+}
+/* Toque não tem hover: o lápis fica sempre visível. */
+@media (hover: none) {
+  .pencil {
+    opacity: 1;
+  }
+}
+.spinner {
+  margin-inline-start: var(--s-2);
+}
+
+/* ——— Edição ——— */
+.field {
+  position: relative;
+  display: flex;
+  margin: calc(-1 * var(--et-out-y)) calc(-1 * var(--et-out-x));
+  border: 1px solid var(--b-500);
+  border-radius: var(--et-radius);
+  background: var(--paper);
+  box-shadow: var(--ring-field);
+  transition: box-shadow var(--dur-2) var(--ease-out);
+}
+.root[data-invalid='true'] .field {
+  border-color: var(--red-dot);
+  box-shadow: var(--ring-invalid);
+}
+.input {
+  display: block;
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: var(--et-py) var(--et-px);
+  border: 0;
+  outline: 0;
+  background: transparent;
+  resize: none;
+  overflow: hidden;
+  font: var(--et-font);
+  letter-spacing: var(--et-track);
+  color: var(--ink);
+  caret-color: var(--b-600);
+}
+.input:focus-visible {
+  outline: none;
+}
+.input::placeholder {
+  color: var(--subtle);
+  opacity: 1;
+}
+/* ——— Nota sob o campo: erro (11.5/500 --red-ink + CircleAlert 14) à esquerda, contador à direita.
+   Fica fora do campo: o título não reflui quando o contador aparece. ——— */
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  margin-top: calc(var(--et-py) + 6px);
+  letter-spacing: normal;
+  animation: note-in var(--dur-2) var(--ease-out);
+}
+@keyframes note-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+.error {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  align-items: flex-start;
+  min-width: 0;
+  margin: 0;
+  font: var(--t-caption-strong);
+  color: var(--red-ink);
+}
+.error svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  margin-top: 1px;
+}
+.counter {
+  flex: none;
+  margin-inline-start: auto;
+}
