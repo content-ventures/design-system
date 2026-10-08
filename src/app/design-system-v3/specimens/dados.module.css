@@ -624,3 +624,17 @@
     border-radius: 0;
   }
 }
+
+/* Texto que corta: caixa estreita e a linha com reticência (o corte é do consumidor; a dica, do DS). */
+.clipBox {
+  width: 220px;
+  min-width: 0;
+}
+.clipLine {
+  display: block;
+  overflow: hidden;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

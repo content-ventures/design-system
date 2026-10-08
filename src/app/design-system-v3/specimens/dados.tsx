@@ -5,10 +5,13 @@ import {
   Check,
   CircleAlert,
   Download,
+  FileAudio,
   FileSignature,
+  FileText,
   LayoutList,
   Megaphone,
   Pause,
+  PenLine,
   Pencil,
   Plus,
   RotateCw,
@@ -41,10 +44,12 @@ import {
   IconButton,
   IconTile,
   SearchField,
+  Section,
   Segmented,
   Switch,
   Tabs,
   Tooltip,
+  TruncatedText,
   VisuallyHidden,
   type Tone,
 } from '@content-ventures/design-system/v3';
@@ -56,12 +61,22 @@ import {
   FilterField,
   type ActiveFilter,
 } from '@content-ventures/design-system/v3/filter-bar';
-import { LinkButton } from '@content-ventures/design-system/v3/link';
-import { List, ListGroup, ListItem, ListItemSkeleton } from '@content-ventures/design-system/v3/list-item';
-import { Metric, MetricStrip, type MetricProps } from '@content-ventures/design-system/v3/metric-strip';
+import { LinkButton, TextLink } from '@content-ventures/design-system/v3/link';
+import {
+  List,
+  ListGroup,
+  ListItem,
+  ListItemSkeleton,
+} from '@content-ventures/design-system/v3/list-item';
+import {
+  Metric,
+  MetricStrip,
+  type MetricProps,
+} from '@content-ventures/design-system/v3/metric-strip';
 import { Pagination } from '@content-ventures/design-system/v3/pagination';
 import { RowActions } from '@content-ventures/design-system/v3/row-actions';
 import { Select } from '@content-ventures/design-system/v3/select';
+import { Meter } from '@content-ventures/design-system/v3/stat';
 import {
   BulkBar,
   ColumnsMenu,
@@ -978,9 +993,34 @@ function Tabela() {
           />
         </div>
       </Shot>
+
+      <Shot title="Texto que corta" align="stretch" pad="md">
+        <States min={260}>
+          <State label="Cortado · dica ao passar o ponteiro">
+            <div className={x.clipBox}>
+              <TruncatedText className={x.clipLine} text={CLIPPED_NAME} />
+            </div>
+          </State>
+          <State label="Dica aberta">
+            <div className={x.clipBox}>
+              <Tooltip open content={CLIPPED_NAME}>
+                <span className={x.clipLine}>{CLIPPED_NAME}</span>
+              </Tooltip>
+            </div>
+          </State>
+          <State label="Cabe · sem dica">
+            <div className={x.clipBox}>
+              <TruncatedText className={x.clipLine} text="Calçados Aurora" />
+            </div>
+          </State>
+        </States>
+      </Shot>
     </Shots>
   );
 }
+
+/** Nome longo para a prancha de texto cortado (dica do DS no lugar do `title` nativo). */
+const CLIPPED_NAME = 'Coleção primavera-verão 2027 · lojistas multimarca do Nordeste';
 
 /* ——————————————————————————— Tabela de dados ——————————————————————————— */
 
@@ -1643,6 +1683,36 @@ function BarraFiltros() {
                     />
                   </FilterField>
                 </FilterBand>
+              </div>
+            </State>
+          </States>
+        </div>
+      </Shot>
+
+      {/* Empilhar é da quebra de linha (CSS): o HTML do servidor e a barra hidratada saem iguais,
+          e as contagens que chegam nas abas cabem na folga da busca (base de 220 px). */}
+      <Shot title="Lado a lado e empilhada" tone="white" align="stretch" pad="md">
+        <div className={x.looseStates}>
+          <States columns={1}>
+            <State label="Lado a lado">
+              <div className={x.barStack}>
+                <FilterBar
+                  tabs={tabs(f)}
+                  search={searchStub}
+                  filtersOpen={false}
+                  onFiltersOpenChange={noop}
+                />
+              </div>
+            </State>
+            <State label="Empilhada, 720 px">
+              <div className={x.narrowBand}>
+                <FilterBar
+                  tabs={tabs(f)}
+                  search={searchStub}
+                  filtersOpen={false}
+                  onFiltersOpenChange={noop}
+                  actions={<ViewAndExport />}
+                />
               </div>
             </State>
           </States>
@@ -2393,7 +2463,9 @@ function Lista() {
               title="Campanha aprovada · Aurora Calçados"
               description="A campanha entra no ar em 12/10"
               meta="há 2 h"
-              actions={<IconButton size="sm" variant="ghost" icon={Check} label="Marcar como lida" />}
+              actions={
+                <IconButton size="sm" variant="ghost" icon={Check} label="Marcar como lida" />
+              }
             />
             <ListItem
               href="#lista"
@@ -2403,6 +2475,101 @@ function Lista() {
             />
           </List>
         </div>
+      </Shot>
+
+      <Shot title="Com ícone" tone="white" align="stretch" pad="md">
+        <div className={x.fill}>
+          <List label="Material da produção">
+            <ListItem
+              icon={FileAudio}
+              href="#lista"
+              title="Entrevista com Clara Souto"
+              description="Transcrição · 42 min · 3 falantes"
+              meta="há 2 h"
+            />
+            <ListItem
+              icon={PenLine}
+              href="#lista"
+              selected
+              title="Couro vegetal chega às vitrines"
+              description="Artigo · rascunho · 812 palavras"
+              meta="há 20 min"
+            />
+            <ListItem
+              icon={FileText}
+              disabled
+              title="Release da Aurora Calçados"
+              description="PDF · 3 páginas"
+              meta="ontem"
+            />
+          </List>
+        </div>
+      </Shot>
+
+      <Shot title="Título em duas linhas" align="stretch" pad="md">
+        <States min={280}>
+          {(['Uma linha (padrão)', 'Duas linhas'] as const).map((name, index) => (
+            <State key={name} label={name}>
+              <div className={x.fill}>
+                <List label={name}>
+                  <ListItem
+                    titleLines={index === 0 ? 1 : 2}
+                    leading={
+                      <BrandMark name="Aurora Calçados" size="sm" variant="soft" decorative />
+                    }
+                    title="Aurora Calçados: couro vegetal chega às vitrines da Francal 2026"
+                    description="Aguardando aprovação · Artigo v2"
+                    trailing={
+                      <TextLink size="sm" href="#lista">
+                        Revisar
+                      </TextLink>
+                    }
+                  />
+                  <ListItem
+                    titleLines={index === 0 ? 1 : 2}
+                    leading={<BrandMark name="Ateliê Sul" size="sm" variant="soft" decorative />}
+                    title="Ateliê Sul na Francal"
+                    description="Ajustes solicitados · Carrossel"
+                    trailing={
+                      <TextLink size="sm" href="#lista">
+                        Ajustar
+                      </TextLink>
+                    }
+                  />
+                </List>
+              </div>
+            </State>
+          ))}
+        </States>
+      </Shot>
+
+      <Shot title="Sangrada numa seção" align="stretch" pad="md">
+        <States min={280}>
+          {([false, true] as const).map((bleed) => (
+            <State key={String(bleed)} label={bleed ? 'bleed' : 'Sem bleed'}>
+              <div className={x.fill}>
+                <Section variant="panel" title="Aguardando você" meta="2">
+                  <List label="Aguardando você" framed={false} bleed={bleed}>
+                    <ListItem
+                      href="#lista"
+                      leading={
+                        <BrandMark name="Aurora Calçados" size="sm" variant="soft" decorative />
+                      }
+                      title="Aurora Calçados"
+                      description="Aguardando aprovação"
+                    />
+                    <ListItem
+                      href="#lista"
+                      leading={<BrandMark name="Ateliê Sul" size="sm" variant="soft" decorative />}
+                      title="Ateliê Sul"
+                      description="Ajustes solicitados"
+                    />
+                  </List>
+                </Section>
+              </div>
+            </State>
+          ))}
+        </States>
       </Shot>
 
       <Shot title="Estados" align="stretch" pad="md">
@@ -2929,6 +3096,50 @@ const WINDOW: Record<Range, string> = {
   '14d': '09/10 – 22/10',
   all: '01/10 – 22/10',
 };
+/** Cinco indicadores com a tendência diária: 5 → 3 + 2 no painel estreito, 2 + 2 + 1 no celular. */
+const TREND: MetricProps[] = [
+  {
+    label: 'Impressões',
+    value: '97.328',
+    delta: { value: '3,8%', trend: 'up' },
+    hint: '24,3% do contratado',
+    sparkline: {
+      points: [12.4, 13.1, 13.6, 14.2, 13.8, 14.9, 15.3],
+      label: 'De 12.400 a 15.300 por dia',
+    },
+  },
+  {
+    label: 'Cliques',
+    value: '2.296',
+    delta: { value: '10,2%', trend: 'up' },
+    hint: 'média de 328 por dia',
+    sparkline: { points: [290, 305, 318, 331, 322, 352, 378], label: 'De 290 a 378 por dia' },
+  },
+  {
+    label: 'CTR',
+    value: '2,36%',
+    delta: { value: '6,1%', trend: 'up' },
+    hint: 'pico de 2,77% em 16/10',
+    sparkline: {
+      points: [2.77, 2.21, 2.18, 2.3, 2.26, 2.35, 2.41],
+      label: 'De 2,77% a 2,41% por dia',
+    },
+  },
+  {
+    label: 'Leads',
+    value: '71',
+    delta: { value: '14,5%', trend: 'down' },
+    hint: '3,1% dos cliques',
+    sparkline: { points: [13, 12, 11, 10, 9, 8, 8], label: 'De 13 a 8 por dia' },
+  },
+  {
+    label: 'Entrega',
+    value: '68',
+    unit: '%',
+    meter: { value: 68, label: 'Entrega do contratado' },
+    hint: 'de ≈ 400.000 impressões',
+  },
+];
 
 function Kpis() {
   const [range, setRange] = useState<Range>('7d');
@@ -2951,6 +3162,7 @@ function Kpis() {
             </div>
             <MetricStrip label="Indicadores do período" items={KPI[range]} />
           </div>
+          <MetricStrip label="Tendência dos últimos 7 dias" items={TREND} />
           <MetricStrip
             label="Resumo da campanha"
             items={[
@@ -2988,6 +3200,31 @@ function Kpis() {
                 value="97.328"
                 delta={{ value: '3,8%', trend: 'up' }}
                 hint="24,3% do contratado"
+              />
+            </MetricStrip>
+          </State>
+          <State label="Com tendência">
+            <MetricStrip columns={1}>
+              <Metric
+                label="Cliques"
+                value="2.296"
+                delta={{ value: '10,2%', trend: 'up' }}
+                hint="média de 328 por dia"
+                sparkline={{
+                  points: [290, 305, 318, 331, 322, 352, 378],
+                  label: 'De 290 a 378 por dia',
+                }}
+              />
+            </MetricStrip>
+          </State>
+          <State label="Com medidor">
+            <MetricStrip columns={1}>
+              <Metric
+                label="Entrega"
+                value="68"
+                unit="%"
+                meter={{ value: 68, label: 'Entrega do contratado' }}
+                hint="de ≈ 400.000 impressões"
               />
             </MetricStrip>
           </State>
@@ -3036,6 +3273,70 @@ function Kpis() {
               />
             </MetricStrip>
           </State>
+          <State label="Link">
+            <MetricStrip columns={1}>
+              <Metric label="Aguardando aprovação" value="3" hint="2 vencem hoje" href="#kpi" />
+            </MetricStrip>
+          </State>
+          <State label="Link · hover">
+            <MetricStrip columns={1}>
+              <Metric
+                label="Aguardando aprovação"
+                value="3"
+                hint="2 vencem hoje"
+                href="#kpi"
+                data-force="hover"
+              />
+            </MetricStrip>
+          </State>
+          <State label="Link · pressionado">
+            <MetricStrip columns={1}>
+              <Metric
+                label="Aguardando aprovação"
+                value="3"
+                hint="2 vencem hoje"
+                href="#kpi"
+                data-force="active"
+              />
+            </MetricStrip>
+          </State>
+        </States>
+      </Shot>
+
+      <Shot title="Medidor" align="stretch" pad="md">
+        <States min={200}>
+          <State label="Neutro">
+            <Meter
+              value={3}
+              max={4}
+              label="Prontidão: 3 de 4 conferências"
+              start="Prontidão"
+              end="3 de 4"
+            />
+          </State>
+          <State label="Atenção">
+            <Meter
+              value={1}
+              max={4}
+              label="Prontidão: 1 de 4, 2 bloqueiam"
+              tone="amber"
+              start="Prontidão"
+              end="1 de 4"
+            />
+          </State>
+          <State label="Concluído">
+            <Meter
+              value={4}
+              max={4}
+              label="Prontidão: 4 de 4 conferências"
+              tone="green"
+              start="Prontidão"
+              end="4 de 4"
+            />
+          </State>
+          <State label="Na tabela">
+            <Meter value={3} max={4} label="Prontidão: 3 de 4 conferências" inline />
+          </State>
         </States>
       </Shot>
 
@@ -3052,6 +3353,7 @@ function Kpis() {
                 options={RANGES}
               />
               <MetricStrip label="Indicadores do período" items={KPI[phoneRange]} />
+              <MetricStrip label="Tendência dos últimos 7 dias" items={TREND} />
             </div>
           </Phone>
         </Shot>

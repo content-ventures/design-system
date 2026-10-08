@@ -609,6 +609,10 @@
   max-width: 760px;
   margin: 0 auto;
 }
+/* Painel baixo da revisão, com o respiro de uma área de trabalho (“Cabe no palco”). */
+.reviewPane {
+  padding: 16px;
+}
 .product {
   display: grid;
   gap: 2px;

@@ -55,9 +55,16 @@ import {
   useNotice,
 } from '@content-ventures/design-system/v3/fields';
 import { LinkButton } from '@content-ventures/design-system/v3/link';
-import { MoneyField, moneyBRL, type MoneyAdjustReason } from '@content-ventures/design-system/v3/money-field';
+import {
+  MoneyField,
+  moneyBRL,
+  type MoneyAdjustReason,
+} from '@content-ventures/design-system/v3/money-field';
 import { NumberField } from '@content-ventures/design-system/v3/number-field';
-import { PasswordField, type PasswordRequirement } from '@content-ventures/design-system/v3/password-field';
+import {
+  PasswordField,
+  type PasswordRequirement,
+} from '@content-ventures/design-system/v3/password-field';
 import { Select } from '@content-ventures/design-system/v3/select';
 import { Slider } from '@content-ventures/design-system/v3/slider';
 import { FormRow } from '@content-ventures/design-system/v3/stepper';
@@ -1297,6 +1304,27 @@ function Frequencia() {
   );
 }
 
+/** `fit`: o campo mede os dígitos do máximo, sem esticar na coluna (sem classe de largura). */
+function FitState() {
+  const [count, setCount] = useState<number | null>(5);
+  return (
+    <Field label="Quantidade de slides" hint="Entre 3 e 10">
+      {({ id, describedBy }) => (
+        <NumberField
+          id={id}
+          aria-describedby={describedBy}
+          fit
+          stepper
+          min={3}
+          max={10}
+          value={count}
+          onChange={setCount}
+        />
+      )}
+    </Field>
+  );
+}
+
 function NumState({
   label,
   value,
@@ -1378,6 +1406,9 @@ function Numero() {
           </State>
           <State label="Indisponível">
             <NumState label="Alocação" value={50} disabled />
+          </State>
+          <State label="Largura do conteúdo (fit)">
+            <FitState />
           </State>
         </Grid>
       </Shot>

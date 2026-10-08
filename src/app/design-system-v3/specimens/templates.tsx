@@ -3293,7 +3293,7 @@ function AssetCard({ asset, selected, onOpen }: { asset: Asset; selected: boolea
             value={asset.free}
             label={`${asset.free}% livre`}
             size="sm"
-            tone={asset.free < 20 ? 'amber' : 'blue'}
+            tone={asset.free < 20 ? 'amber' : 'neutral'}
             start="Disponível"
             end={`${asset.free}%`}
           />
