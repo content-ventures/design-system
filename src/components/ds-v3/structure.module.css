@@ -44,6 +44,8 @@
 
 .ph {
   container: dsv3-page-header / inline-size;
+  /* Altura da linha do título: a volta (`back`) centra nela sem crescer a linha. */
+  --ph-title-lh: 32px;
   display: grid;
   gap: var(--s-6);
   min-width: 0;
@@ -56,6 +58,7 @@
   margin-bottom: 0;
 }
 .ph[data-variant='frame'] {
+  --ph-title-lh: 26px;
   gap: var(--s-3);
 }
 .phMain {
@@ -136,6 +139,87 @@
   min-width: 0;
 }
 
+/*
+ * Volta (`back`, “← Produções”): antes do título, na mesma linha e fora do h1 — numa tela sem o menu
+ * do app é o caminho de volta. Discreta como um botão fantasma pequeno: seta e nome em `--muted`,
+ * fundo só no hover. O texto da página (descrição, meta) continua alinhado ao título; a seta fica na
+ * borda da página (o respiro do alvo sai para fora, como a volta da trilha). A grade do texto ganha a
+ * coluna da volta com especificidade acima do `gap` da moldura (`.ph[data-variant='frame'] .phText`).
+ */
+.ph .phMain > .phText[data-back] {
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--s-2);
+}
+.phText[data-back] > * {
+  grid-column: 2;
+}
+.phText[data-back] > .phBack {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  /* 32 de alvo centrado na linha do título (26 na moldura) sem crescer a linha. */
+  margin-block: calc((var(--ph-title-lh) - var(--h-sm)) / 2);
+}
+.phBack {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  max-width: 14rem;
+  height: var(--h-sm);
+  padding: 0 var(--s-2) 0 6px;
+  margin-inline-start: -6px;
+  border-radius: var(--r-sm);
+  font: var(--t-body-strong);
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
+}
+.phBack svg {
+  flex: none;
+  width: var(--icon-md);
+  height: var(--icon-md);
+  color: var(--icon-rest);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.phBack:is(:hover, [data-force~='hover']) {
+  color: var(--ink);
+  background: var(--paper-hover);
+}
+.phBack:is(:hover, [data-force~='hover']) svg {
+  color: var(--icon-hover);
+}
+.phBack:is(:active, [data-force~='active']) {
+  color: var(--ink);
+  background: var(--paper-pressed);
+}
+.phBackText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/*
+ * Motivo visível de uma ação indisponível (`actionsNote`): uma linha de 12 px em `--muted` logo antes
+ * das ações, que corta com reticência (o texto inteiro na dica) e cede antes do título e das ações.
+ * O botão indisponível leva `aria-describedby` para ela.
+ */
+.phNote {
+  flex: 0 1 auto;
+  min-width: 7rem;
+  max-width: min(22rem, 30cqi);
+  margin-inline-end: var(--s-1);
+  overflow: hidden;
+  font: var(--t-small);
+  color: var(--muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 /* Moldura de criação: título contido (18), legenda e régua de etapas à direita. */
 .ph[data-variant='frame'] .phMain {
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -202,8 +286,49 @@
 .ph[data-variant='frame'] .phMain[data-steps] :is(.phActions, .phMore) {
   flex: none;
 }
+/* Com motivo, as ações cedem antes do título: o motivo corta até o mínimo dele, depois o título. */
+.ph[data-variant='frame'] .phMain[data-steps] .phActions:has(> .phNote) {
+  flex: 0 100000 auto;
+}
+/* Na régua cabe outra coisa que não o `Stepper` (um menu “Artigo · 2 de 5”): ocupa o que mede e o
+   resto da linha fica antes das ações — o título só corta quando a linha não cabe mesmo. */
+.ph[data-variant='frame'] .phMain[data-steps] .phSteps:not(:has(> nav)) {
+  flex: 0 0 auto;
+  max-width: none;
+}
+
+/*
+ * Moldura sem `steps` (cabeçalho de uma tela de trabalho): também uma linha só. O título cede e
+ * corta (o texto inteiro na dica) antes de qualquer ação, até 10rem; só então o status desce para
+ * baixo dele. O motivo, quando há, corta antes do título. Ações e ⋯ não encolhem e ficam no fim
+ * da linha. Em ≤640 vale o arranjo do celular (abaixo).
+ */
+@container dsv3-page-header (min-width: 641px) {
+  .ph[data-variant='frame'] .phMain:not([data-steps]) {
+    display: flex;
+    align-items: center;
+    column-gap: var(--s-6);
+  }
+  .ph[data-variant='frame'] .phMain:not([data-steps]) .phText {
+    flex: 0 1000 auto;
+    margin-right: auto;
+  }
+  .ph[data-variant='frame'] .phMain:not([data-steps]) .phTitle {
+    flex: 1 1 0;
+    min-width: min(10rem, 40cqi);
+  }
+  .ph[data-variant='frame'] .phMain:not([data-steps]) :is(.phActions, .phMore) {
+    flex: none;
+  }
+  .ph[data-variant='frame'] .phMain:not([data-steps]) .phActions:has(> .phNote) {
+    flex: 0 100000 auto;
+  }
+}
 
 @container dsv3-page-header (max-width: 760px) {
+  .ph[data-variant='page'] {
+    --ph-title-lh: 30px;
+  }
   .ph[data-variant='page'] .phTitle {
     font-size: 22px;
     line-height: 30px;
@@ -230,8 +355,34 @@
     flex-wrap: wrap;
     margin-top: 0;
   }
-  .phActions > :first-child {
+  .phActions > :first-child:not(.phNote),
+  .phActions > .phNote + * {
     flex: 1 1 auto;
+  }
+  /* O motivo desce para a linha dele, acima dos botões, e quebra em vez de cortar. */
+  .phNote {
+    flex: 1 1 100%;
+    min-width: 0;
+    max-width: none;
+    margin-inline-end: 0;
+    white-space: normal;
+  }
+  /* A volta fica só com a seta (o nome acessível continua “Voltar para …”). */
+  .phBack {
+    justify-content: center;
+    width: var(--h-sm);
+    padding: 0;
+    /* A seta (16 no meio do alvo de 32) encosta na borda da página. */
+    margin-inline-start: calc((var(--icon-md) - var(--h-sm)) / 2);
+  }
+  .phBackText {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
   /* Celular: título e ⋯ em cima, a régua (ou a versão compacta) na linha dela, ações embaixo. */
   .ph[data-variant='frame'] .phMain[data-steps] {
@@ -500,6 +651,11 @@
 }
 .accTrigger:disabled .accMark {
   opacity: 0.5;
+}
+/* Sem estado numa lista que tem marcadores: só o lugar (um fato neutro, “não se aplica”). */
+.accMark[data-status='none'] {
+  border-color: transparent;
+  background: none;
 }
 
 /* Altura por grid-template-rows (0fr → 1fr); abre em 280 ms, fecha mais curto. */

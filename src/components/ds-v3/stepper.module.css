@@ -1140,6 +1140,26 @@ button.sectionHead:hover .sectionChevron {
   gap: 8px;
   flex-shrink: 0;
 }
+/*
+ * Motivo visível de uma ação indisponível (`detail` sem `status`, README §1.7): perto dos botões, em
+ * `--muted`, quebrando em até 18rem em vez de cortar. Sem espaço na linha, os botões descem para a
+ * linha de baixo (alinhados ao fim); no celular o motivo ganha a linha dele acima dos botões.
+ */
+.bar:has(> .barReason) {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+.barReason {
+  flex: 0 1 18rem;
+  min-width: min(10rem, 100%);
+  font: var(--t-small);
+  color: var(--muted);
+  text-align: end;
+  text-wrap: pretty;
+}
+.bar:has(> .barReason) .barActions {
+  margin-left: auto;
+}
 @container (max-width: 520px) {
   .barDetail {
     display: none;
@@ -1152,6 +1172,10 @@ button.sectionHead:hover .sectionChevron {
 @container (max-width: 400px) {
   .barStart {
     display: none;
+  }
+  .barReason {
+    flex-basis: 100%;
+    text-align: start;
   }
   .barActions {
     flex: 1;

@@ -65,8 +65,11 @@
   margin-right: auto;
 }
 @container filterbar (max-width: 640px) {
+  /* Ao lado de abas que quase enchem a linha (gaveta de 552), as ferramentas não espremem a busca
+     no resto: abaixo de 220 elas descem para a linha delas e esticam. */
   .tools {
     flex-wrap: wrap;
+    min-width: min(100%, 220px);
   }
   .root:not([data-tabs]) .search,
   .search {

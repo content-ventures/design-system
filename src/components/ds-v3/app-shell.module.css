@@ -752,6 +752,23 @@ button.groupLabel[aria-expanded='false'] svg {
   }
 }
 
+/* ——— Imersivo: a tela de trabalho sem o menu do app (o texto de uma produção). Nenhuma coluna de
+   menu, nenhuma gaveta e nenhum botão de menu, em qualquer largura; a volta fica no cabeçalho da
+   página (`PageHeader back`). O `sidebar` nem é desenhado. ——— */
+.shell[data-layout='immersive'] .frame {
+  grid-template-columns: minmax(0, 1fr);
+}
+.shell[data-layout='immersive'] .topbar .menuButton,
+.shell[data-layout='immersive'] .topbar .toggle,
+.shell[data-layout='immersive'] .topbar .toggle + .topRule {
+  display: none;
+}
+/* Sem topo: a moldura encostada (`WorkspaceLayout docked`, `FixedFrame docked`) desconta 0, não 52 —
+   ocupa a janela até a borda de cima. */
+.shell[data-no-topbar] .main {
+  --topbar-h: 0px;
+}
+
 /* ——— Topo ——— */
 .topbar {
   container: topbar / inline-size;

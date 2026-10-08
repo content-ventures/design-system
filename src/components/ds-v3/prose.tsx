@@ -50,6 +50,17 @@
  *   `width`/`height`; sem eles, 16:9), com ImageOff e “Imagem indisponível”; o `alt` continua para
  *   leitor de tela. `img[data-loading]` — carregando: sem `src`, a mesma moldura pulsando; com `src`,
  *   o fundo pulsa até a imagem cobrir (tire o atributo no `load`).
+ * - `figure[data-slot] > img[data-missing] + figcaption` — imagem sugerida, que o texto pede e ainda
+ *   não existe: a mesma moldura com ImagePlus e “Imagem sugerida”; a figcaption (o que mostrar) em
+ *   `--muted`; na escrita, cursor de clique. Nomeie a figura para leitor de tela (ex.:
+ *   `aria-roledescription="Sugestão de imagem"`).
+ * - `figure[data-slot][data-display="line"]` — a mesma imagem sugerida numa linha de 40 px (escrita,
+ *   leitura e compacto): ImagePlus, “Imagem sugerida:” e o assunto (a figcaption, até duas linhas), no
+ *   ritmo de um parágrafo, em vez da moldura do tamanho da foto. O `img[data-missing]` continua no
+ *   DOM (o arquivo cai nele) e não aparece. Na escrita é escolhível (hover, pressionado); com
+ *   `[data-over]` — o produto põe enquanto um arquivo passa por cima — fio tracejado b-400 sobre b-25;
+ *   selecionada (`.ProseMirror-selectednode`) ou focada, o anel de foco. Gêmeos `data-force`
+ *   (`hover`, `active`, `over`, `focus`). Nomeie a figura (`aria-label`: o pedido e como preencher).
  * - Widgets da fábrica `proseWidgets` (prose-widgets.ts, sem framework): `[data-prose-widget=
  *   "insertion" | "caret" | "skeleton" | "gutter-marker"]` e `[data-prose-sr]` (texto só para leitor
  *   de tela). O consumidor nunca cria DOM: pede o nó à fábrica (ex.: `Decoration.widget`).

@@ -6,7 +6,7 @@
  * Tudo chapado, fio de 1px, movimento curto e respeitando prefers-reduced-motion (tema).
  */
 
-import { Check, ChevronDown, Copy, PanelLeftOpen } from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, Copy, PanelLeftOpen } from 'lucide-react';
 import {
   createContext,
   useCallback,
@@ -19,6 +19,7 @@ import {
   type CSSProperties,
   type ComponentProps,
   type KeyboardEvent,
+  type MouseEvent,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
   type Ref,
@@ -91,6 +92,19 @@ export function PageStack({ className = '', ...props }: ComponentProps<'div'>) {
   return <div className={`${s.pageStack} ${className}`} data-part="page-stack" {...props} />;
 }
 
+/** Volta discreta antes do título (“← Produções”). */
+export type PageHeaderBack = {
+  label: string;
+  href: string;
+  /** Clique na volta (navegação do cliente, guarda de saída); `preventDefault` fica com quem chama. */
+  onNavigate?: (event: MouseEvent<HTMLAnchorElement>) => void;
+  /** Estado parado para pranchas (`hover`, `active`, `focus`). Nunca no produto. */
+  force?: string;
+};
+
+/** Motivo visível de uma ação indisponível; o botão leva `aria-describedby={id}`. */
+export type PageHeaderNote = { id: string; text: string };
+
 /**
  * Cabeçalho de página: título (24; 22 em ≤760), status na mesma linha, meta em “·” sem separador
  * pendurado, ações à direita (principal primeiro: principal, secundária, ⋯) e `toolbar` abaixo.
@@ -100,11 +114,17 @@ export function PageStack({ className = '', ...props }: ComponentProps<'div'>) {
  * primeiro (até 10rem), depois a régua recolhe os nomes; em ≤640 a régua desce para a linha dela
  * (`stepsCompact` no lugar, quando houver). Responde à largura do próprio cabeçalho (container
  * query), não da janela: o servidor e a primeira pintura saem iguais.
+ * `back` põe a volta (“← Produções”) antes do título, na mesma linha e fora do h1 — numa tela sem o
+ * menu do app (`AppShell layout="immersive"`) é o caminho de volta; em ≤640 fica só a seta.
+ * `actionsNote` é o motivo visível de uma ação indisponível, logo antes das ações: uma linha
+ * discreta que corta com reticência (o texto inteiro na dica) e cede antes do título; em ≤640 desce
+ * para a linha dela e quebra.
  */
 export function PageHeader({
   title,
   description,
   actions,
+  actionsNote,
   more,
   toolbar,
   steps,
@@ -113,6 +133,7 @@ export function PageHeader({
   eyebrow,
   status,
   meta,
+  back,
   variant = 'page',
   titleAs: Title = 'h1',
   className = '',
@@ -121,6 +142,18 @@ export function PageHeader({
   description?: ReactNode;
   /** Principal primeiro, depois as secundárias. */
   actions?: ReactNode;
+  /**
+   * Motivo visível de uma ação indisponível (“Aguarde a IA terminar.”): 12 px em `--muted`, numa
+   * linha logo antes das ações. Corta com reticência e mostra o texto inteiro na dica; em ≤640
+   * desce para a linha dele e quebra. O botão indisponível leva `aria-describedby={id}` (e
+   * `aria-disabled`): o motivo nunca fica só numa dica.
+   */
+  actionsNote?: PageHeaderNote;
+  /**
+   * Volta antes do título (“← Produções”), discreta e fora do h1. Em ≤640 vira só a seta; o nome
+   * acessível é sempre “Voltar para {label}”. Não combine com `eyebrow`.
+   */
+  back?: PageHeaderBack;
   /** Menu “⋯”: fica na linha do título no celular. */
   more?: ReactNode;
   toolbar?: ReactNode;
@@ -154,11 +187,24 @@ export function PageHeader({
     <header className={`${s.ph} ${className}`} data-variant={variant} data-part="page-header">
       <div
         className={s.phMain}
-        data-actions={actions ? true : undefined}
+        data-actions={actions || actionsNote ? true : undefined}
         data-more={more ? true : undefined}
         data-steps={steps ? true : undefined}
       >
-        <div className={s.phText}>
+        <div className={s.phText} data-back={back ? true : undefined}>
+          {back && (
+            <a
+              className={s.phBack}
+              href={back.href}
+              onClick={back.onNavigate}
+              aria-label={`Voltar para ${back.label}`}
+              data-force={back.force}
+              data-part="page-header-back"
+            >
+              <ArrowLeft aria-hidden="true" />
+              <span className={s.phBackText}>{back.label}</span>
+            </a>
+          )}
           {eyebrow && <div className={s.phEyebrow}>{eyebrow}</div>}
           <div className={s.phTitleRow}>
             {titleText !== undefined ? (
@@ -185,7 +231,19 @@ export function PageHeader({
             {stepsCompact}
           </div>
         )}
-        {actions && <div className={s.phActions}>{actions}</div>}
+        {(actions || actionsNote) && (
+          <div className={s.phActions}>
+            {actionsNote && (
+              <TruncatedText
+                id={actionsNote.id}
+                className={s.phNote}
+                text={actionsNote.text}
+                data-part="page-header-note"
+              />
+            )}
+            {actions}
+          </div>
+        )}
         {more && <div className={s.phMore}>{more}</div>}
       </div>
       {notice && (
@@ -363,12 +421,15 @@ function AccordionRow({
   onToggle,
   headingLevel,
   onKeyDown,
+  marked = false,
 }: {
   item: AccordionItem;
   open: boolean;
   onToggle: () => void;
   headingLevel: 'h2' | 'h3' | 'h4';
   onKeyDown?: (event: KeyboardEvent<HTMLButtonElement>) => void;
+  /** Outra linha tem marcador: esta, sem estado, guarda o lugar dele (os títulos alinham). */
+  marked?: boolean;
 }) {
   const base = useId();
   const triggerId = `${base}-trigger`;
@@ -394,7 +455,11 @@ function AccordionRow({
           data-status={item.status}
           data-force={item.force}
         >
-          {item.status && <StatusMark status={item.status} />}
+          {item.status ? (
+            <StatusMark status={item.status} />
+          ) : marked ? (
+            <span className={s.accMark} data-status="none" aria-hidden="true" />
+          ) : null}
           <span className={s.accTitle}>
             {item.title}
             {item.status && <VisuallyHidden>{` (${statusText[item.status]})`}</VisuallyHidden>}
@@ -455,6 +520,8 @@ export function Accordion({
     if (value === undefined) setInner(next);
     onValueChange?.(next);
   }
+  // Uma linha com marcador faz as outras guardarem o lugar dele: os títulos ficam na mesma borda.
+  const marked = items.some((item) => item.status);
   return (
     <div ref={rootRef} className={`${s.accordion} ${className}`} data-variant={variant}>
       {items.map((item) => (
@@ -465,6 +532,7 @@ export function Accordion({
           onToggle={() => toggle(item.id)}
           headingLevel={headingLevel}
           onKeyDown={(event) => moveFocus(event, rootRef.current)}
+          marked={marked}
         />
       ))}
     </div>

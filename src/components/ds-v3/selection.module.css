@@ -403,6 +403,9 @@
     width var(--dur-3) var(--ease-out);
 }
 .segment {
+  /* Esticado por quem o contém (barra de ações no celular), o trilho reparte a sobra entre as opções:
+     nunca sobra um rabo cinza vazio depois da última. */
+  flex: 1 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -625,6 +628,32 @@
   position: absolute;
   top: 12px;
   right: 12px;
+}
+/*
+ * Com peça no topo (miniatura de um modelo): respiro de 8 para a peça ocupar o cartão, o texto
+ * recua 4 e alinha a 12 da borda como no cartão sem peça; o rádio fica sobre o canto da peça, no
+ * papel, legível sobre imagem clara ou escura. Numa grade, a área clicável cresce até a altura da
+ * linha: o rodapé dos cartões vizinhos fica na mesma altura, mesmo com título em duas linhas.
+ */
+.card[data-media='true'] .cardMain {
+  flex: 1 0 auto;
+  padding: var(--s-2) var(--s-2) var(--s-3);
+}
+.cardMedia {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  transition: opacity var(--dur-1) var(--ease-out);
+}
+.card[data-media='true'] .cardBody {
+  padding-inline: var(--s-1);
+}
+.card[data-media='true'] .radioDot {
+  top: var(--s-4);
+  right: var(--s-4);
+}
+.card[data-disabled='true'] .cardMedia {
+  opacity: 0.45;
 }
 
 /* ——— Toque: área de acerto de 40 px em volta de caixa e chave, sem mudar o desenho ——— */
