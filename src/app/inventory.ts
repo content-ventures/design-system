@@ -622,6 +622,18 @@ export const inventory: readonly InventoryGroup[] = [
         'Linha do tempo do copiloto: turnos, artefato, voto e ir para o fim.',
         'conversation chat thread mensagem turno feedback copiloto',
       ),
+      item(
+        'etapas-ia',
+        'Etapas da IA',
+        'Passos visíveis de uma geração: em andamento, concluída, falha e parada.',
+        'agent trace reasoning etapas passos',
+      ),
+      item(
+        'fonte',
+        'Fonte',
+        'Fonte citada: chip com prévia e marca numerada no texto.',
+        'source citation citacao referencia',
+      ),
     ],
   },
   {
