@@ -8,6 +8,7 @@
 export { ThemeV3, type ThemeMode } from './theme';
 export { interV3 } from './font';
 export { VisuallyHidden, LiveRegion, useAnnouncer } from './a11y';
+export { formatRelative, textStats, type TextStats } from './format';
 
 /* Ações */
 export {

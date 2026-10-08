@@ -29,6 +29,7 @@
     ".": "./src/components/ds-v3/index.ts",
     "./v3": "./src/components/ds-v3/index.ts",
     "./v3/icons": "./src/components/ds-v3/icons.ts",
+    "./v3/format": "./src/components/ds-v3/format.ts",
     "./v3/*.module.css": "./src/components/ds-v3/*.module.css",
     "./v3/*": "./src/components/ds-v3/*.tsx",
     "./package.json": "./package.json"
