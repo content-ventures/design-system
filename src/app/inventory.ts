@@ -47,6 +47,12 @@ export const inventory: readonly InventoryGroup[] = [
         'fontes texto',
       ),
       item(
+        'leitura',
+        'Leitura',
+        'Texto corrido de artigo: escala de leitura, itálico, diferença entre versões e marca-texto.',
+        'prose artigo editor italico diff marca-texto tempo relativo palavras',
+      ),
+      item(
         'espacamento',
         'Espaçamento',
         'Escala de distâncias, alinhamentos e densidade das interfaces.',

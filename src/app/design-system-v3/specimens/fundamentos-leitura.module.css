@@ -1,0 +1,231 @@
+/* Prancha “Leitura”: só arranjo e aplicação dos tokens de leitura. Nenhum valor solto. */
+
+/* ——— Artigo ——— */
+.article {
+  container: leitura / inline-size;
+  display: grid;
+  width: 100%;
+  max-width: var(--prose-measure);
+  margin-inline: auto;
+  font: var(--t-prose-body);
+  color: var(--text);
+}
+.article > * + * {
+  margin-top: var(--prose-space-block);
+}
+.title {
+  margin-top: var(--s-3);
+  font: var(--t-prose-title);
+  letter-spacing: var(--track-display);
+  color: var(--ink);
+  text-wrap: balance;
+}
+/* Coluna estreita (celular): título na escala de página (24/32); o resto da escala não muda. */
+@container leitura (max-width: 440px) {
+  .title {
+    font: var(--t-page);
+    letter-spacing: var(--track-title);
+  }
+}
+.article > .lead {
+  margin-top: var(--s-3);
+}
+.lead {
+  font: var(--t-prose-lead);
+  color: var(--muted);
+  text-wrap: pretty;
+}
+.body {
+  font: var(--t-prose-body);
+  color: var(--text);
+  text-wrap: pretty;
+}
+.body strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.article > .h2 {
+  margin-top: var(--prose-space-section);
+}
+.h2 {
+  font: var(--t-prose-h2);
+  letter-spacing: var(--track-title);
+  color: var(--ink);
+  text-wrap: balance;
+}
+.article > .h3 {
+  margin-top: var(--s-8);
+}
+.h3 {
+  font: var(--t-prose-h3);
+  letter-spacing: var(--track-tight);
+  color: var(--ink);
+}
+.article > .h2 + *,
+.article > .h3 + * {
+  margin-top: var(--s-3);
+}
+
+/* Citação: recuo e escala maior; sem fio lateral, sem caixa. */
+.quote {
+  display: grid;
+  gap: var(--s-2);
+  padding-inline-start: var(--s-6);
+}
+.quote blockquote {
+  margin: 0;
+  font: var(--t-prose-quote);
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.caption {
+  font: var(--t-prose-caption);
+  color: var(--muted);
+}
+
+/* Marca-texto: tom nomeado, texto em `--mark-ink`, raio mínimo e respiro que acompanha a quebra. */
+.mark {
+  padding: 1px 2px;
+  border-radius: var(--r-xs);
+  color: var(--mark-ink);
+  background: var(--mark-yellow-bg);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.mark[data-tone='green'] {
+  background: var(--mark-green-bg);
+}
+.mark[data-tone='pink'] {
+  background: var(--mark-pink-bg);
+}
+
+/* ——— Escala ——— */
+.scale {
+  container: escala / inline-size;
+  display: grid;
+}
+.scaleRow {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--s-6);
+  min-height: var(--s-14);
+  padding: var(--s-3) 0;
+  border-top: 1px solid var(--line-soft);
+}
+.scaleRow:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+.scaleRow:last-child {
+  padding-bottom: 0;
+}
+.scaleMeta {
+  display: grid;
+  gap: 2px;
+}
+.scaleRole {
+  font: var(--t-small-strong);
+  color: var(--ink);
+}
+.scaleSpec {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--s-2);
+  font: var(--t-caption);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.scaleSample {
+  min-width: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.scaleSample[data-kind='title'] {
+  font: var(--t-prose-title);
+  letter-spacing: var(--track-display);
+}
+.scaleSample[data-kind='h2'] {
+  font: var(--t-prose-h2);
+  letter-spacing: var(--track-title);
+}
+.scaleSample[data-kind='h3'] {
+  font: var(--t-prose-h3);
+  letter-spacing: var(--track-tight);
+}
+.scaleSample[data-kind='lead'] {
+  font: var(--t-prose-lead);
+  color: var(--muted);
+}
+.scaleSample[data-kind='body'] {
+  font: var(--t-prose-body);
+  color: var(--text);
+}
+.scaleSample[data-kind='quote'] {
+  font: var(--t-prose-quote);
+}
+.scaleSample[data-kind='caption'] {
+  font: var(--t-prose-caption);
+  color: var(--muted);
+}
+@container escala (max-width: 560px) {
+  .scaleRow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-2);
+  }
+}
+
+/* ——— Itálico ——— */
+.italic {
+  display: grid;
+  gap: var(--s-1);
+  font: var(--t-prose-body);
+  color: var(--ink);
+}
+.italic[data-weight='500'] {
+  font-weight: 500;
+}
+.italic[data-weight='600'] {
+  font-weight: 600;
+}
+
+/* ——— Diferença ——— */
+.diff {
+  font: var(--t-prose-body);
+  color: var(--text);
+}
+.diff ins {
+  padding: 1px 2px;
+  border-radius: var(--r-xs);
+  color: var(--diff-insert-ink);
+  background: var(--diff-insert-bg);
+  text-decoration: underline 1.5px var(--diff-insert-line);
+  text-underline-offset: 3px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.diff del {
+  padding: 1px 2px;
+  border-radius: var(--r-xs);
+  color: var(--diff-delete-ink);
+  background: var(--diff-delete-bg);
+  text-decoration: line-through 1.5px var(--diff-delete-line);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.diff del + ins {
+  margin-left: 2px;
+}
+
+/* ——— Tempo e contagem ——— */
+.pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: var(--s-4);
+  width: 100%;
+}
+
+/* ——— Celular ——— */
+.phoneBody {
+  padding: var(--s-6) var(--s-4) var(--s-8);
+}

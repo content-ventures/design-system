@@ -42,7 +42,7 @@ export function familyOf(groupId: string): FamilyMeta {
   );
 }
 
-/** Os 126 itens em ordem de leitura, com a família de cada um (`groupLabel` = nome curto). */
+/** Os itens em ordem de leitura, com a família de cada um (`groupLabel` = nome curto). */
 export const catalogItems = inventory.flatMap((group) =>
   group.items.map((item) => ({
     ...item,
