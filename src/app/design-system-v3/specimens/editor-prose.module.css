@@ -1,0 +1,51 @@
+/* Prancha “Editor (texto)”: só arranjo do palco. Tipografia e estados vêm de Prose/EditableTitle. */
+
+/* Gancho: margem à esquerda como a calha da escrita. */
+.hook {
+  width: 100%;
+  padding-inline-start: var(--s-5);
+}
+
+/* Cartão que ocupa a célula inteira */
+.fill {
+  width: 100%;
+}
+
+/* Título editável em contexto: cabeçalho da produção e dois cartões de slide */
+.context {
+  display: grid;
+  gap: var(--s-8);
+  width: 100%;
+}
+.head {
+  display: grid;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.slides {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  gap: var(--s-2);
+}
+.slide {
+  display: grid;
+  gap: var(--s-1);
+  min-width: 0;
+}
+
+/* Escrita em contexto: área de rolagem do estúdio — mostra o respiro do fim (overscroll). */
+.scroll {
+  height: 720px;
+  overflow: auto;
+}
+.phoneScroll {
+  height: 640px;
+  overflow: auto;
+}
+
+/* Celular */
+.phoneBody {
+  display: grid;
+  gap: var(--s-8);
+  padding: var(--s-6) var(--s-4) var(--s-8);
+}

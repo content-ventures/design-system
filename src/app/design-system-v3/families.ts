@@ -9,6 +9,7 @@ import {
   MessageSquareDot,
   MousePointerClick,
   Palette,
+  PenLine,
   Table2,
   TextCursorInput,
   type LucideIcon,
@@ -29,6 +30,7 @@ export const families: Record<string, FamilyMeta> = {
   feedback: { icon: MessageSquareDot, label: 'Feedback' },
   camadas: { icon: Layers, label: 'Modais e camadas' },
   midia: { icon: Images, label: 'Mídia e arquivos' },
+  editor: { icon: PenLine, label: 'Editor' },
   padroes: { icon: Blocks, label: 'Padrões' },
   templates: { icon: LayoutTemplate, label: 'Templates' },
 };

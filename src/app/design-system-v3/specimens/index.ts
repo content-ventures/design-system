@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 import { specimens as acoes } from './acoes';
 import { specimens as camadas } from './camadas';
 import { specimens as dados } from './dados';
+import { specimens as editorProse } from './editor-prose';
 import { specimens as estrutura } from './estrutura';
 import { specimens as estruturaLayout } from './estrutura-layout';
 import { specimens as feedback } from './feedback';
@@ -32,6 +33,7 @@ export const specimens: Record<string, ComponentType> = {
   ...feedback,
   ...camadas,
   ...midia,
+  ...editorProse,
   ...padroesA,
   ...padroesB,
   ...templates,

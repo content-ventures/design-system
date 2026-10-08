@@ -577,6 +577,24 @@ export const inventory: readonly InventoryGroup[] = [
     ],
   },
   {
+    id: 'editor',
+    label: 'Editor',
+    items: [
+      item(
+        'texto-corrido',
+        'Texto corrido',
+        'Corpo do artigo para edição, revisão e prévia, com marcas de IA, fonte e diferença.',
+        'prose artigo leitura tiptap editor',
+      ),
+      item(
+        'titulo-editavel',
+        'Título editável',
+        'Título que vira campo ao clicar, com contagem, salvamento e erro.',
+        'titulo inline renomear editable title',
+      ),
+    ],
+  },
+  {
     id: 'padroes',
     label: 'Padrões do MediaOn',
     items: [
