@@ -11,6 +11,15 @@
   background: var(--paper);
   overflow: clip;
 }
+/* Sangrada (sem contorno, dentro de seção): o respiro da linha sai para fora do bloco de conteúdo,
+   o texto alinha ao título da seção e o hover vai de borda a borda. */
+.frame[data-bleed] {
+  width: calc(100% + 2 * var(--s-4));
+  margin-inline: calc(-1 * var(--s-4));
+}
+.frame[data-bleed] .item[data-density='sm'] .row {
+  padding-inline: var(--s-4);
+}
 .list {
   display: grid;
   margin: 0;
@@ -105,6 +114,25 @@
   align-items: center;
   flex: none;
 }
+/* Ícone na frente (`icon`): 16 px, cor de repouso; escurece com a linha, azul quando selecionada. */
+.icon {
+  width: var(--icon-md);
+  height: var(--icon-md);
+  color: var(--icon-rest);
+  transition: color var(--dur-1) var(--ease-out);
+}
+.item[data-interactive] .row:is(:hover, [data-force~='hover']) .icon {
+  color: var(--g-600);
+}
+.item[data-selected] .icon {
+  color: var(--b-600);
+}
+.item[data-disabled] .icon {
+  color: var(--disabled-icon);
+}
+.item[data-disabled] .leading[data-icon] {
+  opacity: 1;
+}
 .text {
   display: grid;
   gap: 1px;
@@ -118,6 +146,15 @@
   color: var(--ink);
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+/* Título em até duas linhas (`titleLines={2}`): quebra por palavra e corta na segunda. */
+.item[data-title-lines='2'] .title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .desc {
   min-width: 0;

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, GripVertical } from 'lucide-react';
+import { ChevronRight, GripVertical, type LucideIcon } from 'lucide-react';
 import {
   Children,
   createContext,
@@ -36,12 +36,14 @@ const itemsOf = (list: HTMLElement | null) =>
 /**
  * Lista em fios dentro de um contorno (um painel, nunca um cartão por linha). `onReorder` liga o
  * arrastar pela alça (as outras linhas abrem espaço em 280 ms) e Alt + ↑/↓ pelo teclado, com aviso
- * para leitor de tela. `maxHeight` rola a lista e prende os cabeçalhos de grupo no topo.
+ * para leitor de tela. `maxHeight` rola a lista e prende os cabeçalhos de grupo no topo. Sem
+ * contorno dentro de `Section`/`Panel`, `bleed` alinha o conteúdo das linhas ao título da seção.
  */
 export function List({
   label,
   dividers = true,
   framed = true,
+  bleed = false,
   children,
   empty,
   onReorder,
@@ -50,6 +52,11 @@ export function List({
   label: string;
   dividers?: boolean;
   framed?: boolean;
+  /**
+   * Só sem contorno (`framed={false}`), dentro de `Section` ou `Panel`: as linhas sangram o próprio
+   * respiro (16 px) — o texto alinha ao título da seção e o hover vai de borda a borda do bloco.
+   */
+  bleed?: boolean;
   children?: ReactNode;
   /** Sem itens: uma linha em `--muted` (“Nenhum P.I. pendente”). */
   empty?: ReactNode;
@@ -203,7 +210,7 @@ export function List({
   );
   return (
     <ReorderContext.Provider value={api}>
-      <div className={s.frame} data-framed={framed || undefined}>
+      <div className={s.frame} data-framed={framed || undefined} data-bleed={(bleed && !framed) || undefined}>
         {maxHeight ? (
           // Com rolagem: o fim esmaece enquanto ainda há linhas abaixo (some no fim da lista).
           <ScrollArea label={label} maxHeight={maxHeight} fade="end">
@@ -251,11 +258,16 @@ export function ListGroup({ label, meta, children }: { label: string; meta?: Rea
  * `href` vira link com chevron; `onClick`, botão; `checkbox`, caixa de seleção na frente.
  * Linha clicável não leva controle no `trailing` (nada de botão dentro de botão): o controle de
  * uma linha clicável vai em `actions`, ao lado da linha e fora dela. Com `href`, `onClick` também
- * roda (ex.: marcar como lida ao abrir).
+ * roda (ex.: marcar como lida ao abrir). `icon` desenha um ícone lucide na frente com os tokens do
+ * contrato (16 px, `--icon-rest`, g-600 no hover, b-600 selecionado); `leading` tem precedência.
+ * `titleLines={2}` deixa o título quebrar em até duas linhas antes das reticências (painéis
+ * estreitos com títulos longos, como “Aguardando você”); a linha cresce com ele.
  */
 export function ListItem({
   leading,
+  icon: Icon,
   title,
+  titleLines = 1,
   description,
   meta,
   trailing,
@@ -271,7 +283,11 @@ export function ListItem({
   'data-testid': testId,
 }: {
   leading?: ReactNode;
+  /** Ícone na frente do título (sem `IconTile`). Ignorado quando há `leading`. */
+  icon?: LucideIcon;
   title: ReactNode;
+  /** Linhas do título antes das reticências. Padrão 1; 2 para títulos longos em coluna estreita. */
+  titleLines?: 1 | 2;
   description?: ReactNode;
   meta?: ReactNode;
   trailing?: ReactNode;
@@ -311,7 +327,15 @@ export function ListItem({
           </svg>
         </span>
       )}
-      {leading && <span className={s.leading}>{leading}</span>}
+      {leading ? (
+        <span className={s.leading}>{leading}</span>
+      ) : (
+        Icon && (
+          <span className={s.leading} data-icon="">
+            <Icon className={s.icon} aria-hidden="true" />
+          </span>
+        )
+      )}
       <span className={s.text}>
         <span className={s.title}>{title}</span>
         {description && <span className={s.desc}>{description}</span>}
@@ -361,8 +385,9 @@ export function ListItem({
       data-title={titleText}
       data-density={density}
       data-lines={description ? 2 : 1}
+      data-title-lines={titleLines === 2 ? 2 : undefined}
       data-meta={meta ? '' : undefined}
-      data-lead={leading || checkbox ? '' : undefined}
+      data-lead={leading || Icon || checkbox ? '' : undefined}
       data-selected={selected || undefined}
       data-disabled={disabled || undefined}
       data-interactive={interactive || checkbox || undefined}
