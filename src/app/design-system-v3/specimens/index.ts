@@ -20,6 +20,7 @@ import { specimens as navegacao } from './navegacao';
 import { specimens as padroesA } from './padroes-a';
 import { specimens as padroesB } from './padroes-b';
 import { specimens as pageBuilder } from './page-builder';
+import { specimens as revisaoDiferencas } from './revisao-diferencas';
 import { specimens as templates } from './templates';
 
 /** Prancha de cada item do inventário (id → componente). Item sem prancha aparece como “Em desenho”. */
@@ -42,6 +43,7 @@ export const specimens: Record<string, ComponentType> = {
   ...iaCopiloto,
   ...iaAgent,
   ...iaSugestao,
+  ...revisaoDiferencas,
   ...padroesA,
   ...padroesB,
   ...templates,

@@ -643,6 +643,24 @@ export const inventory: readonly InventoryGroup[] = [
     ],
   },
   {
+    id: 'revisao',
+    label: 'Revisão',
+    items: [
+      item(
+        'diferencas',
+        'Diferenças',
+        'Comparação entre versões em linha ou lado a lado, com resumo e blocos recolhidos.',
+        'diff versoes comparar revisao',
+      ),
+      item(
+        'selo',
+        'Selo',
+        'Confirmação de aprovação em três tamanhos, com animação de entrada.',
+        'seal aprovado aprovacao check',
+      ),
+    ],
+  },
+  {
     id: 'padroes',
     label: 'Padrões do MediaOn',
     items: [

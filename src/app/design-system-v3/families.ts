@@ -2,6 +2,7 @@ import {
   Blocks,
   ChartColumnBig,
   Compass,
+  GitCompareArrows,
   Images,
   LayoutPanelLeft,
   LayoutTemplate,
@@ -33,6 +34,7 @@ export const families: Record<string, FamilyMeta> = {
   midia: { icon: Images, label: 'Mídia e arquivos' },
   editor: { icon: PenLine, label: 'Editor' },
   ia: { icon: Sparkles, label: 'IA' },
+  revisao: { icon: GitCompareArrows, label: 'Revisão' },
   padroes: { icon: Blocks, label: 'Padrões' },
   templates: { icon: LayoutTemplate, label: 'Templates' },
 };
