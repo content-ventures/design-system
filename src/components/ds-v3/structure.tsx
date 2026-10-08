@@ -25,6 +25,7 @@ import {
   type UIEvent,
 } from 'react';
 import { VisuallyHidden } from './a11y';
+import { Tooltip, TruncatedText } from './overlays';
 import { MetaList, type MetaItem } from './surfaces';
 import s from './structure.module.css';
 
@@ -95,7 +96,10 @@ export function PageStack({ className = '', ...props }: ComponentProps<'div'>) {
  * pendurado, ações à direita (principal primeiro: principal, secundária, ⋯) e `toolbar` abaixo.
  * Em ≤640 as ações descem para baixo do título com a principal esticada; o `more` (⋯) fica na
  * linha do título. `variant="frame"` é o cabeçalho contido da moldura de criação (título 18).
- * Responde à largura do próprio cabeçalho (container query), não da janela.
+ * Com `steps`, a moldura é uma linha só: título · status · régua · ações · ⋯ — o título cede
+ * primeiro (até 10rem), depois a régua recolhe os nomes; em ≤640 a régua desce para a linha dela
+ * (`stepsCompact` no lugar, quando houver). Responde à largura do próprio cabeçalho (container
+ * query), não da janela: o servidor e a primeira pintura saem iguais.
  */
 export function PageHeader({
   title,
@@ -103,6 +107,9 @@ export function PageHeader({
   actions,
   more,
   toolbar,
+  steps,
+  stepsCompact,
+  notice,
   eyebrow,
   status,
   meta,
@@ -117,6 +124,20 @@ export function PageHeader({
   /** Menu “⋯”: fica na linha do título no celular. */
   more?: ReactNode;
   toolbar?: ReactNode;
+  /**
+   * `frame`: régua de etapas (`Stepper size="sm"`) na linha do título, entre o título e as ações.
+   * Pede ~27rem (o `sm` com quatro nomes) e estica até o que sobra; sem espaço, o título trunca
+   * antes, até 10rem, e só então a régua recolhe os nomes.
+   */
+  steps?: ReactNode;
+  /** `frame` com `steps`: o que fica no lugar da régua em ≤640 (ex.: `StepperCompact`). */
+  stepsCompact?: ReactNode;
+  /**
+   * Aviso da página dentro do cabeçalho (`Banner variant="inline"`), na largura toda, logo abaixo
+   * da linha do título: numa moldura encostada (`WorkspaceLayout docked`), uma faixa acima dela
+   * empurraria a moldura para fora da janela.
+   */
+  notice?: ReactNode;
   /** Compatibilidade. Evite: o título não precisa de selo acima. */
   eyebrow?: ReactNode;
   /** Status logo depois do título (Badge em texto). */
@@ -127,29 +148,51 @@ export function PageHeader({
   titleAs?: 'h1' | 'h2';
   className?: string;
 }) {
-  /* Título que pode cortar em 2 linhas leva o texto inteiro no `title`. */
-  const titleText = typeof title === 'string' && title.length > 56 ? title : undefined;
+  /* Título que corta (2 linhas, ou uma na moldura) mostra o texto inteiro numa dica do DS. */
+  const titleText = typeof title === 'string' ? title : undefined;
   return (
     <header className={`${s.ph} ${className}`} data-variant={variant} data-part="page-header">
       <div
         className={s.phMain}
         data-actions={actions ? true : undefined}
         data-more={more ? true : undefined}
+        data-steps={steps ? true : undefined}
       >
         <div className={s.phText}>
           {eyebrow && <div className={s.phEyebrow}>{eyebrow}</div>}
           <div className={s.phTitleRow}>
-            <Title className={s.phTitle} title={titleText}>
-              {title}
-            </Title>
+            {titleText !== undefined ? (
+              <TruncatedText as={Title} className={s.phTitle} text={titleText} />
+            ) : (
+              <Title className={s.phTitle}>{title}</Title>
+            )}
             {status && <span className={s.phStatus}>{status}</span>}
           </div>
           {description && <p className={s.phDesc}>{description}</p>}
           {meta && meta.length > 0 && <MetaList items={meta} className={s.phMeta} />}
         </div>
+        {steps && (
+          <div
+            className={s.phSteps}
+            data-part="page-header-steps"
+            data-compact={stepsCompact ? true : undefined}
+          >
+            {steps}
+          </div>
+        )}
+        {steps && stepsCompact && (
+          <div className={s.phStepsCompact} data-part="page-header-steps-compact">
+            {stepsCompact}
+          </div>
+        )}
         {actions && <div className={s.phActions}>{actions}</div>}
         {more && <div className={s.phMore}>{more}</div>}
       </div>
+      {notice && (
+        <div className={s.phNotice} data-part="page-header-notice">
+          {notice}
+        </div>
+      )}
       {toolbar && <div className={s.phToolbar}>{toolbar}</div>}
     </header>
   );
@@ -252,7 +295,12 @@ export function Section({
           {action && <div className={s.sectionAction}>{action}</div>}
         </div>
       )}
-      {children !== undefined && <div className={s.sectionBody}>{children}</div>}
+      {children !== undefined && (
+        // `data-part`: campos irmãos no corpo ganham o vão da pilha de campos (fields.module.css).
+        <div className={s.sectionBody} data-part="section-body">
+          {children}
+        </div>
+      )}
     </section>
   );
 }
@@ -435,6 +483,7 @@ export function Disclosure({
   open: controlled,
   onOpenChange,
   variant = 'plain',
+  headingLevel = 'h3',
   force,
   className = '',
 }: {
@@ -446,6 +495,8 @@ export function Disclosure({
   onOpenChange?: (open: boolean) => void;
   /** `bar`: faixa de largura total com fio embaixo (topo de moldura no celular). */
   variant?: 'plain' | 'panel' | 'bar';
+  /** Nível do título do resumo (o tamanho não muda). Padrão h3. */
+  headingLevel?: 'h2' | 'h3' | 'h4';
   force?: string;
   className?: string;
 }) {
@@ -456,7 +507,7 @@ export function Disclosure({
       <AccordionRow
         item={{ id: 'disclosure', title: summary, meta, content: children, force }}
         open={open}
-        headingLevel="h3"
+        headingLevel={headingLevel}
         onToggle={() => {
           if (controlled === undefined) setInner(!open);
           onOpenChange?.(!open);
@@ -656,9 +707,17 @@ export function ScrollArea({
   );
 }
 
-/* ——————————————————————————— ResizablePanels ——————————————————————————— */
+/* ——————————————————————————— Alça de painel (interna) ——————————————————————————— */
+/*
+ * Peças compartilhadas por `ResizablePanels` e `WorkspaceLayout` (workspace-layout.tsx). Ficam fora
+ * do barril: o produto usa os dois componentes, não a alça solta.
+ */
 
-function readStored(key: string | undefined) {
+/** Largura e recolhimento de um painel, como ficam guardados neste navegador. */
+export type PaneMemory = { size: number; collapsed: boolean };
+
+/** Interno. Lê a preferência guardada de um painel; `null` sem chave, sem registro ou sem acesso. */
+export function readPaneMemory(key: string | undefined) {
   if (!key) return null;
   try {
     const raw = window.localStorage.getItem(key);
@@ -673,7 +732,8 @@ function readStored(key: string | undefined) {
   }
 }
 
-function writeStored(key: string | undefined, value: { size: number; collapsed: boolean }) {
+/** Interno. Guarda a preferência de um painel (armazenamento indisponível: segue sem lembrar). */
+export function writePaneMemory(key: string | undefined, value: PaneMemory) {
   if (!key) return;
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
@@ -682,7 +742,173 @@ function writeStored(key: string | undefined, value: { size: number; collapsed: 
   }
 }
 
-const clampTo = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+/** Interno. Largura de um elemento, observada (`undefined` antes da primeira medida). */
+export const useElementWidth = useWidth;
+
+/** Interno. */
+export const clampTo = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
+
+/** Abaixo de `min − 24` px o arrasto recolhe o painel (quando recolhível). */
+const COLLAPSE_SLACK = 24;
+
+export type PaneSeparatorProps = {
+  /**
+   * Onde está o painel que a alça mede: `start` vem antes dela (cresce para a direita) e `end`
+   * vem depois (cresce para a esquerda). As setas seguem o arrasto.
+   */
+  side?: 'start' | 'end';
+  /** Largura aberta lembrada, em px (continua valendo enquanto o painel está recolhido). */
+  size: number;
+  collapsed: boolean;
+  min: number;
+  /** Teto já descontado do espaço dos vizinhos. */
+  max: number;
+  /** Duplo clique volta a esta largura. */
+  defaultSize: number;
+  collapsible: boolean;
+  /** Nome da alça (“Redimensionar Fonte”). */
+  label: string;
+  /** `id` do painel controlado. */
+  controls: string;
+  /** Durante o arrasto: desenha sem guardar. */
+  onPreview: (size: number, collapsed: boolean) => void;
+  /** Fim do arrasto, seta, Home/End, duplo clique ou Escape (desfaz o arrasto). */
+  onCommit: (size: number, collapsed: boolean) => void;
+  /** Enter, ou a seta de encolher já no mínimo: recolhe ou mostra o painel. */
+  onToggle: (collapsed: boolean) => void;
+  onDraggingChange?: (dragging: boolean) => void;
+  /** Só pranchas: `hover`, `active` (= arrastando) ou `focus`. */
+  force?: string;
+  className?: string;
+  ref?: Ref<HTMLDivElement>;
+};
+
+/**
+ * Interno. Divisória arrastável (fio de 1px, alvo invisível de 12px) com o teclado do separador
+ * ARIA: ←/→ 16px (Shift ×4), Home/End, Enter recolhe/mostra, Escape desfaz o arrasto e duplo
+ * clique volta ao padrão. `aria-valuenow` é a largura do painel em px (0 recolhido).
+ */
+export function PaneSeparator({
+  side = 'start',
+  size,
+  collapsed,
+  min,
+  max,
+  defaultSize,
+  collapsible,
+  label,
+  controls,
+  onPreview,
+  onCommit,
+  onToggle,
+  onDraggingChange,
+  force,
+  className = '',
+  ref,
+}: PaneSeparatorProps) {
+  const ceiling = Math.max(min, max);
+  const open = collapsed ? 0 : clampTo(size, min, ceiling);
+  const direction = side === 'start' ? 1 : -1;
+  const [dragging, setDragging] = useState(false);
+  const drag = useRef<{ x: number; from: PaneMemory; last: PaneMemory } | null>(null);
+
+  function setDrag(next: boolean) {
+    setDragging(next);
+    onDraggingChange?.(next);
+  }
+
+  function onPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    const from = { size, collapsed };
+    drag.current = { x: event.clientX, from, last: from };
+    setDrag(true);
+  }
+  function onPointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    const current = drag.current;
+    if (!current) return;
+    const startWidth = current.from.collapsed ? 0 : clampTo(current.from.size, min, ceiling);
+    const raw = startWidth + (event.clientX - current.x) * direction;
+    // Recolhido pelo arrasto, o painel lembra a largura de antes: reabre como estava.
+    const next =
+      collapsible && raw < min - COLLAPSE_SLACK
+        ? { size: current.from.size, collapsed: true }
+        : { size: clampTo(raw, min, ceiling), collapsed: false };
+    if (next.size === current.last.size && next.collapsed === current.last.collapsed) return;
+    current.last = next;
+    onPreview(next.size, next.collapsed);
+  }
+  function endDrag() {
+    const current = drag.current;
+    if (!current) return;
+    drag.current = null;
+    setDrag(false);
+    onCommit(current.last.size, current.last.collapsed);
+  }
+  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key === 'Escape' && drag.current) {
+      event.preventDefault();
+      const { from } = drag.current;
+      drag.current = null;
+      setDrag(false);
+      onCommit(from.size, from.collapsed);
+      return;
+    }
+    const grow = side === 'start' ? 'ArrowRight' : 'ArrowLeft';
+    const shrink = side === 'start' ? 'ArrowLeft' : 'ArrowRight';
+    const step = event.shiftKey ? 64 : 16;
+    let next: number | null = null;
+    if (event.key === shrink) {
+      if (collapsed) return;
+      if (collapsible && open <= min) {
+        event.preventDefault();
+        onToggle(true);
+        return;
+      }
+      next = open - step;
+    } else if (event.key === grow) next = collapsed ? min : open + step;
+    else if (event.key === 'Home') next = min;
+    else if (event.key === 'End') next = ceiling;
+    else if (event.key === 'Enter' && collapsible) {
+      event.preventDefault();
+      onToggle(!collapsed);
+      return;
+    }
+    if (next === null) return;
+    event.preventDefault();
+    onCommit(clampTo(next, min, ceiling), false);
+  }
+
+  return (
+    <div
+      ref={ref}
+      className={`${s.splitHandle} ${className}`}
+      role="separator"
+      aria-orientation="vertical"
+      aria-label={label}
+      aria-controls={controls}
+      aria-valuenow={Math.round(open)}
+      aria-valuemin={collapsible ? 0 : min}
+      aria-valuemax={Math.round(ceiling)}
+      aria-valuetext={collapsed ? 'Recolhido' : `${Math.round(open)} px`}
+      tabIndex={0}
+      data-side={side}
+      data-dragging={dragging || undefined}
+      data-force={force}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      onLostPointerCapture={endDrag}
+      onDoubleClick={() => onCommit(clampTo(defaultSize, min, ceiling), false)}
+      onKeyDown={onKeyDown}
+    />
+  );
+}
+
+/* ——————————————————————————— ResizablePanels ——————————————————————————— */
 
 /**
  * Dois painéis lado a lado com divisória arrastável (fio de 1px, alvo invisível de 12px).
@@ -733,7 +959,6 @@ export function ResizablePanels({
   const [size, setSize] = useState(defaultSize);
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [dragging, setDragging] = useState(false);
-  const drag = useRef<{ x: number; size: number; collapsed: boolean } | null>(null);
   const handleRef = useRef<HTMLDivElement>(null);
   const showRef = useRef<HTMLButtonElement>(null);
 
@@ -742,7 +967,7 @@ export function ResizablePanels({
   const stacked = width !== undefined && width <= stackBelow;
 
   useEffect(() => {
-    const stored = readStored(storageKey);
+    const stored = readPaneMemory(storageKey);
     if (!stored) return;
     // Restaura a preferência salva depois da hidratação (o servidor não conhece o navegador).
     if (stored.size !== undefined) setSize(stored.size);
@@ -752,7 +977,7 @@ export function ResizablePanels({
   function commit(nextSize: number, nextCollapsed: boolean) {
     setSize(nextSize);
     setCollapsed(nextCollapsed);
-    writeStored(storageKey, { size: nextSize, collapsed: nextCollapsed });
+    writePaneMemory(storageKey, { size: nextSize, collapsed: nextCollapsed });
     onSizeChange?.(nextSize, nextCollapsed);
   }
 
@@ -760,66 +985,6 @@ export function ResizablePanels({
     commit(size, next);
     // O foco segue a ação: recolhido → botão “Mostrar lista”; aberto → alça.
     window.requestAnimationFrame(() => (next ? showRef.current : handleRef.current)?.focus());
-  }
-
-  function onPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.button !== 0) return;
-    event.preventDefault();
-    event.currentTarget.setPointerCapture(event.pointerId);
-    drag.current = {
-      x: event.clientX,
-      size: collapsed ? 0 : clampTo(size, min, ceiling),
-      collapsed,
-    };
-    setDragging(true);
-  }
-  function onPointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    const start = drag.current;
-    if (!start) return;
-    const raw = start.size + (event.clientX - start.x);
-    if (collapsible && raw < min - 24) {
-      setCollapsed(true);
-    } else {
-      setCollapsed(false);
-      setSize(clampTo(raw, min, ceiling));
-    }
-  }
-  function endDrag() {
-    if (!drag.current) return;
-    drag.current = null;
-    setDragging(false);
-    commit(size, collapsed);
-  }
-  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === 'Escape' && drag.current) {
-      const start = drag.current;
-      drag.current = null;
-      setDragging(false);
-      commit(start.size || size, start.collapsed);
-      return;
-    }
-    const step = event.shiftKey ? 64 : 16;
-    const base = collapsed ? min : clampTo(size, min, ceiling);
-    let next: number | null = null;
-    if (event.key === 'ArrowLeft') {
-      if (collapsed) return;
-      if (collapsible && size <= min) {
-        event.preventDefault();
-        setCollapse(true);
-        return;
-      }
-      next = base - step;
-    } else if (event.key === 'ArrowRight') next = collapsed ? min : base + step;
-    else if (event.key === 'Home') next = min;
-    else if (event.key === 'End') next = ceiling;
-    else if (event.key === 'Enter' && collapsible) {
-      event.preventDefault();
-      setCollapse(!collapsed);
-      return;
-    }
-    if (next === null) return;
-    event.preventDefault();
-    commit(clampTo(next, min, ceiling), false);
   }
 
   const leftWidth = collapsed ? 0 : clampTo(size, min, ceiling);
@@ -843,42 +1008,41 @@ export function ResizablePanels({
         {left}
       </div>
       {!stacked && (
-        <div
+        <PaneSeparator
           ref={handleRef}
-          className={s.splitHandle}
-          role="separator"
-          aria-orientation="vertical"
-          aria-label={label}
-          aria-controls={leftId}
-          aria-valuenow={Math.round(leftWidth)}
-          aria-valuemin={collapsible ? 0 : min}
-          aria-valuemax={Math.round(ceiling)}
-          aria-valuetext={collapsed ? 'Recolhido' : `${Math.round(leftWidth)} px`}
-          tabIndex={0}
-          data-force={force}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={endDrag}
-          onPointerCancel={endDrag}
-          onLostPointerCapture={endDrag}
-          onDoubleClick={() => commit(clampTo(defaultSize, min, ceiling), false)}
-          onKeyDown={onKeyDown}
+          size={size}
+          collapsed={collapsed}
+          min={min}
+          max={ceiling}
+          defaultSize={defaultSize}
+          collapsible={collapsible}
+          label={label}
+          controls={leftId}
+          force={force}
+          onPreview={(nextSize, nextCollapsed) => {
+            setSize(nextSize);
+            setCollapsed(nextCollapsed);
+          }}
+          onCommit={commit}
+          onToggle={setCollapse}
+          onDraggingChange={setDragging}
         />
       )}
       <div className={s.splitRight}>
         {collapsed && !stacked && (
-          <button
-            ref={showRef}
-            type="button"
-            className={s.splitShow}
-            aria-label={showLabel}
-            aria-controls={leftId}
-            aria-expanded={false}
-            title={showLabel}
-            onClick={() => setCollapse(false)}
-          >
-            <PanelLeftOpen aria-hidden="true" />
-          </button>
+          <Tooltip content={showLabel} bare describe={false}>
+            <button
+              ref={showRef}
+              type="button"
+              className={s.splitShow}
+              aria-label={showLabel}
+              aria-controls={leftId}
+              aria-expanded={false}
+              onClick={() => setCollapse(false)}
+            >
+              <PanelLeftOpen aria-hidden="true" />
+            </button>
+          </Tooltip>
         )}
         {right}
       </div>
@@ -904,33 +1068,59 @@ export type DescriptionItem = {
   data?: Record<string, string>;
 };
 
-function CopyButton({ text, label }: { text: string; label: string }) {
+/**
+ * Copiar um texto: ícone 14 numa caixa de 24 (32 no toque), check por 1,2 s e aviso para leitor de
+ * tela. `reveal="hover"` só aparece no hover ou foco da linha (como na `DescriptionList`); o padrão
+ * fica sempre à vista. Sem permissão de área de transferência, nada muda (o retorno não mente).
+ */
+export function CopyButton({
+  text,
+  label,
+  reveal = 'always',
+  onCopy,
+  className = '',
+  'data-force': force,
+}: {
+  text: string;
+  /** O que é copiado (“link da produção”): vira “Copiar link da produção” e “… copiado”. */
+  label: string;
+  reveal?: 'always' | 'hover';
+  /** Depois de copiar com sucesso. */
+  onCopy?: () => void;
+  className?: string;
+  /** Prancha: `hover`, `active`, `focus`. */
+  'data-force'?: string;
+}) {
   const [done, setDone] = useState(false);
   const timer = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(timer.current), []);
   return (
     <>
-      <button
-        type="button"
-        className={s.copy}
-        aria-label={done ? `${label} copiado` : `Copiar ${label}`}
-        title={done ? 'Copiado' : 'Copiar'}
-        data-done={done || undefined}
-        onClick={async () => {
-          try {
-            await navigator.clipboard.writeText(text);
-          } catch {
-            /* sem permissão de área de transferência: o retorno visual não mente */
-            return;
-          }
-          setDone(true);
-          window.clearTimeout(timer.current);
-          timer.current = window.setTimeout(() => setDone(false), 1200);
-        }}
-      >
-        <Copy className={s.copyIcon} aria-hidden="true" />
-        <Check className={s.copyDone} aria-hidden="true" />
-      </button>
+      <Tooltip content={done ? 'Copiado' : 'Copiar'} bare describe={false}>
+        <button
+          type="button"
+          className={`${s.copy} ${className}`}
+          aria-label={done ? `${label} copiado` : `Copiar ${label}`}
+          data-done={done || undefined}
+          data-reveal={reveal}
+          data-force={force}
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(text);
+            } catch {
+              /* sem permissão de área de transferência: o retorno visual não mente */
+              return;
+            }
+            onCopy?.();
+            setDone(true);
+            window.clearTimeout(timer.current);
+            timer.current = window.setTimeout(() => setDone(false), 1200);
+          }}
+        >
+          <Copy className={s.copyIcon} aria-hidden="true" />
+          <Check className={s.copyDone} aria-hidden="true" />
+        </button>
+      </Tooltip>
       <VisuallyHidden role="status">{done ? `${label} copiado` : ''}</VisuallyHidden>
     </>
   );
@@ -1033,15 +1223,18 @@ export function DescriptionList({
               data-copy={item.copy ? true : undefined}
             >
               <dt>{item.label}</dt>
-              <dd
-                data-state={state}
-                data-num={item.numeric && !state ? '' : undefined}
-                title={titleText}
-              >
+              <dd data-state={state} data-num={item.numeric && !state ? '' : undefined}>
                 <span className={s.dlValue}>
                   {item.leading && !state && <span className={s.dlLead}>{item.leading}</span>}
-                  <span className={s.dlText}>{text}</span>
-                  {item.copy && !state && <CopyButton text={item.copy} label={item.label} />}
+                  {titleText !== undefined ? (
+                    // Faixa: o valor corta numa linha; o inteiro vai na dica do DS, só quando cortou.
+                    <TruncatedText className={s.dlText} text={titleText} />
+                  ) : (
+                    <span className={s.dlText}>{text}</span>
+                  )}
+                  {item.copy && !state && (
+                    <CopyButton text={item.copy} label={item.label} reveal="hover" />
+                  )}
                 </span>
                 {item.hint && <span className={s.dlHint}>{item.hint}</span>}
               </dd>
@@ -1058,7 +1251,8 @@ export function DescriptionList({
 /**
  * Moldura fixa da criação: cabeçalho, corpo que rola (miolo + lateral de 320 com rolagem
  * própria e esmaecimento) e rodapé de ações de 64. `overflow: clip`: a moldura nunca desliza.
- * Abaixo de `stackBelow`, a lateral vira um `Disclosure` de uma linha no topo do corpo.
+ * Abaixo de `stackBelow`, a lateral vira um `Disclosure` de uma linha no topo do corpo, com o
+ * resumo em h2 (vem logo depois do h1 do cabeçalho).
  */
 export function FixedFrame({
   header,
@@ -1115,9 +1309,11 @@ export function FixedFrame({
           fade={false}
         >
           {narrow && aside && (
+            // Logo abaixo do h1 do cabeçalho: o resumo é um h2 (nenhum nível pulado no celular).
             <Disclosure
               summary={asideSummary ?? asideLabel}
               variant="bar"
+              headingLevel="h2"
               defaultOpen={asideDefaultOpen}
             >
               <div className={s.frameAsideInline}>{aside}</div>

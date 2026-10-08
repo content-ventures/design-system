@@ -211,6 +211,7 @@ export {
   ResizablePanels,
   DescriptionList,
   FixedFrame,
+  CopyButton,
   type AccordionStatus,
   type AccordionItem,
   type DescriptionItem,
