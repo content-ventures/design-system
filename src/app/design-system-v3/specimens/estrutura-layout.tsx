@@ -4,12 +4,14 @@ import { useState, type ComponentType, type ReactNode } from 'react';
 import {
   ActionBar,
   AgentTrace,
+  Alert,
   Avatar,
   Badge,
   Button,
   Card,
   CardHeader,
   DescriptionList,
+  DiffView,
   EditableTitle,
   Grid,
   GridItem,
@@ -20,6 +22,8 @@ import {
   PageHeader,
   PromptComposer,
   Prose,
+  ReadingColumn,
+  Seal,
   Section,
   SuggestionCard,
   Tabs,
@@ -685,7 +689,78 @@ function GridSpecimen() {
   );
 }
 
+/* ——————————————————————————— Coluna de leitura ——————————————————————————— */
+
+/** A revisão de um artigo: decisão, aviso e texto na mesma borda, centrados na área. */
+function ReviewColumn({
+  align = 'center',
+  diff = false,
+}: {
+  align?: 'center' | 'start';
+  diff?: boolean;
+}) {
+  return (
+    <ReadingColumn align={align} label="Texto da versão 4">
+      <List label="Decisão" framed={false} dividers={false}>
+        <ListItem
+          leading={<Seal label="" size="lg" still />}
+          title="Versão 4 aprovada"
+          description={<MetaList size="sm" items={['Pedro Alves', 'há 2 h']} />}
+        />
+      </List>
+      <Alert tone="warning" title="O carrossel usa a versão 3" />
+      {diff ? (
+        <DiffView blocks={LEAD_DIFF} before={{ label: 'v3 · IA' }} after={{ label: 'v4' }} />
+      ) : (
+        <Prose
+          variant="read"
+          as="section"
+          label="Texto final"
+          header={
+            <EditableTitle
+              value="Couro vegetal sai do nicho e chega às vitrines da Francal 2026"
+              onCommit={() => undefined}
+              label="Título do artigo"
+              size="document"
+              readOnly
+            />
+          }
+        >
+          <p>
+            Na abertura da feira, a Aurora Calçados apresentou a primeira linha feita inteiramente
+            com couro de cacto. A meta é chegar a 30% do catálogo até o fim de 2027.
+          </p>
+        </Prose>
+      )}
+    </ReadingColumn>
+  );
+}
+
+function ReadingColumnSpecimen() {
+  return (
+    <Shots>
+      <Shot title="Centrada" tone="white" align="stretch" pad="lg">
+        <ReviewColumn />
+      </Shot>
+      <Shot title="Diferenças" tone="white" align="stretch" pad="lg">
+        <ReviewColumn diff />
+      </Shot>
+      <Shot title="Encostada no início" tone="white" align="stretch" pad="lg">
+        <ReviewColumn align="start" />
+      </Shot>
+      <Shot title="Celular" tone="canvas" align="center" pad="lg">
+        <Phone label="Celular, 390">
+          <div className={l.phonePage}>
+            <ReviewColumn />
+          </div>
+        </Phone>
+      </Shot>
+    </Shots>
+  );
+}
+
 export const specimens: Record<string, ComponentType> = {
   grade: GridSpecimen,
   'area-de-trabalho': WorkspaceSpecimen,
+  'coluna-de-leitura': ReadingColumnSpecimen,
 };

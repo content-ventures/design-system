@@ -4,6 +4,70 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [Não publicado]
+
+### Adicionado
+
+- `Prose`: imagem sugerida (`figure[data-slot] > img[data-missing] + figcaption`), o lugar que o texto
+  reserva para uma imagem que ainda não existe — a moldura funda com ImagePlus e “Imagem sugerida”, o
+  pedido na figcaption em `--muted` e cursor de clique na escrita; espécime “Sugerida” na prancha de
+  imagem;
+- ícone `ImagePlus` em `icons.ts`;
+- estrutura: `ReadingColumn`, a coluna na medida do texto (68ch na fonte de leitura), centrada ou
+  encostada no início, para a decisão, avisos, diferenças e imagens ficarem na mesma borda do `Prose`;
+  espécime “Coluna de leitura” na prancha de layout;
+- `ChoiceCard`: `media`, uma peça no topo do cartão (a miniatura de um modelo de carrossel) — empilha o
+  cartão, entra na área clicável e leva o rádio para o canto da peça; indisponível, a peça esmaece;
+  espécime “Com miniatura” na prancha de rádio;
+- `AppShell`: `layout="immersive"`, a tela de trabalho de um documento sem o menu do app — nenhuma
+  coluna de menu, gaveta ou botão de menu em qualquer largura; `sidebar` opcional (ignorado no
+  imersivo) e `topbar` opcional; sem topo, a moldura encostada ocupa a janela até a borda de cima;
+  `useShell().immersive`; espécime “Imersivo” na prancha de estrutura de aplicação;
+- `PageHeader`: `back` (`{ label, href, onNavigate? }`), a volta discreta “← Produções” antes do
+  título, fora do h1, com nome “Voltar para …” e só a seta em ≤640 px; espécimes “Volta” e
+  “Volta · estados”;
+- `PageHeader`: `actionsNote` (`{ id, text }`), o motivo visível de uma ação indisponível logo antes
+  das ações — 12 px em `--muted`, corta com a dica e cede antes do título; em ≤640 px desce para a
+  linha dele e quebra; espécime “Motivo do bloqueio”;
+- `Prose`: imagem sugerida em linha (`figure[data-slot][data-display="line"]`), uma linha de 40 px com
+  ImagePlus, “Imagem sugerida:” e o assunto, no ritmo de um parágrafo, em escrita, leitura e compacto;
+  na escrita, hover, pressionado, arrasto (`[data-over]`, tracejado b-400) e foco, com os gêmeos
+  `data-force`; prancha “Imagem em linha”;
+- `ActionBar`: `detail` sem `status` é o motivo visível de uma ação indisponível, logo antes dos
+  botões, com `detailId` para o `aria-describedby` do botão; quebra em vez de cortar e no celular
+  ganha a linha dele; espécime “Barra · motivo do bloqueio”;
+- tipos `PageHeaderBack` e `PageHeaderNote` exportados no índice.
+
+### Alterado
+
+- Contrato §1.7 (“Sem texto a mais”): duas exceções — o aviso de tarefa (1 frase e 1 verbo,
+  `Banner variant="inline"`) e o motivo visível do bloqueio (`PageHeader actionsNote`,
+  `ActionBar detail`);
+- `Prose`: figura de tamanho conhecido (`img[width][height]`, inclusive a moldura de uma imagem que
+  falta) abraça a imagem e fica no centro da coluna, com a legenda quebrando na largura dela — uma
+  vertical ou quadrada não encosta mais na borda esquerda de uma coluna centrada; horizontal larga
+  continua na largura da coluna;
+- `Prose`: imagem sugerida diz como preencher na escrita (“Arraste a imagem aqui ou clique para
+  escolher”, fundo que responde ao ponteiro) e, na leitura e no compacto, vira uma faixa baixa (3:1) na
+  largura da coluna em vez da moldura do tamanho da foto;
+- `MetaList`: um fato mais longo que a linha quebra dentro dele (o “·” fica pendurado no recuo), em vez
+  de cortar com reticências; `wrap={false}` continua numa linha só;
+- `Accordion`: numa lista em que alguma linha tem marcador, as linhas sem estado guardam o lugar dele
+  (os títulos ficam na mesma borda);
+- `Segmented`: esticado por quem o contém (barra de ações no celular), o trilho reparte a sobra entre as
+  opções em vez de deixar um rabo vazio depois da última.
+
+### Corrigido
+
+- `PageHeader variant="frame"` sem `steps`: um título longo empurrava as ações para largura zero e os
+  botões passavam por cima dele; agora a linha é uma só — o título corta (com a dica) antes das ações,
+  que não encolhem;
+- `Sidebar` recolhida (trilho): um grupo recolhível fechado (`collapsible`, `defaultOpen: false`, como
+  “Em breve”) desenhava todos os ícones dele; agora o trilho mostra só os grupos abertos;
+- `FilterBar`: numa barra de até 640 px com abas que quase enchem a linha (uma gaveta de 552), a busca
+  ficava espremida no resto da linha e vazava; agora as ferramentas descem para a linha delas abaixo
+  de 220 px.
+
 ## [0.2.0] - 2026-10-07
 
 Famílias editoriais para o estúdio do Reporter IA. Nenhuma API foi removida nem renomeada; as mudanças

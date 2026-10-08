@@ -89,6 +89,7 @@ import { PageArrow, PageButton, Pagination } from '@content-ventures/design-syst
 import { Tooltip } from '@content-ventures/design-system/v3/overlays';
 import { Select } from '@content-ventures/design-system/v3/select';
 import {
+  ActionBar,
   SaveIndicator,
   StepList,
   StepMarker,
@@ -1903,6 +1904,40 @@ function StepperSpecimen() {
             <Row gap={12} wrap={false}>
               <SaveIndicator status="error" onRetry={() => undefined} data-force="focus" />
             </Row>
+          </State>
+        </States>
+      </Shot>
+      <Shot title="Barra · motivo do bloqueio" tone="white" align="stretch">
+        <States min={360}>
+          <State label="Motivo antes dos botões">
+            <ActionBar
+              position="static"
+              start="Artigo · 1,4 de 2 laudas · enviado por Juliana"
+              detail="Quem enviou não aprova o próprio envio."
+              detailId="motivo-barra"
+            >
+              <Button>Pedir ajustes</Button>
+              <Button variant="primary" aria-disabled="true" aria-describedby="motivo-barra">
+                Aprovar artigo
+              </Button>
+            </ActionBar>
+          </State>
+          <State label="Celular, 390">
+            <Phone label="Celular, 390">
+              <ActionBar
+                position="static"
+                detail="Aguarde a IA terminar."
+                detailId="motivo-barra-celular"
+              >
+                <Button
+                  variant="primary"
+                  aria-disabled="true"
+                  aria-describedby="motivo-barra-celular"
+                >
+                  Enviar para aprovação
+                </Button>
+              </ActionBar>
+            </Phone>
           </State>
         </States>
       </Shot>

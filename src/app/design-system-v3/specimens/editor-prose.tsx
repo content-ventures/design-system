@@ -425,6 +425,79 @@ function TextoCorrido() {
               </figure>
             </Hook>
           </State>
+          <State label="Sugerida">
+            <Hook>
+              <figure data-slot="" data-missing="" aria-roledescription="Sugestão de imagem">
+                {/* eslint-disable-next-line @next/next/no-img-element -- imagem que ainda não existe: o Prose desenha o pedido */}
+                <img data-missing="" alt="" />
+                <figcaption>Esteira e sala de modelagem da fábrica</figcaption>
+              </figure>
+            </Hook>
+          </State>
+          <State label="Sugerida, vertical">
+            <Hook>
+              <figure
+                data-slot=""
+                data-missing=""
+                data-orientation="portrait"
+                aria-roledescription="Sugestão de imagem"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- imagem que ainda não existe: o Prose desenha o pedido */}
+                <img data-missing="" alt="" width={448} height={560} />
+                <figcaption>Tela do aplicativo com o estoque em tempo real</figcaption>
+              </figure>
+            </Hook>
+          </State>
+        </States>
+      </Shot>
+
+      <Shot title="Imagem em linha" tone="white" align="stretch" pad="md">
+        <States min={300}>
+          <State label="Entre parágrafos">
+            <EditHook>
+              <p>{P1}</p>
+              <SlotLine subject="Peças impressas na bancada" />
+              <p>{P_AI}</p>
+            </EditHook>
+          </State>
+          {(
+            [
+              ['Repouso', undefined],
+              ['Hover', 'hover'],
+              ['Pressionado', 'active'],
+              ['Arrastando um arquivo', 'over'],
+              ['Foco', 'focus'],
+            ] as const
+          ).map(([label, force]) => (
+            <State key={label} label={label}>
+              <EditHook>
+                <SlotLine subject="Esteira e sala de modelagem da fábrica" force={force} />
+              </EditHook>
+            </State>
+          ))}
+          <State label="Selecionada">
+            <EditHook>
+              <SlotLine subject="Esteira e sala de modelagem da fábrica" selected />
+            </EditHook>
+          </State>
+          <State label="Assunto longo">
+            <EditHook>
+              <SlotLine subject="Juliana Prates na sala de corte, separando as sobras de couro por cor e espessura antes da costura" />
+            </EditHook>
+          </State>
+          <State label="Leitura">
+            <Hook>
+              <SlotLine subject="Esteira e sala de modelagem da fábrica" />
+            </Hook>
+          </State>
+          <State label="Compacto">
+            <Card padding="md" className={r.fill}>
+              <Prose variant="compact" measure="wide">
+                <p>{LIST_INTRO}</p>
+                <SlotLine subject="Etiqueta com QR code no forro" />
+              </Prose>
+            </Card>
+          </State>
         </States>
       </Shot>
 
@@ -525,6 +598,48 @@ function Hook({ children }: { children: ReactNode }) {
         {children}
       </Prose>
     </div>
+  );
+}
+
+/** Trecho de gancho na escrita (`edit`, escala de trabalho): os estados que respondem ao ponteiro. */
+function EditHook({ children }: { children: ReactNode }) {
+  return (
+    <div className={r.fill}>
+      <Prose variant="edit" size="sm" measure="wide" align="start" overscroll={false}>
+        {children}
+      </Prose>
+    </div>
+  );
+}
+
+/**
+ * Imagem sugerida em linha, como o editor a desenha (`figure[data-slot][data-display="line"]`): o
+ * `img` vazio continua (o arquivo cai nele), o assunto vai na figcaption. `force` e `selected` são os
+ * estados parados da prancha; no produto, `[data-over]` vem do arrasto e a seleção do ProseMirror.
+ */
+function SlotLine({
+  subject,
+  force,
+  selected = false,
+}: {
+  subject: string;
+  force?: 'hover' | 'active' | 'over' | 'focus';
+  selected?: boolean;
+}) {
+  return (
+    <figure
+      data-slot=""
+      data-missing=""
+      data-display="line"
+      data-force={force}
+      className={selected ? 'ProseMirror-selectednode' : undefined}
+      aria-roledescription="Sugestão de imagem"
+      aria-label={`Imagem sugerida: ${subject}. Arraste uma imagem ou pressione Enter para escolher.`}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element -- imagem que ainda não existe: o Prose desenha o pedido */}
+      <img data-missing="" alt="" />
+      <figcaption>{subject}</figcaption>
+    </figure>
   );
 }
 

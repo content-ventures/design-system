@@ -27,6 +27,7 @@ import { Field, FieldGroup, Input, SearchField, useNotice } from '@content-ventu
 import f from '@content-ventures/design-system/v3/fields.module.css';
 import { BrandMark } from '@content-ventures/design-system/v3/identity';
 import { LinkButton } from '@content-ventures/design-system/v3/link';
+import { MediaFrame } from '@content-ventures/design-system/v3/media';
 import { MoneyField, moneyBRL } from '@content-ventures/design-system/v3/money-field';
 import { MultiSelect } from '@content-ventures/design-system/v3/multiselect';
 import { Dialog, Tooltip } from '@content-ventures/design-system/v3/overlays';
@@ -1078,6 +1079,80 @@ function InvalidModel() {
   );
 }
 
+/** Modelos de carrossel como escolha: a miniatura da capa no topo, o rádio sobre o canto dela. */
+const TEMPLATE_CARDS = [
+  {
+    value: 'editorial',
+    title: 'Editorial',
+    description: 'Editorial · Feed 4:5',
+    tone: 'paper',
+    ratio: '4/5',
+  },
+  {
+    value: 'noturno',
+    title: 'Noturno',
+    description: 'Editorial · Feed 4:5',
+    tone: 'night',
+    ratio: '4/5',
+  },
+  {
+    value: 'aspas',
+    title: 'Aspas',
+    description: 'Citação · Quadrado 1:1',
+    tone: 'forest',
+    ratio: '1/1',
+  },
+] as const;
+
+function TemplateThumb({ tone }: { tone: string }) {
+  return (
+    <span className={x.tplThumb} data-tone={tone}>
+      <span className={x.tplKicker}>Entrevista · Agro</span>
+      <span className={x.tplTitle}>A cooperativa que levou o café do sítio à xícara</span>
+    </span>
+  );
+}
+
+function TemplateChoices() {
+  const [picked, setPicked] = useState('editorial');
+  const name = useId();
+  return (
+    <div className={x.templates} role="radiogroup" aria-label="Modelo do carrossel">
+      {TEMPLATE_CARDS.map((card) => (
+        <ChoiceCard
+          key={card.value}
+          name={name}
+          value={card.value}
+          checked={picked === card.value}
+          onChange={setPicked}
+          media={
+            <MediaFrame ratio={card.ratio} alt="" radius="sm">
+              <TemplateThumb tone={card.tone} />
+            </MediaFrame>
+          }
+          title={card.title}
+          description={card.description}
+          footer={<LinkButton>Ver modelo</LinkButton>}
+        />
+      ))}
+      <ChoiceCard
+        name={name}
+        value="stories"
+        checked={false}
+        onChange={noop}
+        disabled
+        media={
+          <MediaFrame ratio="4/5" alt="" radius="sm">
+            <TemplateThumb tone="paper" />
+          </MediaFrame>
+        }
+        title="Minimal"
+        description="Indisponível neste formato"
+      />
+    </div>
+  );
+}
+
 function RadioSpecimen() {
   const [asset, setAsset] = useState('banner');
   const [model, setModel] = useState('cpm');
@@ -1127,6 +1202,10 @@ function RadioSpecimen() {
           </div>
           <SendChoice />
         </div>
+      </Shot>
+
+      <Shot title="Com miniatura" tone="white" align="stretch">
+        <TemplateChoices />
       </Shot>
 
       <Shot title="Estados" align="stretch">
