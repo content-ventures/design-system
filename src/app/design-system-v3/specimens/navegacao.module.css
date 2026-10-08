@@ -384,6 +384,18 @@ td.colMoney {
   border-radius: var(--r-lg);
   background: var(--g-25);
 }
+/* Prancha “foco e dica”: a dica parada (`Tooltip open`) fica acima e o item mantém a largura da faixa. */
+.navStrip li > [data-side] {
+  display: flex;
+  width: 100%;
+}
+.navStrip li > [data-side] > :first-child {
+  display: flex;
+  width: 100%;
+}
+.navStrip li > [data-side] > [role='tooltip'] {
+  max-width: 100%;
+}
 
 /* ——— Cabeçalho ——— */
 .persona {
@@ -688,6 +700,7 @@ td.colMoney {
   color: var(--ink);
 }
 .stepChip[data-state='done'],
+.stepChip[data-state='active'],
 .stepChip[data-state='warn'] {
   color: var(--text);
 }
