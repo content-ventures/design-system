@@ -171,12 +171,17 @@
 .meter[data-size='lg'] .meterTrack {
   height: 8px;
 }
+/* Cinza por padrão (prontidão, progresso): azul é ação, nunca status. Mesmo cinza do `MeterList`
+   com cor `neutral`. */
 .meterFill {
   position: absolute;
   inset: 0 auto 0 0;
   border-radius: inherit;
-  background: var(--b-600);
+  background: var(--gray-dot);
   transition: width var(--dur-3) var(--ease-out);
+}
+.meter[data-tone='blue'] .meterFill {
+  background: var(--b-600);
 }
 .meter[data-tone='green'] .meterFill {
   background: var(--green-dot);
@@ -219,4 +224,7 @@
 .spark {
   display: block;
   overflow: visible;
+}
+.spark[data-fluid] {
+  width: 100%;
 }

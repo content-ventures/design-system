@@ -1,9 +1,9 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import type { ElementType, MouseEvent, ReactNode } from 'react';
 import { VisuallyHidden } from './a11y';
 import { Tooltip } from './overlays';
-import { Delta } from './stat';
+import { Delta, Sparkline, type MeterTone } from './stat';
 import s from './metric-strip.module.css';
 
 export type MetricDelta = {
@@ -25,17 +25,34 @@ export type MetricProps = {
   hint?: ReactNode;
   /** Legenda em âmbar: atenção (“Abaixo do ritmo”). */
   warn?: boolean;
-  /** Barra de 4 px sob o valor (entrega, consumo). */
-  meter?: { value: number; max?: number; label?: string };
+  /** Barra de 4 px sob o valor (entrega, consumo). `tone` como no `Meter`: cinza por padrão. */
+  meter?: { value: number; max?: number; label?: string; tone?: MeterTone };
+  /**
+   * Tendência do período: linha cinza de 1,5 px à direita do valor, com ponto no último valor.
+   * Precisa de dois pontos ou mais. `label` é a leitura para leitor de tela (“de 9 para 14”);
+   * sem ele a linha é decorativa e a variação conta a tendência.
+   */
+  sparkline?: { points: number[]; label?: string };
   /** Sem dado: “—” e a legenda “Sem dados no período” (ou o texto passado). */
   empty?: boolean | string;
   loading?: boolean;
   /** Comparação ao passar o mouse ou focar a célula. */
   tooltip?: string;
+  /** A célula inteira vira link (abre a lista filtrada). Mesmo visual, com hover e foco. */
+  href?: string;
+  /** Link do framework (`next/link`) para `href` navegar sem recarregar. */
+  linkAs?: ElementType;
+  /** A célula inteira vira botão. Com `href`, roda também ao abrir (como em `ListItem`). */
+  onClick?: (event: MouseEvent<HTMLElement>) => void;
+  /** Prancha: `hover`, `active`, `focus`. */
   'data-force'?: string;
 };
 
-/** Uma célula da faixa. Rótulo 12 `--muted` com a variação à direita, valor tabular e legenda. */
+/**
+ * Uma célula da faixa. Rótulo 12 `--muted` com a variação à direita, valor tabular e legenda.
+ * `href` ou `onClick` tornam a célula inteira clicável (link ou botão) sem mudar o desenho:
+ * hover `--g-25`, pressionado `--g-50`, anel por dentro. Carregando, volta a ser bloco.
+ */
 export function Metric({
   label,
   value,
@@ -44,26 +61,43 @@ export function Metric({
   hint,
   warn = false,
   meter,
+  sparkline,
   empty = false,
   loading = false,
   tooltip,
+  href,
+  linkAs,
+  onClick,
   'data-force': force,
 }: MetricProps) {
   const isEmpty = Boolean(empty) || value === undefined || value === null || value === '';
   const caption = isEmpty && !loading ? (typeof empty === 'string' ? empty : hint ?? 'Sem dados no período') : hint;
   const pct = meter ? Math.max(0, Math.min(100, (meter.value / (meter.max ?? 100)) * 100)) : 0;
   const valueKey = typeof value === 'string' || typeof value === 'number' ? String(value) : undefined;
+  const spark = !loading && !isEmpty && sparkline && sparkline.points.length > 1 ? sparkline : undefined;
+  const interactive = Boolean(href || onClick) && !loading;
+  // Link ou botão: o nome acessível vem do conteúdo (rótulo, valor, legenda), sem `role="group"`.
+  const Cell: ElementType = interactive ? (href ? (linkAs ?? 'a') : 'button') : 'div';
+  const cellProps = interactive
+    ? href
+      ? { href, onClick }
+      : { type: 'button' as const, onClick }
+    : {
+        role: 'group',
+        'aria-label': label,
+        'aria-busy': loading || undefined,
+        tabIndex: tooltip ? 0 : undefined,
+      };
   const cell = (
-    <div
+    <Cell
+      {...cellProps}
       className={s.metric}
-      role="group"
-      aria-label={label}
-      aria-busy={loading || undefined}
-      tabIndex={tooltip ? 0 : undefined}
+      data-interactive={interactive || undefined}
       data-tip={tooltip ? '' : undefined}
+      data-spark={spark ? '' : undefined}
       data-force={force}
     >
-      <span className={s.label} aria-hidden="true">
+      <span className={s.label} aria-hidden={interactive ? undefined : true}>
         {label}
       </span>
       {loading ? (
@@ -89,9 +123,16 @@ export function Metric({
               />
             </span>
           )}
+          {spark && (
+            <span className={s.spark}>
+              <Sparkline points={spark.points} width={64} height={24} tone="gray" fluid />
+              {spark.label && <VisuallyHidden>{spark.label}</VisuallyHidden>}
+            </span>
+          )}
           {meter && !isEmpty && (
             <span
               className={s.meter}
+              data-tone={meter.tone ?? 'neutral'}
               role="progressbar"
               aria-label={meter.label ?? label}
               aria-valuemin={0}
@@ -108,14 +149,15 @@ export function Metric({
           )}
         </>
       )}
-    </div>
+    </Cell>
   );
   return tooltip ? <Tooltip content={tooltip}>{cell}</Tooltip> : cell;
 }
 
 /**
  * Faixa de indicadores: um contorno só, células unidas por fio de 1 px. Até 6 células; quebra pela
- * largura do próprio contêiner (6 → 3 → 2; 4 → 2). `figure` é a faixa compacta de formulário (16 px).
+ * largura do próprio contêiner (6 → 3 → 2; 5 → 3 → 2; 4 → 2). A última linha incompleta se reparte
+ * por igual (5 → 3 + 2 ou 2 + 2 + 1), sem célula vazia. `figure` é a faixa compacta de formulário (16 px).
  */
 export function MetricStrip({
   items,
