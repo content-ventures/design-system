@@ -149,6 +149,8 @@ export function useAnchoredPanel({
 
 type FilterBarBase = {
   tabs?: ReactNode;
+  /** `comfortable` dá respiro vertical com --s-2; o padrão preserva a barra compacta. */
+  spacing?: 'compact' | 'comfortable';
   /** Normalmente `SearchField size="sm"`; a largura é da barra (220 lado a lado, até 320 empilhada; sem abas, até 320). */
   search?: ReactNode;
   filterCount?: number;
@@ -191,6 +193,7 @@ export type FilterBarProps = FilterBarBase &
  */
 export function FilterBar({
   tabs,
+  spacing = 'compact',
   search,
   filtersOpen = false,
   onFiltersOpenChange,
@@ -202,7 +205,7 @@ export function FilterBar({
   'data-force': force,
 }: FilterBarProps) {
   return (
-    <div className={s.root} data-tabs={tabs ? '' : undefined}>
+    <div className={s.root} data-tabs={tabs ? '' : undefined} data-spacing={spacing}>
       <div className={s.bar}>
         {tabs && <div className={s.tabs}>{tabs}</div>}
         <div className={s.tools}>

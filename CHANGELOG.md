@@ -4,6 +4,12 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.2.1] - 2026-10-15
+
+### Added
+
+- `FilterBar` supports opt-in `spacing="comfortable"` using existing spacing tokens. The compact default, wrapping behavior and keyboard controls are preserved.
+
 ## [Não publicado]
 
 ### Adicionado
