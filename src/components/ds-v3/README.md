@@ -308,7 +308,9 @@ Para mostrar um estado parado, todo componente interativo aceita `data-force="ho
   o texto alinha ao título da seção e o hover vai de borda a borda do bloco.
 - **`FilterBar`:** busca e ferramentas lado a lado enquanto cabem; empilha pela quebra de linha do CSS
   (busca com base de 220 px, até 320 px empilhada), igual no servidor e no cliente — contagens que chegam
-  depois não mudam a altura.
+  depois não mudam a altura. `spacing="comfortable"` acrescenta `--s-2` (8 px) acima e abaixo das
+  abas, mantendo o sublinhado no mesmo fio da barra; sem abas, o respiro envolve as ferramentas.
+  O padrão `compact` preserva a altura existente.
 - **Campos em `Section` e `Drawer`:** campos irmãos no corpo ganham 20 px entre si (o ritmo do
   `FieldGroup`); grade ou pilha com espaçamento próprio manda no próprio ritmo.
 - **Mídia na altura do palco:** `MediaFrame`/`SlideCanvas` com `maxHeight` (teto) ou `fitHeight` (cabe na

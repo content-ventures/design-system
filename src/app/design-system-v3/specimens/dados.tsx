@@ -1567,6 +1567,9 @@ function BarraFiltros() {
   );
   return (
     <Shots>
+      <Shot title="Espaçamento confortável" tone="white" align="stretch" pad="sm">
+        <FilterBar spacing="comfortable" tabs={tabs(f)} search={searchStub} filters={false} />
+      </Shot>
       <Shot title="Em contexto" tone="white" align="stretch" pad="sm">
         <div className={x.listing}>
           <FilterBar

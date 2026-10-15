@@ -39,6 +39,13 @@
 .tabs > [role='tablist'] {
   background: none;
 }
+/* O trilho ganha altura sem afastar o sublinhado do fio comum da barra. */
+.root[data-spacing='comfortable'] .tabs > [role='tablist'] {
+  padding-block: var(--s-2);
+}
+.root[data-spacing='comfortable']:not([data-tabs]) .bar {
+  padding-block: var(--s-2);
+}
 /* Ferramentas: lado a lado, só a largura delas; empilhadas (sozinhas na linha), a linha inteira. */
 .tools {
   display: flex;

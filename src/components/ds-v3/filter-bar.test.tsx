@@ -17,10 +17,11 @@ import { Tabs } from './tabs';
 
 const css = readFileSync(resolve(__dirname, 'filter-bar.module.css'), 'utf8');
 
-function Bar({ counts }: { counts?: number[] }) {
+function Bar({ counts, spacing }: { counts?: number[]; spacing?: 'compact' | 'comfortable' }) {
   return (
     <FilterBar
       filters={false}
+      spacing={spacing}
       tabs={
         <Tabs
           label="Produções por status"
@@ -57,18 +58,18 @@ describe('FilterBar', () => {
     expect(change).toHaveBeenCalledWith(true);
   });
 
-  it('servidor e cliente desenham a mesma barra, com ou sem contagens', () => {
+  it.each(['compact', 'comfortable'] as const)('servidor e cliente preservam a geometria %s quando chegam contagens', (spacing) => {
     const attrs = (el: Element | null) =>
       el ? [...el.attributes].map((attr) => `${attr.name}=${attr.value}`).sort() : [];
     const host = document.createElement('div');
-    host.innerHTML = renderToString(<Bar />);
+    host.innerHTML = renderToString(<Bar spacing={spacing} />);
     const server = host.firstElementChild;
 
-    const { container, rerender } = render(<Bar />);
+    const { container, rerender } = render(<Bar spacing={spacing} />);
     expect(attrs(container.firstElementChild)).toEqual(attrs(server));
     expect(container.firstElementChild).not.toHaveAttribute('data-stacked');
 
-    rerender(<Bar counts={[9, 5]} />);
+    rerender(<Bar spacing={spacing} counts={[9, 5]} />);
     expect(attrs(container.firstElementChild)).toEqual(attrs(server));
   });
 
