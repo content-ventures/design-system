@@ -420,7 +420,12 @@ export { HoverCard } from './hover-card';
 export { Drawer, DrawerFrame, type DrawerSize } from './drawer';
 export { BottomSheet, BottomSheetFrame, type SheetSnap } from './bottom-sheet';
 export { ResponsiveDialog, type ResponsiveVariant } from './responsive-dialog';
-export { ConfirmDialog, ConfirmFrame, type ConfirmTone } from './confirm-dialog';
+export {
+  ConfirmDialog,
+  ConfirmFrame,
+  type ConfirmDialogProps,
+  type ConfirmTone,
+} from './confirm-dialog';
 
 /* Editor */
 export {

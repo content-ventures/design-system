@@ -303,6 +303,12 @@ Para mostrar um estado parado, todo componente interativo aceita `data-force="ho
   Etapa fora de alcance leva `reason` (dica e `aria-describedby`; focável, indisponível, não navega);
   nome escondido pela largura aparece na dica.
 - Lista com paginação sempre. Criação é página com etapas, nunca modal. Modal só confirma ou edita pouco.
+- **Modal só aviso (`ConfirmDialog acknowledge`):** o modal também avisa um bloqueio que a pessoa não
+  resolve na hora (“Você não tem permissão para isso” / “Só editor ou admin cria produções.”). Só avisa:
+  um botão primário com o foco, “Entendi” por padrão (`confirmLabel` troca), sem Cancelar, sem tom
+  destrutivo e sem digitação; `onConfirm` é opcional e o botão fecha. Esc, véu e X fecham; no celular o
+  botão ocupa a largura toda. Bloqueio que a tela explica antes do clique continua no motivo visível
+  (§1.7).
 - **`ListItem titleLines={2}`:** em coluna estreita com títulos longos (“Aguardando você”), o título quebra
   em até duas linhas antes das reticências e a linha cresce com ele. Padrão: uma linha.
 - **`List framed={false} bleed`** dentro de `Section`/`Panel`: as linhas sangram o próprio respiro (16 px),

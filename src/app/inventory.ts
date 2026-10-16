@@ -519,8 +519,8 @@ export const inventory: readonly InventoryGroup[] = [
       item(
         'confirmacao',
         'Confirmação de ação',
-        'Confirmações comuns, destrutivas e com digitação de segurança.',
-        'alert dialog confirm',
+        'Confirmações comuns, destrutivas, com digitação de segurança e só aviso.',
+        'alert dialog confirm acknowledge',
       ),
       item('drawer', 'Painel lateral', 'Detalhes ou edição em uma gaveta lateral.', 'drawer sheet'),
       item(
