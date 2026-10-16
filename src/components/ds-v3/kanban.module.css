@@ -73,6 +73,35 @@
   min-width: 100%;
   padding-bottom: var(--s-2);
 }
+/* Quadro que fecha a página (`fill`): do topo medido (`--kanban-top`; antes da primeira medida, o
+   topo de uma página com cabeçalho e filtros) ao fim da janela, menos o respiro de baixo do
+   conteúdo. As colunas esticam até o pé e os cartões rolam dentro de cada uma. */
+.board[data-fill] {
+  height: calc(100dvh - var(--kanban-top, 240px) - var(--content-pb, 0px));
+  min-height: 360px;
+  overflow-y: hidden;
+}
+.board[data-fill] .boardTrack {
+  height: 100%;
+}
+.board[data-fill] .column {
+  min-height: 0;
+}
+/* 4 px saem do cabeçalho e entram no corpo: o anel de foco do primeiro cartão não é cortado pela
+   rolagem e a distância entre título e cartão continua a mesma. */
+.board[data-fill] .columnHead {
+  padding-bottom: var(--s-1);
+}
+.board[data-fill] .columnBody {
+  flex-basis: 0;
+  min-height: 0;
+  padding-top: var(--s-1);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scroll-padding-block: var(--s-2);
+  scrollbar-width: thin;
+  scrollbar-color: var(--g-200) transparent;
+}
 :global(html[data-kanban-dragging]),
 :global(html[data-kanban-dragging] *) {
   cursor: grabbing !important;
