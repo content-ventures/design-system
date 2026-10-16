@@ -371,8 +371,9 @@ Para mostrar um estado parado, todo componente interativo aceita `data-force="ho
   também no celular; cabeçalho de página não leva link de volta. Em ≤640 px do topo, a trilha guarda o
   primeiro nível (link) e o atual, com o separador entre eles, e esconde os do meio (o “…” recolhido
   também). Cada nível corta com reticência: o curto fica inteiro, o atual leva o resto e, se os dois
-  forem longos, cada um fica com metade; o link mantém o alvo de 26 px de altura. Um ou dois níveis
-  não mudam. Decidido em container query, igual no servidor, pelo `li[data-crumb="first|middle|current"]`;
+  forem longos, cada um fica com metade; o link mantém o alvo de 26 px de altura. Com um ou dois
+  níveis, nada se esconde (com dois, os dois aparecem). Decidido em container query, igual no
+  servidor, pelo `li[data-crumb="first|middle|current"]`;
   o desktop e `Breadcrumb variant="compact"` não mudam.
 - **Volta no cabeçalho (`PageHeader back`):** `{ label, href, onNavigate? }` põe “← Produções” antes do
   título, na mesma linha e fora do h1 — o caminho de volta de uma tela sem o menu do app
