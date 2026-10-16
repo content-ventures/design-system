@@ -184,6 +184,14 @@ const SETTLE_MS = 180;
 const EXIT_MS = 280;
 const EDGE = 56;
 
+/** Passo da rolagem automática perto de uma borda: até 18 px por quadro, mais rápido quanto mais perto. */
+const edgeStep = (at: number, start: number, end: number) =>
+  at > end - EDGE
+    ? Math.min(18, (at - (end - EDGE)) / 3)
+    : at < start + EDGE
+      ? -Math.min(18, (start + EDGE - at) / 3)
+      : 0;
+
 const cardsIn = (column: Element) => [
   ...column.querySelectorAll<HTMLElement>('[data-kanban-card]'),
 ];
@@ -327,16 +335,32 @@ export function useKanbanDrag<C extends string>({
     const current = session.current;
     if (!current?.started || current.settling) return;
     const board = current.board;
+    let moved = false;
     if (board) {
       const rect = board.getBoundingClientRect();
-      let dx = 0;
-      if (current.x > rect.right - EDGE) dx = Math.min(18, (current.x - (rect.right - EDGE)) / 3);
-      else if (current.x < rect.left + EDGE) dx = -Math.min(18, (rect.left + EDGE - current.x) / 3);
+      const dx = edgeStep(current.x, rect.left, rect.right);
       if (dx) {
+        const before = board.scrollLeft;
         board.scrollLeft += dx;
-        const next = targetAt(current.x, current.y, current);
-        if (next) placeSlot(next, 'enter');
+        moved = board.scrollLeft !== before;
       }
+    }
+    // Coluna que rola por dentro (quadro `fill`): perto do topo ou do pé, os cartões andam.
+    const body = columnAt(current.x, current.y, board)?.querySelector<HTMLElement>(
+      '[data-kanban-body]',
+    );
+    if (body && body.scrollHeight > body.clientHeight) {
+      const rect = body.getBoundingClientRect();
+      const dy = edgeStep(current.y, rect.top, rect.bottom);
+      if (dy) {
+        const before = body.scrollTop;
+        body.scrollTop += dy;
+        moved ||= body.scrollTop !== before;
+      }
+    }
+    if (moved) {
+      const next = targetAt(current.x, current.y, current);
+      if (next) placeSlot(next, 'enter');
     }
     current.frame = window.requestAnimationFrame(autoScroll);
   }
@@ -691,24 +715,94 @@ export function useKanbanDrag<C extends string>({
 
 /* ——————————————————————————— Quadro, coluna, espaço e vazio ——————————————————————————— */
 
-/** Faixa de colunas com rolagem horizontal. No celular as colunas encaixam em 85% da largura. */
+/**
+ * Faixa de colunas com rolagem horizontal. No celular as colunas encaixam em 85% da largura.
+ * `fill` fecha a página com o quadro: ele vai do próprio topo até o fim da janela (menos o respiro de
+ * baixo do conteúdo), todas as colunas ocupam essa altura e os cartões rolam dentro de cada coluna.
+ * Com menos de 360 px de altura útil o quadro para de encolher e a página volta a rolar.
+ */
 export function KanbanBoard({
   label,
+  fill = false,
   children,
   className = '',
+  ref,
   ...props
-}: ComponentProps<'div'> & { label: string }) {
+}: ComponentProps<'div'> & {
+  label: string;
+  /** Quadro na altura da janela, com rolagem dentro das colunas. */
+  fill?: boolean;
+}) {
+  const boardRef = useRef<HTMLDivElement | null>(null);
+  const setRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      boardRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref],
+  );
+  useBoardTop(boardRef, fill);
   return (
     <div
       {...props}
+      ref={setRef}
       role="region"
       aria-label={label}
       className={`${s.board} ${className}`}
       data-kanban-board=""
+      data-fill={fill || undefined}
     >
       <div className={s.boardTrack}>{children}</div>
     </div>
   );
+}
+
+/**
+ * Onde o quadro começa na página, em `--kanban-top`: o CSS desconta essa distância da altura da
+ * janela. Mede de novo quando muda o tamanho de quem vem antes do quadro (filtros que abrem), quando
+ * entra ou sai alguém antes dele (avisos) e quando a janela muda.
+ */
+function useBoardTop(ref: { current: HTMLElement | null }, fill: boolean) {
+  useIsoLayoutEffect(() => {
+    const board = ref.current;
+    if (!fill || !board) return undefined;
+    const measure = () => {
+      let top = board.getBoundingClientRect().top;
+      for (let node = board.parentElement; node; node = node.parentElement) top += node.scrollTop;
+      board.style.setProperty('--kanban-top', `${Math.ceil(top)}px`);
+    };
+    const ancestors: Element[] = [];
+    for (let node = board.parentElement; node && node !== document.body; node = node.parentElement)
+      ancestors.push(node);
+    // Só quem vem antes do quadro: o tamanho deles não depende da altura que a medida grava, então
+    // medir não realimenta a observação.
+    const sizes = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    const watch = () => {
+      if (!sizes) return;
+      sizes.disconnect();
+      for (const node of [board, ...ancestors])
+        for (let prev = node.previousElementSibling; prev; prev = prev.previousElementSibling)
+          sizes.observe(prev);
+    };
+    const tree =
+      typeof MutationObserver === 'undefined'
+        ? null
+        : new MutationObserver(() => {
+            watch();
+            measure();
+          });
+    for (const node of ancestors) tree?.observe(node, { childList: true });
+    watch();
+    measure();
+    window.addEventListener('resize', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      sizes?.disconnect();
+      tree?.disconnect();
+      board.style.removeProperty('--kanban-top');
+    };
+  }, [fill, ref]);
 }
 
 /** Número que troca por esmaecimento quando o valor muda (totais da coluna). */
@@ -820,7 +914,7 @@ export function KanbanColumn({
           </p>
         )}
       </header>
-      <div className={s.columnBody} role="list" aria-labelledby={headingId}>
+      <div className={s.columnBody} role="list" aria-labelledby={headingId} data-kanban-body="">
         {children}
         {!hasCards && empty}
       </div>

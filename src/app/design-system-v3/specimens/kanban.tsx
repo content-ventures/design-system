@@ -141,7 +141,7 @@ const OWNER_OPTIONS = [
 
 /* ——————————————————————————— Quadro vivo ——————————————————————————— */
 
-function LeadPipeline({ narrow = false }: { narrow?: boolean }) {
+function LeadPipeline({ narrow = false, fill = false }: { narrow?: boolean; fill?: boolean }) {
   const [columns, setColumns] = useState<Columns>(initialColumns);
   const [collapsed, setCollapsed] = useState<Set<StageId>>(() => new Set(['perdido']));
   const [query, setQuery] = useState('');
@@ -261,7 +261,7 @@ function LeadPipeline({ narrow = false }: { narrow?: boolean }) {
       </div>
 
       {view === 'funil' ? (
-        <KanbanBoard label="Funil de leads" className={k.board}>
+        <KanbanBoard label="Funil de leads" className={k.board} fill={fill}>
           {STAGES.map((stage) => {
             const ids = visible[stage.id];
             const entries = drag.layout(stage.id, ids);
@@ -453,6 +453,9 @@ function Kanban() {
     <Shots>
       <Shot title="Em contexto" tone="white" align="stretch" pad="md">
         <LeadPipeline />
+      </Shot>
+      <Shot title="Altura da janela (fill)" tone="white" align="stretch" pad="md">
+        <LeadPipeline fill />
       </Shot>
       <Shot title="Campanhas" tone="white" align="stretch" pad="md">
         <KanbanBoard label="Pipeline de campanhas de exemplo">
