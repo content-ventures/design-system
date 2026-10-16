@@ -9,8 +9,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { ConfirmDialog } from './confirm-dialog';
 
-function footerButtons() {
-  const footer = screen.getByRole('dialog').querySelector('footer');
+function footerButtons(role: 'dialog' | 'alertdialog' = 'alertdialog') {
+  const footer = screen.getByRole(role).querySelector('footer');
   if (!footer) throw new Error('Diálogo sem rodapé');
   return within(footer).getAllByRole('button');
 }
@@ -26,7 +26,8 @@ describe('ConfirmDialog acknowledge', () => {
         description="Só editor ou admin cria produções."
       />,
     );
-    const dialog = screen.getByRole('dialog', { name: 'Você não tem permissão para isso' });
+    // O aviso interrompe e pede resposta: é um alertdialog, não um diálogo de edição.
+    const dialog = screen.getByRole('alertdialog', { name: 'Você não tem permissão para isso' });
     expect(dialog).toHaveAccessibleDescription('Só editor ou admin cria produções.');
     const buttons = footerButtons();
     expect(buttons).toHaveLength(1);
@@ -88,7 +89,9 @@ describe('ConfirmDialog acknowledge', () => {
         confirmLabel="Iniciar veiculação"
       />,
     );
-    expect(footerButtons().map((button) => button.textContent)).toEqual([
+    // A pergunta mantém o papel nativo do diálogo.
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(footerButtons('dialog').map((button) => button.textContent)).toEqual([
       'Cancelar',
       'Iniciar veiculação',
     ]);
