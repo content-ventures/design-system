@@ -420,9 +420,17 @@ pousa macio). Ao montar, ou quando `arrived` vira `true`, ele aparece uma vez na
 mínimo: o corpo da coluna (`fill`), a faixa do quadro e, sem `fill`, a página, com 12 px de respiro.
 Onde as colunas encaixam (≤640 px do quadro), o cartão encosta no início e o encaixe assenta a coluna
 dele. Outra renderização não rola de novo. Não leva o foco e não é seleção (sem `aria-current`; isso é
-`selected`). Com movimento reduzido, a rolagem salta e a cor fica parada até `arrived` sair. Gancho
+`selected`). O cartão não anuncia nada: a descrição dele ganha “Acabou de chegar.” para quem chega
+nele, e o produto diz o movimento em texto (o toast “Produção enviada para aprovação”, que já é região
+viva). Com movimento reduzido, a rolagem salta e a cor fica parada até `arrived` sair. Gancho
 `[data-arrived]`; nas pranchas, `data-force="arrived"` mostra o começo do destaque. `LeadCard` e
 `CampaignKanbanCard` repassam a prop.
+
+`arrived` vale para uma chegada: o produto o limpa no próximo movimento (no `onMove` do
+`useKanbanDrag`, como a prancha) e quando a pessoa filtra ou troca de visualização. Cada montagem nova
+do cartão (arrasto solto ou cancelado, teclado entre colunas, filtro, coluna recolhida e aberta) acende
+e rola de novo. Com movimento reduzido, a cor parada é a mesma de `selected` até `arrived` sair. Coluna
+recolhida não desenha cartões: o produto a abre antes de marcar `arrived`.
 
 - **Página do item:** família (caption `--muted`) → título `--t-page` → pranchas → anterior/próximo.
   Sem lede, sem abas de uso, sem “Quando usar/Evitar”.
