@@ -216,7 +216,11 @@ function LeadPipeline({ narrow = false, fill = false }: { narrow?: boolean; fill
           <SearchField
             size="sm"
             value={query}
-            onValueChange={setQuery}
+            onValueChange={(next) => {
+              // Filtro e visualização tiram e devolvem o cartão (remonta): a chegada já passou.
+              setArrivedId(null);
+              setQuery(next);
+            }}
             label="Buscar lead"
             placeholder="Empresa ou contato"
           />
@@ -225,7 +229,10 @@ function LeadPipeline({ narrow = false, fill = false }: { narrow?: boolean; fill
           <Select
             size="sm"
             value={owner}
-            onChange={setOwner}
+            onChange={(next) => {
+              setArrivedId(null);
+              setOwner(next);
+            }}
             options={OWNER_OPTIONS}
             label="Responsável"
           />
@@ -234,7 +241,10 @@ function LeadPipeline({ narrow = false, fill = false }: { narrow?: boolean; fill
           label="Visualização"
           size="sm"
           value={view}
-          onChange={setView}
+          onChange={(next) => {
+            setArrivedId(null);
+            setView(next);
+          }}
           options={[
             { value: 'funil', label: 'Funil', icon: Columns3, iconOnly: narrow },
             { value: 'lista', label: 'Lista', icon: ListIcon, iconOnly: narrow },
@@ -306,8 +316,10 @@ function LeadPipeline({ narrow = false, fill = false }: { narrow?: boolean; fill
                           items: [
                             {
                               label: 'Recolher coluna',
-                              onSelect: () =>
-                                setCollapsed((current) => new Set(current).add(stage.id)),
+                              onSelect: () => {
+                                setArrivedId(null);
+                                setCollapsed((current) => new Set(current).add(stage.id));
+                              },
                             },
                             {
                               label: 'Ordenar por valor',
@@ -364,6 +376,12 @@ function LeadPipeline({ narrow = false, fill = false }: { narrow?: boolean; fill
                           onMove={(to) => {
                             const from = stageOfId(entry.id);
                             move(entry.id, to, null);
+                            // Coluna recolhida não desenha cartões: abre o destino antes de marcar.
+                            setCollapsed((current) => {
+                              const next = new Set(current);
+                              next.delete(to);
+                              return next;
+                            });
                             setArrivedId(entry.id);
                             moveWithToast(entry.id, to, from);
                           }}
