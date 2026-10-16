@@ -367,6 +367,9 @@ export type SegmentOption<T extends string> = {
   disabledReason?: string;
 };
 
+/** Teclas que andam no segmentado. */
+const SEGMENT_KEYS = new Set(['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End']);
+
 /**
  * Escolha exclusiva entre poucas visões. O ativo é papel sobre trilho cinza e desliza entre as
  * opções. Setas, Home e End movem a seleção e pulam as opções indisponíveis.
@@ -422,10 +425,13 @@ export function Segmented<T extends string>({
             : event.key === 'End'
               ? last
               : undefined;
-    if (next === undefined) return;
+    if (!SEGMENT_KEYS.has(event.key)) return;
+    // A tecla é do grupo: não rola a página, mesmo sem opção para onde ir (grupo travado).
+    event.preventDefault();
+    // Sem outra disponível, fica onde está: `onChange` não roda com o mesmo valor.
+    if (next === undefined || next === index) return;
     const target = options[next];
     if (!target) return;
-    event.preventDefault();
     onChange(target.value);
     refs.current[target.value]?.focus();
   }
@@ -452,7 +458,6 @@ export function Segmented<T extends string>({
         const reason = off ? (option.disabledReason ?? disabledReason) : undefined;
         const segment = (
           <button
-            key={optionValue}
             ref={(node) => {
               refs.current[optionValue] = node;
             }}
@@ -464,6 +469,11 @@ export function Segmented<T extends string>({
             aria-disabled={off || undefined}
             tabIndex={optionValue === value ? 0 : -1}
             className={s.segment}
+            onMouseDown={(event) => {
+              // Indisponível: o clique mostra o motivo, mas o foco fica na escolha atual (as setas
+              // andam a partir dela).
+              if (off) event.preventDefault();
+            }}
             onClick={() => {
               if (!off) onChange(optionValue);
             }}
@@ -473,13 +483,13 @@ export function Segmented<T extends string>({
           </button>
         );
         // A dica do DS (nunca o `title` nativo) diz o motivo de indisponível ou, só ícone, o nome.
-        const tip = reason || (iconOnly ? optionLabel : null);
-        return tip ? (
-          <Tooltip key={optionValue} bare content={tip}>
+        // Sempre embrulhada e desligada sem dica: ligar ou desligar o motivo não remonta o botão, e o
+        // foco continua nele.
+        const tip = reason || (iconOnly ? optionLabel : undefined);
+        return (
+          <Tooltip key={optionValue} bare content={tip ?? optionLabel} disabled={!tip}>
             {segment}
           </Tooltip>
-        ) : (
-          segment
         );
       })}
     </div>

@@ -1233,6 +1233,19 @@ function GrupoBotoes() {
             </span>
             <span className={x.openCaption}>Menu aberto</span>
           </div>
+          {/* Grupo travado: a escolha atual à vista (papel sem sombra), o motivo do grupo na dica. */}
+          <div className={x.openRow}>
+            <Segmented
+              size="sm"
+              label="Como trazer o material"
+              value="texto"
+              onChange={noop}
+              options={MATERIAL_OPTIONS}
+              disabled
+              disabledReason="Aguarde a IA terminar."
+            />
+            <span className={x.openCaption}>Segmentado · Travado</span>
+          </div>
         </div>
       </Shot>
     </Shots>
