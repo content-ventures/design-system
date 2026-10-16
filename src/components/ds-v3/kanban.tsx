@@ -23,6 +23,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
+  type Ref,
 } from 'react';
 import { useAnnouncer, VisuallyHidden } from './a11y';
 import { Chip, Count, type Tone } from './badge';
@@ -42,6 +43,27 @@ const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayout
 const reducedMotion = () =>
   typeof window !== 'undefined' &&
   Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+
+/**
+ * Soma a referência interna à do consumidor, no contrato do React 19: um ref de função que devolve
+ * limpeza recebe a limpeza ao desmontar (nunca `null`); os demais recebem `null`, como sempre.
+ */
+function useJoinedRef<T>(own: { current: T | null }, ref: Ref<T> | undefined) {
+  return useCallback(
+    (node: T | null) => {
+      own.current = node;
+      const cleanup = typeof ref === 'function' ? ref(node) : undefined;
+      if (ref && typeof ref !== 'function') ref.current = node;
+      return () => {
+        own.current = null;
+        if (typeof cleanup === 'function') cleanup();
+        else if (typeof ref === 'function') ref(null);
+        else if (ref) ref.current = null;
+      };
+    },
+    [own, ref],
+  );
+}
 
 /* ——————————————————————————— Ícone de etapa ——————————————————————————— */
 
@@ -736,14 +758,7 @@ export function KanbanBoard({
   fill?: boolean;
 }) {
   const boardRef = useRef<HTMLDivElement | null>(null);
-  const setRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      boardRef.current = node;
-      if (typeof ref === 'function') ref(node);
-      else if (ref) ref.current = node;
-    },
-    [ref],
-  );
+  const setRef = useJoinedRef(boardRef, ref);
   useBoardTop(boardRef, fill);
   return (
     <div
@@ -1049,7 +1064,12 @@ export type KanbanCardProps = Omit<ComponentProps<'article'>, 'title'> & {
   /**
    * Acabou de chegar: o cartão que a pessoa acabou de mover (enviou para aprovação, aprovou). Acende
    * e volta sozinho ao repouso; ao montar, ou quando vira `true`, aparece uma vez na rolagem da
-   * coluna e do quadro. Não leva o foco nem é seleção.
+   * coluna e do quadro, e a descrição acessível ganha “Acabou de chegar.”. Não leva o foco nem é
+   * seleção. Vale para uma chegada: o produto o limpa no próximo movimento e quando a pessoa filtra
+   * ou troca de visualização — cada montagem nova do cartão (arrasto solto ou cancelado, teclado
+   * entre colunas, filtro, coluna recolhida e aberta) acende e rola de novo. Com movimento reduzido,
+   * a cor parada é a mesma de `selected` até `arrived` sair. Coluna recolhida não desenha cartões:
+   * abra-a antes de marcar.
    */
   arrived?: boolean;
   onOpen?: () => void;
@@ -1069,7 +1089,8 @@ function revealCard(card: HTMLElement) {
   card.scrollIntoView({
     block: 'nearest',
     inline: snaps ? 'start' : 'nearest',
-    behavior: reducedMotion() ? 'instant' : 'smooth',
+    // `auto`, como o resto do DS: com movimento reduzido o tema já força `scroll-behavior: auto`.
+    behavior: reducedMotion() ? 'auto' : 'smooth',
   });
 }
 
@@ -1094,18 +1115,16 @@ export function KanbanCard({
 }: KanbanCardProps) {
   const nameId = useId();
   const summaryId = useId();
-  const describedBy = [summary ? summaryId : undefined, props['aria-describedby']]
+  const arrivedId = useId();
+  const describedBy = [
+    summary ? summaryId : undefined,
+    arrived ? arrivedId : undefined,
+    props['aria-describedby'],
+  ]
     .filter(Boolean)
     .join(' ');
   const cardRef = useRef<HTMLElement | null>(null);
-  const setRef = useCallback(
-    (node: HTMLElement | null) => {
-      cardRef.current = node;
-      if (typeof ref === 'function') ref(node);
-      else if (ref) ref.current = node;
-    },
-    [ref],
-  );
+  const setRef = useJoinedRef(cardRef, ref);
   // Efeito passivo: roda depois de o quadro `fill` medir a própria altura (efeito de layout do pai),
   // quando o corpo da coluna já é o que rola. Só ao montar ou quando `arrived` vira `true`.
   useEffect(() => {
@@ -1168,6 +1187,12 @@ export function KanbanCard({
       {summary && (
         <VisuallyHidden>
           <span id={summaryId}>{summary}</span>
+        </VisuallyHidden>
+      )}
+      {/* A cor não fala: quem chega ao cartão pelo leitor de tela ouve que ele acabou de chegar. */}
+      {arrived && (
+        <VisuallyHidden>
+          <span id={arrivedId}>Acabou de chegar.</span>
         </VisuallyHidden>
       )}
     </article>
@@ -1252,7 +1277,10 @@ export type LeadCardProps = Omit<ComponentProps<'article'>, 'children'> & {
   lifted?: boolean;
   /** Fantasma: o lugar de origem enquanto o cartão é arrastado. */
   ghost?: boolean;
-  /** Acabou de chegar: acende, volta sozinho ao repouso e aparece na rolagem (ver `KanbanCard`). */
+  /**
+   * Acabou de chegar: acende, volta sozinho ao repouso e aparece na rolagem. Vale para uma chegada:
+   * o produto o limpa no próximo movimento, no filtro e na troca de visualização (ver `KanbanCard`).
+   */
   arrived?: boolean;
   /** Linha de nota no pé (alerta curto). */
   note?: LeadNote;
@@ -1264,7 +1292,7 @@ export type LeadCardProps = Omit<ComponentProps<'article'>, 'children'> & {
   maxInterests?: number;
   /** Abre o detalhe (clique e Enter). O cartão vira focável. */
   onOpen?: () => void;
-  /** Prancha: `hover`, `focus`. */
+  /** Prancha: `hover`, `focus`, `arrived`. */
   'data-force'?: string;
 };
 

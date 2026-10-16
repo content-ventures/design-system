@@ -1,8 +1,9 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CampaignKanbanCard } from './campaign-kanban-card';
-import { KanbanCard, KanbanColumn, LeadCard } from './kanban';
+import { KanbanBoard, KanbanCard, KanbanColumn, LeadCard } from './kanban';
 
 describe('Cartão compartilhado dos pipelines V3', () => {
   it('campanhas e leads usam a mesma base visual, com dados próprios', () => {
@@ -144,6 +145,50 @@ describe('Cartão que acabou de chegar', () => {
       </KanbanColumn>,
     );
     computed.mockRestore();
-    expect(scroll).toHaveBeenCalledWith({ block: 'nearest', inline: 'start', behavior: 'instant' });
+    expect(scroll).toHaveBeenCalledWith({ block: 'nearest', inline: 'start', behavior: 'auto' });
+  });
+
+  it('diz “Acabou de chegar.” na descrição enquanto `arrived` vale', () => {
+    const { rerender } = render(<LeadCard company="Aurora" code="1200" owner="Marina" arrived />);
+    const card = screen.getByRole('listitem', { name: 'Aurora' });
+    expect(card).toHaveAccessibleDescription(/Lead 1200\. Responsável Marina\. Acabou de chegar\./);
+    rerender(<LeadCard company="Aurora" code="1200" owner="Marina" />);
+    expect(card).not.toHaveAccessibleDescription(/Acabou de chegar/);
+    expect(card).not.toHaveTextContent('Acabou de chegar');
+  });
+});
+
+describe('Referência do cartão e do quadro', () => {
+  it('o ref de objeto chega ao cartão e ao quadro', () => {
+    const card = createRef<HTMLElement>();
+    const board = createRef<HTMLDivElement>();
+    render(
+      <KanbanBoard label="Funil" ref={board}>
+        <KanbanCard title="Aurora" ref={card} />
+      </KanbanBoard>,
+    );
+    expect(card.current).toBe(screen.getByRole('listitem', { name: 'Aurora' }));
+    expect(board.current).toBe(screen.getByRole('region', { name: 'Funil' }));
+  });
+
+  it('o ref de função com limpeza recebe a limpeza, nunca `null`', () => {
+    const seen: (HTMLElement | null)[] = [];
+    const cleanup = vi.fn();
+    const ref = (node: HTMLElement | null) => {
+      seen.push(node);
+      return cleanup;
+    };
+    const { unmount } = render(<KanbanCard title="Aurora" ref={ref} />);
+    expect(seen.at(-1)).toBe(screen.getByRole('listitem', { name: 'Aurora' }));
+    unmount();
+    expect(cleanup).toHaveBeenCalled();
+    expect(seen).not.toContain(null);
+  });
+
+  it('o ref de função sem limpeza recebe `null` ao desmontar', () => {
+    const ref = vi.fn();
+    const { unmount } = render(<KanbanCard title="Aurora" ref={ref} />);
+    unmount();
+    expect(ref).toHaveBeenLastCalledWith(null);
   });
 });
