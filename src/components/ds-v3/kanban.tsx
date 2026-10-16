@@ -389,6 +389,8 @@ export function useKanbanDrag<C extends string>({
     clone.querySelectorAll('[id]').forEach((node) => node.removeAttribute('id'));
     clone.setAttribute('aria-hidden', 'true');
     clone.removeAttribute('data-kanban-card');
+    // Quem pega o cartão já o achou: a cópia não repete o destaque de recém-chegado.
+    clone.removeAttribute('data-arrived');
     if (s.dragLayer) clone.classList.add(s.dragLayer);
     clone.style.left = `${rect.left}px`;
     clone.style.top = `${rect.top}px`;
@@ -1044,10 +1046,32 @@ export type KanbanCardProps = Omit<ComponentProps<'article'>, 'title'> & {
   selected?: boolean;
   lifted?: boolean;
   ghost?: boolean;
+  /**
+   * Acabou de chegar: o cartão que a pessoa acabou de mover (enviou para aprovação, aprovou). Acende
+   * e volta sozinho ao repouso; ao montar, ou quando vira `true`, aparece uma vez na rolagem da
+   * coluna e do quadro. Não leva o foco nem é seleção.
+   */
+  arrived?: boolean;
   onOpen?: () => void;
+  /** Prancha: `hover`, `focus`, `arrived`. */
   'data-force'?: string;
   'data-outcome'?: 'won' | 'lost';
 };
+
+/**
+ * Traz à vista o cartão que acabou de chegar, andando o mínimo: o corpo da coluna (quadro `fill`), a
+ * faixa do quadro e, sem `fill`, a página. Onde as colunas encaixam (celular, 85% da largura), o
+ * cartão encosta no início e o encaixe assenta a coluna inteira. Com movimento reduzido, salta.
+ */
+function revealCard(card: HTMLElement) {
+  const column = card.closest('[data-kanban-body]')?.parentElement;
+  const snaps = column ? (getComputedStyle(column).scrollSnapAlign || 'none') !== 'none' : false;
+  card.scrollIntoView({
+    block: 'nearest',
+    inline: snaps ? 'start' : 'nearest',
+    behavior: reducedMotion() ? 'instant' : 'smooth',
+  });
+}
 
 export function KanbanCard({
   title,
@@ -1059,11 +1083,13 @@ export function KanbanCard({
   selected = false,
   lifted = false,
   ghost = false,
+  arrived = false,
   onOpen,
   children,
   className = '',
   onClick,
   onKeyDown,
+  ref,
   ...props
 }: KanbanCardProps) {
   const nameId = useId();
@@ -1071,15 +1097,31 @@ export function KanbanCard({
   const describedBy = [summary ? summaryId : undefined, props['aria-describedby']]
     .filter(Boolean)
     .join(' ');
+  const cardRef = useRef<HTMLElement | null>(null);
+  const setRef = useCallback(
+    (node: HTMLElement | null) => {
+      cardRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref],
+  );
+  // Efeito passivo: roda depois de o quadro `fill` medir a própria altura (efeito de layout do pai),
+  // quando o corpo da coluna já é o que rola. Só ao montar ou quando `arrived` vira `true`.
+  useEffect(() => {
+    if (arrived && cardRef.current) revealCard(cardRef.current);
+  }, [arrived]);
 
   return (
     <article
       {...props}
+      ref={setRef}
       className={`${s.card} ${className}`}
       data-density={density}
       data-selected={selected || undefined}
       data-lifted={lifted || undefined}
       data-ghost={ghost || undefined}
+      data-arrived={arrived || undefined}
       data-open={onOpen ? true : undefined}
       tabIndex={props.tabIndex ?? (onOpen ? 0 : undefined)}
       aria-labelledby={nameId}
@@ -1210,6 +1252,8 @@ export type LeadCardProps = Omit<ComponentProps<'article'>, 'children'> & {
   lifted?: boolean;
   /** Fantasma: o lugar de origem enquanto o cartão é arrastado. */
   ghost?: boolean;
+  /** Acabou de chegar: acende, volta sozinho ao repouso e aparece na rolagem (ver `KanbanCard`). */
+  arrived?: boolean;
   /** Linha de nota no pé (alerta curto). */
   note?: LeadNote;
   /** Ganho em … / Perdido · motivo. */
@@ -1248,6 +1292,7 @@ export function LeadCard({
   selected = false,
   lifted = false,
   ghost = false,
+  arrived = false,
   note,
   outcome,
   menu,
@@ -1290,6 +1335,7 @@ export function LeadCard({
       selected={selected}
       lifted={lifted}
       ghost={ghost}
+      arrived={arrived}
       data-outcome={outcome?.kind}
       onOpen={onOpen}
       onClick={onClick}

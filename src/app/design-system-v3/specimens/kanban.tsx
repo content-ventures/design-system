@@ -149,6 +149,8 @@ function LeadPipeline({ narrow = false, fill = false }: { narrow?: boolean; fill
   const [view, setView] = useState<'funil' | 'lista'>('funil');
   const [openId, setOpenId] = useState<string | null>(null);
   const [fresh, setFresh] = useState<string | null>(null);
+  // Movido pelo menu: o cartão aparece na coluna nova, que pode estar fora da vista.
+  const [arrivedId, setArrivedId] = useState<string | null>(null);
 
   const visible = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase('pt-BR');
@@ -196,7 +198,10 @@ function LeadPipeline({ narrow = false, fill = false }: { narrow?: boolean; fill
       collapsed: collapsed.has(stage.id),
     })),
     labelOf: (id) => leadOf(id).company,
-    onMove: ({ id, column, beforeId }) => move(id, column, beforeId),
+    onMove: ({ id, column, beforeId }) => {
+      setArrivedId(null);
+      move(id, column, beforeId);
+    },
     onDrop: ({ id, column, from }) => {
       if (column !== from) moveWithToast(id, column, from);
     },
@@ -349,6 +354,7 @@ function LeadPipeline({ narrow = false, fill = false }: { narrow?: boolean; fill
                       {...drag.cardProps(entry.id, stage.id)}
                       lifted={drag.pickedId === entry.id}
                       selected={openId === entry.id}
+                      arrived={arrivedId === entry.id}
                       className={fresh === entry.id ? k.fresh : undefined}
                       onOpen={() => setOpenId(entry.id)}
                       menu={
@@ -358,6 +364,7 @@ function LeadPipeline({ narrow = false, fill = false }: { narrow?: boolean; fill
                           onMove={(to) => {
                             const from = stageOfId(entry.id);
                             move(entry.id, to, null);
+                            setArrivedId(entry.id);
                             moveWithToast(entry.id, to, from);
                           }}
                         />
@@ -415,6 +422,7 @@ const LADEIRA = LEADS.find((lead) => lead.company === 'Sapataria Ladeira') ?? LE
 const ATELIE = LEADS.find((lead) => lead.company === 'Ateliê Sul') ?? LEADS[0]!;
 const HORIZONTE = LEADS.find((lead) => lead.company === 'Grupo Horizonte') ?? LEADS[0]!;
 const NORTE = LEADS.find((lead) => lead.company === 'Estúdio Norte') ?? LEADS[0]!;
+const PATIO = LEADS.find((lead) => lead.company === 'Pátio Couro') ?? LEADS[0]!;
 
 function StaticColumn({
   title,
@@ -544,6 +552,19 @@ function Kanban() {
                 menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
               />
               <KanbanPlaceholder height={112} />
+            </StaticColumn>
+          </State>
+          <State label="Acabou de chegar">
+            <StaticColumn stage="proposta" ids={[PATIO.id, LEADS[9]!.id]}>
+              <LeadCard
+                {...cardOf(PATIO, 'proposta')}
+                data-force="arrived"
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
+              <LeadCard
+                {...cardOf(LEADS[9]!, 'proposta')}
+                menu={<KanbanIconButton label="Ações" icon={MoreHorizontal} />}
+              />
             </StaticColumn>
           </State>
           <State label="Coluna vazia">

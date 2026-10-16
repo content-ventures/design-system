@@ -9,6 +9,7 @@ O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 ### Added
 
 - `KanbanBoard` supports opt-in `fill`: the board runs from its own top to the bottom of the window, every column takes that height and the cards scroll inside each column, with the column header fixed and the footer pinned. The board re-measures when the content above it or the window changes, and stops shrinking at 360 px. Dragging near the top or bottom of a scrolling column scrolls it. Without `fill` the board keeps growing with its content.
+- `KanbanCard` supports opt-in `arrived` to point out a card that just moved (sent for approval, approved): it renders `data-arrived` and lights up with a `--b-300` border and `--b-25` background that fade back to rest over the new `--arrival-fade` token (2.4 s). On mount, or when `arrived` turns true, the card scrolls into view once with the least movement, inside its column body on a `fill` board, along the board's lanes and, without `fill`, on the page; where columns snap (≤640 px) its column lands at the start. Re-renders do not scroll again, focus does not move and `aria-current` stays reserved for `selected`. With reduced motion the scroll is instant and the tint is static until `arrived` turns false. `LeadCard` and `CampaignKanbanCard` pass it through; `data-force="arrived"` shows the state in the catalog.
 
 ### Changed
 

@@ -262,6 +262,9 @@
   --icon-stroke-mark: 2.5;
   /* Único movimento contínuo do produto: o ponto do que está no ar. */
   --live-pulse: 2.2s;
+  /* Destaque do que acabou de chegar (cartão movido): some sozinho, uma vez, devagar o bastante
+     para o olho achar o item depois da rolagem que o revela. */
+  --arrival-fade: 2.4s;
   /* Rede de segurança: se a regra global do V2 vencer em alguma ordem de carga, ao menos pinta b-500. */
   --ds-focus: var(--focus-color);
 
