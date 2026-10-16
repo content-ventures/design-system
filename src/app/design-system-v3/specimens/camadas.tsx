@@ -609,7 +609,13 @@ function PhoneDetail() {
 
 /* ——————————————————————————— Confirmação ——————————————————————————— */
 
-type ConfirmKind = 'start' | 'delete' | 'cancel-pi' | 'approve';
+type ConfirmKind = 'start' | 'delete' | 'cancel-pi' | 'approve' | 'blocked';
+
+/** Aviso de bloqueio: a pessoa tentou o que o perfil dela não faz. */
+const BLOCKED = {
+  title: 'Você não tem permissão para isso',
+  description: 'Só editor ou admin cria campanhas.',
+};
 
 const SELECTED = [CAMPAIGNS[0]!, CAMPAIGNS[2]!, CAMPAIGNS[3]!];
 
@@ -866,6 +872,40 @@ function ConfirmacaoSpecimen() {
             <figcaption>Confirmando</figcaption>
           </figure>
         </div>
+      </Shot>
+
+      <Shot title="Só aviso" align="stretch">
+        <div className={x.triple}>
+          <figure className={x.figure}>
+            <div className={`${x.panel} ${x.confirmCard}`}>
+              <div className={x.rowLine}>
+                <div className={x.rowText}>
+                  <strong>Campanhas</strong>
+                  <Meta items={['Perfil: leitura']} />
+                </div>
+                <Button size="sm" variant="primary" icon={Plus} onClick={() => setOpen('blocked')}>
+                  Nova campanha
+                </Button>
+              </div>
+            </div>
+            <figcaption>Em contexto</figcaption>
+          </figure>
+          <figure className={x.figure}>
+            <ConfirmFrame width="100%" acknowledge {...BLOCKED} focus="confirm" />
+            <figcaption>Foco no botão</figcaption>
+          </figure>
+          <figure className={x.figure}>
+            <Phone height={420} label="Celular, 390">
+              <PhoneDetail />
+              <div className={x.phoneScrim} />
+              <div className={x.phoneCenter}>
+                <ConfirmFrame compact acknowledge {...BLOCKED} />
+              </div>
+            </Phone>
+            <figcaption>Celular</figcaption>
+          </figure>
+        </div>
+        <ConfirmDialog open={open === 'blocked'} onClose={close} acknowledge {...BLOCKED} />
       </Shot>
     </Shots>
   );
