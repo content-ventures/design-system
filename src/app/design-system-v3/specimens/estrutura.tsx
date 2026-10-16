@@ -85,10 +85,12 @@ import {
 } from '@content-ventures/design-system/v3/structure';
 import {
   AppShell,
+  NotificationsButton,
   PortalSwitcher,
   Sidebar,
   SidebarAccount,
   TopBar,
+  type Crumb,
   type NavGroup,
 } from '@content-ventures/design-system/v3/app-shell';
 import {
@@ -2558,14 +2560,10 @@ function BleedShell() {
           }
           topbar={
             <TopBar
-              breadcrumb={
-                narrow
-                  ? [{ label: 'Briefing' }]
-                  : [
-                      { label: 'Campanhas', onClick: () => undefined },
-                      { label: 'Aurora Calçados · Briefing' },
-                    ]
-              }
+              breadcrumb={[
+                { label: 'Campanhas', onClick: () => undefined },
+                { label: 'Aurora Calçados · Briefing' },
+              ]}
             />
           }
         >
@@ -2734,6 +2732,58 @@ function ImmersiveShell() {
   );
 }
 
+/** Trilha de três níveis: no celular, o topo guarda o primeiro (a volta) e o atual; o meio sai. */
+const phoneTrail: Crumb[] = [
+  { label: 'Campanhas', href: '#shell' },
+  { label: 'Aurora Calçados', href: '#shell' },
+  { label: 'Coleção Primavera-Verão no portal' },
+];
+
+function PhoneTrailShell() {
+  const [drawer, setDrawer] = useState(false);
+  const [active, setActive] = useState('campanhas');
+  return (
+    <Phone height={360} label="Trilha no celular">
+      <AppShell
+        fill
+        contentAs="div"
+        layout="drawer"
+        navOpen={drawer}
+        onNavOpenChange={setDrawer}
+        sidebar={
+          <ShellSidebar
+            active={active}
+            onNavigate={(id) => {
+              setActive(id);
+              setDrawer(false);
+            }}
+          />
+        }
+        topbar={
+          <TopBar
+            breadcrumb={phoneTrail}
+            notifications={
+              <NotificationsButton
+                count={2}
+                sections={[
+                  {
+                    items: [
+                      { label: 'Aurora Calçados assinou o P.I.' },
+                      { label: 'Banner Super Topo — Portal aprovado' },
+                    ],
+                  },
+                ]}
+              />
+            }
+          />
+        }
+      >
+        <DetailHeader />
+      </AppShell>
+    </Phone>
+  );
+}
+
 type ShellDevice = 'desktop' | 'tablet' | 'phone';
 
 /** Largura da moldura por aparelho. Desktop ocupa o palco inteiro (menu lateral fixo). */
@@ -2811,7 +2861,7 @@ function ShellSpecimen() {
               }
               topbar={
                 <TopBar
-                  breadcrumb={phone ? [{ label: 'Campanhas' }] : crumbs}
+                  breadcrumb={crumbs}
                   onToggleSidebar={drawerMode ? undefined : () => setCollapsed((value) => !value)}
                 />
               }
@@ -2940,6 +2990,9 @@ function ShellSpecimen() {
             </div>
           </FixedFrame>
         </div>
+      </Shot>
+      <Shot title="Trilha no celular" pad="lg">
+        <PhoneTrailShell />
       </Shot>
     </Shots>
   );

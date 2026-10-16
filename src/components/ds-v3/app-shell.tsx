@@ -1174,6 +1174,12 @@ function goTo(item: Crumb) {
 }
 
 /**
+ * Papel do nível na trilha (`data-crumb` no `li`). No topo do celular, o CSS mostra o primeiro (o
+ * caminho de volta) e o atual e esconde o meio — o “…” recolhido também é meio.
+ */
+type CrumbPart = 'first' | 'middle' | 'current';
+
+/**
  * Trilha de navegação. O último item é a página atual (texto, não link). Com `maxItems`, os níveis
  * do meio recolhem num “…” que abre um menu. `compact` mostra só “‹ nível acima” (celular).
  */
@@ -1233,17 +1239,20 @@ export function Breadcrumb({
   const tail = collapse ? items.slice(items.length - tailCount) : [];
   const lastIndex = items.length - 1;
   const sep = <ChevronRight className={s.crumbSep} aria-hidden="true" />;
+  // Um nível só é o atual; com dois ou mais, o primeiro é a volta e o último, o atual.
+  const headPart = (index: number): CrumbPart =>
+    !collapse && index === lastIndex ? 'current' : index === 0 ? 'first' : 'middle';
   return (
     <nav aria-label={label} className={s.crumbs}>
       <ol>
         {head.map((item, index) => (
-          <li key={`h-${item.label}-${index}`}>
+          <li key={`h-${item.label}-${index}`} data-crumb={headPart(index)}>
             {index > 0 && sep}
             <CrumbNode item={item} current={!collapse && index === lastIndex} />
           </li>
         ))}
         {collapse && (
-          <li>
+          <li data-crumb="middle">
             {sep}
             <Menu
               label="Níveis ocultos"
@@ -1270,7 +1279,10 @@ export function Breadcrumb({
           </li>
         )}
         {tail.map((item, index) => (
-          <li key={`t-${item.label}-${index}`}>
+          <li
+            key={`t-${item.label}-${index}`}
+            data-crumb={index === tail.length - 1 ? 'current' : 'middle'}
+          >
             {sep}
             <CrumbNode item={item} current={index === tail.length - 1} />
           </li>
@@ -1284,7 +1296,8 @@ export function Breadcrumb({
 
 /**
  * Barra do topo: 52 px, branco 94% com desfoque e fio inferior, presa ao rolar. Trilha à
- * esquerda, ações à direita. Até 1199 px mostra o botão do menu, alinhado ao x do conteúdo.
+ * esquerda, ações à direita. Até 1199 px mostra o botão do menu, alinhado ao x do conteúdo. Em
+ * ≤640 px a trilha fica com o primeiro nível (a volta) e o atual; o meio sai.
  */
 export function TopBar({
   breadcrumb,
