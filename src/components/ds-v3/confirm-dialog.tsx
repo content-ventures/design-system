@@ -54,8 +54,8 @@ export type ConfirmDialogProps = {
  * indisponível-até-válido do sistema. `onConfirm` pode ser assíncrono: o botão carrega e a camada
  * fecha quando ele termina; se falhar, fica aberta para tentar de novo.
  * `acknowledge`: só avisa um bloqueio — um botão primário (“Entendi”) com o foco, sem Cancelar;
- * `onConfirm` é opcional e o botão fecha. Esc, véu e X fecham como sempre; no celular o botão
- * ocupa a largura toda, como os dois da pergunta.
+ * `onConfirm` é opcional e o botão fecha. Abre como `alertdialog`. Esc, véu e X fecham como
+ * sempre; no celular o botão ocupa a largura toda, como os dois da pergunta.
  */
 export function ConfirmDialog({
   open,
@@ -129,6 +129,8 @@ export function ConfirmDialog({
       dismissible={!busy}
       dirty={typed.length > 0}
       contained={contained}
+      // O aviso interrompe e pede resposta: o leitor de tela o anuncia como alerta.
+      role={acknowledge ? 'alertdialog' : 'dialog'}
       title={title}
       description={description}
       footer={

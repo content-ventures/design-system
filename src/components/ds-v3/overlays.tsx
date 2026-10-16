@@ -437,6 +437,7 @@ export function Dialog({
   dismissible = true,
   dirty = false,
   contained = false,
+  role = 'dialog',
   className = '',
 }: DialogLayoutProps & {
   open: boolean;
@@ -448,6 +449,11 @@ export function Dialog({
   dirty?: boolean;
   /** Preso ao contêiner posicionado mais próximo, em vez da janela (pranchas, simuladores). */
   contained?: boolean;
+  /**
+   * `alertdialog`: o aviso que interrompe e pede resposta (`ConfirmDialog acknowledge`); o leitor de
+   * tela o anuncia como alerta. Padrão: o papel nativo do `<dialog>`.
+   */
+  role?: 'dialog' | 'alertdialog';
   className?: string;
 }) {
   const layer = useModalLayer({
@@ -472,6 +478,7 @@ export function Dialog({
       {...layer.dialogProps}
       className={`${s.dialog} ${className}`}
       data-size={size}
+      role={role === 'alertdialog' ? 'alertdialog' : undefined}
       aria-labelledby={titleId}
       aria-describedby={shown.description ? descId : undefined}
       tabIndex={-1}
