@@ -15,7 +15,7 @@ O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### Changed
 
-- `TopBar` keeps a way up on phones: at ≤640 px of its container the trail shows the first crumb (a link) and the current one, with the separator between them, and hides only the middle levels (and the collapsed “…”). Both truncate with an ellipsis: a short crumb stays whole, the current one takes the rest and two long ones split the trail in half. Each `li` carries `data-crumb="first|middle|current"`. One or two crumbs, the desktop trail and `Breadcrumb variant="compact"` are unchanged. In the default layout the trail is the way back; `PageHeader back` stays for `layout="immersive"`.
+- `TopBar` keeps a way up on phones: at ≤640 px of its container the trail shows the first crumb (a link) and the current one, with the separator between them, and hides only the middle levels (and the collapsed “…”). Both truncate with an ellipsis: a short crumb stays whole, the current one takes the rest and two long ones split the trail in half. Each `li` carries `data-crumb="first|middle|current"`. A single crumb, the desktop trail and `Breadcrumb variant="compact"` are unchanged. A two-crumb trail now shows both crumbs on phones (before, only the current one). If you cut the trail to one crumb on phones by hand, pass the full trail. In the default layout the trail is the way back; `PageHeader back` stays for `layout="immersive"`.
 
 ## [0.2.1] - 2026-10-15
 

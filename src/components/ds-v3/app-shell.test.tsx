@@ -421,6 +421,14 @@ const phoneBlock = () => {
   const start = css.indexOf('@container topbar (max-width: 640px)', trailBase());
   return start < 0 ? '' : css.slice(start, css.indexOf('\n}\n', start));
 };
+/** Todos os blocos do topo a ≤640 px, em qualquer ponto do arquivo. */
+const phoneBlocks = () => {
+  const query = '@container topbar (max-width: 640px)';
+  const blocks: string[] = [];
+  for (let at = css.indexOf(query); at >= 0; at = css.indexOf(query, at + 1))
+    blocks.push(css.slice(at, css.indexOf('\n}\n', at)));
+  return blocks;
+};
 
 describe('TopBar · trilha no celular', () => {
   it('três níveis: o primeiro é o link de volta, o do meio sai, o atual leva o separador', () => {
@@ -479,6 +487,11 @@ describe('TopBar · trilha no celular', () => {
     expect(css).not.toMatch(/\.crumbs li:last-child > \.crumbSep/);
     expect(block).not.toContain('crumbSep');
     expect(block).not.toMatch(/data-crumb='(first|current)'/);
+    // Em todos os blocos do celular, a única regra sobre os níveis é a que esconde o meio.
+    const crumbRules = phoneBlocks()
+      .flatMap((text) => text.match(/\.crumbs li[^{,]*/g) ?? [])
+      .map((selector) => selector.trim());
+    expect(crumbRules).toEqual([".crumbs li[data-crumb='middle']"]);
     // Cada nível corta com reticência, e o link tem 3 px acima e abaixo da linha de 20 px (26 px).
     expect(css).toMatch(/\.crumbText \{[^}]*overflow: hidden;[^}]*text-overflow: ellipsis;/);
     expect(css).toMatch(/\.crumbLink,\n\.crumbBack \{\s*padding: 3px 4px;/);
