@@ -742,7 +742,8 @@ export function Tooltip({
         if (!unavailable()) hide();
         return;
       }
-      if (!unavailable()) return;
+      // Dica desligada nunca abre, nem no toque num controle indisponível.
+      if (off.current || !unavailable()) return;
       reveal(false);
       window.clearTimeout(timer.current);
       timer.current = window.setTimeout(hide, TOUCH_MS);
