@@ -355,11 +355,21 @@ export type SegmentOption<T extends string> = {
   icon?: LucideIcon;
   /** Esconde o texto e usa o rótulo só como nome acessível. */
   iconOnly?: boolean;
+  /**
+   * Indisponível, mas à vista (`aria-disabled`): o clique e as setas não escolhem a opção.
+   * Diga o motivo em `disabledReason`.
+   */
+  disabled?: boolean;
+  /**
+   * Motivo de estar indisponível (“Em breve”): vai na dica do DS e na descrição acessível. Só
+   * ícone: a dica mostra o motivo no lugar do nome, então nomeie a opção nele.
+   */
+  disabledReason?: string;
 };
 
 /**
  * Escolha exclusiva entre poucas visões. O ativo é papel sobre trilho cinza e desliza entre as
- * opções. Setas, Home e End movem a seleção.
+ * opções. Setas, Home e End movem a seleção e pulam as opções indisponíveis.
  */
 export function Segmented<T extends string>({
   options,
@@ -368,6 +378,8 @@ export function Segmented<T extends string>({
   label,
   size = 'md',
   full = false,
+  disabled = false,
+  disabledReason,
 }: {
   options: SegmentOption<T>[];
   value: T;
@@ -375,8 +387,14 @@ export function Segmented<T extends string>({
   label: string;
   size?: 'sm' | 'md' | 'lg';
   full?: boolean;
+  /** O grupo inteiro indisponível: a escolha atual fica à vista e nenhuma opção é escolhida. */
+  disabled?: boolean;
+  /** Motivo do grupo indisponível; o `disabledReason` de uma opção vale antes dele. */
+  disabledReason?: string;
 }) {
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
+  // Índices das opções que a seta e o clique podem escolher.
+  const enabled = options.flatMap((option, index) => (disabled || option.disabled ? [] : [index]));
   const [box, setBox] = useState<{ x: number; w: number } | null>(null);
   useIsoLayoutEffect(() => {
     const measure = () => {
@@ -391,22 +409,20 @@ export function Segmented<T extends string>({
   }, [value, options.length]);
   function onKey(event: KeyboardEvent<HTMLDivElement>) {
     const index = options.findIndex((option) => option.value === value);
-    const last = options.length - 1;
+    const first = enabled[0];
+    const last = enabled[enabled.length - 1];
+    // A seta anda até a próxima opção disponível e dá a volta; Home e End vão às pontas disponíveis.
     const next =
       event.key === 'ArrowRight' || event.key === 'ArrowDown'
-        ? index === last
-          ? 0
-          : index + 1
+        ? (enabled.find((at) => at > index) ?? first)
         : event.key === 'ArrowLeft' || event.key === 'ArrowUp'
-          ? index === 0
-            ? last
-            : index - 1
+          ? ([...enabled].reverse().find((at) => at < index) ?? last)
           : event.key === 'Home'
-            ? 0
+            ? first
             : event.key === 'End'
               ? last
-              : -1;
-    if (next < 0) return;
+              : undefined;
+    if (next === undefined) return;
     const target = options[next];
     if (!target) return;
     event.preventDefault();
@@ -417,6 +433,7 @@ export function Segmented<T extends string>({
     <div
       role="radiogroup"
       aria-label={label}
+      aria-disabled={disabled || undefined}
       className={s.segmented}
       data-size={size}
       data-full={full || undefined}
@@ -429,7 +446,10 @@ export function Segmented<T extends string>({
           style={{ width: box.w, transform: `translateX(${box.x}px)` }}
         />
       )}
-      {options.map(({ value: optionValue, label: optionLabel, icon: Icon, iconOnly }) => {
+      {options.map((option) => {
+        const { value: optionValue, label: optionLabel, icon: Icon, iconOnly } = option;
+        const off = disabled || option.disabled === true;
+        const reason = off ? (option.disabledReason ?? disabledReason) : undefined;
         const segment = (
           <button
             key={optionValue}
@@ -440,17 +460,22 @@ export function Segmented<T extends string>({
             role="radio"
             aria-checked={optionValue === value}
             aria-label={iconOnly ? optionLabel : undefined}
+            // Indisponível continua à vista e no leitor de tela; a escolha atual segue sendo a parada de Tab.
+            aria-disabled={off || undefined}
             tabIndex={optionValue === value ? 0 : -1}
             className={s.segment}
-            onClick={() => onChange(optionValue)}
+            onClick={() => {
+              if (!off) onChange(optionValue);
+            }}
           >
             {Icon && <Icon aria-hidden="true" />}
             {!iconOnly && optionLabel}
           </button>
         );
-        // Só ícone: o nome aparece na dica do DS (nunca no `title` nativo).
-        return iconOnly ? (
-          <Tooltip key={optionValue} bare content={optionLabel}>
+        // A dica do DS (nunca o `title` nativo) diz o motivo de indisponível ou, só ícone, o nome.
+        const tip = reason || (iconOnly ? optionLabel : null);
+        return tip ? (
+          <Tooltip key={optionValue} bare content={tip}>
             {segment}
           </Tooltip>
         ) : (
