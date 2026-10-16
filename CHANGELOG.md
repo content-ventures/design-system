@@ -4,6 +4,12 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.2.2] - 2026-10-16
+
+### Added
+
+- `KanbanBoard` supports opt-in `fill`: the board runs from its own top to the bottom of the window, every column takes that height and the cards scroll inside each column, with the column header fixed and the footer pinned. The board re-measures when the content above it or the window changes, and stops shrinking at 360 px. Dragging near the top or bottom of a scrolling column scrolls it. Without `fill` the board keeps growing with its content.
+
 ## [0.2.1] - 2026-10-15
 
 ### Added

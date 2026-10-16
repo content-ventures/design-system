@@ -380,6 +380,15 @@ responsável, origem e atividades; `CampaignKanbanCard` usa a mesma base com cam
 portal, verba e período. Não duplicar CSS do cartão nas telas. Status de campanhas só avançam
 pelas regras e ações do produto; o arrasto livre do exemplo de leads não substitui esse fluxo.
 
+`KanbanBoard fill` é o quadro que fecha a página: vai do próprio topo até o fim da janela (menos o
+`--content-pb` do conteúdo), todas as colunas na mesma altura, e os cartões rolam dentro de cada
+coluna. O cabeçalho da coluna fica parado e o `footer` (“Carregar mais”) preso no pé; coluna vazia
+continua alta. O quadro mede o próprio topo (`--kanban-top`) e mede de novo quando o que vem antes dele
+muda (filtros que abrem, avisos que entram) ou a janela muda; abaixo de 360 px de altura útil ele para
+de encolher e a página rola. No arrasto, perto do topo ou do pé de uma coluna que rola, os cartões
+andam sozinhos, como o quadro anda perto das bordas laterais. Sem `fill`, o quadro cresce com o
+conteúdo, como antes.
+
 - **Página do item:** família (caption `--muted`) → título `--t-page` → pranchas → anterior/próximo.
   Sem lede, sem abas de uso, sem “Quando usar/Evitar”.
 - **Ordem das pranchas:** 1) **Em contexto** (vivo, interativo, copy real); 2) **Variantes**; 3) **Estados** (matriz parada com `data-force`); 4) **Celular** quando o layout muda.
