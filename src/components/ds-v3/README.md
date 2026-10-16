@@ -314,9 +314,10 @@ Para mostrar um estado parado, todo componente interativo aceita `data-force="ho
 - **Modal só aviso (`ConfirmDialog acknowledge`):** o modal também avisa um bloqueio que a pessoa não
   resolve na hora (“Você não tem permissão para isso” / “Só editor ou admin cria produções.”). Só avisa:
   um botão primário com o foco, “Entendi” por padrão (`confirmLabel` troca), sem Cancelar, sem tom
-  destrutivo e sem digitação; `onConfirm` é opcional e o botão fecha. Esc, véu e X fecham; no celular o
-  botão ocupa a largura toda. Bloqueio que a tela explica antes do clique continua no motivo visível
-  (§1.7).
+  destrutivo e sem digitação; `onConfirm` é opcional e o botão fecha. Abre como `alertdialog` (o leitor
+  de tela o anuncia como alerta). Esc, véu e X fecham; no celular o botão ocupa a largura toda.
+  Bloqueio que passa na própria tela (IA trabalhando, campo faltando) continua no motivo visível
+  (§1.7); o aviso é para a tentativa que o perfil ou o servidor recusa.
 - **`ListItem titleLines={2}`:** em coluna estreita com títulos longos (“Aguardando você”), o título quebra
   em até duas linhas antes das reticências e a linha cresce com ele. Padrão: uma linha.
 - **`List framed={false} bleed`** dentro de `Section`/`Panel`: as linhas sangram o próprio respiro (16 px),
