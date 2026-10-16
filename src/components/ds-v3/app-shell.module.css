@@ -863,14 +863,11 @@ button.groupLabel[aria-expanded='false'] svg {
     padding: 0 8px 0 16px;
   }
 }
-/* Celular: botão do menu, só o nível atual e o sino — alvos quadrados de 40 px. */
+/* Celular: botão do menu, o primeiro nível e o atual da trilha (em “Trilha”) e o sino — alvos
+   quadrados de 40 px. */
 @container topbar (max-width: 640px) {
   .topInner {
     padding: 0 4px 0 16px;
-  }
-  .crumbs li:not(:last-child),
-  .crumbs li:last-child > .crumbSep {
-    display: none;
   }
   .topItem[data-phone='hide'] {
     display: none;
@@ -1005,6 +1002,22 @@ button.groupLabel[aria-expanded='false'] svg {
 .crumbMore svg {
   width: 16px;
   height: 16px;
+}
+/* Celular: a volta fica — o primeiro nível (link) e o atual, com o separador entre eles; o meio sai,
+   junto com o “…” recolhido. Cada coluna vai até o próprio texto e a largura é repartida por igual: o
+   nível curto fica inteiro, o atual leva o resto e, se os dois forem longos, cada um corta com
+   reticência na metade da trilha — o primeiro nunca some nem empurra o atual para fora. Vem depois
+   das regras da trilha para a grade valer sobre o `flex` delas. */
+@container topbar (max-width: 640px) {
+  .crumbs li[data-crumb='middle'] {
+    display: none;
+  }
+  .crumbs ol {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, max-content);
+    justify-content: start;
+  }
 }
 
 /* ——— Cabeçalho da página ——— */
