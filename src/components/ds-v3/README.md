@@ -190,17 +190,18 @@ cortou.
 
 ## 8. Movimento
 
-| Token           | Valor                                                            | Uso                                                                                                    |
-| --------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `--dur-1`       | 120 ms                                                           | cor, fundo, fio, ícone; pressionar (`scale(var(--press-scale))`)                                       |
-| `--dur-2`       | 180 ms                                                           | abrir menu/popover/tooltip, marca de check, chevron, crossfade                                         |
-| `--dur-3`       | 280 ms                                                           | entrar camada (modal, gaveta, toast), altura (acordeão, faixa de filtros), indicador de aba, reordenar |
-| `--dur-exit`    | 160 ms                                                           | toda saída (sempre mais curta que a entrada)                                                           |
-| `--ease-out`    | entrada e mudança de estado                                      |
-| `--ease-in`     | saída                                                            |
-| `--ease-move`   | o que já está na tela muda de lugar (indicador, FLIP, pilha)     |
-| `--ease-spring` | **só** check, ponto do rádio, polegar do switch, selo de sucesso |
-| `--stagger`     | 40 ms entre itens (máx. 6)                                       |
+| Token            | Valor                                                            | Uso                                                                                                    |
+| ---------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `--dur-1`        | 120 ms                                                           | cor, fundo, fio, ícone; pressionar (`scale(var(--press-scale))`)                                       |
+| `--dur-2`        | 180 ms                                                           | abrir menu/popover/tooltip, marca de check, chevron, crossfade                                         |
+| `--dur-3`        | 280 ms                                                           | entrar camada (modal, gaveta, toast), altura (acordeão, faixa de filtros), indicador de aba, reordenar |
+| `--dur-exit`     | 160 ms                                                           | toda saída (sempre mais curta que a entrada)                                                           |
+| `--ease-out`     | entrada e mudança de estado                                      |
+| `--ease-in`      | saída                                                            |
+| `--ease-move`    | o que já está na tela muda de lugar (indicador, FLIP, pilha)     |
+| `--ease-spring`  | **só** check, ponto do rádio, polegar do switch, selo de sucesso |
+| `--stagger`      | 40 ms entre itens (máx. 6)                                       |
+| `--arrival-fade` | 2,4 s                                                            | **só** o destaque do que acabou de chegar (`KanbanCard arrived`): some sozinho, uma vez                |
 
 Coreografia: flutuante entra `opacity 0 → 1` + `translateY(∓4px) scale(.98)` a partir do lado do gatilho;
 modal `translateY(8px) scale(.985)`; gaveta desliza da direita; bottom sheet sobe do fim; toast sobe 8 px.
@@ -396,6 +397,17 @@ muda (filtros que abrem, avisos que entram) ou a janela muda; abaixo de 360 px d
 de encolher e a página rola. No arrasto, perto do topo ou do pé de uma coluna que rola, os cartões
 andam sozinhos, como o quadro anda perto das bordas laterais. Sem `fill`, o quadro cresce com o
 conteúdo, como antes.
+
+`KanbanCard arrived` aponta o cartão que acabou de chegar: a pessoa moveu um item (enviou para
+aprovação, aprovou) e o produto abre o quadro com ele marcado. O cartão acende com fio `--b-300` e
+fundo `--b-25` e volta sozinho ao repouso em `--arrival-fade` (2,4 s; o destaque segura no começo e
+pousa macio). Ao montar, ou quando `arrived` vira `true`, ele aparece uma vez na rolagem, andando o
+mínimo: o corpo da coluna (`fill`), a faixa do quadro e, sem `fill`, a página, com 12 px de respiro.
+Onde as colunas encaixam (≤640 px do quadro), o cartão encosta no início e o encaixe assenta a coluna
+dele. Outra renderização não rola de novo. Não leva o foco e não é seleção (sem `aria-current`; isso é
+`selected`). Com movimento reduzido, a rolagem salta e a cor fica parada até `arrived` sair. Gancho
+`[data-arrived]`; nas pranchas, `data-force="arrived"` mostra o começo do destaque. `LeadCard` e
+`CampaignKanbanCard` repassam a prop.
 
 - **Página do item:** família (caption `--muted`) → título `--t-page` → pranchas → anterior/próximo.
   Sem lede, sem abas de uso, sem “Quando usar/Evitar”.

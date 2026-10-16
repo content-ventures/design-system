@@ -421,6 +421,31 @@
   border-color: var(--select-line);
   background: var(--select-bg);
 }
+/* Acabou de chegar: o cartão que a pessoa acabou de mover acende com fio e fundo azuis e volta
+   sozinho ao repouso, uma vez — o destaque segura no começo e pousa macio. A rolagem que o revela
+   deixa respiro em volta. Com movimento reduzido, a cor fica parada até `arrived` sair; na prancha,
+   `data-force` mostra o começo do destaque. */
+.card[data-arrived] {
+  scroll-margin: var(--s-3);
+  animation: card-arrived var(--arrival-fade) var(--ease-move);
+}
+.card[data-force~='arrived'] {
+  border-color: var(--b-300);
+  background: var(--b-25);
+}
+@keyframes card-arrived {
+  from {
+    border-color: var(--b-300);
+    background-color: var(--b-25);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card[data-arrived] {
+    animation: none;
+    border-color: var(--b-300);
+    background: var(--b-25);
+  }
+}
 .card[data-lifted] {
   z-index: 2;
   border-color: var(--line);
