@@ -5,6 +5,9 @@
  *
  * `NavItem.soon`: o item do roadmap aparece no menu, mas não navega — botão `aria-disabled`, selo
  * “Em breve”, motivo na dica do DS e na descrição; recolhido, a dica lateral diz nome, selo e motivo.
+ *
+ * Trilha do `TopBar` no celular: a volta é a trilha, então em ≤640 px ficam o primeiro nível e o
+ * atual. O jsdom não avalia container query; o teste confere a estrutura em que o CSS se apoia.
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -15,7 +18,16 @@ import { FileText, LayoutList, Newspaper, Radio } from 'lucide-react';
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
-import { AppShell, Sidebar, SidebarItem, TopBar, useShell, type NavGroup } from './app-shell';
+import {
+  AppShell,
+  Breadcrumb,
+  Sidebar,
+  SidebarItem,
+  TopBar,
+  useShell,
+  type Crumb,
+  type NavGroup,
+} from './app-shell';
 
 const css = readFileSync(resolve(__dirname, 'app-shell.module.css'), 'utf8');
 
@@ -387,5 +399,94 @@ describe('Sidebar · item “Em breve”', () => {
     expect(within(nav()).queryByRole('button', { name: /Notícias/ })).toBeNull();
     await user.click(group);
     expect(soonItem()).toHaveAttribute('aria-disabled', 'true');
+  });
+});
+
+/* ——— TopBar · trilha no celular ——— */
+
+/** A trilha que o Reporter passa: Produções › produção › etapa. */
+const TRAIL: Crumb[] = [
+  { label: 'Produções', href: '/productions' },
+  { label: 'Tendências do verão 2027', href: '/productions/tendencias-do-verao-2027' },
+  { label: 'Artigo' },
+];
+
+const trail = () => screen.getByRole('navigation', { name: 'Trilha de navegação' });
+const levels = () => Array.from(trail().querySelectorAll('li'));
+const parts = () => levels().map((li) => li.getAttribute('data-crumb'));
+
+/** Regras da trilha a ≤640 px do topo: o bloco que vem depois das regras da trilha (o `flex` delas). */
+const trailBase = () => css.search(/^\.crumbs ol \{/m);
+const phoneBlock = () => {
+  const start = css.indexOf('@container topbar (max-width: 640px)', trailBase());
+  return start < 0 ? '' : css.slice(start, css.indexOf('\n}\n', start));
+};
+
+describe('TopBar · trilha no celular', () => {
+  it('três níveis: o primeiro é o link de volta, o do meio sai, o atual leva o separador', () => {
+    render(<TopBar breadcrumb={TRAIL} />);
+    expect(parts()).toEqual(['first', 'middle', 'current']);
+    const [first, , current] = levels();
+    expect(within(first!).getByRole('link', { name: 'Produções' })).toHaveAttribute(
+      'href',
+      '/productions',
+    );
+    // Nada antes do primeiro; o atual começa pelo separador, que fica entre os dois no celular.
+    expect(first!.querySelector('svg')).toBeNull();
+    expect(current!.firstElementChild).toHaveAttribute('aria-hidden', 'true');
+    expect(current!.firstElementChild?.tagName.toLowerCase()).toBe('svg');
+    expect(within(current!).getByText('Artigo').closest('[aria-current="page"]')).not.toBeNull();
+    expect(within(current!).queryByRole('link')).toBeNull();
+  });
+
+  it('um nível é só o atual; dois mostram os dois', () => {
+    const { rerender } = render(<TopBar breadcrumb={[{ label: 'Produções' }]} />);
+    expect(parts()).toEqual(['current']);
+    rerender(<TopBar breadcrumb={[TRAIL[0]!, TRAIL[2]!]} />);
+    expect(parts()).toEqual(['first', 'current']);
+    expect(within(trail()).getByRole('link', { name: 'Produções' })).toBeInTheDocument();
+  });
+
+  it('recolhida: o “…” e os níveis da cauda antes do atual são meio', () => {
+    render(
+      <TopBar
+        maxCrumbs={4}
+        breadcrumb={[
+          { label: 'Portal', href: '/portal' },
+          { label: 'Vitrine', href: '/vitrine' },
+          { label: 'Categorias', href: '/categorias' },
+          { label: 'Calçados femininos', href: '/calcados-femininos' },
+          { label: 'Scarpin Couro Vegetal Primavera' },
+        ]}
+      />,
+    );
+    expect(parts()).toEqual(['first', 'middle', 'middle', 'current']);
+    expect(
+      within(trail()).getByRole('button', { name: 'Mostrar 2 níveis ocultos' }).closest('li'),
+    ).toHaveAttribute('data-crumb', 'middle');
+  });
+
+  it('o CSS do celular esconde só o meio e reparte a largura entre o primeiro e o atual', () => {
+    // A grade só vale sobre o `flex` da trilha se vier depois dele no arquivo.
+    expect(trailBase()).toBeGreaterThan(0);
+    const block = phoneBlock();
+    expect(block).toMatch(/\.crumbs li\[data-crumb='middle'\] \{\s*display: none;\s*\}/);
+    expect(block).toMatch(
+      /\.crumbs ol \{[^}]*display: grid;[^}]*grid-auto-flow: column;[^}]*grid-auto-columns: minmax\(0, max-content\);/,
+    );
+    // Nem o primeiro nível nem o separador do atual somem mais, em nenhum bloco do celular.
+    expect(css).not.toContain('.crumbs li:not(:last-child)');
+    expect(css).not.toMatch(/\.crumbs li:last-child > \.crumbSep/);
+    expect(block).not.toContain('crumbSep');
+    expect(block).not.toMatch(/data-crumb='(first|current)'/);
+    // Cada nível corta com reticência, e o link tem 3 px acima e abaixo da linha de 20 px (26 px).
+    expect(css).toMatch(/\.crumbText \{[^}]*overflow: hidden;[^}]*text-overflow: ellipsis;/);
+    expect(css).toMatch(/\.crumbLink,\n\.crumbBack \{\s*padding: 3px 4px;/);
+  });
+
+  it('`compact` continua só com “‹ nível acima”, sem níveis marcados', () => {
+    render(<Breadcrumb variant="compact" items={TRAIL} />);
+    expect(trail().querySelector('li, [data-crumb]')).toBeNull();
+    expect(within(trail()).getByRole('link', { name: 'Tendências do verão 2027' })).toBeVisible();
   });
 });

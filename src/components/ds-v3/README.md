@@ -352,12 +352,20 @@ Para mostrar um estado parado, todo componente interativo aceita `data-force="ho
 - **Etapa em andamento (`StepItem.state: 'active'`):** quando a régua mostra outra etapa (voltar ao
   material, ver a entrega), a etapa em que o trabalho está fica com anel e número azuis e “em andamento”
   para leitor de tela; navega como as feitas. O disco sólido continua só na atual (a que está na tela).
+- **A volta é a trilha do topo (`TopBar`):** na moldura padrão do app, o caminho de volta é a trilha,
+  também no celular; cabeçalho de página não leva link de volta. Em ≤640 px do topo, a trilha guarda o
+  primeiro nível (link) e o atual, com o separador entre eles, e esconde os do meio (o “…” recolhido
+  também). Cada nível corta com reticência: o curto fica inteiro, o atual leva o resto e, se os dois
+  forem longos, cada um fica com metade; o link mantém o alvo de 26 px de altura. Um ou dois níveis
+  não mudam. Decidido em container query, igual no servidor, pelo `li[data-crumb="first|middle|current"]`;
+  o desktop e `Breadcrumb variant="compact"` não mudam.
 - **Volta no cabeçalho (`PageHeader back`):** `{ label, href, onNavigate? }` põe “← Produções” antes do
   título, na mesma linha e fora do h1 — o caminho de volta de uma tela sem o menu do app
-  (`AppShell layout="immersive"`). Discreta como um fantasma pequeno (seta e nome em `--muted`, fundo só
-  no hover), centrada na linha do título; descrição e meta continuam alinhadas ao título. Nome acessível
-  “Voltar para {label}”; em ≤640 px do cabeçalho, só a seta. `onNavigate` recebe o clique (navegação do
-  cliente, guarda de saída). Não combine com `eyebrow`.
+  (`AppShell layout="immersive"`), e só dela: na moldura padrão, a volta é a trilha do topo. Discreta
+  como um fantasma pequeno (seta e nome em `--muted`, fundo só no hover), centrada na linha do título;
+  descrição e meta continuam alinhadas ao título. Nome acessível “Voltar para {label}”; em ≤640 px do
+  cabeçalho, só a seta. `onNavigate` recebe o clique (navegação do cliente, guarda de saída). Não
+  combine com `eyebrow`.
 - **Motivo visível do bloqueio (`PageHeader actionsNote`):** `{ id, text }` escreve, logo antes das
   ações, por que a principal não anda (“Aguarde a IA terminar.”): 12 px em `--muted`, uma linha que corta
   com reticência (o texto inteiro na dica) e cede antes do título. O botão fica `aria-disabled` e leva
@@ -494,7 +502,8 @@ importa TipTap, AI SDK nem código de produto; o produto liga o editor e o model
   coluna de menu, nenhuma gaveta e nenhum botão de menu (nem de recolher), em qualquer largura. O
   `sidebar` não é desenhado (passe `null`) e o `topbar` é opcional; sem topo, a moldura encostada ocupa a
   janela até a borda de cima (`--topbar-h` vale 0 dentro do conteúdo). A volta fica no cabeçalho da
-  página (`PageHeader back`); atalhos globais (⌘K) são do produto, ligados fora do `Sidebar`.
+  página (`PageHeader back`) — só aqui; na moldura padrão, a volta é a trilha do `TopBar`, também no
+  celular (§12). Atalhos globais (⌘K) são do produto, ligados fora do `Sidebar`.
 - **`SaveIndicator`**: o estado de salvamento da `ActionBar` (ícone, texto, complemento e “Tentar de novo”),
   para quando as ações sobem ao cabeçalho e o estado fica numa barra ou linha de status. `data-force`
   (`hover`, `focus`) para “Tentar de novo” nas pranchas.

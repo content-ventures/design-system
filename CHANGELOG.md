@@ -4,11 +4,15 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
-## [0.2.2] - 2026-10-16
+## [0.3.0] - 2026-10-16
 
 ### Added
 
 - `KanbanBoard` supports opt-in `fill`: the board runs from its own top to the bottom of the window, every column takes that height and the cards scroll inside each column, with the column header fixed and the footer pinned. The board re-measures when the content above it or the window changes, and stops shrinking at 360 px. Dragging near the top or bottom of a scrolling column scrolls it. Without `fill` the board keeps growing with its content.
+
+### Changed
+
+- `TopBar` keeps a way up on phones: at ≤640 px of its container the trail shows the first crumb (a link) and the current one, with the separator between them, and hides only the middle levels (and the collapsed “…”). Both truncate with an ellipsis: a short crumb stays whole, the current one takes the rest and two long ones split the trail in half. Each `li` carries `data-crumb="first|middle|current"`. One or two crumbs, the desktop trail and `Breadcrumb variant="compact"` are unchanged. In the default layout the trail is the way back; `PageHeader back` stays for `layout="immersive"`.
 
 ## [0.2.1] - 2026-10-15
 
