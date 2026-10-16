@@ -11,11 +11,13 @@ import {
   ChevronLeft,
   ChevronRight,
   CircleAlert,
+  ClipboardList,
   Copy,
   Download,
   Ellipsis,
   Eye,
   FileText,
+  FileUp,
   Handshake,
   LayoutList,
   Link2,
@@ -62,6 +64,7 @@ import {
   VisuallyHidden,
   type Column,
   type MenuSection,
+  type SegmentOption,
   type Tone,
 } from '@content-ventures/design-system/v3';
 import { ButtonLink, SplitButton } from '@content-ventures/design-system/v3/button';
@@ -988,6 +991,13 @@ const SEND_MENU: MenuSection[] = [
   },
 ];
 const ADJUST_NOTE = 'Trocar a peça 970 × 250 pela versão com o logotipo novo.';
+type Material = 'texto' | 'arquivo' | 'link';
+/** Segmentado com uma opção que ainda não abre: à vista, fora da escolha, motivo na dica. */
+const MATERIAL_OPTIONS: SegmentOption<Material>[] = [
+  { value: 'texto', label: 'Texto', icon: ClipboardList },
+  { value: 'arquivo', label: 'Arquivo', icon: FileUp },
+  { value: 'link', label: 'Link', icon: Link2, disabled: true, disabledReason: 'Em breve' },
+];
 
 function Pager({ force, disabledPrev = false }: { force?: string; disabledPrev?: boolean }) {
   return (
@@ -1005,6 +1015,7 @@ function Pager({ force, disabledPrev = false }: { force?: string; disabledPrev?:
 function GrupoBotoes() {
   const [tab, setTab] = useState<'todas' | 'veiculacao' | 'rascunhos'>('todas');
   const [view, setView] = useState<'grupos' | 'lista'>('lista');
+  const [material, setMaterial] = useState<Material>('texto');
   const [filters, setFilters] = useState(false);
   const [position, setPosition] = useState(3);
   const [note, setNote] = useState(ADJUST_NOTE);
@@ -1147,40 +1158,53 @@ function GrupoBotoes() {
       </Shot>
 
       <Shot title="Variantes" tone="white" align="stretch">
-        <States min={168} align="center">
-          <State label="Colados">
-            <ButtonGroup label="Peça criativa">
-              <Button size="sm" icon={Eye}>
-                Visualizar
-              </Button>
-              <Button size="sm" icon={Download}>
-                Baixar
-              </Button>
-            </ButtonGroup>
-          </State>
-          <State label="Espaçados">
-            <span className={x.pair}>
-              <Button size="sm">Cancelar</Button>
-              <Button size="sm" variant="primary">
-                Salvar
-              </Button>
-            </span>
-          </State>
-          <State label="Dividido principal">
-            <SplitButton variant="primary" size="sm" label="Enviar" icon={Send} menuLabel="Outras formas de envio" menu={SEND_MENU} />
-          </State>
-          <State label="Dividido secundário">
-            <SplitButton size="sm" label="Baixar P.I." icon={Download} menuLabel="Outras opções do P.I." menu={PI_MENU} />
-          </State>
-          <State label="Ícones">
-            <Pager />
-          </State>
-          <State label="Link com cara de botão">
-            <ButtonLink size="sm" href="#" icon={Download} onClick={(event) => event.preventDefault()}>
-              Baixar CSV
-            </ButtonLink>
-          </State>
-        </States>
+        <div className={x.stackLg}>
+          <States min={168} align="center">
+            <State label="Colados">
+              <ButtonGroup label="Peça criativa">
+                <Button size="sm" icon={Eye}>
+                  Visualizar
+                </Button>
+                <Button size="sm" icon={Download}>
+                  Baixar
+                </Button>
+              </ButtonGroup>
+            </State>
+            <State label="Espaçados">
+              <span className={x.pair}>
+                <Button size="sm">Cancelar</Button>
+                <Button size="sm" variant="primary">
+                  Salvar
+                </Button>
+              </span>
+            </State>
+            <State label="Dividido principal">
+              <SplitButton variant="primary" size="sm" label="Enviar" icon={Send} menuLabel="Outras formas de envio" menu={SEND_MENU} />
+            </State>
+            <State label="Dividido secundário">
+              <SplitButton size="sm" label="Baixar P.I." icon={Download} menuLabel="Outras opções do P.I." menu={PI_MENU} />
+            </State>
+            <State label="Ícones">
+              <Pager />
+            </State>
+            <State label="Link com cara de botão">
+              <ButtonLink size="sm" href="#" icon={Download} onClick={(event) => event.preventDefault()}>
+                Baixar CSV
+              </ButtonLink>
+            </State>
+          </States>
+          {/* Segmentado numa linha própria: com ícones, não cabe na célula de 168 px. */}
+          <div className={x.openRow}>
+            <Segmented
+              size="sm"
+              label="Como trazer o material"
+              value={material}
+              onChange={setMaterial}
+              options={MATERIAL_OPTIONS}
+            />
+            <span className={x.openCaption}>Segmentado · Em breve</span>
+          </div>
+        </div>
       </Shot>
 
       <Shot title="Estados" tone="white" align="stretch">

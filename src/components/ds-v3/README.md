@@ -233,6 +233,14 @@ Só os estados que se aplicam. Transição `--dur-1` salvo indicação.
 
 Somente leitura: fundo `--g-25`, fio `--line`, sem hover.
 
+**Opção indisponível no segmentado (`SegmentOption.disabled` + `disabledReason`):** a opção que ainda
+não abre (Texto · Arquivo · Link “Em breve”) fica no trilho, com texto e ícone em `--disabled-ink`, sem
+hover e com `cursor: not-allowed`. Leva `aria-disabled` e o motivo na dica do DS e em
+`aria-describedby` (toque mostra por 1,5 s); nada de `title` nativo. O clique não escolhe e setas, Home
+e End pulam para a próxima disponível. Só ícone: a dica mostra o motivo no lugar do nome, então o
+motivo nomeia a opção. `Segmented disabled` trava o grupo: a escolha atual fica à vista (papel sem
+sombra) e continua a parada de Tab, com o `disabledReason` do grupo na dica; o de uma opção vale antes.
+
 ### 10.1 Convenção `data-force` (pranchas)
 
 Para mostrar um estado parado, todo componente interativo aceita `data-force="hover" | "active" | "focus"`

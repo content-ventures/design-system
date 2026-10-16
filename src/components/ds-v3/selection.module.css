@@ -418,12 +418,23 @@
   white-space: nowrap;
   transition: color var(--dur-2);
 }
-.segment:hover {
+.segment:hover:where(:not([aria-disabled='true'])) {
   color: var(--text);
 }
 .segment[aria-checked='true'],
 .segment[aria-selected='true'] {
   color: var(--ink);
+}
+/*
+ * Indisponível: continua no trilho, com texto e ícone em --disabled-ink (o ícone do segmento segue o
+ * texto) e sem hover. A escolha atual de um grupo indisponível fica à vista, com o papel sem sombra.
+ */
+.segment[aria-disabled='true'] {
+  cursor: not-allowed;
+  color: var(--disabled-ink);
+}
+.segmented:has(.segment[aria-checked='true'][aria-disabled='true']) .indicator {
+  box-shadow: none;
 }
 .segment svg {
   width: 15px;
