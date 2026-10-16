@@ -240,6 +240,9 @@ hover e com `cursor: not-allowed`. Leva `aria-disabled` e o motivo na dica do DS
 e End pulam para a próxima disponível. Só ícone: a dica mostra o motivo no lugar do nome, então o
 motivo nomeia a opção. `Segmented disabled` trava o grupo: a escolha atual fica à vista (papel sem
 sombra) e continua a parada de Tab, com o `disabledReason` do grupo na dica; o de uma opção vale antes.
+Travar ou soltar o grupo (ou uma opção) não remonta o botão: o foco fica onde estava. O clique numa
+indisponível mostra o motivo sem tirar o foco da escolha atual, e sem outra opção disponível as setas
+não fazem nada (nem rolam a página).
 
 ### 10.1 Convenção `data-force` (pranchas)
 

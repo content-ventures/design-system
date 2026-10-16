@@ -2,10 +2,11 @@
  * `Segmented` com opção indisponível (“Em breve”): a opção continua à vista e no leitor de tela
  * (`aria-disabled`, motivo como descrição e na dica do DS), mas nem o clique nem as setas a escolhem —
  * as setas pulam para a próxima disponível. `disabled` no grupo trava todas as opções e mantém a
- * escolha atual como parada de Tab, com o motivo na dica.
+ * escolha atual como parada de Tab, com o motivo na dica. Travar ou soltar não remonta o botão (o
+ * foco fica nele) e as teclas do grupo nunca rolam a página nem repetem a escolha.
  */
 import { useState } from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FileText, Link2, Type } from 'lucide-react';
 import { describe, expect, it, vi } from 'vitest';
@@ -176,5 +177,111 @@ describe('Segmented disabled', () => {
     await user.click(radio('Arquivo'));
     expect(onChange).not.toHaveBeenCalled();
     expect(texto).toHaveAttribute('aria-checked', 'true');
+  });
+});
+
+describe('Segmented: foco e teclas nas bordas', () => {
+  it('ligar e desligar o grupo não tira o foco da opção', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<Picker />);
+    await user.tab();
+    await user.tab();
+    await user.keyboard('{ArrowRight}');
+    expect(radio('Texto')).toHaveFocus();
+
+    // O botão é o mesmo nó: ganhar o motivo não o remonta.
+    const texto = radio('Texto');
+    rerender(<Picker disabled disabledReason="Aguarde" />);
+    expect(radio('Texto')).toBe(texto);
+    expect(texto).toHaveFocus();
+    expect(texto).toHaveAccessibleDescription('Aguarde');
+
+    rerender(<Picker />);
+    expect(radio('Texto')).toBe(texto);
+    expect(texto).toHaveFocus();
+    expect(texto).not.toHaveAccessibleDescription();
+  });
+
+  it('a escolha atual indisponível segue parada de Tab e as setas saem dela', async () => {
+    const user = userEvent.setup();
+    render(<Picker initial="link" />);
+    await user.tab();
+    await user.tab();
+    expect(radio('Link')).toHaveFocus();
+    expect(radio('Link')).toHaveAttribute('tabindex', '0');
+    await user.keyboard('{ArrowRight}');
+    expect(radio('Arquivo')).toHaveFocus();
+    expect(radio('Arquivo')).toHaveAttribute('aria-checked', 'true');
+  });
+
+  it('com uma opção só disponível, as setas não repetem a escolha', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Picker
+        onChange={onChange}
+        options={OPTIONS.map((option) =>
+          option.value === 'texto' ? { ...option, disabled: true } : option,
+        )}
+      />,
+    );
+    await user.tab();
+    await user.tab();
+    expect(radio('Arquivo')).toHaveFocus();
+    await user.keyboard('{ArrowRight}{ArrowLeft}{Home}{End}');
+    expect(onChange).not.toHaveBeenCalled();
+    expect(radio('Arquivo')).toHaveFocus();
+  });
+
+  it('no grupo travado, as setas não rolam a página', () => {
+    render(<Picker initial="texto" disabled disabledReason="Aguarde a IA terminar." />);
+    for (const key of ['ArrowDown', 'ArrowRight', 'Home', 'End']) {
+      expect(fireEvent.keyDown(radio('Texto'), { key })).toBe(false);
+    }
+    // Outras teclas seguem o caminho normal.
+    expect(fireEvent.keyDown(radio('Texto'), { key: 'a' })).toBe(true);
+  });
+
+  it('Espaço e Enter na opção indisponível não escolhem', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Picker onChange={onChange} initial="link" />);
+    await user.tab();
+    await user.tab();
+    expect(radio('Link')).toHaveFocus();
+    await user.keyboard(' ');
+    await user.keyboard('{Enter}');
+    expect(onChange).not.toHaveBeenCalled();
+    expect(radio('Link')).toHaveAttribute('aria-checked', 'true');
+  });
+
+  it('o clique na indisponível não leva o foco; as setas andam a partir da escolha', async () => {
+    const user = userEvent.setup();
+    render(<Picker />);
+    await user.tab();
+    await user.tab();
+    expect(radio('Arquivo')).toHaveFocus();
+    await user.click(radio('Link'));
+    expect(radio('Arquivo')).toHaveFocus();
+    await user.keyboard('{ArrowRight}');
+    expect(radio('Texto')).toHaveAttribute('aria-checked', 'true');
+  });
+
+  it('no toque, indisponível sem motivo não abre dica; com motivo, abre', async () => {
+    const user = userEvent.setup();
+    const { unmount } = render(
+      <Picker
+        options={OPTIONS.map((option) =>
+          option.value === 'link' ? { ...option, disabledReason: undefined } : option,
+        )}
+      />,
+    );
+    await user.pointer({ keys: '[TouchA]', target: radio('Link') });
+    expect(screen.queryByRole('tooltip', { hidden: true })).toBeNull();
+    unmount();
+
+    render(<Picker />);
+    await user.pointer({ keys: '[TouchA]', target: radio('Link') });
+    expect(await screen.findByRole('tooltip', { hidden: true })).toHaveTextContent('Em breve');
   });
 });
