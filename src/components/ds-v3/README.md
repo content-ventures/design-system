@@ -591,7 +591,9 @@ importa TipTap, AI SDK nem código de produto; o produto liga o editor e o model
 
 - **`TranscriptViewer`**: falas por falante com tempo; busca destaca (não filtra); filtro de falante; trecho
   usado marcado; seleção abre `FloatingToolbar` com as ações do produto (“Inserir citação”). Uma parada de
-  Tab, ↑/↓ entre falas. Acima de 200 falas, só a janela visível renderiza (precisa de altura).
+  Tab, ↑/↓ entre falas. Acima de 200 falas, só a janela visível renderiza (precisa de altura). O falante
+  aceita `description` (cargo/organização), ao lado do nome em `--muted`; a fala ativa repete o falante
+  mesmo no meio do bloco, porque o começo dele pode estar fora da vista.
 - **`SlideStrip`** + **`SlideCanvas`**: o carrossel. A faixa escolhe, reordena (arrastar ou Alt+setas),
   duplica e exclui com confirmação; o slide é desenhado por dados (`layout`, `theme`, `content`) e avisa
   transbordo por `onOverflow`. Slides fixam a própria paleta (o tema escuro do app não muda a peça).
