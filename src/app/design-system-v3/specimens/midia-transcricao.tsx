@@ -21,9 +21,9 @@ import x from './midia-transcricao.module.css';
  * ou contexto da IA.
  */
 
-const MARINA = { id: 'marina', name: 'Marina Lopes' };
-const CLARA = { id: 'clara', name: 'Clara Souto' };
-const TIAGO = { id: 'tiago', name: 'Tiago Rezende' };
+const MARINA = { id: 'marina', name: 'Marina Lopes', description: 'Repórter' };
+const CLARA = { id: 'clara', name: 'Clara Souto', description: 'Aurora Calçados' };
+const TIAGO = { id: 'tiago', name: 'Tiago Rezende', description: 'Ateliê Sul' };
 
 const at = (minutes: number, seconds: number) => (minutes * 60 + seconds) * 1000;
 
@@ -487,6 +487,15 @@ function Transcricao() {
           </State>
           <State label="Ativa">
             <Still activeId="t05" />
+          </State>
+          <State label="Ativa no meio do bloco">
+            <TranscriptViewer
+              label="Falas"
+              variant="compact"
+              segments={[seg('t05'), seg('t06')]}
+              activeId="t06"
+              onSegmentClick={noop}
+            />
           </State>
           <State label="Usada">
             <Still usedIds={['t05']} />

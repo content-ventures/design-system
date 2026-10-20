@@ -4,6 +4,16 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.4.0] - 2026-10-19
+
+### Added
+
+- `TranscriptSpeaker` supports opt-in `description`, a short role and/or organization line (“Seafood Brasil”). It shows after the name in the speaker header, in `--t-body` and `--muted` after a `·`, and truncates before the name does. The first segment of each speaker's block also reads it to screen readers (“Clara Souto, Aurora Calçados: …”); the other segments keep the name only. Speakers without it render as before.
+
+### Changed
+
+- `TranscriptViewer` repeats the speaker header (avatar, name and description) above the active segment when it continues another segment's block, so the highlighted line always says who is speaking even when the block began far above. Only the active segment gains it; the row grows by the header's height and the windowed list re-measures it. Inactive segments and block starts are unchanged.
+
 ## [0.3.0] - 2026-10-16
 
 ### Added
