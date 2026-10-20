@@ -105,7 +105,28 @@
   display: flex;
   justify-content: flex-end;
 }
+/* Nome · cargo/organização numa linha; a descrição corta primeiro, o nome por último. */
+.speakerLine {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.speakerDescription {
+  flex: 0 100 auto;
+  min-width: 0;
+  overflow: hidden;
+  font: var(--t-body);
+  color: var(--muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.speakerDescription::before {
+  content: '·';
+  margin-inline-end: var(--s-2);
+}
 .speakerName {
+  flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
   font: var(--t-body-strong);

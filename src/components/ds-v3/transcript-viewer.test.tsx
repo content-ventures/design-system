@@ -56,6 +56,35 @@ describe('TranscriptViewer', () => {
     expect(segmentEl(container, 's5').querySelector('time')).toBeNull();
   });
 
+  it('mostra cargo/organização ao lado do nome e quem fala na fala ativa do meio do bloco', () => {
+    const withOrg: TranscriptSegment[] = SEGMENTS.map((segment) =>
+      segment.speaker?.id === 'clara'
+        ? { ...segment, speaker: { ...clara, description: 'Aurora Calçados' } }
+        : segment,
+    );
+    const { container, rerender } = render(
+      <TranscriptViewer label="Transcrição" segments={withOrg} />,
+    );
+    expect(screen.getAllByText('Clara Souto')).toHaveLength(1);
+    expect(screen.getAllByText('Aurora Calçados')).toHaveLength(1);
+    // O começo do bloco leva cargo/organização também para o leitor de tela.
+    expect(textEl(container, 's2').previousElementSibling).toHaveTextContent(
+      'Clara Souto, Aurora Calçados:',
+    );
+    expect(textEl(container, 's3').previousElementSibling).toHaveTextContent(/^Clara Souto:$/);
+
+    // s3 continua o bloco de Clara: ativa, ela repete o falante acima da fala.
+    rerender(<TranscriptViewer label="Transcrição" segments={withOrg} activeId="s3" />);
+    expect(screen.getAllByText('Clara Souto')).toHaveLength(2);
+    expect(screen.getAllByText('Aurora Calçados')).toHaveLength(2);
+    const row = segmentEl(container, 's3').closest('[role="listitem"]') as HTMLElement;
+    expect(within(row).getByText('Clara Souto')).toBeInTheDocument();
+    expect(row).not.toHaveAttribute('data-group-start');
+
+    rerender(<TranscriptViewer label="Transcrição" segments={withOrg} activeId={null} />);
+    expect(screen.getAllByText('Clara Souto')).toHaveLength(1);
+  });
+
   it('busca sem acento, conta e navega entre ocorrências', async () => {
     const user = userEvent.setup();
     const onQueryChange = vi.fn();

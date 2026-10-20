@@ -37,6 +37,8 @@ export type TranscriptSpeaker = {
   name: string;
   /** Foto. Sem ela (ou se falhar), o orbe do nome — nunca iniciais. */
   src?: string;
+  /** Cargo e/ou organização numa linha curta (“Seafood Brasil”): ao lado do nome, em `--muted`. */
+  description?: string;
 };
 
 export type TranscriptSegment = {
@@ -400,6 +402,8 @@ const SegmentRow = memo(function SegmentRow({
 }) {
   const { segment, groupStart } = row;
   const { speaker, start } = segment;
+  // A fala ativa diz quem fala mesmo no meio do bloco: o começo do bloco pode estar longe, acima.
+  const header = Boolean(speaker) && (groupStart || active);
   const segmentRef = useRef<HTMLDivElement>(null);
 
   // Fala que sai da janela levando o foco: o foco vai para a área de rolagem, não para o body.
@@ -435,13 +439,18 @@ const SegmentRow = memo(function SegmentRow({
       aria-posinset={index + 1}
       aria-setsize={total}
     >
-      {groupStart && speaker && (
+      {header && speaker && (
         // O nome vai para o leitor de tela em cada fala (abaixo); aqui é só visual.
         <div className={s.speaker} aria-hidden="true">
           <span className={s.orb}>
             <Avatar name={speaker.name} src={speaker.src} size="xs" decorative />
           </span>
-          <span className={s.speakerName}>{speaker.name}</span>
+          <span className={s.speakerLine}>
+            <span className={s.speakerName}>{speaker.name}</span>
+            {speaker.description && (
+              <span className={s.speakerDescription}>{speaker.description}</span>
+            )}
+          </span>
         </div>
       )}
       {bar && <div className={s.pinnedBar}>{bar}</div>}
@@ -483,7 +492,13 @@ const SegmentRow = memo(function SegmentRow({
             ))}
         </span>
         <div className={s.body}>
-          {speaker && <VisuallyHidden>{`${speaker.name}: `}</VisuallyHidden>}
+          {speaker && (
+            <VisuallyHidden>
+              {header && speaker.description
+                ? `${speaker.name}, ${speaker.description}: `
+                : `${speaker.name}: `}
+            </VisuallyHidden>
+          )}
           <span className={s.text} data-segment-text={segment.id}>
             {content}
           </span>
