@@ -200,7 +200,7 @@ export function useModalLayer({
         latest.current.onClose();
         return;
       }
-      if (!contained || event.defaultPrevented) return;
+      if (event.defaultPrevented) return;
       trapTab(event, event.currentTarget);
     },
   };
