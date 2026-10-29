@@ -182,9 +182,18 @@ export function Floating({
     const pop = ref.current;
     if (!open || !host || !anchor || !pop) return;
     let frame = 0;
+    const moving = () => {
+      if (!topLayer || host.getAttribute('data-state') !== 'open' || host.hasAttribute('data-contained')) return false;
+      for (let node: Element | null = anchor.parentElement; node; node = node.parentElement) {
+        if (node.getAnimations?.().some(animation => (animation.playState === 'running' || animation.pending) && animation.effect?.getTiming().iterations !== Infinity)) return true;
+        if (node === host) break;
+      }
+      return false;
+    };
     const update = () => {
       frame = 0;
-      if (anchorHidden(anchor)) {
+      // A keyboard user can open a sheet control before its entry brings it into the viewport.
+      if (anchorHidden(anchor) && !moving()) {
         dismiss.current();
         return;
       }
@@ -238,23 +247,7 @@ export function Floating({
           ? prev
           : next,
       );
-      if (topLayer) {
-        for (let node: Element | null = anchor; node; node = node.parentElement) {
-          if (
-            node
-              .getAnimations?.()
-              .some(
-                (animation) =>
-                  (animation.playState === 'running' || animation.pending) &&
-                  animation.effect?.getTiming().iterations !== Infinity,
-              )
-          ) {
-            frame = requestAnimationFrame(update);
-            break;
-          }
-          if (node === host) break;
-        }
-      }
+      if (moving()) frame = requestAnimationFrame(update);
     };
     const schedule = (event?: Event) => {
       if (event?.target instanceof Node && pop.contains(event.target)) return;
