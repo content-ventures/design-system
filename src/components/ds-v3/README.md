@@ -226,6 +226,9 @@ animada). Esqueleto pulsa (`--skeleton-pulse`), sem brilho correndo. Spinner só
 Campos: borda b-500 + `--ring-field` (inválido: `--ring-invalid`). Dentro de tabela, menu, grupo colado ou
 trilho com `overflow`: `outline-offset: -2px`. Foco nunca some sem substituto; só teclado mostra anel.
 Camadas prendem o foco e devolvem ao gatilho. Destrutivas abrem com foco em “Cancelar”.
+O texto preservado do ProseMirror (`contenteditable="false"`) recebe o mesmo anel ao ser focado
+por teclado. O consumidor fornece nome acessível e `tabindex="0"` para leitura e rolagem sem edição;
+a prancha “Leitura” mostra esse contrato.
 
 ## 10. Modelo de estados (componentes interativos)
 

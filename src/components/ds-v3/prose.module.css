@@ -965,6 +965,10 @@
 .flow :global(.ProseMirror):focus-visible {
   outline: none;
 }
+.flow :global(.ProseMirror)[contenteditable='false']:is(:focus-visible, [data-force~='focus']) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
 .prose[data-variant='edit'] .flow :global(.ProseMirror) {
   min-height: calc(3 * 1lh);
 }
