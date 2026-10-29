@@ -6,7 +6,7 @@ import { Dialog } from './overlays';
 import { anchorHidden } from './popover';
 
 const descriptors = new Map(
-  ['showPopover', 'hidePopover'].map((key) => [
+  ['showPopover', 'hidePopover', 'getAnimations'].map((key) => [
     key,
     Object.getOwnPropertyDescriptor(HTMLElement.prototype, key),
   ]),
@@ -36,6 +36,19 @@ function nativeLayer() {
 }
 
 describe('Select in the native top layer', () => {
+  it('preserves keyboard input during sheet entry and then dismisses a still-hidden anchor', async () => {
+    nativeLayer(); let moving = true;
+    Object.defineProperty(HTMLElement.prototype, 'getAnimations', { configurable: true, value: function (this: HTMLElement) {
+      return moving && this.tagName === 'DIALOG' ? [{ playState: 'running', pending: false, effect: { getTiming: () => ({ iterations: 1 }) } }] : [];
+    } });
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
+      return this.getAttribute('role') === 'combobox' ? new DOMRect(20, 900, 300, 44) : new DOMRect(0, 0, 1000, 768);
+    });
+    render(<Dialog open title="Material" onClose={() => {}}><Select label="Tipo" value="transcript" options={options} onChange={() => {}} /></Dialog>);
+    const trigger = screen.getByRole('combobox', { name: 'Tipo' }); trigger.focus(); await userEvent.keyboard('{ArrowDown}');
+    expect(trigger).toHaveAttribute('aria-expanded', 'true'); moving = false;
+    await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'false'));
+  });
   it.each([false, true])('honors clipping above contained=%s dialogs only', async contained => {
     nativeLayer();
     vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
