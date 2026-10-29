@@ -41,6 +41,7 @@ import {
   DialogFrame,
   Field,
   IconButton,
+  Section,
   Menu,
   Segmented,
   Switch,
@@ -1765,7 +1766,8 @@ function DetailScreen({
 
 function DialogoResponsivoSpecimen() {
   const [device, setDevice] = useState<Device>('desktop');
-  const [open, setOpen] = useState<'links' | 'adjust' | null>(null);
+  const [open, setOpen] = useState<'links' | 'adjust' | 'selection' | null>(null);
+  const [materialKind, setMaterialKind] = useState('transcript');
   const close = () => setOpen(null);
   const form = useAdjustForm(
     () =>
@@ -1829,6 +1831,38 @@ function DialogoResponsivoSpecimen() {
         </div>
       </Shot>
 
+      <Shot title="Escolha imediata" align="center">
+        <Button onClick={() => setOpen('selection')}>Abrir formulário</Button>
+        <ResponsiveDialog
+          open={open === 'selection'}
+          onClose={close}
+          title="Novo material"
+          footer={
+            <Button variant="secondary" onClick={close}>
+              Fechar
+            </Button>
+          }
+        >
+          <Section>
+            <Field label="Tipo de material">
+              {({ id }) => (
+                <Select
+                  id={id}
+                  value={materialKind}
+                  onChange={setMaterialKind}
+                  options={[
+                    { value: 'transcript', label: 'Transcrição' },
+                    { value: 'report', label: 'Relatório' },
+                    { value: 'archive', label: 'Acervo' },
+                    { value: 'news', label: 'Notícia' },
+                  ]}
+                />
+              )}
+            </Field>
+            <Field label="Texto original">{({ id }) => <Textarea id={id} rows={12} />}</Field>
+          </Section>
+        </ResponsiveDialog>
+      </Shot>
       <Shot title="Lado a lado" align="stretch">
         <div className={x.sideBySide}>
           <figure className={x.figure}>

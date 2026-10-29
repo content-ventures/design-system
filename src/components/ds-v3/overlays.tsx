@@ -182,9 +182,10 @@ export function useModalLayer({
       event.preventDefault();
       latest.current.onClose();
     },
-    onClose: () => {
+    onClose: (event: SyntheticEvent<HTMLDialogElement>) => {
       // Fechou pelo navegador (Escape repetido) sem passar pelo estado do consumidor.
-      if (latest.current.open) latest.current.onClose();
+      // A queued close from the previous opening, or a nested dialog, cannot close this opening.
+      if (event.target === event.currentTarget && latest.current.open && !event.currentTarget.open) latest.current.onClose();
     },
     onPointerDown: (event: ReactPointerEvent<HTMLDialogElement>) => {
       downOnBackdrop.current = !contained && event.target === event.currentTarget;
