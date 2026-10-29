@@ -6,7 +6,7 @@ O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [0.5.0] - 2026-10-29
 
-Brings back the changes MediaOn made to its vendored copy of DS V3 since the extraction (base `452eba0`), so MediaOn can consume this package instead of the copy.
+Brings back the changes MediaOn made to its vendored copies of DS V3 since the extraction (base `452eba0`; the `homolog` line plus the Vitrine branch), so MediaOn can consume this package instead of the copy.
 
 ### Added
 
@@ -15,6 +15,9 @@ Brings back the changes MediaOn made to its vendored copy of DS V3 since the ext
 - `EntitySheet` (`EntitySheetAction`, `EntitySheetProps`): an entity detail header with title, text status badge, one primary action, secondary actions, settings link and a pending-items block before the content.
 - `AppShell` `topbarFirst`: the top bar comes before the sidebar in keyboard order without changing the layout.
 - `RowActions` `target="touch"`: 44 × 44 px targets on touch (`pointer: coarse` or up to 480 px wide); desktop slots stay at 32 px.
+- `NavigationProvider` and `NavigationLink`: the shell, breadcrumb and list items render links through the product's router link (for example `next/link` with prefetch). Without a provider they keep native anchors.
+- Hydration guards: menu triggers, kanban cards, buttons and fields wait for hydration before handling input, so an early click or keystroke is not lost. Native controls stay usable in the server HTML.
+- `./v3/font` export for `interV3`.
 
 ### Changed
 
@@ -35,6 +38,8 @@ Visible in every consumer; review screens after upgrading.
 - `Upload` marks a rejected file as a field error (`aria-invalid`) with the reason in place of the specification.
 - Modal key handling ignores events from nested layers; Tab wrapping skips disabled and `tabindex="-1"` controls.
 - The color picker label has its own id so the swatch can reference it.
+- A breadcrumb level with neither `href` nor `onClick` renders as plain text without `aria-current`.
+- Square icon buttons do not shrink below their target in tight flex rows; stepper actions wrap instead of scrolling sideways.
 
 ## 0.4.2
 

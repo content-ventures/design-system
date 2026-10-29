@@ -253,7 +253,7 @@ export function ContainedLayer({
 
 /* ——————————————————————————— Dialog ——————————————————————————— */
 
-export type DialogSize = 'sm' | 'md' | 'lg';
+export type DialogSize = 'sm' | 'md' | 'lg' | 'xl';
 
 type DialogLayoutProps = {
   title: ReactNode;

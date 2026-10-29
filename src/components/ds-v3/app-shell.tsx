@@ -1,5 +1,6 @@
 'use client';
 
+import { NavigationLink } from './navigation';
 import {
   Bell,
   ChevronLeft,
@@ -617,9 +618,9 @@ function NavEntry({
     },
   };
   const control = item.href ? (
-    <a {...shared} href={item.href}>
+    <NavigationLink {...shared} href={item.href}>
       {inner}
-    </a>
+    </NavigationLink>
   ) : (
     <button {...shared} type="button">
       {inner}
@@ -1150,14 +1151,20 @@ function CrumbNode({ item, current }: { item: Crumb; current: boolean }) {
       </span>
     </>
   );
-  const node = current ? (
-    <span className={s.crumbCurrent} aria-current="page">
+  const node =
+    current || (!item.href && !item.onClick) ? (
+      <span className={s.crumbCurrent} aria-current={current ? 'page' : undefined}>
+        {body}
+      </span>
+    ) : item.href ? (
+      <NavigationLink
+        className={s.crumbLink}
+        href={item.href}
+        onClick={item.onClick}
+        data-force={item.force}
+      >
       {body}
-    </span>
-  ) : item.href ? (
-    <a className={s.crumbLink} href={item.href} onClick={item.onClick} data-force={item.force}>
-      {body}
-    </a>
+    </NavigationLink>
   ) : (
     <button type="button" className={s.crumbLink} onClick={item.onClick} data-force={item.force}>
       {body}
@@ -1211,13 +1218,16 @@ export function Breadcrumb({
   moreOpenForce?: string;
 }) {
   if (variant === 'compact') {
-    const parent = items[items.length - 2];
+    const parent = items
+      .slice(0, -1)
+      .reverse()
+      .find((item) => item.href || item.onClick);
     const current = items[items.length - 1];
     return (
       <nav aria-label={label} className={s.crumbs} data-variant="compact">
         {parent ? (
           parent.href ? (
-            <a
+            <NavigationLink
               className={s.crumbBack}
               href={parent.href}
               onClick={parent.onClick}
@@ -1225,7 +1235,7 @@ export function Breadcrumb({
             >
               <ChevronLeft aria-hidden="true" />
               <span className={s.crumbText}>{parent.label}</span>
-            </a>
+            </NavigationLink>
           ) : (
             <button
               type="button"
@@ -1271,7 +1281,11 @@ export function Breadcrumb({
               width={240}
               sections={[
                 {
-                  items: hidden.map((item) => ({ label: item.label, onSelect: () => goTo(item) })),
+                  items: hidden.map((item) => ({
+                    label: item.label,
+                    disabled: !item.href && !item.onClick,
+                    onSelect: () => goTo(item),
+                  })),
                 },
               ]}
               trigger={(props) => (

@@ -412,6 +412,8 @@
 .button.icon {
   padding: 0;
   width: var(--btn-h);
+  /* Quadrado sempre: numa linha flex apertada o ícone não encolhe abaixo do alvo. */
+  flex-shrink: 0;
 }
 .trailing {
   margin-right: -3px;

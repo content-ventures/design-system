@@ -14,6 +14,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from 'react';
+import { NavigationLink } from './navigation';
 import { VisuallyHidden } from './a11y';
 import s from './list-item.module.css';
 import { ScrollArea } from './structure';
@@ -30,8 +31,9 @@ type ReorderApi = {
 };
 const ReorderContext = createContext<ReorderApi | null>(null);
 
-const itemsOf = (list: HTMLElement | null) =>
-  [...(list?.querySelectorAll<HTMLLIElement>(':scope > li[data-item]') ?? [])];
+const itemsOf = (list: HTMLElement | null) => [
+  ...(list?.querySelectorAll<HTMLLIElement>(':scope > li[data-item]') ?? []),
+];
 
 /**
  * Lista em fios dentro de um contorno (um painel, nunca um cartão por linha). `onReorder` liga o
@@ -93,13 +95,18 @@ export function List({
       items.forEach((li) => {
         const before = positions.current.get(li);
         const delta = before === undefined ? 0 : before - li.offsetTop;
-        if (delta) li.animate([{ transform: `translateY(${delta}px)` }, { transform: 'none' }], { duration: 280, easing: EASE_MOVE });
+        if (delta)
+          li.animate([{ transform: `translateY(${delta}px)` }, { transform: 'none' }], {
+            duration: 280,
+            easing: EASE_MOVE,
+          });
       });
     }
     // O navegador pode tirar o foco ao mover o nó: devolve à alça da linha movida.
     const li = moved.current;
     moved.current = null;
-    if (li && !li.contains(document.activeElement)) li.querySelector<HTMLElement>('button')?.focus();
+    if (li && !li.contains(document.activeElement))
+      li.querySelector<HTMLElement>('button')?.focus();
     settle.current = null;
     positions.current = new Map(items.map((item) => [item, item.offsetTop]));
   });
@@ -135,7 +142,10 @@ export function List({
             const lastBottom = (d.tops[lastIndex] ?? 0) + (d.heights[lastIndex] ?? 0);
             const h = d.heights[d.from] ?? 0;
             const top0 = d.tops[d.from] ?? 0;
-            const dy = Math.min(Math.max(moveEvent.clientY - d.startY, first - top0), lastBottom - h - top0);
+            const dy = Math.min(
+              Math.max(moveEvent.clientY - d.startY, first - top0),
+              lastBottom - h - top0,
+            );
             d.li.style.transform = `translateY(${dy}px) scale(1.01)`;
             const center = top0 + dy + h / 2;
             let to = d.from;
@@ -237,7 +247,15 @@ export function List({
 }
 
 /** Grupo com cabeçalho em legenda que fica preso no topo enquanto o grupo rola. */
-export function ListGroup({ label, meta, children }: { label: string; meta?: ReactNode; children: ReactNode }) {
+export function ListGroup({
+  label,
+  meta,
+  children,
+}: {
+  label: string;
+  meta?: ReactNode;
+  children: ReactNode;
+}) {
   const id = useId();
   return (
     <li className={s.group}>
@@ -315,7 +333,8 @@ export function ListItem({
     if (!reorder || !draggable || !event.altKey) return;
     if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
     event.preventDefault();
-    if (liRef.current) reorder.move(liRef.current, event.key === 'ArrowUp' ? -1 : 1, titleText ?? 'Item');
+    if (liRef.current)
+      reorder.move(liRef.current, event.key === 'ArrowUp' ? -1 : 1, titleText ?? 'Item');
   }
 
   const content = (
@@ -323,7 +342,12 @@ export function ListItem({
       {checkbox && (
         <span className={s.box} aria-hidden="true">
           <svg viewBox="0 0 12 12" fill="none">
-            <path d="M2.5 6.2 5 8.6l4.6-5.2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M2.5 6.2 5 8.6l4.6-5.2"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </span>
       )}
@@ -352,14 +376,14 @@ export function ListItem({
     onKeyDown,
   };
   const row = href ? (
-    <a
+    <NavigationLink
       {...common}
       href={disabled ? undefined : href}
       aria-disabled={disabled || undefined}
       onClick={disabled ? undefined : onClick}
     >
       {content}
-    </a>
+    </NavigationLink>
   ) : onClick || checkbox ? (
     <button
       {...common}
@@ -373,7 +397,11 @@ export function ListItem({
       {content}
     </button>
   ) : (
-    <div {...common} aria-disabled={disabled || undefined} tabIndex={draggable && reorder ? -1 : undefined}>
+    <div
+      {...common}
+      aria-disabled={disabled || undefined}
+      tabIndex={draggable && reorder ? -1 : undefined}
+    >
       {content}
     </div>
   );
@@ -414,7 +442,15 @@ export function ListItem({
 }
 
 /** Linha de esqueleto com a geometria final (marca, título, descrição, meta). */
-export function ListItemSkeleton({ lines = 2, leading = true, meta = true }: { lines?: 1 | 2; leading?: boolean; meta?: boolean }) {
+export function ListItemSkeleton({
+  lines = 2,
+  leading = true,
+  meta = true,
+}: {
+  lines?: 1 | 2;
+  leading?: boolean;
+  meta?: boolean;
+}) {
   return (
     <li className={s.item} data-lines={lines} data-density="md" aria-hidden="true">
       <div className={s.row}>

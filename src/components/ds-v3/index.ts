@@ -7,6 +7,7 @@
 /* Fundamentos */
 export { ThemeV3, type ThemeMode } from './theme';
 export { interV3 } from './font';
+export { NavigationProvider, NavigationLink, type NavigationLinkProps } from './navigation';
 export { VisuallyHidden, LiveRegion, useAnnouncer } from './a11y';
 export { formatRelative, textStats, type TextStats } from './format';
 

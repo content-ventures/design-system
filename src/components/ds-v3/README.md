@@ -6,6 +6,16 @@ catálogo. Se uma aplicação divergir deles, a correção começa aqui e depois
 
 ---
 
+## Integração de navegação
+
+O produto deve instalar `NavigationProvider` com um adaptador para seu roteador.
+`NavigationLink` é a âncora compartilhada por botões, texto, cartões, listas,
+indicadores e menu. Sem provider, mantém o HTML nativo do catálogo. O adaptador
+preserva downloads, autenticação, URLs externas e abertura em outra aba.
+Não introduza `<a>` diretamente nos componentes de navegação do DS: use `NavigationLink`. O produto
+envolve a aplicação em `NavigationProvider` com o link do seu roteador (por exemplo, `next/link` com
+prefetch); sem provider, o DS usa âncoras nativas.
+
 ## 1. Princípios
 
 1. **Chapado.** Cor sólida. Nenhum degradê, 3D, brilho, chanfro, `text-shadow` ou glow.

@@ -37,6 +37,7 @@ import { Select, type SelectOption } from './select';
 import { Checkbox, Segmented } from './selection';
 import { ExpandableText } from './structure';
 import { TimeField } from './time-field';
+import { useHydrated } from './use-hydrated';
 import s from './kanban.module.css';
 
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
@@ -1113,6 +1114,7 @@ export function KanbanCard({
   ref,
   ...props
 }: KanbanCardProps) {
+  const hydrated = useHydrated();
   const nameId = useId();
   const summaryId = useId();
   const arrivedId = useId();
@@ -1135,6 +1137,7 @@ export function KanbanCard({
     <article
       {...props}
       ref={setRef}
+      inert={props.inert || (!hydrated && Boolean(onOpen || onClick || onKeyDown)) || undefined}
       className={`${s.card} ${className}`}
       data-density={density}
       data-selected={selected || undefined}

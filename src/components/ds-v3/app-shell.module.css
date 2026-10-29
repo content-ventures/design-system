@@ -939,10 +939,14 @@ button.groupLabel[aria-expanded='false'] svg {
   align-items: center;
   gap: 6px;
   min-width: 0;
+  flex-shrink: 1;
+}
+.crumbs li:has(.crumbMore) {
   flex-shrink: 0;
 }
 .crumbs li:last-child {
-  flex-shrink: 1;
+  flex-shrink: 0;
+  max-width: min(40vw, 280px);
 }
 .crumbSep {
   width: 14px;

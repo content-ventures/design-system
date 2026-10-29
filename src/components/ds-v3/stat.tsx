@@ -1,3 +1,4 @@
+import { NavigationLink } from './navigation';
 import { ArrowDownRight, ArrowUpRight, Minus, type LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { Tone } from './badge';
@@ -44,9 +45,9 @@ export function StatCard({
           {period && <span className={s.statSub}>{period}</span>}
         </div>
         {href && (
-          <a href={href} className={s.statLink} aria-label={`Abrir ${title}`}>
+          <NavigationLink href={href} className={s.statLink} aria-label={`Abrir ${title}`}>
             <ArrowUpRight aria-hidden="true" />
-          </a>
+          </NavigationLink>
         )}
       </header>
       <div className={s.statBody}>
@@ -93,7 +94,13 @@ export function Delta({
   const Icon = trend === 'up' ? ArrowUpRight : trend === 'down' ? ArrowDownRight : Minus;
   const resolved = tone ?? (trend === 'up' ? 'good' : trend === 'down' ? 'bad' : 'flat');
   return (
-    <span className={s.delta} data-trend={trend} data-tone={resolved} data-variant={variant} aria-label={label}>
+    <span
+      className={s.delta}
+      data-trend={trend}
+      data-tone={resolved}
+      data-variant={variant}
+      aria-label={label}
+    >
       <Icon aria-hidden="true" />
       {value}
     </span>
@@ -192,7 +199,9 @@ export function Sparkline({
   const max = Math.max(...points);
   const x = (i: number) => (i / Math.max(1, points.length - 1)) * (width - 3);
   const y = (v: number) => height - 3 - ((v - min) / (max - min || 1)) * (height - 6);
-  const line = points.map((v, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+  const line = points
+    .map((v, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`)
+    .join(' ');
   const last = points.length - 1;
   const end = { x: x(last), y: y(points[last] ?? 0) };
   if (fluid) {

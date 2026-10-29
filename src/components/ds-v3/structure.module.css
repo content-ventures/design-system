@@ -477,6 +477,16 @@
   border-radius: var(--r-lg);
   background: var(--paper);
 }
+.panel[data-pad='md'] {
+  padding: 14px 16px 16px;
+}
+.panel[data-pad='lg'] {
+  padding: 18px 20px 20px;
+}
+/* `Section` já carrega o próprio respiro e pode formar vários blocos no mesmo painel. */
+.panel:has(> .section[data-variant='block']) {
+  padding: 0;
+}
 .section[data-variant='panel'],
 .section[data-variant='block'] {
   padding: 14px 16px 16px;

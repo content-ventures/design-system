@@ -1,3 +1,4 @@
+import { NavigationLink } from './navigation';
 import type { LucideIcon } from 'lucide-react';
 import { isValidElement } from 'react';
 import type { ComponentProps, CSSProperties, MouseEvent, ReactNode } from 'react';
@@ -71,7 +72,7 @@ export function CardLink({
 }) {
   if (href && !disabled) {
     return (
-      <a
+      <NavigationLink
         {...rest}
         href={href}
         onClick={onClick}
@@ -79,7 +80,7 @@ export function CardLink({
         data-card-link=""
       >
         {children}
-      </a>
+      </NavigationLink>
     );
   }
   return (
