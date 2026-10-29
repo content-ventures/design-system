@@ -615,3 +615,7 @@ importa TipTap, AI SDK nem código de produto; o produto liga o editor e o model
   `MediaFrame` sem legenda e com `alt=""` no topo do cartão: faz parte da área clicável, o cartão empilha e
   o rádio fica sobre o canto dela. A prévia completa vai no `footer` (“Ver modelo”), fora da área que
   escolhe. Numa grade, `Grid columns="auto"` com o grupo em `role="radiogroup"`.
+
+### Accessible original-file selection
+
+`Dropzone` keeps its hidden native file input beside its focusable button, never inside another interactive control. Enter, Space and pointer activation use the same native picker; accepted extensions and byte limits also apply to drops. `Segmented` uses the existing readable text token for inactive options on its rail. The Upload catalog includes a bounded UTF-8 document picker.
