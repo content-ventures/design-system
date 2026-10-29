@@ -129,6 +129,8 @@ export function anchorHidden(anchor: Element) {
     if (style.overflowX !== 'visible' || style.overflowY !== 'visible') {
       if (outside(node.getBoundingClientRect())) return true;
     }
+    // Native modals escape every clipping ancestor above them. Contained catalog layers do not.
+    if (node.tagName === 'DIALOG' && node.hasAttribute('open') && !node.hasAttribute('data-contained')) break;
   }
   return false;
 }

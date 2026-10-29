@@ -173,6 +173,13 @@ Superfície em repouso **não tem sombra**. Só flutuantes:
 Flutuante é `position: fixed` ancorado ao gatilho, vira para cima/lado quando falta espaço e fica a 8 px
 da borda da janela. Nunca é recortado por tabela ou moldura (`overflow: clip` nas molduras).
 
+Dentro de um diálogo aberto, a camada compartilhada dos seletores usa um popover nativo manual
+quando a API está disponível. O menu continua no mesmo escopo de tema e de foco, mas suas coordenadas
+ficam relativas à janela mesmo durante a transformação de entrada do modal. Ele acompanha os
+ancestrais enquanto animam; teclado, clique fora, saída de vista e animação de fechamento mantêm o
+mesmo contrato. Sem essa API, permanece o portal existente. A prancha “Escolha imediata” de
+`dialogo-responsivo` permite abrir e escolher durante a entrada, inclusive no celular.
+
 **Dica (`Tooltip`):** texto curto que o gatilho não mostra — nome de botão de ícone, nome de etapa
 escondido pela largura, motivo de indisponível, aviso de um slide. `title` nativo não é usado em nenhum
 controle do DS. `bare` faz do próprio filho a âncora (sem caixa extra no layout; o filho repassa `ref` e

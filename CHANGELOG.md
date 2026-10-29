@@ -4,6 +4,13 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.4.1] - 2026-10-29
+
+### Fixed
+
+- Shared select panels inside an open dialog use the native manual-popover top layer when available. This keeps viewport coordinates valid during modal entry and resizing, prevents the menu from scrolling the dialog sideways and disappearing before selection, and follows animated ancestors until they settle. Anchor visibility stops at native modal boundaries; clipping above a contained layer still applies. The public API, theme, keyboard/focus, outside-pointer and hidden-anchor dismissal, closing transition and nonmodal/unsupported-browser fallback remain intact. The responsive-dialog catalog includes an immediate-selection example.
+- Modal layers ignore queued native close events after reopening and close events from nested dialogs. An actual current native close still synchronizes the controlled state.
+
 ## [0.4.0] - 2026-10-19
 
 ### Added

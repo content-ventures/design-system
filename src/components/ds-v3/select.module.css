@@ -155,6 +155,11 @@
   transform-origin: top center;
   animation: popIn var(--dur-2) var(--ease-out);
 }
+.panel[popover] {
+  /* Reset native top-layer placement; the shared anchor owns these coordinates. */
+  inset: auto;
+  margin: 0;
+}
 /* Cresce com as opções (texto inteiro), entre a largura do gatilho e o máximo que o JS prende. */
 .panel[data-fit] {
   width: max-content;

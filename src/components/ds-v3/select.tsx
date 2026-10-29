@@ -73,6 +73,8 @@ function anchorHidden(anchor: Element) {
     if (style.overflowX !== 'visible' || style.overflowY !== 'visible') {
       if (outside(node.getBoundingClientRect())) return true;
     }
+    // Native modals escape every clipping ancestor above them. Contained catalog layers do not.
+    if (node.tagName === 'DIALOG' && node.hasAttribute('open') && !node.hasAttribute('data-contained')) break;
   }
   return false;
 }
@@ -158,6 +160,23 @@ export function Floating({
       : anchorNow.parentElement
     : null;
 
+  // A transformed modal establishes a containing block for fixed descendants. Promote the
+  // floating panel so its viewport coordinates remain valid throughout entry and resizing.
+  const topLayer =
+    mounted &&
+    !inline &&
+    host?.tagName === 'DIALOG' &&
+    typeof HTMLElement !== 'undefined' &&
+    typeof HTMLElement.prototype.showPopover === 'function';
+  useLayoutEffect(() => {
+    const panel = ref.current;
+    if (!topLayer || !host || !panel) return;
+    panel.showPopover();
+    return () => {
+      if (panel.isConnected) panel.hidePopover();
+    };
+  }, [topLayer, host]);
+
   useLayoutEffect(() => {
     const anchor = anchorRef.current;
     const pop = ref.current;
@@ -219,6 +238,23 @@ export function Floating({
           ? prev
           : next,
       );
+      if (topLayer) {
+        for (let node: Element | null = anchor; node; node = node.parentElement) {
+          if (
+            node
+              .getAnimations?.()
+              .some(
+                (animation) =>
+                  (animation.playState === 'running' || animation.pending) &&
+                  animation.effect?.getTiming().iterations !== Infinity,
+              )
+          ) {
+            frame = requestAnimationFrame(update);
+            break;
+          }
+          if (node === host) break;
+        }
+      }
     };
     const schedule = (event?: Event) => {
       if (event?.target instanceof Node && pop.contains(event.target)) return;
@@ -245,7 +281,7 @@ export function Floating({
       window.removeEventListener('scroll', schedule, true);
       window.removeEventListener('resize', schedule);
     };
-  }, [open, host, anchorRef, width, minWidth, fitMax, maxHeight]);
+  }, [open, host, anchorRef, width, minWidth, fitMax, maxHeight, topLayer]);
 
   useEffect(() => {
     // Painel parado de prancha: não fecha com clique fora.
@@ -281,6 +317,7 @@ export function Floating({
   const panel = (
     <div
       ref={ref}
+      popover={topLayer ? 'manual' : undefined}
       id={id}
       role={role}
       aria-label={ariaLabel}
