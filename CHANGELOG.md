@@ -4,6 +4,12 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## 0.4.2
+
+- Keep the hidden file input outside the Dropzone button so assistive technologies encounter one interactive control. Keyboard, native file selection and drop validation retain their public behavior.
+- Use the existing readable text token for inactive Segmented options against the gray rail.
+- Add bounded original-file catalog and regression coverage.
+
 ## [0.4.1] - 2026-10-29
 
 ### Fixed

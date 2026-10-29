@@ -143,6 +143,22 @@ export function Dropzone({
 
   return (
     <div className={s.dropzone}>
+      <input
+        id={id}
+        ref={inputRef}
+        type="file"
+        hidden
+        tabIndex={-1}
+        aria-hidden="true"
+        className={s.input}
+        accept={accept}
+        multiple={multiple}
+        disabled={disabled}
+        onChange={(event) => {
+          take(event.target.files);
+          event.target.value = '';
+        }}
+      />
       <div
         id={id ? `${id}-dropzone` : undefined}
         role="button"
@@ -166,21 +182,6 @@ export function Dropzone({
           take(event.dataTransfer.files);
         }}
       >
-        <input
-          id={id}
-          ref={inputRef}
-          type="file"
-          tabIndex={-1}
-          aria-hidden="true"
-          className={s.input}
-          accept={accept}
-          multiple={multiple}
-          disabled={disabled}
-          onChange={(event) => {
-            take(event.target.files);
-            event.target.value = '';
-          }}
-        />
         {disabled ? (
           <span className={s.line}>
             <span className={s.lineText}>{disabledText}</span>

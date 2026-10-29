@@ -20,7 +20,11 @@ import {
   SidebarItem,
   type Portal,
 } from '@content-ventures/design-system/v3/app-shell';
-import { AttachmentChip, AttachmentPreview, AttachmentRow } from '@content-ventures/design-system/v3/attachment';
+import {
+  AttachmentChip,
+  AttachmentPreview,
+  AttachmentRow,
+} from '@content-ventures/design-system/v3/attachment';
 import { Button, ButtonGroup, IconButton } from '@content-ventures/design-system/v3/button';
 import { Carousel, Gallery, type GalleryItem } from '@content-ventures/design-system/v3/gallery';
 import {
@@ -1328,9 +1332,57 @@ function PiAttachments() {
   );
 }
 
+function OriginalFilePicker() {
+  const [format, setFormat] = useState<'txt' | 'csv'>('txt');
+  const [file, setFile] = useState<File>();
+  const [error, setError] = useState<string>();
+  return (
+    <div className={x.piUpload}>
+      <Segmented
+        label="Formato do original"
+        value={format}
+        options={[
+          { value: 'txt', label: 'Texto' },
+          { value: 'csv', label: 'Tabela CSV' },
+        ]}
+        onChange={(value) => {
+          setFormat(value);
+          setFile(undefined);
+          setError(undefined);
+        }}
+      />
+      <Dropzone
+        title="Escolher original"
+        accept={`.${format}`}
+        maxSize={1024 * 1024}
+        spec={`${format.toUpperCase()} · até 1 MiB`}
+        invalid={Boolean(error)}
+        error={error}
+        onFiles={(files, rejected) => {
+          setFile(files[0]);
+          setError(rejected.length ? 'Confira o formato e o limite de 1 MiB.' : undefined);
+        }}
+      />
+      {file && (
+        <FileRow
+          name={file.name}
+          size={file.size}
+          status="done"
+          compact
+          message="Arquivo selecionado"
+          onRemove={() => setFile(undefined)}
+        />
+      )}
+    </div>
+  );
+}
+
 function UploadPage() {
   return (
     <Shots>
+      <Shot title="Originais de texto" tone="white" align="stretch" pad="md">
+        <OriginalFilePicker />
+      </Shot>
       <Shot title="Briefing" align="stretch">
         <UploadFlow />
       </Shot>
