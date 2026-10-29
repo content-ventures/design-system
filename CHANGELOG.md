@@ -12,6 +12,7 @@ O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Modal layers ignore queued native close events after reopening and close events from nested dialogs. An actual current native close still synchronizes the controlled state.
 - A menu opened by keyboard during sheet entry remains open while its anchor moves into view; normal hidden-anchor dismissal resumes when the finite ancestor animation ends. Contained-layer clipping remains authoritative.
 - Native and contained modal layers both wrap Tab/Shift+Tab within their current controls, preserving the documented focus boundary instead of letting keyboard focus leave the dialog.
+- Keyboard-focused immutable ProseMirror text has the shared focus ring, including the catalog force-state twin. The reading specimen exposes a named, focusable read-only text area.
 - Sidebar identity, navigation and footer share a named complementary landmark; workspace/account text retains its word boundary in accessible names. Secondary identity text and the search action use readable existing foreground roles. Toast announcements have a valid named live-region role.
 
 ## [0.4.0] - 2026-10-19

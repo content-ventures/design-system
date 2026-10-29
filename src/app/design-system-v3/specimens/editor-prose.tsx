@@ -267,7 +267,9 @@ function TextoCorrido() {
 
       <Shot title="Leitura" tone="white" align="stretch" pad="lg">
         <Prose variant="read" as="article" label="Texto final">
-          <ReadArticle />
+          <div className="ProseMirror" contentEditable={false} role="textbox" aria-label="Texto final preservado" aria-multiline="true" aria-readonly="true" tabIndex={0}>
+            <ReadArticle />
+          </div>
         </Prose>
       </Shot>
 
