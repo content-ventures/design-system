@@ -147,7 +147,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .chipSpin {
-    animation: spin 2.4s linear infinite !important;
+    animation: none !important;
   }
 }
 .chipName {

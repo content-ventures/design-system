@@ -30,7 +30,7 @@ export { Menu, MenuPanel, type MenuItem, type MenuSection } from './menu';
 
 /* ——————————————————————————————————————————————————————————————————————————
  * Camada modal (Dialog, Drawer, BottomSheet)
- * `<dialog>` nativo com `showModal`: foco preso e fundo inerte pelo navegador, Escape fecha.
+ * `<dialog>` nativo com `showModal`: fundo inerte; Tab circula na camada e Escape fecha.
  * `contained`: a mesma camada presa a um contêiner posicionado (palco do catálogo, moldura de
  * celular) — véu próprio, foco preso por Tab e irmãos `inert`.
  * Entrada e saída por `data-state` (`open` → `closing` → `closed`); a camada só desmonta o
@@ -195,12 +195,21 @@ export function useModalLayer({
       downOnBackdrop.current = false;
     },
     onKeyDown: (event: ReactKeyboardEvent<HTMLDialogElement>) => {
+      if (event.defaultPrevented) return;
+      // Eventos de camadas internas também propagam por portais na árvore React.
+      if (
+        event.target instanceof Element &&
+        event.target.closest('dialog[open]') !== event.currentTarget
+      ) {
+        return;
+      }
       if (event.key === 'Escape') {
         event.preventDefault();
         latest.current.onClose();
         return;
       }
       if (event.defaultPrevented) return;
+      // showModal torna o fundo inerte, mas pode deixar Tab alcançar a interface do navegador.
       trapTab(event, event.currentTarget);
     },
   };

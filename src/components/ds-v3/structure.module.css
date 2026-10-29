@@ -8,7 +8,13 @@
 /* ——————————————————————————— PageHeader ——————————————————————————— */
 .pageStack {
   display: grid;
+  /* Uma coluna que nunca passa da largura da página: a tabela larga rola dentro do próprio
+     invólucro, sem empurrar a página para a lateral (390 e 322 px). */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--s-6);
+  min-width: 0;
+}
+.pageStack > * {
   min-width: 0;
 }
 .pageStack > [data-part='page-header'] {

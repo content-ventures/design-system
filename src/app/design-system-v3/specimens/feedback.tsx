@@ -71,6 +71,13 @@ import {
   type ProgressStep,
 } from '@content-ventures/design-system/v3/feedback';
 import { LinkButton } from '@content-ventures/design-system/v3/link';
+import {
+  CardsSkeleton,
+  ChartSkeleton,
+  FormSkeleton,
+  PageSkeleton,
+  TableSkeleton,
+} from '@content-ventures/design-system/v3/route-skeleton';
 import { ToastCard, Toaster, toast } from '@content-ventures/design-system/v3/toast';
 import toastStyles from '@content-ventures/design-system/v3/toast.module.css';
 import { Shot, Shots, State, States } from '../stage';
@@ -1645,6 +1652,32 @@ function SkeletonSpecimen() {
                   { width: 72, bar: 56, align: 'end' },
                 ]}
               />
+            </div>
+          </State>
+        </States>
+      </Shot>
+
+      <Shot title="Rota carregando (loading.tsx)" tone="white" align="stretch">
+        <PageSkeleton>
+          <TableSkeleton rows={4} />
+        </PageSkeleton>
+      </Shot>
+
+      <Shot title="Blocos de rota" tone="white" align="stretch">
+        <States min={280}>
+          <State label="Indicadores">
+            <div className={x.cellFill}>
+              <CardsSkeleton cards={2} />
+            </div>
+          </State>
+          <State label="Gráfico">
+            <div className={x.cellFill}>
+              <ChartSkeleton height={120} />
+            </div>
+          </State>
+          <State label="Formulário">
+            <div className={x.cellFill}>
+              <FormSkeleton fields={2} />
             </div>
           </State>
         </States>

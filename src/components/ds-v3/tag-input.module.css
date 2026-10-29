@@ -57,7 +57,7 @@
   }
 }
 .input::placeholder {
-  color: var(--subtle);
+  color: var(--placeholder);
 }
 .field[data-full] .input {
   min-width: 48px;

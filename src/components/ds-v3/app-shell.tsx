@@ -91,7 +91,8 @@ const SHELL_BREAKPOINT = 1200;
 
 /**
  * Moldura do app (igual ao /dashboardv3): menu lateral de 236 px em g-25 encostado, com fio à
- * direita; topo de 52 px com fio — um único fio corre do menu ao conteúdo; conteúdo branco direto.
+ * direita; topo de 52 px com fio — um único fio corre do menu ao conteúdo; identidade com altura
+ * mínima de 52 px e conteúdo branco direto.
  * Até 1199 px de largura o menu vira gaveta (véu, Escape, conteúdo `inert`). Quem decide gaveta ou
  * barra é o CSS (`@container shell`): o HTML do servidor e a primeira pintura no celular já saem com
  * a gaveta fechada, sem a barra espremendo a página; o JS só abre, fecha e cuida do foco. Com
@@ -119,6 +120,7 @@ export function AppShell({
   onNavOpenChange,
   layout = 'auto',
   breakpoint = SHELL_BREAKPOINT,
+  topbarFirst = false,
 }: {
   /** O menu lateral. Ignorado em `layout="immersive"` (passe `null`). */
   sidebar?: ReactNode;
@@ -146,6 +148,11 @@ export function AppShell({
    * CSS; outro valor é medido no cliente (a primeira pintura do servidor sai com a barra).
    */
   breakpoint?: number;
+  /**
+   * A barra do topo vem antes do menu na ordem do teclado (o desenho não muda): para quando a ação
+   * da barra precisa estar a poucos `Tab` do topo, como um `Sair da conta` na barra.
+   */
+  topbarFirst?: boolean;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -244,8 +251,8 @@ export function AppShell({
         data-no-topbar={!hasTopbar || undefined}
         data-part="shell"
       >
-        <div className={s.frame}>
-          {!immersive && sidebar}
+        <div className={s.frame} data-topbar-first={topbarFirst || undefined}>
+          {!immersive && !topbarFirst && sidebar}
           {!immersive && (
             <button
               type="button"
@@ -262,6 +269,7 @@ export function AppShell({
               {children}
             </Content>
           </div>
+          {!immersive && topbarFirst && sidebar}
         </div>
       </div>
     </ShellContext.Provider>
@@ -910,6 +918,7 @@ export function PortalSwitcher({
   onChange,
   action,
   label = 'Trocar de portal',
+  sectionLabel = 'Portais',
   markSize = 'md',
   force,
   peek = false,
@@ -919,6 +928,7 @@ export function PortalSwitcher({
   onChange: (id: string) => void;
   action?: MenuItem;
   label?: string;
+  sectionLabel?: string;
   markSize?: 'sm' | 'md';
   /** Estado parado para pranchas: `hover`, `active` ou `focus`. */
   force?: string;
@@ -930,7 +940,7 @@ export function PortalSwitcher({
   if (!current) return null;
   const sections: MenuSection[] = [
     {
-      label: 'Portais',
+      label: sectionLabel,
       items: portals.map((portal) => ({
         label: portal.name,
         description: portal.period ?? portal.detail,

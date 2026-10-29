@@ -948,7 +948,8 @@ button.sectionHead:hover .sectionChevron {
 .optional {
   margin-left: 6px;
   font: var(--t-caption);
-  color: var(--subtle);
+  /* Texto que se lê ("Opcional"): `--muted` (4,8:1), não o `--subtle` decorativo (2,6:1). */
+  color: var(--muted);
 }
 .rowDesc {
   font: var(--t-small);

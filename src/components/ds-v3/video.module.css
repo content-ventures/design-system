@@ -111,7 +111,7 @@ button.center:focus-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   .center[data-spinner] svg {
-    animation: spin 2.4s linear infinite !important;
+    animation: none !important;
   }
 }
 

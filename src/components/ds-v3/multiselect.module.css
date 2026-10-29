@@ -60,7 +60,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   font: var(--t-body);
-  color: var(--subtle);
+  color: var(--placeholder);
 }
 .box[data-size='sm'] .placeholder {
   font: var(--t-small);

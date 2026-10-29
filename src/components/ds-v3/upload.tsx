@@ -165,6 +165,9 @@ export function Dropzone({
         tabIndex={disabled ? -1 : 0}
         aria-disabled={disabled || undefined}
         aria-describedby={[specId, describedBy].filter(Boolean).join(' ')}
+        // O arquivo recusado é erro do campo (WCAG 3.3.1): o leitor de tela ouve "inválido" e o
+        // motivo, que fica no lugar da especificação (`specId`).
+        aria-invalid={(invalid && !disabled) || undefined}
         className={s.zone}
         data-over={isOver || undefined}
         data-invalid={(invalid && !disabled) || undefined}

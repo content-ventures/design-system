@@ -503,6 +503,8 @@
 }
 .summaryList button {
   display: inline;
+  /* Alvo de 24 px (WCAG 2.5.8): cada item é um botão sozinho na linha da lista. */
+  min-height: 24px;
   padding: 0;
   font: var(--t-small);
   color: var(--red-ink);

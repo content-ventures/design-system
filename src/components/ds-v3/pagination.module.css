@@ -78,6 +78,15 @@
 .arrow:is(:active, [data-force~='active']):not(:disabled) {
   background: var(--g-100);
 }
+/*
+ * As páginas que não são a atual e as setas são fantasmas: sem fio nenhum, nem transparente (um fio
+ * invisível contaria como contorno sem contraste, WCAG 1.4.11). O pixel do fio volta no recuo.
+ */
+.page:not([aria-current='page']),
+.arrow {
+  border-width: 0;
+  padding: 0 7px;
+}
 .page[aria-current='page'] {
   font-weight: 500;
   color: var(--ink);
@@ -170,10 +179,11 @@
     display: inline-block;
   }
 }
+/* Toque: alvo de 44 px (WCAG 2.5.5), o mesmo dos botões do DS no toque. */
 @media (pointer: coarse) {
   .page,
   .arrow {
-    min-width: 40px;
-    height: 40px;
+    min-width: 44px;
+    height: 44px;
   }
 }

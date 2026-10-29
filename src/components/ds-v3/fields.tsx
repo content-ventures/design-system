@@ -116,7 +116,8 @@ export function Field({
   return (
     <div className={`${s.field} ${className}`} data-invalid={error ? true : undefined}>
       <div className={s.labelRow}>
-        <label htmlFor={id} className={s.label}>
+        {/* `id` próprio: um segundo controle do mesmo campo (a amostra de cor) usa este rótulo. */}
+        <label id={`${id}-label`} htmlFor={id} className={s.label}>
           {label}
           {required && (
             <span className={s.required} aria-hidden="true">

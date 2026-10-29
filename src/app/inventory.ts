@@ -137,6 +137,12 @@ export const inventory: readonly InventoryGroup[] = [
         'Editar, duplicar, arquivar e excluir em listagens.',
         'row action',
       ),
+      item(
+        'hierarquia-acao',
+        'Hierarquia de ação',
+        'Uma primária por tela, destrutiva na zona de perigo e confirmação com consequência.',
+        'action hierarchy danger zone zona de perigo',
+      ),
     ],
   },
   {

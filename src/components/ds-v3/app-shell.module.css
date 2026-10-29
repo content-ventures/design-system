@@ -1,6 +1,6 @@
 /*
  * AppShell — a moldura do /dashboardv3: menu lateral encostado em g-25 com fio à direita, topo de
- * 52 px com fio (um único fio corre do menu ao conteúdo) e conteúdo branco direto.
+ * 52 px com fio e conteúdo branco direto. A identidade cresce conforme o conteúdo do menu.
  * O item ativo é o único lugar do sistema com barra lateral azul.
  */
 .shell {
@@ -23,6 +23,15 @@
   height: 100%;
   min-height: 0;
 }
+/* Barra antes do menu na ordem do DOM: as colunas continuam menu | conteúdo. */
+.frame[data-topbar-first] > .main {
+  grid-column: 2;
+  grid-row: 1;
+}
+.frame[data-topbar-first] > .sidebar {
+  grid-column: 1;
+  grid-row: 1;
+}
 .shell[data-collapsed] .frame {
   grid-template-columns: var(--sidebar-w-collapsed) minmax(0, 1fr);
 }
@@ -43,13 +52,13 @@
   height: 100%;
   min-height: 0;
 }
-/* Mesma altura do topo: o fio da identidade continua o fio do topo em y = 52. */
+/* Parte da altura do topo e cresce para acomodar identidades com mais de uma linha. */
 .identity {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  height: var(--topbar-h);
-  padding: 0 10px;
+  min-height: var(--topbar-h);
+  padding: 8px 10px;
   border-bottom: 1px solid var(--line);
 }
 .identity > * {
@@ -658,6 +667,9 @@ button.groupLabel[aria-expanded='false'] svg {
 .shell[data-drawer] .frame {
   grid-template-columns: minmax(0, 1fr);
 }
+.shell[data-drawer] .frame[data-topbar-first] > .main {
+  grid-column: 1;
+}
 .shell[data-drawer] .sidebar {
   position: fixed;
   inset: 0 auto 0 0;
@@ -690,16 +702,24 @@ button.groupLabel[aria-expanded='false'] svg {
   background: var(--overlay);
   backdrop-filter: blur(var(--overlay-blur));
   cursor: default;
+  /* Fechado, o véu some de verdade (não só transparente): fica invisível só depois do esmaecer. */
+  visibility: hidden;
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--dur-3) var(--ease-out);
+  transition:
+    opacity var(--dur-3) var(--ease-out),
+    visibility 0s linear var(--dur-3);
 }
 .shell[data-drawer][data-fill] .veil {
   position: absolute;
 }
 .shell[data-drawer][data-nav-open] .veil {
+  visibility: visible;
   opacity: 1;
   pointer-events: auto;
+  transition:
+    opacity var(--dur-3) var(--ease-out),
+    visibility 0s;
 }
 .shell[data-drawer] .topbar[data-menu='auto'] .menuButton {
   display: inline-flex;
@@ -749,6 +769,17 @@ button.groupLabel[aria-expanded='false'] svg {
     --content-pt: 0px;
     --content-pb: 0px;
     padding: 0;
+  }
+  /* Celular: alvos de toque de 44 px na gaveta (busca, itens e limpar a busca). */
+  .shell[data-drawer] .filter {
+    height: 44px;
+  }
+  .shell[data-drawer] .filterClear {
+    width: 44px;
+    height: 44px;
+  }
+  .shell[data-drawer] .navItem {
+    min-height: 44px;
   }
 }
 
@@ -864,7 +895,7 @@ button.groupLabel[aria-expanded='false'] svg {
   }
 }
 /* Celular: botão do menu, o primeiro nível e o atual da trilha (em “Trilha”) e o sino — alvos
-   quadrados de 40 px. */
+   quadrados de 44 px, sem encolher. */
 @container topbar (max-width: 640px) {
   .topInner {
     padding: 0 4px 0 16px;
@@ -877,15 +908,16 @@ button.groupLabel[aria-expanded='false'] svg {
   }
   .topbar .menuButton,
   .topbar .bell button {
-    width: 40px;
-    height: 40px;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
   }
   .topbar .menuButton {
-    margin-left: -12px;
+    margin-left: -14px;
   }
   .bellDot {
-    top: 12px;
-    right: 13px;
+    top: 14px;
+    right: 15px;
   }
 }
 

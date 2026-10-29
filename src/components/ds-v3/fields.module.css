@@ -295,12 +295,21 @@
   color: var(--ink);
   scroll-margin-block: 96px;
 }
+/*
+ * Toque: o campo de uma linha é o alvo, e ele tem 44 px por dentro do fio — o controle
+ * cresce os 2 px do fio em vez de o input ficar com 42.
+ */
+@media (pointer: coarse) {
+  .control:has(> input) {
+    height: calc(var(--ctl-h) + 2px);
+  }
+}
 .control[data-size='sm'] input {
   font: var(--t-small);
 }
 .control input::placeholder,
 .control textarea::placeholder {
-  color: var(--subtle);
+  color: var(--placeholder);
   opacity: 1;
 }
 .control :is(input, textarea):disabled {
@@ -595,9 +604,10 @@
   display: inline-grid;
   place-items: center;
   flex: none;
-  width: 20px;
-  height: 20px;
-  margin-right: -4px;
+  /* Alvo de 24 px (WCAG 2.5.8); a margem negativa mantém o ícone no mesmo lugar. */
+  width: 24px;
+  height: 24px;
+  margin-right: -6px;
   border-radius: 6px;
   color: var(--g-400);
   animation: pop var(--dur-1) var(--ease-out);

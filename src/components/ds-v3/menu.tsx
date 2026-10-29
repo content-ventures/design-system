@@ -99,10 +99,14 @@ const ORIGIN: Record<Side, Record<Align, string>> = {
   left: { start: 'top right', end: 'top right' },
 };
 
-/** Onde o flutuante deve morar: no diálogo aberto (camada do topo) ou no escopo do tema. */
+/** Mantém o flutuante na camada do diálogo/gaveta aberta, acima do véu, ou no tema. */
 export function floatingHost(from: Element | null): Element | null {
   if (!from) return null;
-  return from.closest('dialog[open]') ?? from.closest('[data-ds-v3]') ?? document.body;
+  return (
+    from.closest('dialog[open], [data-nav-open] [data-part="sidebar"]') ??
+    from.closest('[data-ds-v3]') ??
+    document.body
+  );
 }
 
 const normalize = (value: string) =>

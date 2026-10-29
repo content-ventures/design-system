@@ -44,3 +44,11 @@
 .slots button[data-variant]:is(:disabled, [aria-disabled='true']) svg {
   color: var(--g-400);
 }
+/* Alvo de toque: no toque ou em tela estreita, cada controle ganha 44 × 44 px (WCAG 2.5.5). */
+@media (pointer: coarse), (max-width: 480px) {
+  .slots[data-target='touch'] button[data-variant],
+  .slots[data-target='touch'] .slot {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
