@@ -948,7 +948,8 @@ button.sectionHead:hover .sectionChevron {
 .optional {
   margin-left: 6px;
   font: var(--t-caption);
-  color: var(--subtle);
+  /* Texto que se lê ("Opcional"): `--muted` (4,8:1), não o `--subtle` decorativo (2,6:1). */
+  color: var(--muted);
 }
 .rowDesc {
   font: var(--t-small);
@@ -1136,9 +1137,13 @@ button.sectionHead:hover .sectionChevron {
 }
 .barActions {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
+  /* Encolhe só quando não cabe, e aí as ações quebram de linha: nada rola de lado. */
+  flex-shrink: 1;
+  min-width: 0;
 }
 /*
  * Motivo visível de uma ação indisponível (`detail` sem `status`, README §1.7): perto dos botões, em

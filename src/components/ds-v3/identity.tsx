@@ -1,5 +1,6 @@
 'use client';
 
+import { NavigationLink } from './navigation';
 import type { LucideIcon } from 'lucide-react';
 import {
   useEffect,
@@ -384,7 +385,7 @@ export function MadeWith({
   'data-force'?: string;
 }) {
   return (
-    <a {...props} className={`${s.madeWith} ${className}`}>
+    <NavigationLink {...props} className={`${s.madeWith} ${className}`}>
       <span>Feito com</span>
       <span className={s.madeMark}>
         <span className={s.productGlyph}>
@@ -392,7 +393,7 @@ export function MadeWith({
         </span>
         MediaOn
       </span>
-    </a>
+    </NavigationLink>
   );
 }
 

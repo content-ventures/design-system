@@ -14,7 +14,8 @@
   --g-150: #e3e6eb;
   --g-200: #d8dce3;
   --g-300: #c0c6d0;
-  --g-400: #9aa1ae;
+  /* g-400 é o ícone calmo e o fio de controle: ≥ 3:1 sobre paper, canvas e g-100 (WCAG 1.4.11). */
+  --g-400: #808897;
   --g-500: #747c8b;
   --g-600: #5a6272;
   --g-700: #424958;
@@ -79,11 +80,15 @@
   --paper-sunken: var(--g-50);
   --paper-hover: #f5f6f8;
   --paper-pressed: var(--g-100);
-  /* Fios: borda real de 1px. Cartões usam --line; controles, --line-strong. */
+  /*
+   * Fios: borda real de 1px. Cartões usam --line (decorativo); controles, --line-strong, que é o
+   * que diz onde o campo ou o botão começa e por isso fica ≥ 3:1 sobre o fundo (WCAG 1.4.11).
+   * O hover de controle escurece a partir dele.
+   */
   --line: #e7e9ed;
   --line-soft: #f0f1f4;
-  --line-strong: #dfe2e7;
-  --line-hover: #d2d6dd;
+  --line-strong: var(--g-400);
+  --line-hover: var(--g-500);
   --overlay: rgb(14 17 26 / 0.3);
   --tooltip-bg: #191d27;
 
@@ -92,6 +97,8 @@
   --text: #3a4151;
   --muted: #697181;
   --subtle: #99a0ad;
+  /* Placeholder: texto de exemplo legível (AA ≥ 4,5:1 sobre --paper). */
+  --placeholder: var(--muted);
   --on-accent: #ffffff;
 
   /* Ação */
@@ -347,6 +354,7 @@
   --text: #d8dce3;
   --muted: #c0c6d0;
   --subtle: #9aa1ae;
+  --placeholder: var(--subtle);
   --overlay: rgb(16 19 26 / 0.7);
   --b-25: color-mix(in srgb, #0875db 8%, var(--paper));
   --b-50: color-mix(in srgb, #0875db 14%, var(--paper));
@@ -379,9 +387,10 @@
   --danger-soft-hover: var(--red-bg);
 }
 /* Toque: alvos maiores quando o ponteiro é o dedo. */
+/* Toque: todo controle com 44 px de alvo real (WCAG 2.5.5), inclusive o `sm`. */
 @media (pointer: coarse) {
   .theme {
-    --h-sm: 36px;
+    --h-sm: 44px;
     --h-md: 44px;
     --h-lg: 48px;
   }

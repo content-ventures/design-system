@@ -56,7 +56,9 @@ export function focusablesIn(root: Element) {
 /** Tab e Shift+Tab dão a volta dentro da camada (foco preso sem depender do navegador). */
 export function trapTab(event: KeyboardEvent | ReactKeyboardEvent, root: Element) {
   if (event.key !== 'Tab') return;
-  const list = focusablesIn(root);
+  const list = focusablesIn(root).filter(
+    (el) => !el.matches(':disabled') && (!el.hasAttribute('tabindex') || el.tabIndex >= 0),
+  );
   const first = list[0];
   const last = list[list.length - 1];
   if (!first || !last) {
@@ -64,10 +66,10 @@ export function trapTab(event: KeyboardEvent | ReactKeyboardEvent, root: Element
     return;
   }
   const active = document.activeElement;
-  if (event.shiftKey && (active === first || !root.contains(active))) {
+  if (event.shiftKey && (active === first || active === root || !root.contains(active))) {
     event.preventDefault();
     last.focus();
-  } else if (!event.shiftKey && (active === last || !root.contains(active))) {
+  } else if (!event.shiftKey && (active === last || active === root || !root.contains(active))) {
     event.preventDefault();
     first.focus();
   }

@@ -8,7 +8,13 @@
 /* ——————————————————————————— PageHeader ——————————————————————————— */
 .pageStack {
   display: grid;
+  /* Uma coluna que nunca passa da largura da página: a tabela larga rola dentro do próprio
+     invólucro, sem empurrar a página para a lateral (390 e 322 px). */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--s-6);
+  min-width: 0;
+}
+.pageStack > * {
   min-width: 0;
 }
 .pageStack > [data-part='page-header'] {
@@ -470,6 +476,16 @@
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   background: var(--paper);
+}
+.panel[data-pad='md'] {
+  padding: 14px 16px 16px;
+}
+.panel[data-pad='lg'] {
+  padding: 18px 20px 20px;
+}
+/* `Section` já carrega o próprio respiro e pode formar vários blocos no mesmo painel. */
+.panel:has(> .section[data-variant='block']) {
+  padding: 0;
 }
 .section[data-variant='panel'],
 .section[data-variant='block'] {

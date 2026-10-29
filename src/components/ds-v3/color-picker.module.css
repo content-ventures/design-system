@@ -173,17 +173,17 @@
   background: var(--swatch);
 }
 
-/* Toque: amostras de 36 px (8 de vão) e a amostra do campo com 40 px de alvo. */
+/*
+ * Toque: amostras de 36 px (8 de vão); a amostra e a seta do campo crescem para 44 px de verdade
+ * (a caixa, não um pseudo-elemento), cobrindo a altura do controle com o fio.
+ */
 @media (pointer: coarse) {
   .panel.panel {
     --preset: 36px;
   }
-  .swatchButton {
-    position: relative;
-  }
-  .swatchButton::after {
-    content: '';
-    position: absolute;
-    inset: -7px;
+  .swatchButton,
+  .toggle {
+    width: 44px;
+    height: 44px;
   }
 }

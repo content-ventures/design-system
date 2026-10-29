@@ -81,7 +81,7 @@
   white-space: nowrap;
 }
 .placeholder {
-  color: var(--subtle);
+  color: var(--placeholder);
 }
 .trigger:disabled .valueText {
   color: var(--disabled-ink);
@@ -234,7 +234,7 @@
   color: var(--ink);
 }
 .search input::placeholder {
-  color: var(--subtle);
+  color: var(--placeholder);
 }
 .searchClear {
   display: inline-grid;

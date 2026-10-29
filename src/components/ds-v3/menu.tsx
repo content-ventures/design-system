@@ -15,6 +15,7 @@ import {
 import { createPortal } from 'react-dom';
 import { Kbd } from './badge';
 import s from './menu.module.css';
+import { useHydrated } from './use-hydrated';
 
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
@@ -54,7 +55,14 @@ type Placed = { top: number; left: number; side: Side; align: Align; maxHeight?:
 const EDGE = 8;
 
 /** Ancorado ao gatilho, vira para o outro lado quando falta espaço e fica a 8 px da borda da janela. */
-function place(anchor: Rect, width: number, height: number, side: Side, align: Align, gap: number): Placed {
+function place(
+  anchor: Rect,
+  width: number,
+  height: number,
+  side: Side,
+  align: Align,
+  gap: number,
+): Placed {
   const vw = document.documentElement.clientWidth;
   const vh = window.innerHeight;
   if (side === 'right' || side === 'left') {
@@ -89,7 +97,13 @@ function place(anchor: Rect, width: number, height: number, side: Side, align: A
     left = anchor.left;
   }
   left = Math.min(Math.max(left, EDGE), Math.max(EDGE, vw - width - EDGE));
-  return { top, left, side: finalSide, align: finalAlign, maxHeight: height > room ? Math.max(room, 120) : undefined };
+  return {
+    top,
+    left,
+    side: finalSide,
+    align: finalAlign,
+    maxHeight: height > room ? Math.max(room, 120) : undefined,
+  };
 }
 
 const ORIGIN: Record<Side, Record<Align, string>> = {
@@ -99,17 +113,17 @@ const ORIGIN: Record<Side, Record<Align, string>> = {
   left: { start: 'top right', end: 'top right' },
 };
 
-/** Onde o flutuante deve morar: no diálogo aberto (camada do topo) ou no escopo do tema. */
+/** Mantém o flutuante na camada do diálogo/gaveta aberta, acima do véu, ou no tema. */
 export function floatingHost(from: Element | null): Element | null {
   if (!from) return null;
-  return from.closest('dialog[open]') ?? from.closest('[data-ds-v3]') ?? document.body;
+  return (
+    from.closest('dialog[open], [data-nav-open] [data-part="sidebar"]') ??
+    from.closest('[data-ds-v3]') ??
+    document.body
+  );
 }
 
-const normalize = (value: string) =>
-  value
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase();
+const normalize = (value: string) => value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 const ITEM_SELECTOR = '[role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"]';
 
@@ -263,7 +277,10 @@ export function MenuSurface({
         focusAt(list, list.length - 1);
         return;
       case 'ArrowRight':
-        if (item?.getAttribute('aria-haspopup') === 'menu' && item.getAttribute('aria-disabled') !== 'true') {
+        if (
+          item?.getAttribute('aria-haspopup') === 'menu' &&
+          item.getAttribute('aria-disabled') !== 'true'
+        ) {
           event.preventDefault();
           openSub(item.dataset.key ?? '', true);
         }
@@ -287,9 +304,16 @@ export function MenuSurface({
         return;
     }
     // Digitar leva ao primeiro item que começa com o texto (500 ms entre teclas).
-    if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey && event.key !== ' ') {
+    if (
+      event.key.length === 1 &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.altKey &&
+      event.key !== ' '
+    ) {
       const now = Date.now();
-      typed.current.text = now - typed.current.at > 500 ? event.key : typed.current.text + event.key;
+      typed.current.text =
+        now - typed.current.at > 500 ? event.key : typed.current.text + event.key;
       typed.current.at = now;
       const term = normalize(typed.current.text);
       // Primeira tecla procura depois do item atual; as seguintes continuam a partir dele.
@@ -374,7 +398,10 @@ export function MenuSurface({
                   if (hasSub && !item.disabled) {
                     if (!subOpen) {
                       window.clearTimeout(subTimer.current);
-                      subTimer.current = window.setTimeout(() => setSub({ key, focus: false }), 120);
+                      subTimer.current = window.setTimeout(
+                        () => setSub({ key, focus: false }),
+                        120,
+                      );
                     }
                   } else if (sub) {
                     closeSub(120);
@@ -382,7 +409,8 @@ export function MenuSurface({
                 }}
                 onPointerLeave={(event) => {
                   if (event.pointerType !== 'mouse' || hasSub) return;
-                  if (document.activeElement === event.currentTarget) panelRef.current?.focus({ preventScroll: true });
+                  if (document.activeElement === event.currentTarget)
+                    panelRef.current?.focus({ preventScroll: true });
                 }}
                 onClick={() => {
                   if (item.disabled) return;
@@ -469,6 +497,7 @@ function findItem(sections: MenuSection[], key: string) {
 /* ——————————————————————————— Menu ancorado ——————————————————————————— */
 
 export type MenuTriggerProps = {
+  disabled?: boolean;
   'aria-haspopup': 'menu';
   'aria-expanded': boolean;
   'aria-controls': string | undefined;
@@ -500,6 +529,7 @@ export function Menu({
   width?: number;
   onOpenChange?: (open: boolean) => void;
 }) {
+  const hydrated = useHydrated();
   const [phase, setPhase] = useState<'closed' | 'open' | 'closing'>('closed');
   const [host, setHost] = useState<Element | null>(null);
   const [initialFocus, setInitialFocus] = useState<'first' | 'last' | 'checked' | 'panel'>('first');
@@ -523,7 +553,10 @@ export function Menu({
     onOpenChange?.(false);
     if (returnFocus) triggerRef.current?.focus({ preventScroll: true });
     window.clearTimeout(exitTimer.current);
-    exitTimer.current = window.setTimeout(() => setPhase((value) => (value === 'closing' ? 'closed' : value)), 120);
+    exitTimer.current = window.setTimeout(
+      () => setPhase((value) => (value === 'closing' ? 'closed' : value)),
+      120,
+    );
   }
 
   useEffect(() => {
@@ -544,12 +577,15 @@ export function Menu({
   return (
     <span className={s.anchor}>
       {trigger({
+        disabled: !hydrated,
         'aria-haspopup': 'menu',
         'aria-expanded': open,
         'aria-controls': open ? id : undefined,
         // Clique do ponteiro (detail ≥ 1) abre sem destacar item; Enter/Espaço (detail 0) já foca o primeiro.
         onClick: (event) =>
-          open ? close(false) : show(event && event.detail > 0 ? 'panel' : hasChecked ? 'checked' : 'first'),
+          open
+            ? close(false)
+            : show(event && event.detail > 0 ? 'panel' : hasChecked ? 'checked' : 'first'),
         onKeyDown: (event) => {
           if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
             event.preventDefault();

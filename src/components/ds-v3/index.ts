@@ -7,6 +7,7 @@
 /* Fundamentos */
 export { ThemeV3, type ThemeMode } from './theme';
 export { interV3 } from './font';
+export { NavigationProvider, NavigationLink, type NavigationLinkProps } from './navigation';
 export { VisuallyHidden, LiveRegion, useAnnouncer } from './a11y';
 export { formatRelative, textStats, type TextStats } from './format';
 
@@ -24,6 +25,7 @@ export {
 export { TextLink, LinkButton, type LinkTone, type LinkSize } from './link';
 export { ToggleButton, ToggleGroup, type ToggleItem, type ToggleGroupProps } from './toggle';
 export { RowActions, type RowAction } from './row-actions';
+export { DangerZone } from './danger-zone';
 
 /* Identidade e mídia */
 export {
@@ -391,6 +393,13 @@ export {
   type NotificationEntry,
 } from './feedback';
 export {
+  PageSkeleton,
+  TableSkeleton,
+  CardsSkeleton,
+  ChartSkeleton,
+  FormSkeleton,
+} from './route-skeleton';
+export {
   toast,
   Toaster,
   ToastCard,
@@ -571,3 +580,4 @@ export {
   type ActivityEntry,
 } from './kanban';
 export { CampaignKanbanCard } from './campaign-kanban-card';
+export { EntitySheet, type EntitySheetAction, type EntitySheetProps } from './entity-sheet';

@@ -12,13 +12,14 @@
 .choice[data-disabled='true'] {
   cursor: not-allowed;
 }
+/* O input nativo, transparente, é o alvo: 24 px centrados na caixa de 18 (44 px no toque). */
 .choice input {
   position: absolute;
   z-index: 1;
-  top: 0;
-  left: 0;
-  width: 18px;
-  height: 18px;
+  top: -3px;
+  left: -3px;
+  width: 24px;
+  height: 24px;
   margin: 1px 0 0;
   opacity: 0;
   cursor: inherit;
@@ -96,10 +97,15 @@
   transform: none;
 }
 
-/* Foco: anel de 2 px na caixa, só por teclado */
-.choice input:is(:focus-visible, [data-force~='focus']) + .box {
+/*
+ * Foco: anel de 2 px no rótulo inteiro, só por teclado. O input nativo é transparente; o anel fica
+ * no `label` que o contém (caixa e texto), que é o alvo que a pessoa vê — sem texto, o rótulo tem
+ * a medida da caixa e o anel fica igual ao de antes.
+ */
+.choice:has(> input:is(:focus-visible, [data-force~='focus'])) {
   outline: var(--focus-width) solid var(--focus-color);
   outline-offset: var(--focus-offset);
+  border-radius: var(--r-xs);
 }
 .choice input:focus-visible {
   outline: none;
@@ -270,9 +276,17 @@
   cursor: not-allowed;
   opacity: 0.45;
 }
+/*
+ * A chave é o botão, com caixa real de 24 px no computador e 44 px no toque; o trilho
+ * fica centrado nela, com o desenho de sempre.
+ */
 .switch button {
   position: relative;
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
   border-radius: var(--r-full);
   -webkit-tap-highlight-color: transparent;
 }
@@ -667,16 +681,21 @@
   opacity: 0.45;
 }
 
-/* ——— Toque: área de acerto de 40 px em volta de caixa e chave, sem mudar o desenho ——— */
+/* ——— Toque: 44 px de alvo em volta da caixa (o input nativo cresce) e na chave (o botão cresce) ——— */
 @media (pointer: coarse) {
-  .box::before,
-  .switch button::after {
-    content: '';
-    position: absolute;
-    inset: -11px;
+  .choice input {
+    top: -13px;
+    left: -13px;
+    width: 44px;
+    height: 44px;
+    margin: 1px 0 0;
   }
-  .box::before {
-    pointer-events: auto;
+  .choice:not(:has(.text)) input {
+    margin-top: 0;
+  }
+  .switch button {
+    min-width: 44px;
+    min-height: 44px;
   }
 }
 
@@ -710,4 +729,12 @@
 .switchRowDesc {
   color: var(--muted);
   font: var(--t-small);
+}
+
+/* Toque: o segmento mede 44 px de altura (WCAG 2.5.5). */
+@media (pointer: coarse) {
+  .segment,
+  .segmented[data-size='sm'] .segment {
+    height: 44px;
+  }
 }

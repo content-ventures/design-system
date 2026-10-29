@@ -27,6 +27,10 @@
 .dialog[data-size='lg'] {
   --dialog-w: 640px;
 }
+.dialog[data-size='xl'] {
+  --dialog-w: 1120px;
+  max-height: calc(100dvh - 48px);
+}
 dialog.dialog[open] {
   display: flex;
   flex-direction: column;

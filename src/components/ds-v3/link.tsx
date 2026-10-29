@@ -1,5 +1,6 @@
 'use client';
 
+import { NavigationLink } from './navigation';
 import { ArrowUpRight } from 'lucide-react';
 import type { ComponentProps, MouseEvent } from 'react';
 import { VisuallyHidden } from './a11y';
@@ -41,7 +42,7 @@ export function TextLink({
     disabled?: boolean;
   }) {
   return (
-    <a
+    <NavigationLink
       {...props}
       href={disabled ? undefined : props.href}
       className={`${s.link} ${className}`}
@@ -65,7 +66,7 @@ export function TextLink({
           <VisuallyHidden> (abre em nova aba)</VisuallyHidden>
         </>
       )}
-    </a>
+    </NavigationLink>
   );
 }
 
@@ -81,6 +82,12 @@ export function LinkButton({
   ...props
 }: ComponentProps<'button'> & LinkLook) {
   return (
-    <button {...props} type={type} className={`${s.link} ${className}`} data-tone={tone} data-size={size} />
+    <button
+      {...props}
+      type={type}
+      className={`${s.link} ${className}`}
+      data-tone={tone}
+      data-size={size}
+    />
   );
 }

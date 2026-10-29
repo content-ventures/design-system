@@ -1077,10 +1077,10 @@
     left: 35%;
     animation: none !important;
   }
-  /* Como no botão: o spinner gira devagar em vez de tremer. */
+  /* Como no botão: o spinner para; o estado fica no texto ao lado. */
   .spinner .spinnerSvg,
   .marker .markerSpin {
-    animation: spin 2.4s linear infinite !important;
+    animation: none !important;
   }
   .reveal[data-phase='leave'] {
     visibility: hidden;

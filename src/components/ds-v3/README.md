@@ -6,6 +6,16 @@ catálogo. Se uma aplicação divergir deles, a correção começa aqui e depois
 
 ---
 
+## Integração de navegação
+
+O produto deve instalar `NavigationProvider` com um adaptador para seu roteador.
+`NavigationLink` é a âncora compartilhada por botões, texto, cartões, listas,
+indicadores e menu. Sem provider, mantém o HTML nativo do catálogo. O adaptador
+preserva downloads, autenticação, URLs externas e abertura em outra aba.
+Não introduza `<a>` diretamente nos componentes de navegação do DS: use `NavigationLink`. O produto
+envolve a aplicação em `NavigationProvider` com o link do seu roteador (por exemplo, `next/link` com
+prefetch); sem provider, o DS usa âncoras nativas.
+
 ## 1. Princípios
 
 1. **Chapado.** Cor sólida. Nenhum degradê, 3D, brilho, chanfro, `text-shadow` ou glow.
@@ -49,7 +59,8 @@ informação) · `--subtle` **só** placeholder e controle indisponível · `--o
 ### 2.3 Fios
 
 `--line` painéis e divisórias · `--line-soft` dentro de painel (entre linhas) · `--line-strong` controles
-· `--line-hover` hover de controle. Sempre 1px. Tracejado só em “Solte aqui” e na zona de upload
+(g-400, ≥ 3:1 sobre paper e canvas: é o fio que diz onde o controle começa) · `--line-hover` hover de
+controle (g-500). Sempre 1px. Tracejado só em “Solte aqui” e na zona de upload
 **durante** o arrasto.
 
 ### 2.4 Ação, seleção e status
@@ -297,7 +308,8 @@ Para mostrar um estado parado, todo componente interativo aceita `data-force="ho
 ## 12. Layout
 
 - **Moldura do app:** menu lateral `--sidebar-w` 236 em `--g-25` com fio à direita,
-  encostado; topo `--topbar-h` 52 com fio, um único fio corre do menu ao conteúdo; conteúdo branco direto
+  encostado; topo `--topbar-h` 52 com fio, um único fio corre do menu ao conteúdo; identidade do menu com
+  altura mínima de 52 px, crescendo com o conteúdo e com 8 px de respiro vertical; conteúdo branco direto
   com `--page-gutter` 32 (24 em ≤1024, 16 em ≤640), limite `--content-max` 1760 centralizado.
 - **Menu lateral:** item 34 px, `--r-md`; ativo = `--nav-active-bg` + texto 500 ink + ícone b-600 +
   **barra de 3 px `--nav-active-bar` à esquerda** (top/bottom 9 px, raio 3). **É o único lugar do sistema

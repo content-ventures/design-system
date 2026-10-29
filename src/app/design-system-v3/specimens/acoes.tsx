@@ -70,6 +70,7 @@ import {
 import { ButtonLink, SplitButton } from '@content-ventures/design-system/v3/button';
 import { LinkButton, TextLink } from '@content-ventures/design-system/v3/link';
 import { RowActions, type RowAction } from '@content-ventures/design-system/v3/row-actions';
+import { DangerZone } from '@content-ventures/design-system/v3/danger-zone';
 import { Select } from '@content-ventures/design-system/v3/select';
 import { Toaster, toast } from '@content-ventures/design-system/v3/toast';
 import { ToggleButton, ToggleGroup } from '@content-ventures/design-system/v3/toggle';
@@ -138,7 +139,10 @@ const CAMPAIGNS: Campaign[] = [
 const byId = (id: string) => CAMPAIGNS.find((campaign) => campaign.id === id) ?? CAMPAIGNS[0]!;
 
 const noop = () => undefined;
-type Force = Pick<ComponentProps<'button'>, 'disabled'> & { 'data-force'?: string; loading?: boolean };
+type Force = Pick<ComponentProps<'button'>, 'disabled'> & {
+  'data-force'?: string;
+  loading?: boolean;
+};
 const STATES: { label: string; props: Force }[] = [
   { label: 'Repouso', props: {} },
   { label: 'Hover', props: { 'data-force': 'hover' } },
@@ -179,7 +183,12 @@ function Matrix({
       data-align={align}
       data-head={head || undefined}
       data-compact={compact || undefined}
-      style={{ '--cols': columns.length, '--col-w': colWidth ? `${colWidth}px` : undefined } as CSSProperties}
+      style={
+        {
+          '--cols': columns.length,
+          '--col-w': colWidth ? `${colWidth}px` : undefined,
+        } as CSSProperties
+      }
       inert
     >
       {head && (
@@ -196,7 +205,11 @@ function Matrix({
         <div key={row.label || index} className={x.mRow}>
           <span className={x.mLabel}>{row.label}</span>
           {row.cells.map((cell, cellIndex) => (
-            <span key={columns[cellIndex] ?? cellIndex} className={x.mCell} data-caption={columns[cellIndex]}>
+            <span
+              key={columns[cellIndex] ?? cellIndex}
+              className={x.mCell}
+              data-caption={columns[cellIndex]}
+            >
               {cell}
             </span>
           ))}
@@ -248,11 +261,20 @@ function CardBody({ campaign }: { campaign: Campaign }) {
 }
 
 /** Ações fixas de uma campanha: Métricas, Editar (só se editável), Excluir (nunca no ar). */
-function campaignActions(campaign: Campaign, onDelete: (campaign: Campaign) => void = noop): RowAction[] {
+function campaignActions(
+  campaign: Campaign,
+  onDelete: (campaign: Campaign) => void = noop,
+): RowAction[] {
   const live = campaign.status === 'live';
   return [
     { id: 'metrics', label: 'Métricas', icon: ChartColumn, onSelect: noop },
-    { id: 'edit', label: 'Editar', icon: Pencil, onSelect: noop, hidden: !EDITABLE.includes(campaign.status) },
+    {
+      id: 'edit',
+      label: 'Editar',
+      icon: Pencil,
+      onSelect: noop,
+      hidden: !EDITABLE.includes(campaign.status),
+    },
     {
       id: 'delete',
       label: 'Excluir',
@@ -283,13 +305,19 @@ function useCampaignDelete(initial: Campaign[]) {
   useEffect(() => () => timers.current.forEach((id) => window.clearTimeout(id)), []);
   const later = (fn: () => void, ms: number) => timers.current.push(window.setTimeout(fn, ms));
 
-  function focusRow(view: RowsView, id: string | undefined, prefer: 'delete' | 'first', tries = 16) {
+  function focusRow(
+    view: RowsView,
+    id: string | undefined,
+    prefer: 'delete' | 'first',
+    tries = 16,
+  ) {
     if (!id) return;
     const row = document.querySelector(`[data-rows-scope="${scope}-${view}"] [data-key="${id}"]`);
     const actions = row?.querySelector('[data-row-actions]');
     const button =
-      (prefer === 'delete' ? actions?.querySelector<HTMLElement>('button[aria-label="Excluir"]') : null) ??
-      actions?.querySelector<HTMLElement>('button');
+      (prefer === 'delete'
+        ? actions?.querySelector<HTMLElement>('button[aria-label="Excluir"]')
+        : null) ?? actions?.querySelector<HTMLElement>('button');
     button?.focus();
     // Enquanto a confirmação ainda fecha, o resto da página é inerte e o foco não pega: tenta de
     // novo no próximo quadro (só se o foco estiver solto ou ainda na camada).
@@ -337,7 +365,9 @@ function useCampaignDelete(initial: Campaign[]) {
         });
       });
       focusRow(view, next, 'delete');
-      toast('Campanha excluída', { action: { label: 'Desfazer', onClick: () => restore(campaign, view) } });
+      toast('Campanha excluída', {
+        action: { label: 'Desfazer', onClick: () => restore(campaign, view) },
+      });
     }, 200);
   }
 
@@ -376,21 +406,37 @@ function campaignColumns(
   wrap: (campaign: Campaign, node: ReactNode) => ReactNode = (_, node) => node,
 ): Column<Campaign>[] {
   return [
-    { key: 'name', header: 'Campanha', render: (campaign) => wrap(campaign, <NameCell campaign={campaign} />) },
+    {
+      key: 'name',
+      header: 'Campanha',
+      render: (campaign) => wrap(campaign, <NameCell campaign={campaign} />),
+    },
     {
       key: 'status',
       header: 'Status',
       width: 176,
       render: (campaign) => wrap(campaign, <StatusText status={campaign.status} />),
     },
-    { key: 'budget', header: 'Verba', width: 128, numeric: true, render: (campaign) => wrap(campaign, campaign.budget) },
+    {
+      key: 'budget',
+      header: 'Verba',
+      width: 128,
+      numeric: true,
+      render: (campaign) => wrap(campaign, campaign.budget),
+    },
     {
       key: 'actions',
       header: <VisuallyHidden>Ações</VisuallyHidden>,
       align: 'end',
       width: 124,
       render: (campaign) =>
-        wrap(campaign, <RowActions label={`Ações de ${campaign.name}`} actions={campaignActions(campaign, onDelete)} />),
+        wrap(
+          campaign,
+          <RowActions
+            label={`Ações de ${campaign.name}`}
+            actions={campaignActions(campaign, onDelete)}
+          />,
+        ),
     },
   ];
 }
@@ -406,8 +452,16 @@ function NotificationsBell() {
         {
           label: 'Hoje',
           items: [
-            { label: 'P.I. 2026-0400 assinado', description: 'Aurora Calçados · há 2 h', icon: FileText },
-            { label: 'Ajustes solicitados em #2029', description: 'Grupo Horizonte · há 5 h', icon: Pencil },
+            {
+              label: 'P.I. 2026-0400 assinado',
+              description: 'Aurora Calçados · há 2 h',
+              icon: FileText,
+            },
+            {
+              label: 'Ajustes solicitados em #2029',
+              description: 'Grupo Horizonte · há 5 h',
+              icon: Pencil,
+            },
           ],
         },
       ]}
@@ -463,7 +517,11 @@ function CreationFooter() {
       <div className={x.footStatus} aria-live="polite">
         <span key={state} className={x.saveState} data-state={state}>
           {state === 'dirty' ? <i aria-hidden="true" /> : <Check aria-hidden="true" />}
-          {state === 'dirty' ? 'Alterações não salvas' : state === 'saved' ? 'Rascunho salvo agora' : 'Enviada para aprovação'}
+          {state === 'dirty'
+            ? 'Alterações não salvas'
+            : state === 'saved'
+              ? 'Rascunho salvo agora'
+              : 'Enviada para aprovação'}
         </span>
         <span key={step} className={x.stepCount}>
           Etapa {step} de {TOTAL_STEPS}
@@ -506,7 +564,12 @@ function CreationFooter() {
         </Button>
         <span className={x.primarySlot}>
           {last ? (
-            <Button variant="primary" icon={Send} loading={busy === 'next'} onClick={() => run('next', () => setState('sent'))}>
+            <Button
+              variant="primary"
+              icon={Send}
+              loading={busy === 'next'}
+              onClick={() => run('next', () => setState('sent'))}
+            >
               Enviar para aprovação
             </Button>
           ) : (
@@ -711,7 +774,12 @@ function Botoes() {
             {
               label: 'Principal',
               cells: STATES.map((state) => (
-                <Button key={state.label} variant="primary" trailingIcon={ArrowRight} {...state.props}>
+                <Button
+                  key={state.label}
+                  variant="primary"
+                  trailingIcon={ArrowRight}
+                  {...state.props}
+                >
                   Continuar
                 </Button>
               )),
@@ -747,7 +815,13 @@ function Botoes() {
       <Shot title="Celular" align="center">
         <div className={x.phone}>
           <div className={x.phoneTop}>
-            <IconButton label="Abrir menu" icon={MenuIcon} variant="ghost" size="sm" className={x.phoneMenu} />
+            <IconButton
+              label="Abrir menu"
+              icon={MenuIcon}
+              variant="ghost"
+              size="sm"
+              className={x.phoneMenu}
+            />
             <Crumbs items={['Operação', 'Campanhas']} />
             <NotificationsBell />
           </div>
@@ -900,7 +974,15 @@ function BotaoIcone() {
       <Shot title="Estados" tone="white" align="stretch">
         <div className={x.stackLg}>
           <Matrix
-            columns={['Repouso', 'Linha em hover', 'Hover', 'Pressionado', 'Foco', 'Indisponível', 'Toque']}
+            columns={[
+              'Repouso',
+              'Linha em hover',
+              'Hover',
+              'Pressionado',
+              'Foco',
+              'Indisponível',
+              'Toque',
+            ]}
             rows={[
               {
                 label: 'Fantasma',
@@ -908,7 +990,12 @@ function BotaoIcone() {
               },
               {
                 label: 'Destrutivo',
-                cells: iconStateCells({ id: 'delete', label: 'Excluir', icon: Trash2, danger: true }),
+                cells: iconStateCells({
+                  id: 'delete',
+                  label: 'Excluir',
+                  icon: Trash2,
+                  danger: true,
+                }),
               },
               {
                 label: 'Contorno',
@@ -918,7 +1005,12 @@ function BotaoIcone() {
                     —
                   </span>,
                   <IconButton key="h" label="Mais ações" icon={Ellipsis} data-force="hover" />,
-                  <IconButton key="a" label="Mais ações" icon={Ellipsis} data-force="hover active" />,
+                  <IconButton
+                    key="a"
+                    label="Mais ações"
+                    icon={Ellipsis}
+                    data-force="hover active"
+                  />,
                   <IconButton key="f" label="Mais ações" icon={Ellipsis} data-force="focus" />,
                   <IconButton key="d" label="Mais ações" icon={Ellipsis} disabled />,
                   <span key="t" className={x.touch} data-size="md">
@@ -933,7 +1025,15 @@ function BotaoIcone() {
               <RowActions
                 label="Excluir"
                 actions={[
-                  { id: 'delete', label: 'Excluir', icon: Trash2, danger: true, disabled: true, hint: LIVE_DELETE, onSelect: noop },
+                  {
+                    id: 'delete',
+                    label: 'Excluir',
+                    icon: Trash2,
+                    danger: true,
+                    disabled: true,
+                    hint: LIVE_DELETE,
+                    onSelect: noop,
+                  },
                 ]}
               />
             </Tooltip>
@@ -1003,7 +1103,13 @@ function Pager({ force, disabledPrev = false }: { force?: string; disabledPrev?:
   return (
     <ButtonGroup label="Navegar entre campanhas">
       <Tooltip content="Campanha anterior">
-        <IconButton label="Campanha anterior" icon={ChevronLeft} size="sm" disabled={disabledPrev} data-force={force} />
+        <IconButton
+          label="Campanha anterior"
+          icon={ChevronLeft}
+          size="sm"
+          disabled={disabledPrev}
+          data-force={force}
+        />
       </Tooltip>
       <Tooltip content="Próxima campanha">
         <IconButton label="Próxima campanha" icon={ChevronRight} size="sm" />
@@ -1044,7 +1150,12 @@ function GrupoBotoes() {
                 ]}
               />
               <div className={x.barEnd}>
-                <ToggleButton icon={ListFilter} variant="ghost" pressed={filters} onPressedChange={setFilters}>
+                <ToggleButton
+                  icon={ListFilter}
+                  variant="ghost"
+                  pressed={filters}
+                  onPressedChange={setFilters}
+                >
                   Filtros
                 </ToggleButton>
                 <Segmented
@@ -1103,7 +1214,9 @@ function GrupoBotoes() {
               later(() => {
                 setAsking(false);
                 setNote(ADJUST_NOTE);
-                toast('Ajustes solicitados', { description: 'Retargeting de credenciados · #2029' });
+                toast('Ajustes solicitados', {
+                  description: 'Retargeting de credenciados · #2029',
+                });
               }, 900);
             }}
           >
@@ -1211,16 +1324,38 @@ function GrupoBotoes() {
         <div className={x.stackLg} inert>
           <States min={150} align="center">
             <State label="Hover">
-              <SplitButton size="sm" label="Baixar P.I." icon={Download} menuLabel="Opções" menu={PI_MENU} force={{ toggle: 'hover' }} />
+              <SplitButton
+                size="sm"
+                label="Baixar P.I."
+                icon={Download}
+                menuLabel="Opções"
+                menu={PI_MENU}
+                force={{ toggle: 'hover' }}
+              />
             </State>
             <State label="Pressionado">
               <Pager force="hover active" />
             </State>
             <State label="Foco">
-              <SplitButton size="sm" label="Baixar P.I." icon={Download} menuLabel="Opções" menu={PI_MENU} force={{ toggle: 'focus' }} />
+              <SplitButton
+                size="sm"
+                label="Baixar P.I."
+                icon={Download}
+                menuLabel="Opções"
+                menu={PI_MENU}
+                force={{ toggle: 'focus' }}
+              />
             </State>
             <State label="Foco · principal">
-              <SplitButton variant="primary" size="sm" label="Enviar" icon={Send} menuLabel="Opções" menu={SEND_MENU} force={{ main: 'focus' }} />
+              <SplitButton
+                variant="primary"
+                size="sm"
+                label="Enviar"
+                icon={Send}
+                menuLabel="Opções"
+                menu={SEND_MENU}
+                force={{ main: 'focus' }}
+              />
             </State>
             <State label="Indisponível">
               <Pager disabledPrev />
@@ -1228,7 +1363,14 @@ function GrupoBotoes() {
           </States>
           <div className={x.openRow}>
             <span className={x.openMenu}>
-              <SplitButton size="sm" label="Baixar P.I." icon={Download} menuLabel="Opções" menu={PI_MENU} force={{ toggle: 'open' }} />
+              <SplitButton
+                size="sm"
+                label="Baixar P.I."
+                icon={Download}
+                menuLabel="Opções"
+                menu={PI_MENU}
+                force={{ toggle: 'open' }}
+              />
               <MenuPanel label="Opções do P.I." width={200} sections={PI_MENU} />
             </span>
             <span className={x.openCaption}>Menu aberto</span>
@@ -1284,7 +1426,12 @@ function Links() {
                   <span>01/10 – 31/10</span>
                 </p>
               </div>
-              <TextLink href="https://example.com/francal-2026/vitrine" external size="sm" className={x.headLink}>
+              <TextLink
+                href="https://example.com/francal-2026/vitrine"
+                external
+                size="sm"
+                className={x.headLink}
+              >
                 Abrir no portal
               </TextLink>
             </header>
@@ -1486,7 +1633,10 @@ function Toggle() {
   const count = [status, advertiser, category, pavilions.length > 0].filter(Boolean).length;
   const base = CATEGORIES.find((item) => item.value === category)?.count ?? 17;
   const share = (pavilions.length || PAVILIONS.length) / PAVILIONS.length;
-  const total = count === 0 ? 17 : Math.max(1, Math.round(base * share * (status ? 0.5 : 1) * (advertiser ? 0.5 : 1)));
+  const total =
+    count === 0
+      ? 17
+      : Math.max(1, Math.round(base * share * (status ? 0.5 : 1) * (advertiser ? 0.5 : 1)));
   const bandId = useId();
   const filtersId = useId();
   const catId = useId();
@@ -1530,7 +1680,14 @@ function Toggle() {
               <div className={x.bandInner} role="search" aria-label="Filtros de campanhas">
                 <div className={x.bandSelects}>
                   <div className={x.bandField}>
-                    <Select size="sm" label="Status" value={status} onChange={setStatus} placeholder="Todos os status" options={STATUS_OPTIONS} />
+                    <Select
+                      size="sm"
+                      label="Status"
+                      value={status}
+                      onChange={setStatus}
+                      placeholder="Todos os status"
+                      options={STATUS_OPTIONS}
+                    />
                   </div>
                   <div className={x.bandField}>
                     <Select
@@ -1564,13 +1721,27 @@ function Toggle() {
                   <span id={catId} className={x.bandLabel}>
                     Categoria
                   </span>
-                  <ToggleGroup type="single" label="Categoria" labelledBy={catId} value={category} onChange={setCategory} items={CATEGORIES} />
+                  <ToggleGroup
+                    type="single"
+                    label="Categoria"
+                    labelledBy={catId}
+                    value={category}
+                    onChange={setCategory}
+                    items={CATEGORIES}
+                  />
                 </div>
                 <div className={x.bandGroup}>
                   <span id={pavId} className={x.bandLabel}>
                     Pavilhões
                   </span>
-                  <ToggleGroup type="multiple" label="Pavilhões" labelledBy={pavId} value={pavilions} onChange={setPavilions} items={PAVILIONS} />
+                  <ToggleGroup
+                    type="multiple"
+                    label="Pavilhões"
+                    labelledBy={pavId}
+                    value={pavilions}
+                    onChange={setPavilions}
+                    items={PAVILIONS}
+                  />
                 </div>
               </div>
             </div>
@@ -1581,7 +1752,15 @@ function Toggle() {
       <Shot title="Estados" tone="white" align="stretch">
         <div className={x.stackLg}>
           <Matrix
-            columns={['Repouso', 'Hover', 'Pressionado', 'Foco', 'Ligado', 'Ligado · hover', 'Indisponível']}
+            columns={[
+              'Repouso',
+              'Hover',
+              'Pressionado',
+              'Foco',
+              'Ligado',
+              'Ligado · hover',
+              'Indisponível',
+            ]}
             rows={[
               {
                 label: 'Botão',
@@ -1607,7 +1786,14 @@ function Toggle() {
                     label="Pavilhão"
                     value={state.on ? ['azul'] : []}
                     onChange={noop}
-                    items={[{ value: 'azul', label: 'Pavilhão Azul', disabled: state.disabled, 'data-force': state.force }]}
+                    items={[
+                      {
+                        value: 'azul',
+                        label: 'Pavilhão Azul',
+                        disabled: state.disabled,
+                        'data-force': state.force,
+                      },
+                    ]}
                   />
                 )),
               },
@@ -1622,7 +1808,15 @@ function Toggle() {
                   *
                 </span>
               </span>
-              <ToggleGroup type="multiple" invalid label="Pavilhões de interesse" labelledBy={invalidId} value={[]} onChange={noop} items={PAVILIONS} />
+              <ToggleGroup
+                type="multiple"
+                invalid
+                label="Pavilhões de interesse"
+                labelledBy={invalidId}
+                value={[]}
+                onChange={noop}
+                items={PAVILIONS}
+              />
               <span className={x.error}>
                 <CircleAlert aria-hidden="true" />
                 Escolha ao menos um pavilhão
@@ -1698,7 +1892,9 @@ function AcoesLinha() {
           </State>
           <State label="Indisponível">
             <span className={x.rowBox}>
-              <RowActions actions={stateActions({ delete: { disabled: true, hint: LIVE_DELETE } })} />
+              <RowActions
+                actions={stateActions({ delete: { disabled: true, hint: LIVE_DELETE } })}
+              />
             </span>
           </State>
           <State label="Slot vazio">
@@ -1737,12 +1933,115 @@ function AcoesLinha() {
 }
 
 /** As três ações fixas, com ajustes por id (estado forçado, indisponível, slot vazio). */
-function stateActions(patch: Partial<Record<'metrics' | 'edit' | 'delete', Partial<RowAction>>> = {}): RowAction[] {
+function stateActions(
+  patch: Partial<Record<'metrics' | 'edit' | 'delete', Partial<RowAction>>> = {},
+): RowAction[] {
   return [
     { id: 'metrics', label: 'Métricas', icon: ChartColumn, onSelect: noop, ...patch.metrics },
     { id: 'edit', label: 'Editar', icon: Pencil, onSelect: noop, ...patch.edit },
     { id: 'delete', label: 'Excluir', icon: Trash2, danger: true, onSelect: noop, ...patch.delete },
   ];
+}
+
+/* ——————————————————————————— Hierarquia de ação ——————————————————————————— */
+
+/** As 6 regras da hierarquia de ação, na ordem em que se aplicam ao desenhar uma tela. */
+export const ACTION_HIERARCHY_RULES = [
+  'Uma ação primária sólida por tela ou diálogo.',
+  'Ação destrutiva nunca é a primária: fica fora do rodapé, em “Zona de perigo”, com contorno ou texto vermelho.',
+  'Vermelho sólido só dentro da confirmação da ação destrutiva.',
+  'Botão desabilitado não pode ser a única ação construtiva ao lado de uma destrutiva habilitada.',
+  'Ação impossível não é oferecida: fica desabilitada com o motivo ao lado.',
+  'Confirmação diz a consequência concreta.',
+] as const;
+
+const ROLE_OPTIONS = [
+  { value: 'admin_master', label: 'Administrador master' },
+  { value: 'admin_inv', label: 'Administrador de inventário' },
+  { value: 'advertiser', label: 'Anunciante' },
+];
+
+/** O diálogo “Gerenciar usuário” no desenho certo: primária junto ao campo, remoções na zona de perigo. */
+function UserDialogRight() {
+  const [role, setRole] = useState('admin_inv');
+  const dirty = role !== 'admin_inv';
+  return (
+    <div className={x.hierDialog}>
+      <p className={x.hierDialogTitle}>Gerenciar usuário</p>
+      <div className={x.hierField}>
+        <Select label="Papel global" value={role} onChange={setRole} options={ROLE_OPTIONS} />
+        <Button variant="primary" disabled={!dirty}>
+          Salvar papel
+        </Button>
+      </div>
+      <DangerZone description="Cada remoção pede confirmação com a consequência.">
+        <Button variant="danger-soft">Remover vínculo — Portal Centro</Button>
+        <Button variant="danger-soft">Remover da plataforma</Button>
+      </DangerZone>
+      <div className={x.hierFooter}>
+        <Button>Fechar</Button>
+      </div>
+    </div>
+  );
+}
+
+/** O mesmo diálogo no desenho errado: a destrutiva é o único sólido e a construtiva some. */
+function UserDialogWrong() {
+  return (
+    <div className={x.hierDialog}>
+      <p className={x.hierDialogTitle}>Gerenciar usuário</p>
+      <div className={x.hierField}>
+        <Select label="Papel global" value="admin_inv" onChange={noop} options={ROLE_OPTIONS} />
+        <Button disabled>Salvar papel</Button>
+      </div>
+      <div className={x.hierLinks}>
+        <span>Portal Centro</span>
+        <Button size="sm" variant="ghost">
+          Remover vínculo
+        </Button>
+      </div>
+      <div className={x.hierFooter}>
+        <Button variant="danger">Remover da plataforma</Button>
+        <Button>Fechar</Button>
+      </div>
+    </div>
+  );
+}
+
+function HierarquiaAcao() {
+  return (
+    <Shots>
+      <Shot
+        title="Regras"
+        tone="white"
+        align="stretch"
+      >
+        <ol className={x.hierRules} aria-label="Hierarquia de ação">
+          {ACTION_HIERARCHY_RULES.map((rule) => (
+            <li key={rule}>{rule}</li>
+          ))}
+        </ol>
+      </Shot>
+      <Shot title="Certo e errado" align="stretch">
+        <div className={x.hierPair}>
+          <figure className={x.hierCase} data-verdict="right">
+            <figcaption>
+              <Badge tone="green">Certo</Badge> Salvar papel é a primária; remoções na zona de
+              perigo; rodapé só com Fechar (regras 1, 2 e 4).
+            </figcaption>
+            <UserDialogRight />
+          </figure>
+          <figure className={x.hierCase} data-verdict="wrong">
+            <figcaption>
+              <Badge tone="red">Errado</Badge> “Remover da plataforma” é o único sólido do rodapé e
+              “Remover vínculo” não pede confirmação (fere as regras 1, 2, 3, 4 e 6).
+            </figcaption>
+            <UserDialogWrong />
+          </figure>
+        </div>
+      </Shot>
+    </Shots>
+  );
 }
 
 /* ——————————————————————————— Registro ——————————————————————————— */
@@ -1755,4 +2054,5 @@ export const specimens: Record<string, ComponentType> = {
   links: Links,
   toggle: Toggle,
   'acoes-linha': AcoesLinha,
+  'hierarquia-acao': HierarquiaAcao,
 };

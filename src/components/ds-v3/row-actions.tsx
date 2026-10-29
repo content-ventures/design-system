@@ -42,7 +42,8 @@ function sectionsOf(actions: RowAction[]): MenuSection[] {
  * Ações de uma linha em slots fixos de 32 × 32: cada ação fica no mesmo x em todas as linhas,
  * sempre visível (nada de aparecer só no hover). Ícones em g-400; a linha em hover ou com foco
  * sobe para g-600 (`[data-row-actions]` dentro de `tr` ou `[data-row]`). Além de `max`, as demais
- * vão para “⋯”. `compact` põe tudo no “⋯” (cartões no celular).
+ * vão para “⋯”. `compact` põe tudo no “⋯” (cartões no celular). `target="touch"` garante alvo de
+ * 44 × 44 px no toque (`pointer: coarse` ou até 480 px de largura); no desktop o slot segue em 32 px.
  */
 export function RowActions({
   actions,
@@ -50,6 +51,7 @@ export function RowActions({
   overflowLabel = 'Mais ações',
   label = 'Ações',
   compact = false,
+  target = 'default',
 }: {
   actions: RowAction[];
   max?: number;
@@ -57,13 +59,21 @@ export function RowActions({
   /** Nome do grupo (ex.: “Ações de Carrossel de tendências”). */
   label?: string;
   compact?: boolean;
+  /** `touch`: alvo mínimo de 44 × 44 px no toque (WCAG 2.5.5). */
+  target?: 'default' | 'touch';
 }) {
   const overflow = compact || actions.length > max;
   const inline = compact ? [] : overflow ? actions.slice(0, Math.max(0, max - 1)) : actions;
   const rest = compact ? actions : overflow ? actions.slice(Math.max(0, max - 1)) : [];
   const menu = sectionsOf(rest);
   return (
-    <span role="group" aria-label={label} className={s.slots} data-row-actions>
+    <span
+      role="group"
+      aria-label={label}
+      className={s.slots}
+      data-row-actions
+      data-target={target === 'touch' ? 'touch' : undefined}
+    >
       {inline.map((action) =>
         action.hidden ? (
           <span key={action.id} className={s.slot} data-slot="empty" aria-hidden="true" />

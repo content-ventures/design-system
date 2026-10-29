@@ -4,15 +4,11 @@ import { ChevronDown, LoaderCircle, type LucideIcon } from 'lucide-react';
 import type { ComponentProps, ElementType, MouseEvent, ReactNode } from 'react';
 import { Menu, Tooltip, type MenuSection } from './overlays';
 import s from './button.module.css';
+import { NavigationLink } from './navigation';
+import { useHydrated } from './use-hydrated';
 
 export type ButtonVariant =
-  | 'primary'
-  | 'secondary'
-  | 'contrast'
-  | 'soft'
-  | 'ghost'
-  | 'danger'
-  | 'danger-soft';
+  'primary' | 'secondary' | 'contrast' | 'soft' | 'ghost' | 'danger' | 'danger-soft';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export type ButtonProps = ComponentProps<'button'> & {
@@ -67,6 +63,7 @@ export function Button({
   onClick,
   ...props
 }: ButtonProps) {
+  const hydrated = useHydrated();
   // Indisponível focável (motivo em Tooltip) e carregando não executam o clique.
   const blocked = loading || isTrue(props['aria-disabled']);
   // lead: no lugar do ícone inicial · trail: no do final · add: sem ícone, abre antes do rótulo.
@@ -74,6 +71,7 @@ export function Button({
   return (
     <button
       {...props}
+      disabled={props.disabled || (!hydrated && Boolean(onClick))}
       type={type}
       aria-busy={loading || undefined}
       aria-disabled={loading || props['aria-disabled'] || undefined}
@@ -113,7 +111,7 @@ export function Button({
  * `as` recebe o link do framework (`next/link`) para navegar sem recarregar.
  */
 export function ButtonLink({
-  as: Component = 'a',
+  as: Component = NavigationLink,
   variant = 'secondary',
   size = 'md',
   shape = 'rounded',
@@ -236,7 +234,13 @@ export function SplitButton({
   force?: { main?: string; toggle?: string };
 }) {
   return (
-    <div role="group" aria-label={label} className={`${s.group} ${s.split}`} data-variant={variant} data-size={size}>
+    <div
+      role="group"
+      aria-label={label}
+      className={`${s.group} ${s.split}`}
+      data-variant={variant}
+      data-size={size}
+    >
       <Button
         variant={variant}
         size={size}

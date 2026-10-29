@@ -1,5 +1,6 @@
 'use client';
 
+import { NavigationLink } from './navigation';
 import {
   Check,
   ChevronLeft,
@@ -94,9 +95,9 @@ export function AttachmentRow({
         {missing ? (
           <span className={s.name}>{nameNode}</span>
         ) : href && !onPreview ? (
-          <a className={`${s.name} ${s.hit}`} href={href} data-force={force}>
+          <NavigationLink className={`${s.name} ${s.hit}`} href={href} data-force={force}>
             {nameNode}
-          </a>
+          </NavigationLink>
         ) : (
           <button
             type="button"

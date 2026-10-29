@@ -1,0 +1,48 @@
+/*
+ * Ficha de entidade: cabeçalho com título e selo à esquerda e as ações à direita; no
+ * celular, as ações descem para baixo do título. Pendências num bloco com fio, antes do conteúdo.
+ */
+.sheet {
+  display: grid;
+  gap: var(--s-6);
+  min-width: 0;
+}
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4);
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+.identity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  align-items: center;
+  min-width: 0;
+}
+.title {
+  margin: 0;
+  font: var(--t-title-1);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  align-items: center;
+}
+.pending {
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+.content {
+  display: grid;
+  gap: var(--s-6);
+  min-width: 0;
+}

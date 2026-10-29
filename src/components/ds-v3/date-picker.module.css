@@ -27,7 +27,7 @@
   font: var(--t-small);
 }
 .text[data-empty='true'] {
-  color: var(--subtle);
+  color: var(--placeholder);
 }
 .trigger:disabled .text {
   color: var(--muted);
@@ -140,7 +140,7 @@
   background: var(--g-75);
 }
 .segment[data-empty='true'] {
-  color: var(--subtle);
+  color: var(--placeholder);
 }
 .segment[data-placeholder='true'] {
   flex: 1 1 auto;

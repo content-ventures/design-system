@@ -1,0 +1,28 @@
+/*
+ * Zona de perigo: contorno --danger de 1px, sem fundo sólido; título em texto vermelho.
+ * As ações empilham no celular e alinham à esquerda no desktop.
+ */
+.zone {
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-4);
+  border: 1px solid var(--danger);
+  border-radius: var(--r-lg);
+  background: transparent;
+}
+.title {
+  margin: 0;
+  font: var(--t-title-3);
+  color: var(--red-ink);
+}
+.description {
+  margin: 0;
+  font: var(--t-small);
+  color: var(--muted);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  align-items: center;
+}

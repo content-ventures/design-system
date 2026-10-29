@@ -25,6 +25,7 @@ import {
 import { Kbd } from './badge';
 import { Tooltip } from './overlays';
 import s from './fields.module.css';
+import { useHydrated } from './use-hydrated';
 
 /** Liga um nó a uma ref recebida por prop (função ou objeto). */
 export function assignRef<T>(ref: Ref<T> | undefined, node: T | null) {
@@ -116,7 +117,8 @@ export function Field({
   return (
     <div className={`${s.field} ${className}`} data-invalid={error ? true : undefined}>
       <div className={s.labelRow}>
-        <label htmlFor={id} className={s.label}>
+        {/* `id` próprio: um segundo controle do mesmo campo (a amostra de cor) usa este rótulo. */}
+        <label id={`${id}-label`} htmlFor={id} className={s.label}>
           {label}
           {required && (
             <span className={s.required} aria-hidden="true">
@@ -245,14 +247,17 @@ export function Input({
   className = '',
   ...props
 }: InputProps) {
+  const hydrated = useHydrated();
+  const interactive = props.value !== undefined && Boolean(props.onChange) && !props.readOnly;
+  const disabled = props.disabled || (!hydrated && interactive);
   return (
     <div
       className={`${s.control} ${className}`}
       data-size={size}
       data-variant={variant}
       data-invalid={invalid || undefined}
-      data-disabled={props.disabled || undefined}
-      data-readonly={(props.readOnly && !props.disabled) || undefined}
+      data-disabled={disabled || undefined}
+      data-readonly={(props.readOnly && !disabled) || undefined}
     >
       {leading ?? (Icon && <Icon className={s.lead} aria-hidden="true" />)}
       {prefix && (
@@ -262,6 +267,7 @@ export function Input({
       )}
       <input
         {...props}
+        disabled={disabled}
         aria-invalid={invalid || undefined}
         aria-busy={status === 'loading' || props['aria-busy'] || undefined}
       />
@@ -355,6 +361,9 @@ export function Textarea({
   className = '',
   ...props
 }: TextareaProps) {
+  const hydrated = useHydrated();
+  const disabled =
+    props.disabled || (!hydrated && value !== undefined && Boolean(onChange) && !props.readOnly);
   const inner = useRef<HTMLTextAreaElement | null>(null);
   const [typed, setTyped] = useState(String(defaultValue ?? '').length);
   const length = value !== undefined ? String(value ?? '').length : typed;
@@ -413,12 +422,13 @@ export function Textarea({
     <div
       className={`${s.control} ${s.area} ${className}`}
       data-invalid={invalid || undefined}
-      data-disabled={props.disabled || undefined}
-      data-readonly={(props.readOnly && !props.disabled) || undefined}
+      data-disabled={disabled || undefined}
+      data-readonly={(props.readOnly && !disabled) || undefined}
       data-autosize={sizing ? true : undefined}
     >
       <textarea
         {...props}
+        disabled={disabled}
         ref={(node) => {
           inner.current = node;
           assignRef(ref, node);

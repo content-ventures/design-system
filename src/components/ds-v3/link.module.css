@@ -24,6 +24,14 @@
 .link[data-size='sm'] {
   font: var(--t-small-strong);
 }
+/*
+ * Alvo de 24 px (WCAG 2.5.8): vale quando a ação em texto fica sozinha — botão, item de flex ou de
+ * grade. Na frase (`inline`), `min-height` não se aplica e a linha não muda.
+ */
+.link {
+  min-height: 24px;
+  align-content: center;
+}
 
 /* Acento: b-600 → b-700 → b-800 */
 .link:where(:hover, [data-force~='hover']):where(:not(:disabled, [aria-disabled='true'])) {
@@ -81,6 +89,10 @@
 
 /* Toque: a ação em texto ganha alvo de 40 px sem mudar o desenho */
 @media (pointer: coarse) {
+  /* Sozinha (botão, item de flex ou de grade), a caixa mede 44 px (WCAG 2.5.5). */
+  .link {
+    min-height: 44px;
+  }
   button.link {
     position: relative;
   }

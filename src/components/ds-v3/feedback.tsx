@@ -1,5 +1,6 @@
 'use client';
 
+import { NavigationLink } from './navigation';
 import {
   Check,
   CheckCheck,
@@ -1054,7 +1055,7 @@ export function NotificationItem({
     <li className={s.nItem} data-unread={unread || undefined} data-force={rowForce || undefined}>
       <i className={s.nDot} aria-hidden="true" />
       {href ? (
-        <a
+        <NavigationLink
           ref={(node) => {
             mainRef.current = node;
           }}
@@ -1064,7 +1065,7 @@ export function NotificationItem({
           data-force={force}
         >
           {body}
-        </a>
+        </NavigationLink>
       ) : (
         <button
           ref={(node) => {

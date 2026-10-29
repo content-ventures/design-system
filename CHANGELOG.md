@@ -4,6 +4,43 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.5.0] - 2026-10-29
+
+Brings back the changes MediaOn made to its vendored copies of DS V3 since the extraction (base `452eba0`; the `homolog` line plus the Vitrine branch), so MediaOn can consume this package instead of the copy.
+
+### Added
+
+- `PageSkeleton`, `TableSkeleton`, `CardsSkeleton`, `ChartSkeleton` and `FormSkeleton`: route-level loading skeletons for `loading.tsx`, shown in the Feedback catalog page.
+- `DangerZone`: a bordered region that keeps destructive actions out of the primary footer. The new "Hierarquia de ação" catalog page lists the six action hierarchy rules and uses it.
+- `EntitySheet` (`EntitySheetAction`, `EntitySheetProps`): an entity detail header with title, text status badge, one primary action, secondary actions, settings link and a pending-items block before the content.
+- `AppShell` `topbarFirst`: the top bar comes before the sidebar in keyboard order without changing the layout.
+- `RowActions` `target="touch"`: 44 × 44 px targets on touch (`pointer: coarse` or up to 480 px wide); desktop slots stay at 32 px.
+- `NavigationProvider` and `NavigationLink`: the shell, breadcrumb and list items render links through the product's router link (for example `next/link` with prefetch). Without a provider they keep native anchors.
+- Hydration guards: menu triggers, kanban cards, buttons and fields wait for hydration before handling input, so an early click or keystroke is not lost. Native controls stay usable in the server HTML.
+- `./v3/font` export for `interV3`.
+
+### Changed
+
+Visible in every consumer; review screens after upgrading.
+
+- `--g-400` is darker (`#9aa1ae` → `#808897`) and `--line-strong`/`--line-hover` now use `--g-400`/`--g-500`, so control borders meet 3:1 against paper, canvas and `g-100` (WCAG 1.4.11). Card borders (`--line`) do not change.
+- New `--placeholder` token at `--muted` so placeholders meet 4.5:1.
+- On touch, `--h-sm` is 44 px, so small buttons and controls grow to a 44 px target.
+- Stepper "Opcional" text uses `--muted` instead of `--subtle`.
+- Standalone text links get a 24 px minimum target (44 px on touch); inline links in a sentence do not change.
+- `PageStack` keeps one column no wider than the page, so wide tables scroll inside their wrapper at 390 and 322 px.
+
+### Fixed
+
+- Touch targets of 44 px on phones for the shell menu button, bell, drawer items, drawer search and its clear button, pagination, fields, checkboxes, radios, switches, segmented options and every button size.
+- The button spinner stops under `prefers-reduced-motion`; the state stays in the button text.
+- Floating panels opened from the drawer sidebar render inside it, above the veil.
+- `Upload` marks a rejected file as a field error (`aria-invalid`) with the reason in place of the specification.
+- Modal key handling ignores events from nested layers; Tab wrapping skips disabled and `tabindex="-1"` controls.
+- The color picker label has its own id so the swatch can reference it.
+- A breadcrumb level with neither `href` nor `onClick` renders as plain text without `aria-current`.
+- Square icon buttons do not shrink below their target in tight flex rows; stepper actions wrap instead of scrolling sideways.
+
 ## 0.4.2
 
 - Keep the hidden file input outside the Dropzone button so assistive technologies encounter one interactive control. Keyboard, native file selection and drop validation retain their public behavior.

@@ -143,6 +143,14 @@
 }
 
 /* ——— Suave: afirmação discreta em contexto ——— */
+/*
+ * Como o fantasma, sem fio transparente: o suave se identifica pelo texto e pelo fundo, e um fio
+ * invisível de 1px contaria como contorno sem contraste (WCAG 1.4.11). O pixel volta no recuo.
+ */
+.button:is([data-variant='soft'], [data-variant='danger-soft']) {
+  border-width: 0;
+  padding-inline: calc(var(--btn-px) + 1px);
+}
 .button[data-variant='soft'] {
   color: var(--accent-ink);
   background: var(--accent-soft);
@@ -162,9 +170,16 @@
   background: var(--b-200);
 }
 
-/* ——— Fantasma: terciárias e navegação ——— */
+/*
+ * ——— Fantasma: terciárias e navegação ———
+ * Sem fio nenhum (nem transparente): o fantasma é texto ou ícone, e um fio de 1px invisível
+ * contaria como contorno sem contraste (WCAG 1.4.11). O pixel do fio volta no recuo lateral, para a
+ * caixa ter a mesma medida das outras variantes.
+ */
 .button[data-variant='ghost'] {
   color: var(--text);
+  border-width: 0;
+  padding-inline: calc(var(--btn-px) + 1px);
 }
 .button[data-variant='ghost'] svg {
   color: var(--icon-rest);
@@ -286,9 +301,14 @@
   background: var(--g-75);
   border-color: var(--line-hover);
 }
+/*
+ * Fantasma com o menu aberto: o estado vem num anel de 1px ≥ 3:1 (`--line-strong`) por dentro, sem
+ * bloco de fundo de 1,1:1 que contaria como contorno sem contraste (WCAG 1.4.11).
+ */
 .button[data-variant='ghost'][aria-haspopup][aria-expanded='true'] {
   color: var(--ink);
-  background: var(--g-75);
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
 }
 .button:is([data-variant='secondary'], [data-variant='ghost'])[aria-haspopup][aria-expanded='true']
   svg {
@@ -379,18 +399,21 @@
     scale: 0.6;
   }
 }
-/* Movimento reduzido: o tema zera as durações (a espera fica); o spinner gira devagar. */
+/*
+ * Movimento reduzido: o tema zera as durações (a espera fica) e o spinner para — o anel fica
+ * parado e o estado continua no texto do botão.
+ */
 @media (prefers-reduced-motion: reduce) {
   .button .spinner {
-    animation:
-      spin 2.4s linear infinite,
-      spinIn 0.01ms linear var(--spin-delay) backwards !important;
+    animation: spinIn 0.01ms linear var(--spin-delay) backwards !important;
   }
 }
 
 .button.icon {
   padding: 0;
   width: var(--btn-h);
+  /* Quadrado sempre: numa linha flex apertada o ícone não encolhe abaixo do alvo. */
+  flex-shrink: 0;
 }
 .trailing {
   margin-right: -3px;

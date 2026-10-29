@@ -1,5 +1,6 @@
 'use client';
 
+import { NavigationLink } from './navigation';
 import {
   Bell,
   ChevronLeft,
@@ -91,7 +92,8 @@ const SHELL_BREAKPOINT = 1200;
 
 /**
  * Moldura do app (igual ao /dashboardv3): menu lateral de 236 px em g-25 encostado, com fio à
- * direita; topo de 52 px com fio — um único fio corre do menu ao conteúdo; conteúdo branco direto.
+ * direita; topo de 52 px com fio — um único fio corre do menu ao conteúdo; identidade com altura
+ * mínima de 52 px e conteúdo branco direto.
  * Até 1199 px de largura o menu vira gaveta (véu, Escape, conteúdo `inert`). Quem decide gaveta ou
  * barra é o CSS (`@container shell`): o HTML do servidor e a primeira pintura no celular já saem com
  * a gaveta fechada, sem a barra espremendo a página; o JS só abre, fecha e cuida do foco. Com
@@ -119,6 +121,7 @@ export function AppShell({
   onNavOpenChange,
   layout = 'auto',
   breakpoint = SHELL_BREAKPOINT,
+  topbarFirst = false,
 }: {
   /** O menu lateral. Ignorado em `layout="immersive"` (passe `null`). */
   sidebar?: ReactNode;
@@ -146,6 +149,11 @@ export function AppShell({
    * CSS; outro valor é medido no cliente (a primeira pintura do servidor sai com a barra).
    */
   breakpoint?: number;
+  /**
+   * A barra do topo vem antes do menu na ordem do teclado (o desenho não muda): para quando a ação
+   * da barra precisa estar a poucos `Tab` do topo, como um `Sair da conta` na barra.
+   */
+  topbarFirst?: boolean;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -244,8 +252,8 @@ export function AppShell({
         data-no-topbar={!hasTopbar || undefined}
         data-part="shell"
       >
-        <div className={s.frame}>
-          {!immersive && sidebar}
+        <div className={s.frame} data-topbar-first={topbarFirst || undefined}>
+          {!immersive && !topbarFirst && sidebar}
           {!immersive && (
             <button
               type="button"
@@ -262,6 +270,7 @@ export function AppShell({
               {children}
             </Content>
           </div>
+          {!immersive && topbarFirst && sidebar}
         </div>
       </div>
     </ShellContext.Provider>
@@ -609,9 +618,9 @@ function NavEntry({
     },
   };
   const control = item.href ? (
-    <a {...shared} href={item.href}>
+    <NavigationLink {...shared} href={item.href}>
       {inner}
-    </a>
+    </NavigationLink>
   ) : (
     <button {...shared} type="button">
       {inner}
@@ -910,6 +919,7 @@ export function PortalSwitcher({
   onChange,
   action,
   label = 'Trocar de portal',
+  sectionLabel = 'Portais',
   markSize = 'md',
   force,
   peek = false,
@@ -919,6 +929,7 @@ export function PortalSwitcher({
   onChange: (id: string) => void;
   action?: MenuItem;
   label?: string;
+  sectionLabel?: string;
   markSize?: 'sm' | 'md';
   /** Estado parado para pranchas: `hover`, `active` ou `focus`. */
   force?: string;
@@ -930,7 +941,7 @@ export function PortalSwitcher({
   if (!current) return null;
   const sections: MenuSection[] = [
     {
-      label: 'Portais',
+      label: sectionLabel,
       items: portals.map((portal) => ({
         label: portal.name,
         description: portal.period ?? portal.detail,
@@ -1140,14 +1151,20 @@ function CrumbNode({ item, current }: { item: Crumb; current: boolean }) {
       </span>
     </>
   );
-  const node = current ? (
-    <span className={s.crumbCurrent} aria-current="page">
+  const node =
+    current || (!item.href && !item.onClick) ? (
+      <span className={s.crumbCurrent} aria-current={current ? 'page' : undefined}>
+        {body}
+      </span>
+    ) : item.href ? (
+      <NavigationLink
+        className={s.crumbLink}
+        href={item.href}
+        onClick={item.onClick}
+        data-force={item.force}
+      >
       {body}
-    </span>
-  ) : item.href ? (
-    <a className={s.crumbLink} href={item.href} onClick={item.onClick} data-force={item.force}>
-      {body}
-    </a>
+    </NavigationLink>
   ) : (
     <button type="button" className={s.crumbLink} onClick={item.onClick} data-force={item.force}>
       {body}
@@ -1201,13 +1218,16 @@ export function Breadcrumb({
   moreOpenForce?: string;
 }) {
   if (variant === 'compact') {
-    const parent = items[items.length - 2];
+    const parent = items
+      .slice(0, -1)
+      .reverse()
+      .find((item) => item.href || item.onClick);
     const current = items[items.length - 1];
     return (
       <nav aria-label={label} className={s.crumbs} data-variant="compact">
         {parent ? (
           parent.href ? (
-            <a
+            <NavigationLink
               className={s.crumbBack}
               href={parent.href}
               onClick={parent.onClick}
@@ -1215,7 +1235,7 @@ export function Breadcrumb({
             >
               <ChevronLeft aria-hidden="true" />
               <span className={s.crumbText}>{parent.label}</span>
-            </a>
+            </NavigationLink>
           ) : (
             <button
               type="button"
@@ -1261,7 +1281,11 @@ export function Breadcrumb({
               width={240}
               sections={[
                 {
-                  items: hidden.map((item) => ({ label: item.label, onSelect: () => goTo(item) })),
+                  items: hidden.map((item) => ({
+                    label: item.label,
+                    disabled: !item.href && !item.onClick,
+                    onSelect: () => goTo(item),
+                  })),
                 },
               ]}
               trigger={(props) => (
