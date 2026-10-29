@@ -144,7 +144,7 @@
 .portalText span,
 .accountText span {
   font: var(--t-caption);
-  color: var(--muted);
+  color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -239,14 +239,14 @@
   padding: 0 6px 0 12px;
   border-radius: var(--r-sm);
   font: var(--t-body);
-  color: var(--subtle);
+  color: var(--muted);
   text-align: left;
   transition:
     background-color var(--dur-1) var(--ease-out),
     color var(--dur-1) var(--ease-out);
 }
 .search:hover {
-  color: var(--muted);
+  color: var(--text);
   background: var(--g-75);
 }
 .search > svg {

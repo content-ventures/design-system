@@ -180,6 +180,10 @@ ancestrais enquanto animam; teclado, clique fora, saída de vista e animação d
 mesmo contrato. Sem essa API, permanece o portal existente. A prancha “Escolha imediata” de
 `dialogo-responsivo` permite abrir e escolher durante a entrada, inclusive no celular.
 
+O menu lateral reúne identidade, navegação e rodapé numa região complementar nomeada. Os nomes
+da conta e do workspace mantêm a separação entre nome e perfil; a busca e os perfis usam texto
+legível sobre o fundo da barra. O contêiner de avisos é uma região nomeada com anúncio `polite`.
+
 **Dica (`Tooltip`):** texto curto que o gatilho não mostra — nome de botão de ícone, nome de etapa
 escondido pela largura, motivo de indisponível, aviso de um slide. `title` nativo não é usado em nenhum
 controle do DS. `bare` faz do próprio filho a âncora (sem caixa extra no layout; o filho repassa `ref` e

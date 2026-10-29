@@ -800,7 +800,7 @@ export function Sidebar({
   const filterOptions = typeof filter === 'object' ? filter : {};
   const identity = product ?? switcher;
   return (
-    <div id={navId || undefined} className={s.sidebar} data-part="sidebar">
+    <aside id={navId || undefined} className={s.sidebar} data-part="sidebar" aria-label="Área de navegação">
       {identity && <div className={s.identity}>{identity}</div>}
       {product && switcher && <div className={s.sideTools}>{switcher}</div>}
       {search && <div className={s.searchSlot}>{search}</div>}
@@ -848,7 +848,7 @@ export function Sidebar({
           {footer && !collapsed && <div className={s.footNote}>{footer}</div>}
         </div>
       )}
-    </div>
+    </aside>
   );
 }
 
@@ -962,6 +962,7 @@ export function PortalSwitcher({
             <>
               <span className={s.portalText}>
                 <strong>{current.name}</strong>
+                {' '}
                 <span>{current.detail}</span>
               </span>
               <ChevronsUpDown className={s.portalIcon} aria-hidden="true" />
@@ -1078,6 +1079,7 @@ export function SidebarAccount({
             <>
               <span className={s.accountText}>
                 <strong>{name}</strong>
+                {' '}
                 <span>{detail}</span>
               </span>
               <ChevronsUpDown className={s.portalIcon} aria-hidden="true" />

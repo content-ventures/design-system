@@ -303,7 +303,7 @@ export function Toaster() {
   }, [list]);
 
   return (
-    <div ref={ref} className={s.viewport} aria-live="polite" aria-label="Avisos (Alt+T)">
+    <div ref={ref} className={s.viewport} role="region" aria-live="polite" aria-label="Avisos (Alt+T)">
       {list.map((item) => (
         <div
           key={item.id}
