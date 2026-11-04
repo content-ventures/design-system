@@ -1082,6 +1082,7 @@ function CampaignTable({
       header: <VisuallyHidden>Ações</VisuallyHidden>,
       name: 'Ações',
       pinned: true,
+      sticky: 'end',
       align: 'end',
       width: 116,
       skeleton: 'none',

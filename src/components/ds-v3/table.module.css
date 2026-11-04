@@ -159,6 +159,17 @@
 .table tbody tr[data-selected='true'] td:last-child {
   border-radius: 0 var(--r-md) var(--r-md) 0;
 }
+/* Coluna presa à borda direita (`sticky: 'end'`): o resto rola por baixo, com o fundo opaco do
+ * estado da linha (papel, hover, selecionada). */
+.table [data-sticky='end'] {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+}
+.table[data-variant='plain'] thead th[data-sticky='end'],
+.table tfoot [data-sticky='end'] {
+  background: var(--paper);
+}
 .table tbody tr[data-clickable='true'] {
   cursor: pointer;
 }
@@ -687,6 +698,9 @@
   }
   .frame[data-stack] .table[data-fixed='true'] td {
     overflow: visible;
+  }
+  .frame[data-stack] .table [data-sticky='end'] {
+    position: static;
   }
   .frame[data-stack] .table tbody > tr:is([data-key], .skeletonRow) {
     position: relative;

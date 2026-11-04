@@ -4,6 +4,12 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.6.0] - 2026-11-04
+
+### Added
+
+- `DataTable` column `sticky: 'end'`: the column stays pinned to the right edge while the table scrolls horizontally (row actions), over the row's opaque background (rest, hover, selected). In the stacked mobile card it goes back to normal flow. The "Tabela de dados" catalog page uses it on the actions column.
+
 ## [0.5.0] - 2026-10-29
 
 Brings back the changes MediaOn made to its vendored copies of DS V3 since the extraction (base `452eba0`; the `homolog` line plus the Vitrine branch), so MediaOn can consume this package instead of the copy.

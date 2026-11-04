@@ -47,6 +47,11 @@ export type Column<Row> = {
   name?: string;
   /** Fica fora do menu “Colunas” (não pode ser escondida). */
   pinned?: boolean;
+  /**
+   * Presa à borda direita enquanto a tabela rola na horizontal (ações da linha). Fundo opaco do
+   * estado da linha; no cartão do celular (`stack`) volta ao fluxo.
+   */
+  sticky?: 'end';
 };
 export type SortState = { key: string; direction: 'asc' | 'desc' };
 
@@ -377,6 +382,7 @@ export function DataTable<Row>({
                     key={column.key}
                     scope="col"
                     data-col={column.key}
+                    data-sticky={column.sticky}
                     data-align={column.numeric ? 'end' : column.align}
                     style={column.width ? { width: column.width } : undefined}
                     aria-sort={
@@ -418,6 +424,7 @@ export function DataTable<Row>({
                       <td
                         key={column.key}
                         data-col={column.key}
+                        data-sticky={column.sticky}
                         data-title={column.key === titleKey || undefined}
                         data-align={column.numeric ? 'end' : column.align}
                       >
@@ -537,6 +544,7 @@ export function DataTable<Row>({
                         <td
                           key={column.key}
                           data-col={column.key}
+                          data-sticky={column.sticky}
                           data-label={
                             column.header === ''
                               ? undefined
@@ -585,6 +593,7 @@ export function DataTable<Row>({
                       key={column.key}
                       scope="row"
                       data-col={column.key}
+                      data-sticky={column.sticky}
                       data-align={column.numeric ? 'end' : column.align}
                     >
                       {wrap(column.key, totalRow[column.key] ?? 'Total')}
@@ -593,6 +602,7 @@ export function DataTable<Row>({
                     <td
                       key={column.key}
                       data-col={column.key}
+                      data-sticky={column.sticky}
                       data-align={column.numeric ? 'end' : column.align}
                       className={column.numeric ? s.num : undefined}
                     >
