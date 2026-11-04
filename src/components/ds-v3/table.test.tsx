@@ -89,3 +89,33 @@ describe('DataTable — título do cartão', () => {
     expect(onRowClick).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('DataTable — coluna presa ao fim', () => {
+  it('marca cabeçalho, células e esqueleto da coluna sticky; as outras não', () => {
+    const columns: Column<Row>[] = [
+      { key: 'name', header: 'Campanha', render: (row) => row.name },
+      { key: 'actions', header: '', name: 'Ações', sticky: 'end', render: () => 'Editar' },
+    ];
+    const { container, rerender } = render(
+      <DataTable label="Campanhas" rows={ROWS} rowKey={(row) => row.id} columns={columns} />,
+    );
+
+    expect(container.querySelector('th[data-col="actions"]')).toHaveAttribute('data-sticky', 'end');
+    expect(cellOf('Verão', 'actions')).toHaveAttribute('data-sticky', 'end');
+    expect(cellOf('Verão', 'name')).not.toHaveAttribute('data-sticky');
+
+    rerender(
+      <DataTable
+        label="Campanhas"
+        rows={ROWS}
+        rowKey={(row) => row.id}
+        columns={columns}
+        loading
+      />,
+    );
+    expect(container.querySelector('tbody td[data-col="actions"]')).toHaveAttribute(
+      'data-sticky',
+      'end',
+    );
+  });
+});
