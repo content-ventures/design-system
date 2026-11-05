@@ -4,6 +4,14 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.6.1] - 2026-11-05
+
+### Fixed
+
+- Checkbox and radio borders use `--line-strong` at rest and `--line-hover` on hover instead of `--g-300`/`--g-400`, so the control edge reaches 3:1 against the paper (WCAG 1.4.11). Found by the Prospecta contrast check in MediaOn.
+- `Slider` tick labels use `--accent-ink` instead of `--b-600`/`--b-700`, so they keep 4.5:1 in both themes.
+- `Button` gets a 44 px minimum height at 900 px wide and below, the touch-target size that MediaOn uses on phones.
+
 ## [0.6.0] - 2026-11-04
 
 ### Added
