@@ -560,3 +560,9 @@
   background: var(--b-700);
   border-color: var(--b-700);
 }
+
+@media (max-width: 900px) {
+  .button {
+    min-height: 44px;
+  }
+}
