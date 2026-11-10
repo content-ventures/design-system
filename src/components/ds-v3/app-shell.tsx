@@ -38,8 +38,8 @@ import { VisuallyHidden } from './a11y';
 import { Badge, Kbd, type Tone } from './badge';
 import { IconButton } from './button';
 import { Avatar, BrandMark } from './identity';
-import { floatingHost, Menu, type MenuItem, type MenuSection } from './menu';
 import { Tooltip, useClipped } from './overlays';
+import { floatingHost, Menu, type MenuItem, type MenuNoticeTone, type MenuSection } from './menu';
 import s from './app-shell.module.css';
 
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
@@ -809,7 +809,12 @@ export function Sidebar({
   const filterOptions = typeof filter === 'object' ? filter : {};
   const identity = product ?? switcher;
   return (
-    <aside id={navId || undefined} className={s.sidebar} data-part="sidebar" aria-label="Área de navegação">
+    <aside
+      id={navId || undefined}
+      className={s.sidebar}
+      data-part="sidebar"
+      aria-label="Área de navegação"
+    >
       {identity && <div className={s.identity}>{identity}</div>}
       {product && switcher && <div className={s.sideTools}>{switcher}</div>}
       {search && <div className={s.searchSlot}>{search}</div>}
@@ -972,9 +977,7 @@ export function PortalSwitcher({
           {!collapsed && (
             <>
               <span className={s.portalText}>
-                <strong>{current.name}</strong>
-                {' '}
-                <span>{current.detail}</span>
+                <strong>{current.name}</strong> <span>{current.detail}</span>
               </span>
               <ChevronsUpDown className={s.portalIcon} aria-hidden="true" />
             </>
@@ -1089,9 +1092,7 @@ export function SidebarAccount({
           {!collapsed && (
             <>
               <span className={s.accountText}>
-                <strong>{name}</strong>
-                {' '}
-                <span>{detail}</span>
+                <strong>{name}</strong> <span>{detail}</span>
               </span>
               <ChevronsUpDown className={s.portalIcon} aria-hidden="true" />
             </>
@@ -1163,13 +1164,13 @@ function CrumbNode({ item, current }: { item: Crumb; current: boolean }) {
         onClick={item.onClick}
         data-force={item.force}
       >
-      {body}
-    </NavigationLink>
-  ) : (
-    <button type="button" className={s.crumbLink} onClick={item.onClick} data-force={item.force}>
-      {body}
-    </button>
-  );
+        {body}
+      </NavigationLink>
+    ) : (
+      <button type="button" className={s.crumbLink} onClick={item.onClick} data-force={item.force}>
+        {body}
+      </button>
+    );
   // O nome inteiro na dica do DS (nunca o `title` nativo), só quando o nível corta.
   return (
     <Tooltip content={item.label} bare side="bottom" describe={false} disabled={!title}>
@@ -1416,11 +1417,30 @@ export function TopBarItem({
   );
 }
 
-/** Sino das notificações. Com novidade, um ponto azul de 6 px (nunca número). Abre um menu de 344 px. */
+/** Um aviso do painel do sino. */
+export type NotificationNotice = {
+  texto: string;
+  /** “há ⟨tempo⟩”. */
+  tempo: string;
+  naoLida: boolean;
+  tom: MenuNoticeTone;
+  onSelect?: () => void;
+};
+export type NotificationNoticeGroup = { label: string; items: NotificationNotice[] };
+
+/**
+ * Sino das notificações. Com novidade, um ponto azul de 6 px (nunca número). Abre um menu de 344 px
+ * (ou `width`, até 420). Com `notices`, cada aviso tem o ponto de não lida e o ponto do tipo, o texto
+ * inteiro e o tempo abaixo; sem eles, `sections` como qualquer menu. O rodapé `Ver todas` só existe
+ * com `onViewAll`.
+ */
 export function NotificationsButton({
   count = 0,
   unread,
-  sections,
+  sections = [],
+  notices,
+  title,
+  onViewAll,
   label = 'Notificações',
   width = 344,
   force,
@@ -1428,7 +1448,13 @@ export function NotificationsButton({
   count?: number;
   /** Há novidade. Padrão: `count > 0`. */
   unread?: boolean;
-  sections: MenuSection[];
+  sections?: MenuSection[];
+  /** Avisos agrupados (“Hoje”, “Anteriores”), desenhados como itens de aviso. */
+  notices?: NotificationNoticeGroup[];
+  /** Título no alto do painel. */
+  title?: string;
+  /** Rodapé `Ver todas`. */
+  onViewAll?: () => void;
   label?: string;
   width?: number;
   /** Estado parado para pranchas. */
@@ -1438,12 +1464,28 @@ export function NotificationsButton({
   const name = fresh
     ? `${label}: ${count > 0 ? `${count} ${count === 1 ? 'nova' : 'novas'}` : 'há novidades'}`
     : label;
+  const body: MenuSection[] = notices
+    ? notices
+        .filter((group) => group.items.length > 0)
+        .map((group) => ({
+          label: group.label,
+          items: group.items.map((notice) => ({
+            label: notice.texto,
+            notice: { time: notice.tempo, unread: notice.naoLida, tone: notice.tom },
+            onSelect: notice.onSelect,
+          })),
+        }))
+    : [];
   return (
     <Menu
       label={label}
+      title={title}
       align="end"
       width={width}
-      sections={sections}
+      sections={[
+        ...(body.length ? body : sections),
+        ...(onViewAll ? [{ items: [{ label: 'Ver todas', onSelect: onViewAll }] }] : []),
+      ]}
       trigger={(props) => (
         <span className={s.bell} data-unread={fresh || undefined}>
           <IconButton

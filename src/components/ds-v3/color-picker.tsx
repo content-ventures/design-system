@@ -73,15 +73,32 @@ export type ColorFieldProps = {
   hoverColor?: string;
 };
 
+/** Mensagem do código fora do formato, no campo e na cor personalizada do painel. */
+export const HEX_FORMAT_MESSAGE = 'Use o formato #RRGGBB';
+
+/** O que se digita no código: maiúsculas, só `#` e hexadecimais, com o `#` na frente, até 7. */
+export function cleanHexInput(raw: string) {
+  const clean = raw.toUpperCase().replace(/[^#0-9A-F]/g, '');
+  const next = clean.startsWith('#')
+    ? `#${clean.slice(1).replace(/#/g, '')}`
+    : clean
+      ? `#${clean}`
+      : '';
+  return next.slice(0, 7);
+}
+
 /**
- * Cor de marca por código: amostra + hexadecimal digitável. O painel traz doze cores prontas,
- * o mesmo código e a leitura de contraste com texto branco ("4,6:1 · AA"). Sem espectro, conta-gotas
- * nem transparência — a marca chega pronta do manual.
+ * Cor de marca por código: amostra + hexadecimal digitável. O painel traz doze cores prontas, a
+ * cor personalizada (o seletor nativo do sistema e o código `#RRGGBB`, para a cor do manual que não
+ * está entre as prontas) e a leitura de contraste com texto branco ("4,6:1 · AA"), que acompanha a
+ * cor personalizada enquanto se digita. Sem transparência.
  *
  * Teclado: Enter/↓ na amostra abre o painel com o foco na cor escolhida (ou na primeira). As setas
  * percorrem a grade (Home/End vão às pontas) e a leitura acompanha a cor em foco; Enter/Espaço
- * escolhem, fecham e devolvem o foco à amostra. Escape fecha e devolve; Tab/Shift+Tab saem do
- * painel e o fecham. O painel fica logo depois do campo no DOM (ordem do leitor de tela).
+ * escolhem, fecham e devolvem o foco à amostra. Tab vai da grade ao seletor e ao código da cor
+ * personalizada (Enter no código aplica e fecha); depois do último, Tab sai para o código do campo e
+ * Shift+Tab, da grade, volta à amostra, fechando o painel. Escape fecha e devolve. O painel fica
+ * logo depois do campo no DOM (ordem do leitor de tela).
  */
 export function ColorField({
   id,
@@ -104,7 +121,11 @@ export function ColorField({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const nativeRef = useRef<HTMLInputElement>(null);
+  const customRef = useRef<HTMLInputElement>(null);
   const focusOnOpen = useRef(false);
+  const customId = `${auto}-custom`;
+  const customErrorId = `${auto}-custom-error`;
   const pinned = forcedOpen(force);
   const [openState, setOpen] = useState(false);
   const open = openState || pinned;
@@ -117,6 +138,18 @@ export function ColorField({
   }
   const typed = normalizeHex(text);
   const live = typed ?? color;
+  /** O código da cor personalizada: segue a cor do campo até alguém digitar nele. */
+  const [customText, setCustomText] = useState(normalizeHex(value) ?? '');
+  const [customError, setCustomError] = useState(false);
+  const [customSynced, setCustomSynced] = useState(value);
+  if (customSynced !== value) {
+    setCustomSynced(value);
+    const hex = normalizeHex(value);
+    if (hex) {
+      setCustomText(hex);
+      setCustomError(false);
+    }
+  }
   /** Cor sob o ponteiro e cor em foco na grade: a leitura do painel mostra a que se está olhando. */
   const [pointed, setPointed] = useState<string | null>(null);
   const [focused, setFocused] = useState<string | null>(null);
@@ -146,22 +179,38 @@ export function ColorField({
     }
     const hex = normalizeHex(raw);
     if (!hex) {
-      onInputError?.('Use o formato #RRGGBB');
+      onInputError?.(HEX_FORMAT_MESSAGE);
       return;
     }
     apply(hex);
   }
   function onText(raw: string) {
-    const clean = raw.toUpperCase().replace(/[^#0-9A-F]/g, '');
-    const next = clean.startsWith('#')
-      ? `#${clean.slice(1).replace(/#/g, '')}`
-      : clean
-        ? `#${clean}`
-        : '';
-    setText(next.slice(0, 7));
+    const next = cleanHexInput(raw);
+    setText(next);
     const hex = normalizeHex(next);
     // Com seis dígitos válidos, a cor já vale: amostra e prévia acompanham a digitação.
     if (hex) apply(hex);
+  }
+  /** Cor personalizada: com seis dígitos, já vale (amostra, leitura e prévia acompanham). */
+  function onCustomText(raw: string) {
+    const next = cleanHexInput(raw);
+    setCustomText(next);
+    const hex = normalizeHex(next);
+    if (hex) {
+      setCustomError(false);
+      apply(hex);
+    }
+  }
+  /** Enter ou saída do código personalizado: incompleto vira o erro, nunca uma cor pela metade. */
+  function commitCustom() {
+    const hex = normalizeHex(customText);
+    if (!hex) {
+      setCustomError(customText.trim() !== '');
+      return false;
+    }
+    setCustomError(false);
+    apply(hex);
+    return true;
   }
   function show() {
     if (disabled || openState) return;
@@ -174,6 +223,8 @@ export function ColorField({
     setOpen(false);
     setPointed(null);
     setFocused(null);
+    setCustomError(false);
+    setCustomText(normalizeHex(value) ?? '');
     const target = restore === true ? triggerRef.current : restore || null;
     target?.focus({ preventScroll: true });
   }
@@ -294,67 +345,132 @@ export function ColorField({
             event.stopPropagation();
             close(true);
           } else if (event.key === 'Tab' && !pinned) {
-            // Uma parada só (a grade): Tab segue para o código, Shift+Tab volta à amostra.
+            // Três paradas (a grade, o seletor e o código da cor personalizada); das pontas, Tab
+            // segue para o código do campo e Shift+Tab volta à amostra, fechando o painel.
+            const target = event.target as Node;
+            const stops = [gridRef.current, nativeRef.current, customRef.current];
+            const at = stops.findIndex((stop) => stop?.contains(target));
+            const next = at < 0 ? null : stops[at + (event.shiftKey ? -1 : 1)];
             event.preventDefault();
-            close(event.shiftKey ? triggerRef.current : inputRef.current);
+            if (next === gridRef.current) {
+              gridRef.current
+                ?.querySelectorAll<HTMLButtonElement>('button')
+                [cursor]?.focus({ preventScroll: true });
+            } else if (next) next.focus({ preventScroll: true });
+            else close(event.shiftKey ? triggerRef.current : inputRef.current);
           }
         }}
       >
         <div
-          ref={gridRef}
-          className={s.grid}
-          role="group"
-          aria-label="Cores prontas"
-          onKeyDown={onGridKey}
-          onPointerLeave={() => setPointed(null)}
+          className={s.body}
           onBlur={(event) => {
-            const next = event.relatedTarget;
-            if (gridRef.current?.contains(next)) return;
-            setFocused(null);
             // O foco saiu do painel por outro caminho (clique num campo, atalho): fecha junto.
-            if (next && !pinned && !boxRef.current?.contains(next)) close(false);
+            const next = event.relatedTarget;
+            if (!next || pinned || event.currentTarget.contains(next)) return;
+            if (!boxRef.current?.contains(next)) close(false);
           }}
         >
-          {presets.map((preset, index) => {
-            const hex = normalizeHex(preset) ?? preset;
-            const selected = hex === color;
-            return (
-              <button
-                key={hex}
-                type="button"
-                className={s.preset}
-                style={{ '--swatch': hex } as CSSProperties}
-                aria-label={hex}
-                aria-pressed={selected}
-                data-force={staticHover === hex ? 'hover' : undefined}
-                tabIndex={index === (openState ? cursor : home) ? 0 : -1}
-                onPointerEnter={() => setPointed(hex)}
-                onFocus={() => {
-                  setCursor(index);
-                  setFocused(hex);
+          <div
+            ref={gridRef}
+            className={s.grid}
+            role="group"
+            aria-label="Cores prontas"
+            onKeyDown={onGridKey}
+            onPointerLeave={() => setPointed(null)}
+            onBlur={(event) => {
+              if (gridRef.current?.contains(event.relatedTarget)) return;
+              setFocused(null);
+            }}
+          >
+            {presets.map((preset, index) => {
+              const hex = normalizeHex(preset) ?? preset;
+              const selected = hex === color;
+              return (
+                <button
+                  key={hex}
+                  type="button"
+                  className={s.preset}
+                  style={{ '--swatch': hex } as CSSProperties}
+                  aria-label={hex}
+                  aria-pressed={selected}
+                  data-force={staticHover === hex ? 'hover' : undefined}
+                  tabIndex={index === (openState ? cursor : home) ? 0 : -1}
+                  onPointerEnter={() => setPointed(hex)}
+                  onFocus={() => {
+                    setCursor(index);
+                    setFocused(hex);
+                  }}
+                  onClick={() => (pinned ? apply(hex) : choose(hex))}
+                />
+              );
+            })}
+          </div>
+          <div className={s.custom}>
+            <label className={s.customLabel} htmlFor={customId}>
+              Cor personalizada
+            </label>
+            <span className={s.customRow}>
+              <input
+                ref={nativeRef}
+                type="color"
+                className={s.native}
+                aria-label="Escolher no seletor do sistema"
+                value={live.toLowerCase()}
+                onChange={(event) => {
+                  const hex = normalizeHex(event.target.value);
+                  if (!hex) return;
+                  setCustomText(hex);
+                  setCustomError(false);
+                  apply(hex);
                 }}
-                onClick={() => (pinned ? apply(hex) : choose(hex))}
               />
-            );
-          })}
-        </div>
-        <div className={s.readout}>
-          <span
-            className={s.readoutSwatch}
-            style={{ '--swatch': shown } as CSSProperties}
-            aria-hidden="true"
-          />
-          <span className={s.hex}>{shown}</span>
-          <span className={s.contrast} data-pass={passes || undefined} aria-live="polite">
+              <input
+                ref={customRef}
+                id={customId}
+                type="text"
+                className={s.customInput}
+                autoComplete="off"
+                spellCheck={false}
+                maxLength={7}
+                placeholder="#RRGGBB"
+                aria-invalid={customError || undefined}
+                aria-describedby={customError ? customErrorId : undefined}
+                value={customText}
+                onChange={(event) => onCustomText(event.target.value)}
+                onBlur={() => {
+                  commitCustom();
+                }}
+                onKeyDown={(event) => {
+                  if (event.key !== 'Enter') return;
+                  event.preventDefault();
+                  if (commitCustom() && !pinned) close(true);
+                }}
+              />
+            </span>
+            {customError ? (
+              <span id={customErrorId} className={s.customError}>
+                {HEX_FORMAT_MESSAGE}
+              </span>
+            ) : null}
+          </div>
+          <div className={s.readout}>
             <span
-              className={s.contrastDemo}
+              className={s.readoutSwatch}
               style={{ '--swatch': shown } as CSSProperties}
               aria-hidden="true"
-            >
-              Aa
+            />
+            <span className={s.hex}>{shown}</span>
+            <span className={s.contrast} data-pass={passes || undefined} aria-live="polite">
+              <span
+                className={s.contrastDemo}
+                style={{ '--swatch': shown } as CSSProperties}
+                aria-hidden="true"
+              >
+                Aa
+              </span>
+              {ratioText(ratio)} · {ratio >= 7 ? 'AAA' : passes ? 'AA' : 'Baixo'}
             </span>
-            {ratioText(ratio)} · {ratio >= 7 ? 'AAA' : passes ? 'AA' : 'Baixo'}
-          </span>
+          </div>
         </div>
       </Floating>
     </>

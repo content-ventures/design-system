@@ -338,6 +338,9 @@ const NOTIFICATIONS: MenuSection[] = [
 const crumb = (label: string): Crumb => ({ label, onClick: noop });
 
 /** O shell do portal (igual ao /dashboardv3): menu lateral, topo com trilha e o conteúdo que rola. */
+/** Rodapé `Ver todas` do sino (no DS ele só existe com `onViewAll`). */
+const viewAllNotifications = () => undefined;
+
 function PortalShell({ active, crumbs, children }: { active: string; crumbs: string[]; children: ReactNode }) {
   const items = crumbs.map((label, index) => (index === crumbs.length - 1 ? { label } : crumb(label)));
   return (
@@ -357,7 +360,7 @@ function PortalShell({ active, crumbs, children }: { active: string; crumbs: str
           account={<SidebarAccount name="Marina Lopes" detail="Operação · Francal" sections={ACCOUNT_SECTIONS} />}
         />
       }
-      topbar={<TopBar breadcrumb={items} notifications={<NotificationsButton count={3} sections={NOTIFICATIONS} />} />}
+      topbar={<TopBar breadcrumb={items} notifications={<NotificationsButton count={3} sections={NOTIFICATIONS} onViewAll={viewAllNotifications} />} />}
     >
       {children}
     </AppShell>

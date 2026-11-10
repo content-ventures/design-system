@@ -19,8 +19,8 @@ export interface EntitySheetProps {
   titulo: ReactNode;
   /** Estado em texto, com ponto (ou anel, no tom `gray`): nunca só cor. */
   selo: { texto: string; tom: Tone };
-  /** A única ação principal da ficha. */
-  acaoPrincipal: EntitySheetAction;
+  /** A única ação principal da ficha; ausente, sem ação principal (ex.: página em criação). */
+  acaoPrincipal?: EntitySheetAction;
   acoesSecundarias?: ReactNode;
   /** O `⚙ Configurações` da entidade. */
   configuracoes?: Omit<EntitySheetAction, 'rotulo'> & { rotulo?: ReactNode };
@@ -89,7 +89,7 @@ export function EntitySheet({
           </Badge>
         </div>
         <div className={s.actions} data-entity-sheet-actions>
-          <Action action={acaoPrincipal} variant="primary" />
+          {acaoPrincipal && <Action action={acaoPrincipal} variant="primary" />}
           {acoesSecundarias}
           {configuracoes && (
             <Action

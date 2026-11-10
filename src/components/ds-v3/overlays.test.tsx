@@ -61,6 +61,27 @@ it('Escape no Select fecha apenas a lista e mantém o diálogo e o foco', async 
 });
 afterEach(() => vi.restoreAllMocks());
 
+describe('o `close` nativo da camada', () => {
+  it('fechado pelo navegador com a camada aberta, avisa o consumidor', () => {
+    const close = vi.fn();
+    render(<Layer onClose={close} />);
+    const dialog = screen.getByRole('dialog') as HTMLDialogElement;
+    dialog.open = false;
+    fireEvent(dialog, new Event('close'));
+    expect(close).toHaveBeenCalledTimes(1);
+  });
+
+  it('atrasado de um fechamento anterior, não fecha a camada que já reabriu', () => {
+    const close = vi.fn();
+    render(<Layer onClose={close} />);
+    const dialog = screen.getByRole('dialog') as HTMLDialogElement;
+    // A tarefa do `close` do fechamento anterior chega com o diálogo de novo aberto.
+    expect(dialog.open).toBe(true);
+    fireEvent(dialog, new Event('close'));
+    expect(close).not.toHaveBeenCalled();
+  });
+});
+
 describe.each([false, true])('sequência de foco modal contained=%s', (contained) => {
   it.each([false, true])('dá a volta nos extremos com Shift=%s', (shiftKey) => {
     render(

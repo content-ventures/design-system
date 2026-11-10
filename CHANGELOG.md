@@ -4,6 +4,16 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.7.0] - 2026-11-10
+
+Brings back the DS V3 changes the MediaOn Vitrine branch (`feat/vitrine-v1`) made to its vendored copy after 0.5.0, so that branch can consume this package.
+
+### Added
+
+- `NotificationsButton` gets `notices` (groups of `NotificationNotice`: text, time, unread, tone), `title` and `onViewAll` (a `Ver todas` footer, only when given). Each notice is a `MenuItem` with the new `notice` field (`MenuNotice`, `MenuNoticeTone`): an unread dot and a tone dot on the left, with the time under the text. The unread state is in the accessible name ("Não lida"), visually hidden.
+- `ColorPicker`: the panel has a custom color code field. With six digits it applies right away; incomplete, Enter or blur shows the format error and never applies half a color. `HEX_FORMAT_MESSAGE` and `cleanHexInput` are exported.
+- `EntitySheet`: `acaoPrincipal` is optional (a page still being created has no main action).
+
 ## [0.6.1] - 2026-11-05
 
 ### Fixed
