@@ -4,6 +4,17 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.9.2] - 2026-11-12
+
+### Changed
+
+- Sidebar account name: `600 12.5px/17px` (was `--t-small-strong`, 500 12 px), per RV-MA1.6. `.portalText strong` keeps `--t-small-strong`.
+- Breadcrumb separator in `--subtle` (was `--g-300`), per RV-MA2.3.
+
+### Fixed
+
+- `Menu` items show the DS focus ring (2 px `--focus-color`, offset −2 px) on keyboard focus (`:focus-visible`), not only when forced on the stage.
+
 ## [0.9.1] - 2026-11-12
 
 ### Changed

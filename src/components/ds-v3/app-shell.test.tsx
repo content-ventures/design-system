@@ -789,6 +789,24 @@ describe('Moldura do protótipo v21: rótulo do grupo e menu da conta', () => {
     expect(rule).toMatch(/color: var\(--muted\);/);
   });
 
+  it('rodapé: nome em 600 12,5 px `--ink` (UI-06, RV-MA1.6)', () => {
+    const rule = css.match(/\n\.accountText strong \{([^}]*)\}/)?.[1] ?? '';
+    expect(rule).toMatch(/font: 600 12\.5px\/17px var\(--font\);/);
+    expect(rule).toMatch(/color: var\(--ink\);/);
+  });
+
+  it('separador da trilha em `--subtle` (UI-11, RV-MA2.3)', () => {
+    const rule = css.match(/\n\.crumbSep \{([^}]*)\}/)?.[1] ?? '';
+    expect(rule).toMatch(/color: var\(--subtle\);/);
+  });
+
+  it('item de menu com foco por teclado mostra o anel do DS (UI-13)', () => {
+    const menuCss = readFileSync(resolve(__dirname, 'menu.module.css'), 'utf8');
+    expect(menuCss).toMatch(
+      /\.item:is\(:focus-visible, \[data-force~='focus'\]\) \{\s*outline: 2px solid var\(--focus-color\);\s*outline-offset: -2px;/,
+    );
+  });
+
   it('o menu da conta abre na largura do rodapé (o gatilho), não mais largo que o menu', async () => {
     const user = userEvent.setup();
     const width = vi

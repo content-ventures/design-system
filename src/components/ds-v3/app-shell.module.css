@@ -149,9 +149,16 @@
   min-width: 0;
   display: grid;
 }
-.portalText strong,
-.accountText strong {
+.portalText strong {
   font: var(--t-small-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* O nome da conta no rodapé: 600 12,5 px (RV-MA1.6 do protótipo v21). */
+.accountText strong {
+  font: 600 12.5px/17px var(--font);
   color: var(--ink);
   white-space: nowrap;
   overflow: hidden;
@@ -1015,7 +1022,7 @@ button.groupLabel[aria-expanded='false'] svg {
 .crumbSep {
   width: 14px;
   height: 14px;
-  color: var(--g-300);
+  color: var(--subtle);
   flex-shrink: 0;
 }
 .crumbLink,
