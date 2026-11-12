@@ -170,6 +170,9 @@
   min-height: 44px;
   padding: 6px 8px;
 }
+.item[data-place] {
+  min-height: 44px;
+}
 .item[data-rich] > .icon,
 .item[data-rich] > .lead {
   margin-top: 2px;

@@ -31,6 +31,11 @@ export type MenuItem = {
   shortcut?: string;
   /** Item de escolha única: `true` mostra o check azul à direita. */
   checked?: boolean;
+  /**
+   * Item de lugar (ex.: portais): `true` marca onde a pessoa está, com `aria-current` e o check;
+   * definido (`true` ou `false`), o item tem 44 px de altura.
+   */
+  current?: boolean;
   danger?: boolean;
   disabled?: boolean;
   /** Esmaecido, mas ainda escolhível (portal encerrado). */
@@ -401,6 +406,7 @@ export function MenuSurface({
                 type="button"
                 role={role}
                 aria-checked={item.checked}
+                aria-current={item.current ? 'true' : undefined}
                 aria-disabled={item.disabled || undefined}
                 aria-haspopup={hasSub ? 'menu' : undefined}
                 aria-expanded={hasSub ? subOpen : undefined}
@@ -410,6 +416,7 @@ export function MenuSurface({
                 data-label={item.label}
                 data-danger={item.danger || undefined}
                 data-muted={item.muted || undefined}
+                data-place={item.current === undefined ? undefined : ''}
                 data-rich={Boolean(item.description || item.notice) || undefined}
                 data-notice={item.notice ? '' : undefined}
                 data-force={item.force ?? (item.active ? 'hover' : undefined)}
@@ -465,11 +472,13 @@ export function MenuSurface({
                   )}
                 </span>
                 {item.notice?.unread && <span className={s.srOnly}>Não lida</span>}
-                {(item.meta || item.shortcut || item.checked || hasSub) && (
+                {(item.meta || item.shortcut || item.checked || item.current || hasSub) && (
                   <span className={s.end}>
                     {item.meta && <span className={s.meta}>{item.meta}</span>}
                     {item.shortcut && <Kbd>{item.shortcut}</Kbd>}
-                    {item.checked && <Check className={s.check} aria-hidden="true" />}
+                    {(item.checked || item.current) && (
+                      <Check className={s.check} aria-hidden="true" />
+                    )}
                     {hasSub && <ChevronRight className={s.chevron} aria-hidden="true" />}
                   </span>
                 )}

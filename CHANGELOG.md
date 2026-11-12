@@ -4,6 +4,17 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.8.0] - 2026-11-12
+
+### Added
+
+- `ProductMark` `mark`: a letter (e.g. "M") in the 28 px blue square instead of the symbol, in white, with the name at weight 600. Without `mark`, the symbol as before.
+- `MenuItem.current`: a place item (e.g. the advertiser's portals). `true` marks where the person is, with `aria-current="true"` and the check; when defined (`true` or `false`) the item is 44 px tall. Items without `current` keep their height.
+
+### Changed
+
+- `SidebarAccount`: the trigger has a 44 px minimum height (it already measured 44 px with the `md` avatar; now it is guaranteed).
+
 ## [0.7.0] - 2026-11-10
 
 Brings back the DS V3 changes the MediaOn Vitrine branch (`feat/vitrine-v1`) made to its vendored copy after 0.5.0, so that branch can consume this package.

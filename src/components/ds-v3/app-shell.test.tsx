@@ -28,6 +28,7 @@ import {
   useShell,
   type Crumb,
   NotificationsButton,
+  ProductMark,
   type NavGroup,
 } from './app-shell';
 
@@ -674,5 +675,43 @@ describe('NotificationsButton: painel de avisos', () => {
     await user.click(within(menu).getByRole('menuitem'));
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(document.activeElement).toBe(screen.getByRole('button', { name: /Notificações/ }));
+  });
+});
+
+describe('ProductMark · marca com letra', () => {
+  it('`mark` desenha a letra no quadrado e o nome ao lado', () => {
+    const { container } = render(
+      <AppShell
+        sidebar={<Sidebar product={<ProductMark mark="M" name="MEDIA.ON" />} groups={groups} />}
+      >
+        <p>Conteúdo</p>
+      </AppShell>,
+    );
+    const product = container.querySelector('[data-part="product"]') as HTMLElement;
+    expect(product).toHaveAttribute('data-mark', '');
+    expect(within(product).getByText('M').closest('[aria-hidden="true"]')).not.toBeNull();
+    expect(within(product).getByText('MEDIA.ON')).toBeInTheDocument();
+    expect(product.querySelector('svg')).toBeNull();
+  });
+
+  it('sem `mark`, o desenho de hoje: o símbolo em SVG e nenhuma letra', () => {
+    const { container } = render(
+      <AppShell sidebar={<Sidebar product={<ProductMark name="Redação" />} groups={groups} />}>
+        <p>Conteúdo</p>
+      </AppShell>,
+    );
+    const product = container.querySelector('[data-part="product"]') as HTMLElement;
+    expect(product).not.toHaveAttribute('data-mark');
+    expect(product.querySelector('svg')).not.toBeNull();
+    expect(within(product).getByText('Redação')).toBeInTheDocument();
+  });
+
+  it('o CSS: letra branca e nome em peso 600 só com `mark`; topo de 52 px com o fio do topo', () => {
+    expect(css).toMatch(/\.product\[data-mark\] \.productText strong \{[^}]*font-weight: 600;/);
+    expect(css).toMatch(/\.logoLetter \{[^}]*color: var\(--on-accent\);/);
+    expect(css).toMatch(
+      /\.identity \{[^}]*min-height: var\(--topbar-h\);[^}]*border-bottom: 1px solid var\(--line\);/,
+    );
+    expect(css).toMatch(/\.account \{[^}]*min-height: 44px;/);
   });
 });

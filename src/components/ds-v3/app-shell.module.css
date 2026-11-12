@@ -92,6 +92,13 @@
   width: 17px;
   height: 17px;
 }
+.logoLetter {
+  font: 600 14px/1 var(--font);
+  color: var(--on-accent);
+}
+.product[data-mark] .productText strong {
+  font-weight: 600;
+}
 .productText {
   display: grid;
   min-width: 0;
@@ -486,6 +493,7 @@ button.groupLabel[aria-expanded='false'] svg {
   gap: 9px;
   width: 100%;
   min-width: 0;
+  min-height: 44px;
   padding: 6px 4px;
   border-radius: var(--r-md);
   text-align: left;

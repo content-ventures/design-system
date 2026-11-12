@@ -866,28 +866,44 @@ export function Sidebar({
   );
 }
 
-/** Marca do produto na linha de identidade. Desenho próprio, sem letras. */
-export function ProductMark({ name = 'MediaOn', caption }: { name?: string; caption?: string }) {
+/**
+ * Marca do produto na linha de identidade. Sem `mark`, o símbolo próprio, sem letras; com `mark`,
+ * a letra branca no quadrado azul e o nome em peso 600.
+ */
+export function ProductMark({
+  name = 'MediaOn',
+  caption,
+  mark,
+}: {
+  name?: string;
+  caption?: string;
+  /** Letra no lugar do símbolo (ex.: “M”). */
+  mark?: string;
+}) {
   const { collapsed } = useShell();
   return (
-    <div className={s.product} data-part="product">
+    <div className={s.product} data-part="product" data-mark={mark ? '' : undefined}>
       <span className={s.logo} aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none">
-          <circle cx="7.6" cy="12" r="3.1" fill="currentColor" />
-          <path
-            d="M13 7.4a6.6 6.6 0 0 1 0 9.2"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-          />
-          <path
-            d="M16.6 4.4a11 11 0 0 1 0 15.2"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            opacity="0.6"
-          />
-        </svg>
+        {mark ? (
+          <span className={s.logoLetter}>{mark}</span>
+        ) : (
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="7.6" cy="12" r="3.1" fill="currentColor" />
+            <path
+              d="M13 7.4a6.6 6.6 0 0 1 0 9.2"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M16.6 4.4a11 11 0 0 1 0 15.2"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              opacity="0.6"
+            />
+          </svg>
+        )}
       </span>
       {collapsed ? (
         <VisuallyHidden>{name}</VisuallyHidden>
