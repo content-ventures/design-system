@@ -767,6 +767,61 @@ button.groupLabel[aria-expanded='false'] svg {
     display: none;
   }
 }
+/* Véu escurecido (`veil="dim"`): `--foreground` a 35%, por cima do `--overlay`. */
+.shell[data-veil='dim'] .veil {
+  background: color-mix(in srgb, var(--foreground) 35%, transparent);
+}
+/* ——— Corte em 900 px (`drawerBelow={900}`): a gaveta fechada do CSS vem até 899,98 px, no lugar do
+   bloco de 1199 px (o shell sai com `data-layout='auto-900'`). Abaixo do corte, item do menu, opções
+   da conta e botão do menu viram alvos de 44 px, e a trilha `last-two` fica com o penúltimo e o
+   atual. ——— */
+@container shell (max-width: 899.98px) {
+  .shell[data-drawer-below='900'] .frame {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .shell[data-drawer-below='900'] .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: var(--z-drawer);
+    width: min(300px, 86vw);
+    height: 100dvh;
+    transform: translateX(-100%);
+    visibility: hidden;
+  }
+  .shell[data-drawer-below='900'][data-fill] .sidebar {
+    position: absolute;
+    width: min(300px, 86%);
+    height: 100%;
+  }
+  .shell[data-drawer-below='900'] .topbar[data-menu='auto'] .menuButton {
+    display: inline-flex;
+  }
+  .shell[data-drawer-below='900'] .topbar .toggle,
+  .shell[data-drawer-below='900'] .topbar .toggle + .topRule {
+    display: none;
+  }
+  .shell[data-drawer-below='900'] .topbar .menuButton {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+  }
+  .shell[data-drawer-below='900'] .navItem {
+    min-height: 44px;
+  }
+  .shell[data-drawer-below='900'] .sidebar [role='menuitem'],
+  .shell[data-drawer-below='900'] .sidebar [role='menuitemradio'],
+  .shell[data-drawer-below='900'] .sidebar [role='menuitemcheckbox'] {
+    min-height: 44px;
+  }
+  .shell[data-drawer-below='900']
+    .crumbs[data-trail='last-two']
+    li:not([data-crumb='parent'], [data-crumb='current']) {
+    display: none;
+  }
+  .shell[data-drawer-below='900'] .crumbs[data-trail='last-two'] li[data-crumb='parent'] .crumbSep {
+    display: none;
+  }
+}
 @container shell (max-width: 640px) {
   .content {
     --content-pt: 20px;

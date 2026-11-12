@@ -715,3 +715,68 @@ describe('ProductMark · marca com letra', () => {
     expect(css).toMatch(/\.account \{[^}]*min-height: 44px;/);
   });
 });
+
+describe('AppShell · gaveta abaixo de 900 px (`drawerBelow`)', () => {
+  it('sem a prop: nenhum atributo novo e o véu de sempre', () => {
+    const html = root(renderToString(shell()));
+    expect(html).toHaveAttribute('data-layout', 'auto');
+    expect(html).not.toHaveAttribute('data-drawer-below');
+    expect(html).not.toHaveAttribute('data-veil');
+  });
+
+  it('servidor: `drawerBelow={900}` marca o corte e sai do bloco de 1199 px', () => {
+    const html = root(renderToString(shell({ drawerBelow: 900, veil: 'dim' })));
+    expect(html).toHaveAttribute('data-drawer-below', '900');
+    expect(html).toHaveAttribute('data-veil', 'dim');
+    expect(html).not.toHaveAttribute('data-layout', 'auto');
+  });
+
+  it('o CSS desenha a gaveta fechada até 899,98 px no modo 900', () => {
+    const block = css.slice(css.indexOf('@container shell (max-width: 899.98px)'));
+    expect(block).toMatch(
+      /\.shell\[data-drawer-below='900'\] \.frame \{\s*grid-template-columns: minmax\(0, 1fr\);/,
+    );
+    expect(block).toMatch(
+      /\.shell\[data-drawer-below='900'\] \.sidebar \{[^}]*position: fixed;[^}]*visibility: hidden;/,
+    );
+    expect(block).toMatch(
+      /\.shell\[data-drawer-below='900'\] \.topbar\[data-menu='auto'\] \.menuButton \{\s*display: inline-flex;/,
+    );
+  });
+
+  it('véu `dim`: `--foreground` a 35%', () => {
+    expect(css).toMatch(
+      /\.shell\[data-veil='dim'\] \.veil \{[^}]*background: color-mix\(in srgb, var\(--foreground\) 35%, transparent\);/,
+    );
+  });
+
+  it('movimento reduzido: gaveta, véu e item ativo com transição e animação de 0,01 ms', () => {
+    const theme = readFileSync(resolve(__dirname, 'theme.module.css'), 'utf8');
+    const block = theme.slice(theme.indexOf('@media (prefers-reduced-motion: reduce)'));
+    expect(block).toMatch(/\.theme \*,\s*\.theme \*::before,\s*\.theme \*::after \{/);
+    expect(block).toMatch(/transition-duration: 0\.01ms !important;/);
+    expect(block).toMatch(/animation-duration: 0\.01ms !important;/);
+    expect(theme).toMatch(/--foreground: var\(--ink\);/);
+  });
+
+  it('o botão do menu abre a gaveta; tocar no véu fecha e devolve o foco ao botão', async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <AppShell
+        drawerBelow={900}
+        veil="dim"
+        sidebar={<Sidebar groups={groups} />}
+        topbar={<TopBar breadcrumb={[{ label: 'Produções' }]} />}
+      >
+        <p>Conteúdo</p>
+      </AppShell>,
+    );
+    const shellRoot = container.querySelector('[data-part="shell"]');
+    const menuButton = screen.getByRole('button', { name: 'Abrir menu' });
+    await user.click(menuButton);
+    expect(shellRoot).toHaveAttribute('data-nav-open');
+    await user.click(screen.getByRole('button', { name: 'Fechar menu' }));
+    expect(shellRoot).not.toHaveAttribute('data-nav-open');
+    expect(menuButton).toHaveFocus();
+  });
+});

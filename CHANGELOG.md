@@ -4,6 +4,17 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.9.0] - 2026-11-12
+
+### Added
+
+- `AppShell` `drawerBelow?: 900 | 1200` (default 1200, today's cut). With `900` the shell gets `data-drawer-below="900"` and `data-layout="auto-900"`: the closed drawer comes from `@container shell (max-width: 899.98px)` instead of the 1199 px block, and the client measure uses the same cut. Below the cut the menu items and the account options are 44 px tall and the menu button is 44 × 44 px. An explicit `breakpoint` still wins (measured mode).
+- `AppShell` `veil?: 'default' | 'dim'`. `dim` (`data-veil="dim"`) paints the drawer veil with `--foreground` at 35%. Tapping the veil closes the drawer and returns focus to the menu button (as before).
+- `Breadcrumb`/`TopBar` `compactTrail?: 'first-current' | 'last-two'` (default `first-current`, today's behavior). `last-two` sets `data-trail="last-two"` and marks the second-to-last level `data-crumb="parent"`; below the 900 px drawer cut only that level and the current one stay, without the leading separator. Type `CompactTrail` exported.
+- Theme token `--foreground` (alias of `--ink`, light and dark).
+
+Without the new props the `AppShell` DOM and its CSS behave as before.
+
 ## [0.8.0] - 2026-11-12
 
 ### Added

@@ -199,6 +199,7 @@ export {
   type NavGroup,
   type Portal,
   type Crumb,
+  type CompactTrail,
   type CommandItem,
   type CommandGroup,
 } from './app-shell';

@@ -94,6 +94,8 @@
 
   /* Papéis de texto */
   --ink: #141824;
+  /* Cor de primeiro plano (o texto mais forte); acompanha `--ink` também no escuro. */
+  --foreground: var(--ink);
   --text: #3a4151;
   --muted: #697181;
   --subtle: #99a0ad;
