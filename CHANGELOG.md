@@ -4,6 +4,17 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.9.1] - 2026-11-12
+
+### Changed
+
+- `Menu` `width` also accepts `'trigger'`: the panel takes the trigger's width. `SidebarAccount` uses it, so the account menu opens as wide as the sidebar footer instead of 248 px past the 236 px sidebar (prototype v21, RV-MA1.7).
+- Sidebar group label: `500 11px/16px` (was `--t-caption-strong`, 11.5 px), per RV-MA1.3.
+
+### Fixed
+
+- `Breadcrumb`: a level without destination that is not the current one (a menu group such as «Anunciar») renders as `.crumbStatic` in `--muted`, weight 400, instead of `.crumbCurrent` (ink, 500). `aria-current="page"` stays on the last level only.
+
 ## [0.9.0] - 2026-11-12
 
 ### Added

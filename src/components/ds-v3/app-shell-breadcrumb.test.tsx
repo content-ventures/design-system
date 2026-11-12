@@ -26,6 +26,26 @@ describe('trilha com níveis de contexto', () => {
     expect(go).toHaveBeenCalledOnce();
   });
 
+  it('nível sem destino antes do atual fica como os anteriores (muted, 400), não como o atual', () => {
+    const { container } = render(
+      <Breadcrumb
+        items={[
+          { label: 'Anunciar' },
+          { label: 'Minhas campanhas', href: '/c' },
+          { label: 'Linha' },
+        ]}
+      />,
+    );
+    const group = screen.getByText('Anunciar').parentElement!;
+    expect(group).not.toHaveAttribute('aria-current');
+    expect(group.className).toMatch(/crumbStatic/);
+    expect(group.className).not.toMatch(/crumbCurrent/);
+    expect(container.querySelectorAll('[class*="crumbCurrent"]')).toHaveLength(1);
+    const rule = css.match(/\.crumbStatic\s*\{([^}]*)\}/)?.[1] ?? '';
+    expect(rule).toMatch(/color:\s*var\(--muted\)/);
+    expect(rule).not.toMatch(/font-weight:\s*500/);
+  });
+
   it('a trilha compacta retorna ao ancestral com destino, ignorando rótulos de contexto', () => {
     const go = vi.fn();
     render(

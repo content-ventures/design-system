@@ -568,7 +568,8 @@ export function Menu({
   /** Lado preferido. Vira sozinho quando não cabe. */
   side?: 'bottom' | 'top';
   label: string;
-  width?: number;
+  /** Largura do painel em px; `trigger`: a do gatilho (o menu da conta na largura do rodapé). */
+  width?: number | 'trigger';
   /** Título no alto do painel. */
   title?: string;
   onOpenChange?: (open: boolean) => void;
@@ -651,7 +652,7 @@ export function Menu({
           anchor={() => triggerRef.current?.getBoundingClientRect() ?? null}
           side={side}
           align={align}
-          width={width}
+          width={width === 'trigger' ? triggerRef.current?.offsetWidth || undefined : width}
           title={title}
           phase={phase === 'open' ? 'open' : 'closing'}
           initialFocus={initialFocus}

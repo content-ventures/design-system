@@ -1109,7 +1109,7 @@ export function SidebarAccount({
   const trigger = (
     <Menu
       label="Conta"
-      width={248}
+      width="trigger"
       side="top"
       sections={sections}
       trigger={(props) => (
@@ -1184,25 +1184,26 @@ function CrumbNode({ item, current }: { item: Crumb; current: boolean }) {
       </span>
     </>
   );
-  const node =
-    current || (!item.href && !item.onClick) ? (
-      <span className={s.crumbCurrent} aria-current={current ? 'page' : undefined}>
-        {body}
-      </span>
-    ) : item.href ? (
-      <NavigationLink
-        className={s.crumbLink}
-        href={item.href}
-        onClick={item.onClick}
-        data-force={item.force}
-      >
-        {body}
-      </NavigationLink>
-    ) : (
-      <button type="button" className={s.crumbLink} onClick={item.onClick} data-force={item.force}>
-        {body}
-      </button>
-    );
+  const node = current ? (
+    <span className={s.crumbCurrent} aria-current="page">
+      {body}
+    </span>
+  ) : !item.href && !item.onClick ? (
+    <span className={s.crumbStatic}>{body}</span>
+  ) : item.href ? (
+    <NavigationLink
+      className={s.crumbLink}
+      href={item.href}
+      onClick={item.onClick}
+      data-force={item.force}
+    >
+      {body}
+    </NavigationLink>
+  ) : (
+    <button type="button" className={s.crumbLink} onClick={item.onClick} data-force={item.force}>
+      {body}
+    </button>
+  );
   // O nome inteiro na dica do DS (nunca o `title` nativo), só quando o nível corta.
   return (
     <Tooltip content={item.label} bare side="bottom" describe={false} disabled={!title}>

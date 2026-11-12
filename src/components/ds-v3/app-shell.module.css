@@ -295,7 +295,8 @@
   gap: 4px;
   width: calc(100% - 22px);
   margin: 0 11px 6px;
-  font: var(--t-caption-strong);
+  /* 11 px/500 (RV-MA1.3 do protótipo v21): um passo abaixo de `--t-caption-strong`. */
+  font: 500 11px/16px var(--font);
   color: var(--muted);
   text-align: left;
 }
@@ -1019,6 +1020,7 @@ button.groupLabel[aria-expanded='false'] svg {
 }
 .crumbLink,
 .crumbCurrent,
+.crumbStatic,
 .crumbBack {
   display: inline-flex;
   align-items: center;
@@ -1055,6 +1057,10 @@ button.groupLabel[aria-expanded='false'] svg {
 .crumbCurrent {
   font-weight: 500;
   color: var(--ink);
+}
+/* Nível sem destino antes do atual (o grupo do menu): texto, no tom dos níveis anteriores. */
+.crumbStatic {
+  color: var(--muted);
 }
 .crumbText {
   min-width: 0;

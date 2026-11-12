@@ -23,6 +23,7 @@ import {
   AppShell,
   Breadcrumb,
   Sidebar,
+  SidebarAccount,
   SidebarItem,
   TopBar,
   useShell,
@@ -778,5 +779,32 @@ describe('AppShell · gaveta abaixo de 900 px (`drawerBelow`)', () => {
     await user.click(screen.getByRole('button', { name: 'Fechar menu' }));
     expect(shellRoot).not.toHaveAttribute('data-nav-open');
     expect(menuButton).toHaveFocus();
+  });
+});
+
+describe('Moldura do protótipo v21: rótulo do grupo e menu da conta', () => {
+  it('rótulo do grupo em 11 px, peso 500, `--muted` (UI-03)', () => {
+    const rule = css.match(/\n\.groupLabel \{([^}]*)\}/)?.[1] ?? '';
+    expect(rule).toMatch(/font: 500 11px\/16px var\(--font\);/);
+    expect(rule).toMatch(/color: var\(--muted\);/);
+  });
+
+  it('o menu da conta abre na largura do rodapé (o gatilho), não mais largo que o menu', async () => {
+    const user = userEvent.setup();
+    const width = vi
+      .spyOn(HTMLElement.prototype, 'offsetWidth', 'get')
+      .mockImplementation(function (this: HTMLElement) {
+        return this.dataset.part === 'account' ? 211 : 0;
+      });
+    render(
+      <SidebarAccount
+        name="Marina Costa"
+        detail="Naturaltech"
+        sections={[{ items: [{ label: 'Sair', onSelect: () => undefined }] }]}
+      />,
+    );
+    await user.click(screen.getByRole('button', { name: /Menu da conta/ }));
+    expect(screen.getByRole('menu', { name: 'Conta' })).toHaveStyle({ width: '211px' });
+    width.mockRestore();
   });
 });
