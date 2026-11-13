@@ -4,6 +4,12 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.9.3] - 2026-11-13
+
+### Fixed
+
+- The 44 px minimum height of `Button`/`IconButton` on phones now applies below 900 px (`max-width: 899.98px`), not at 900 px as well. At exactly 900 px, a 36 px desktop button (such as the board settings gear in My leads, UI-11) was coming out at 44 px.
+
 ## [0.9.2] - 2026-11-12
 
 ### Changed
