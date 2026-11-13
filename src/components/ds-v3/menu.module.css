@@ -178,6 +178,76 @@
   align-self: center;
 }
 
+/* ——— Título do painel (sino: “Notificações”) ——— */
+.title {
+  padding: 8px 8px 2px;
+  font: var(--t-body-strong);
+  color: var(--ink);
+  user-select: none;
+}
+
+/* ——— Aviso: dois pontos decorativos, texto inteiro e o tempo abaixo ——— */
+.item[data-notice] {
+  position: relative;
+  padding: 8px;
+}
+.item[data-notice] .label {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.noticeDots {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  height: 1lh;
+}
+.unreadDot,
+.toneDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.unreadDot {
+  visibility: hidden;
+  background: var(--blue-dot);
+}
+.unreadDot[data-on] {
+  visibility: visible;
+}
+.toneDot {
+  width: 8px;
+  height: 8px;
+  background: var(--gray-dot);
+}
+.toneDot[data-tone='alerta'] {
+  background: var(--orange-dot);
+}
+.toneDot[data-tone='info'] {
+  background: var(--teal-dot);
+}
+.toneDot[data-tone='sucesso'] {
+  background: var(--green-dot);
+}
+.noticeTime {
+  font: var(--t-caption);
+  color: var(--muted);
+}
+/* “Não lida”: só para o leitor de tela (caixa visível nula). */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Hover e foco por teclado são o mesmo destaque: o item em foco segue o ponteiro. */
 .item:is(:focus, [data-force~='hover'], [data-force~='focus'], [aria-expanded='true']) {
   color: var(--ink);

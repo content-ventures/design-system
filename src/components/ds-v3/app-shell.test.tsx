@@ -12,11 +12,12 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { render, screen, within } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FileText, LayoutList, Newspaper, Radio } from 'lucide-react';
 import { renderToString } from 'react-dom/server';
-import { describe, expect, it, vi } from 'vitest';
+import type { ReactNode } from 'react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   AppShell,
@@ -26,6 +27,7 @@ import {
   TopBar,
   useShell,
   type Crumb,
+  NotificationsButton,
   type NavGroup,
 } from './app-shell';
 
@@ -501,5 +503,176 @@ describe('TopBar · trilha no celular', () => {
     render(<Breadcrumb variant="compact" items={TRAIL} />);
     expect(trail().querySelector('li, [data-crumb]')).toBeNull();
     expect(within(trail()).getByRole('link', { name: 'Tendências do verão 2027' })).toBeVisible();
+  });
+});
+
+/** Corpo de cada `@container <nome> (max-width: <px>)`, com as chaves balanceadas. */
+function containerBlocks(name: string, maxWidth: number): string[] {
+  const head = `@container ${name} (max-width: ${maxWidth}px)`;
+  const blocks: string[] = [];
+  for (let at = css.indexOf(head); at !== -1; at = css.indexOf(head, at + 1)) {
+    const open = css.indexOf('{', at);
+    let depth = 0;
+    for (let i = open; i < css.length; i += 1) {
+      if (css[i] === '{') depth += 1;
+      if (css[i] === '}' && --depth === 0) {
+        blocks.push(css.slice(open + 1, i));
+        break;
+      }
+    }
+  }
+  return blocks;
+}
+
+/** A regra que começa pelo seletor (sozinho ou o primeiro de uma lista), até o `}`. */
+function rule(blocks: string[], selector: string): string {
+  for (const block of blocks) {
+    const start = block.search(
+      new RegExp(`(^|\\n)\\s*${selector.replace(/[.[\]]/g, '\\$&')}\\s*[,{]`),
+    );
+    if (start >= 0) return block.slice(start, block.indexOf('}', start));
+  }
+  return '';
+}
+
+describe('AppShell no celular: alvos de 44 px', () => {
+  const topbar = containerBlocks('topbar', 640);
+  const shell = containerBlocks('shell', 640);
+
+  it('botão Menu e sino medem 44 × 44 px e não encolhem', () => {
+    const targets = rule(topbar, '.topbar .menuButton');
+    expect(targets).toContain('.topbar .bell button');
+    expect(targets).toMatch(/width:\s*44px/);
+    expect(targets).toMatch(/height:\s*44px/);
+    expect(targets).toMatch(/flex-shrink:\s*0/);
+  });
+
+  it('itens, busca e limpar a busca da gaveta medem 44 px', () => {
+    expect(rule(shell, '.shell[data-drawer] .navItem')).toMatch(/min-height:\s*44px/);
+    expect(rule(shell, '.shell[data-drawer] .filter')).toMatch(/height:\s*44px/);
+    const clear = rule(shell, '.shell[data-drawer] .filterClear');
+    expect(clear).toMatch(/width:\s*44px/);
+    expect(clear).toMatch(/height:\s*44px/);
+  });
+
+  it('no computador os itens continuam com ao menos 24 px', () => {
+    const base = css.slice(css.indexOf('.navItem {'), css.indexOf('}', css.indexOf('.navItem {')));
+    expect(Number(/min-height:\s*(\d+)px/.exec(base)?.[1])).toBeGreaterThanOrEqual(24);
+  });
+});
+
+describe('NotificationsButton: painel de avisos', () => {
+  const menuCss = readFileSync(resolve(__dirname, 'menu.module.css'), 'utf8');
+  const notices = [
+    {
+      label: 'Hoje',
+      items: [
+        {
+          texto: 'Sua página saiu do ar. A organização a inativou. Motivo: correção em andamento.',
+          tempo: 'há 20 min',
+          naoLida: true,
+          tom: 'alerta' as const,
+        },
+      ],
+    },
+    {
+      label: 'Anteriores',
+      items: [
+        {
+          texto: 'Sua página está no ar. 5 de 5 seções aprovadas.',
+          tempo: 'há 3 dias',
+          naoLida: false,
+          tom: 'sucesso' as const,
+        },
+      ],
+    },
+  ];
+  const sections = [{ items: [{ label: 'P.I. 2026-0400 assinado', description: 'há 12 min' }] }];
+
+  afterEach(cleanup);
+
+  async function open(node: ReactNode) {
+    const user = userEvent.setup();
+    render(<div data-ds-v3>{node}</div>);
+    await user.click(screen.getByRole('button', { name: /Notificações/ }));
+    return { user, menu: screen.getByRole('menu', { name: 'Notificações' }) };
+  }
+
+  it('com `onViewAll` há o rodapé `Ver todas`, que o chama', async () => {
+    const onViewAll = vi.fn();
+    const { user } = await open(<NotificationsButton sections={sections} onViewAll={onViewAll} />);
+    await user.click(screen.getByRole('menuitem', { name: 'Ver todas' }));
+    expect(onViewAll).toHaveBeenCalledTimes(1);
+  });
+
+  it('sem `onViewAll` nenhum `Ver todas`, com `notices` ou com `sections`', async () => {
+    await open(<NotificationsButton title="Notificações" width={420} notices={notices} />);
+    expect(screen.queryByText('Ver todas')).toBeNull();
+    cleanup();
+    await open(<NotificationsButton sections={sections} />);
+    expect(screen.queryByText('Ver todas')).toBeNull();
+    expect(screen.getByRole('menuitem', { name: /P\.I\. 2026-0400 assinado/ })).toBeTruthy();
+  });
+
+  it('título, 420 px e os grupos', async () => {
+    const { menu } = await open(
+      <NotificationsButton title="Notificações" width={420} notices={notices} />,
+    );
+    expect(menu.style.width).toBe('420px');
+    expect(within(menu).getByText('Notificações')).toBeTruthy();
+    expect(within(menu).getByRole('group', { name: 'Hoje' })).toBeTruthy();
+    expect(within(menu).getByRole('group', { name: 'Anteriores' })).toBeTruthy();
+  });
+
+  it('não lido tem "Não lida" no nome acessível, com caixa visível nula; lido não tem', async () => {
+    const { menu } = await open(<NotificationsButton notices={notices} />);
+    const [unread, read] = within(menu).getAllByRole('menuitem');
+    expect(unread).toHaveProperty(
+      'textContent',
+      expect.stringContaining('correção em andamento.há 20 minNão lida'),
+    );
+    expect(read?.textContent).not.toContain('Não lida');
+    const hidden = within(unread as HTMLElement).getByText('Não lida');
+    expect(hidden.className).toMatch(/srOnly/);
+    const srOnly = menuCss.slice(
+      menuCss.indexOf('.srOnly {'),
+      menuCss.indexOf('}', menuCss.indexOf('.srOnly {')),
+    );
+    expect(srOnly).toMatch(/width:\s*1px/);
+    expect(srOnly).toMatch(/height:\s*1px/);
+    expect(srOnly).toMatch(/clip:\s*rect\(0 0 0 0\)/);
+    expect(srOnly).toMatch(/overflow:\s*hidden/);
+  });
+
+  it('os dois pontos são `aria-hidden` e o texto vai inteiro, sem reticências', async () => {
+    const { menu } = await open(<NotificationsButton notices={notices} />);
+    const [unread] = within(menu).getAllByRole('menuitem');
+    const dots = (unread as HTMLElement).querySelectorAll('i');
+    expect(dots).toHaveLength(2);
+    for (const dot of dots) expect(dot.closest('[aria-hidden="true"]')).not.toBeNull();
+    expect(dots[0]?.className).toMatch(/unreadDot/);
+    expect(dots[1]?.getAttribute('data-tone')).toBe('alerta');
+    expect(unread?.textContent).not.toContain('…');
+    expect(
+      within(unread as HTMLElement).getByText(/Motivo: correção em andamento\.$/),
+    ).toBeTruthy();
+    const notice = menuCss.slice(
+      menuCss.indexOf('.item[data-notice] .label {'),
+      menuCss.indexOf('}', menuCss.indexOf('.item[data-notice] .label {')),
+    );
+    expect(notice).toMatch(/white-space:\s*normal/);
+    expect(notice).toMatch(/text-overflow:\s*clip/);
+  });
+
+  it('clique no aviso chama o `onSelect` dele e fecha devolvendo o foco ao sino', async () => {
+    const onSelect = vi.fn();
+    const { user, menu } = await open(
+      <NotificationsButton
+        notices={[{ label: 'Hoje', items: [{ ...notices[0]!.items[0]!, onSelect }] }]}
+      />,
+    );
+    await user.click(within(menu).getByRole('menuitem'));
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: /Notificações/ }));
   });
 });

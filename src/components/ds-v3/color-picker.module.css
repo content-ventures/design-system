@@ -187,3 +187,83 @@
     height: 44px;
   }
 }
+
+/* ——— Cor personalizada: o seletor do sistema e o código, para a cor do manual fora das prontas ——— */
+/* O invólucro só agrupa o foco do painel: a grade do painel segue valendo para os filhos. */
+.body {
+  display: contents;
+}
+.custom {
+  display: grid;
+  gap: 6px;
+  margin: 0 -12px;
+  padding: 10px 12px 0;
+  border-top: 1px solid var(--line-soft);
+}
+.customLabel {
+  font: var(--t-caption-strong);
+  color: var(--muted);
+}
+.customRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.native {
+  flex-shrink: 0;
+  width: var(--preset);
+  height: var(--preset);
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  cursor: pointer;
+}
+.native::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.native::-webkit-color-swatch {
+  border: 0;
+  border-radius: var(--r-md);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+}
+.native::-moz-color-swatch {
+  border: 0;
+  border-radius: var(--r-md);
+}
+.native:focus-visible {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: 2px;
+}
+.customInput {
+  flex: 1;
+  min-width: 0;
+  width: 0;
+  height: var(--preset);
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  font: var(--t-small-strong);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.customInput::placeholder {
+  text-transform: none;
+  color: var(--g-400);
+}
+.customInput:focus-visible {
+  outline: none;
+  border-color: var(--b-500);
+  box-shadow: var(--ring-field);
+}
+.customInput[aria-invalid='true'] {
+  border-color: var(--red-dot);
+  box-shadow: var(--ring-invalid);
+}
+.customError {
+  font: var(--t-caption);
+  color: var(--red-ink);
+}

@@ -41,7 +41,20 @@ export type MenuItem = {
   force?: string;
   /** Submenu: abre à direita depois de 120 ms de hover, com → ou Enter. */
   items?: MenuItem[];
+  /**
+   * Item de aviso (painel do sino): ponto azul de não lida e ponto do tipo à esquerda, o texto
+   * inteiro quebrando linha e o tempo abaixo; “Não lida” só para o leitor de tela.
+   */
+  notice?: MenuNotice;
   onSelect?: () => void;
+};
+/** Cor do ponto do tipo do aviso: laranja, verde-azulado, verde ou o cinza neutro. */
+export type MenuNoticeTone = 'alerta' | 'info' | 'sucesso' | 'neutro';
+export type MenuNotice = {
+  /** “há ⟨tempo⟩”, em cinza abaixo do texto. */
+  time: string;
+  unread: boolean;
+  tone: MenuNoticeTone;
 };
 export type MenuSection = { label?: string; items: MenuItem[] };
 
@@ -142,6 +155,8 @@ export type MenuSurfaceProps = {
   align?: Align;
   gap?: number;
   width?: number;
+  /** Título no alto do painel (o nome acessível continua sendo `label`). */
+  title?: string;
   phase?: 'open' | 'closing';
   isStatic?: boolean;
   level?: number;
@@ -169,6 +184,7 @@ export function MenuSurface({
   align = 'start',
   gap = 6,
   width,
+  title,
   phase = 'open',
   isStatic = false,
   level = 0,
@@ -356,6 +372,11 @@ export function MenuSurface({
       onPointerEnter={onPointerEnterPanel}
       onContextMenu={(event) => event.preventDefault()}
     >
+      {title && (
+        <div className={s.title} aria-hidden="true">
+          {title}
+        </div>
+      )}
       {sections.map((section, sectionIndex) => (
         <div
           key={section.label ?? sectionIndex}
@@ -389,7 +410,8 @@ export function MenuSurface({
                 data-label={item.label}
                 data-danger={item.danger || undefined}
                 data-muted={item.muted || undefined}
-                data-rich={Boolean(item.description) || undefined}
+                data-rich={Boolean(item.description || item.notice) || undefined}
+                data-notice={item.notice ? '' : undefined}
                 data-force={item.force ?? (item.active ? 'hover' : undefined)}
                 onPointerMove={(event) => {
                   if (event.pointerType !== 'mouse') return;
@@ -422,7 +444,12 @@ export function MenuSurface({
                   onDismiss?.(true);
                 }}
               >
-                {item.leading ? (
+                {item.notice ? (
+                  <span className={s.noticeDots} aria-hidden="true">
+                    <i className={s.unreadDot} data-on={item.notice.unread || undefined} />
+                    <i className={s.toneDot} data-tone={item.notice.tone} />
+                  </span>
+                ) : item.leading ? (
                   <span className={s.lead} aria-hidden="true">
                     {item.leading}
                   </span>
@@ -431,8 +458,13 @@ export function MenuSurface({
                 )}
                 <span className={s.text}>
                   <span className={s.label}>{item.label}</span>
-                  {item.description && <span className={s.desc}>{item.description}</span>}
+                  {item.notice ? (
+                    <span className={s.noticeTime}>{item.notice.time}</span>
+                  ) : (
+                    item.description && <span className={s.desc}>{item.description}</span>
+                  )}
                 </span>
+                {item.notice?.unread && <span className={s.srOnly}>Não lida</span>}
                 {(item.meta || item.shortcut || item.checked || hasSub) && (
                   <span className={s.end}>
                     {item.meta && <span className={s.meta}>{item.meta}</span>}
@@ -518,6 +550,7 @@ export function Menu({
   side = 'bottom',
   label,
   width,
+  title,
   onOpenChange,
 }: {
   trigger: (props: MenuTriggerProps) => ReactNode;
@@ -527,6 +560,8 @@ export function Menu({
   side?: 'bottom' | 'top';
   label: string;
   width?: number;
+  /** Título no alto do painel. */
+  title?: string;
   onOpenChange?: (open: boolean) => void;
 }) {
   const hydrated = useHydrated();
@@ -608,6 +643,7 @@ export function Menu({
           side={side}
           align={align}
           width={width}
+          title={title}
           phase={phase === 'open' ? 'open' : 'closing'}
           initialFocus={initialFocus}
           onDismiss={close}

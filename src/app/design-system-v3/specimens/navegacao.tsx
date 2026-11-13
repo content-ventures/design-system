@@ -640,7 +640,13 @@ function PhoneShell({ open = false }: { open?: boolean }) {
         topbar={
           <TopBar
             breadcrumb={[{ label: 'Operação' }, { label: 'Campanhas' }]}
-            notifications={<NotificationsButton count={3} sections={NOTIFICATIONS} />}
+            notifications={
+              <NotificationsButton
+                count={3}
+                sections={NOTIFICATIONS}
+                onViewAll={viewAllNotifications}
+              />
+            }
           />
         }
       >
@@ -1050,6 +1056,9 @@ const crumbsFor = (persona: string): Crumb[] =>
         { label: 'Coleção Primavera-Verão no portal' },
       ];
 
+/** Rodapé `Ver todas` do sino (no DS ele só existe com `onViewAll`). */
+const viewAllNotifications = () => undefined;
+
 function HeaderContext() {
   const [persona, setPersona] = useState('operador');
   return (
@@ -1058,7 +1067,13 @@ function HeaderContext() {
         <TopBar
           breadcrumb={crumbsFor(persona)}
           actions={<PersonaSelect value={persona} onChange={setPersona} />}
-          notifications={<NotificationsButton count={3} sections={NOTIFICATIONS} />}
+          notifications={
+            <NotificationsButton
+              count={3}
+              sections={NOTIFICATIONS}
+              onViewAll={viewAllNotifications}
+            />
+          }
         />
         <DetailPreview />
       </div>
@@ -1116,7 +1131,13 @@ function ResponsiveHeader({ width, height }: { width: number; height: number }) 
           <TopBar
             breadcrumb={crumbsFor(persona)}
             actions={<PersonaSelect value={persona} onChange={setPersona} />}
-            notifications={<NotificationsButton count={3} sections={NOTIFICATIONS} />}
+            notifications={
+              <NotificationsButton
+                count={3}
+                sections={NOTIFICATIONS}
+                onViewAll={viewAllNotifications}
+              />
+            }
           />
         }
       >
@@ -1134,6 +1155,7 @@ function BellState({ unread = false, force }: { unread?: boolean; force?: string
       unread={unread}
       count={unread ? 3 : 0}
       sections={NOTIFICATIONS}
+      onViewAll={viewAllNotifications}
       force={force}
     />
   );
@@ -1170,7 +1192,11 @@ function HeaderSpecimen() {
             <State label="Aberto">
               <div className={x.bellOpen}>
                 <BellState unread force="hover" />
-                <MenuPanel label="Notificações" width={344} sections={NOTIFICATIONS} />
+                <MenuPanel
+                  label="Notificações"
+                  width={344}
+                  sections={[...NOTIFICATIONS, { items: [{ label: 'Ver todas' }] }]}
+                />
               </div>
             </State>
           </States>
@@ -1206,7 +1232,13 @@ function BreadcrumbsSpecimen() {
               { label: 'Coleção Primavera-Verão no portal' },
             ]}
             actions={<PersonaSelect value="operador" onChange={() => undefined} />}
-            notifications={<NotificationsButton count={3} sections={NOTIFICATIONS} />}
+            notifications={
+              <NotificationsButton
+                count={3}
+                sections={NOTIFICATIONS}
+                onViewAll={viewAllNotifications}
+              />
+            }
           />
           <div className={x.barPage}>
             <div className={x.detailHead}>
@@ -1737,7 +1769,13 @@ function CreationHeader() {
         sticky={false}
         breadcrumb={[{ label: 'Operação' }, { label: 'Campanhas' }, { label: 'Nova campanha' }]}
         actions={<PersonaSelect value="operador" onChange={() => undefined} />}
-        notifications={<NotificationsButton count={3} sections={NOTIFICATIONS} />}
+        notifications={
+          <NotificationsButton
+            count={3}
+            sections={NOTIFICATIONS}
+            onViewAll={viewAllNotifications}
+          />
+        }
       />
       <div className={x.creationHead}>
         <div className={x.creationTitle}>
@@ -2448,7 +2486,13 @@ function CommandContext() {
         sticky={false}
         breadcrumb={[{ label: 'Operação' }, { label: 'Campanhas' }]}
         actions={trigger}
-        notifications={<NotificationsButton count={3} sections={NOTIFICATIONS} />}
+        notifications={
+          <NotificationsButton
+            count={3}
+            sections={NOTIFICATIONS}
+            onViewAll={viewAllNotifications}
+          />
+        }
       />
       <div className={x.barPage}>
         <h2 className={x.pageTitle}>Campanhas</h2>
