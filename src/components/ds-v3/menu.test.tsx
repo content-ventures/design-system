@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -106,5 +109,56 @@ describe('teclado do menu do sino', () => {
     await user.keyboard('{ArrowDown}');
     await user.keyboard('{Tab}');
     expect(document.activeElement).toBe(bell);
+  });
+});
+
+describe('item atual (`current`)', () => {
+  const sections = [
+    {
+      label: 'Portais',
+      items: [
+        { label: 'Naturaltech', current: true },
+        { label: 'Escolar Office Brasil', current: false },
+      ],
+    },
+    { items: [{ label: 'Sair' }] },
+  ];
+
+  async function open() {
+    render(
+      <div data-ds-v3>
+        <Menu
+          label="Conta"
+          sections={sections}
+          trigger={(props) => (
+            <button type="button" {...props}>
+              Conta
+            </button>
+          )}
+        />
+      </div>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Conta' }));
+  }
+
+  it('o atual tem `aria-current="true"` e o check; os outros, nenhum dos dois', async () => {
+    await open();
+    const current = screen.getByRole('menuitem', { name: 'Naturaltech' });
+    expect(current).toHaveAttribute('aria-current', 'true');
+    expect(current.querySelector('svg')).not.toBeNull();
+    const other = screen.getByRole('menuitem', { name: 'Escolar Office Brasil' });
+    expect(other).not.toHaveAttribute('aria-current');
+    expect(other.querySelector('svg')).toBeNull();
+  });
+
+  it('itens de lugar (`current` definido) têm 44 px; sem `current`, a altura de hoje', async () => {
+    await open();
+    expect(screen.getByRole('menuitem', { name: 'Escolar Office Brasil' })).toHaveAttribute(
+      'data-place',
+      '',
+    );
+    expect(screen.getByRole('menuitem', { name: 'Sair' })).not.toHaveAttribute('data-place');
+    const css = readFileSync(resolve(__dirname, 'menu.module.css'), 'utf8');
+    expect(css).toMatch(/\.item\[data-place\] \{[^}]*min-height: 44px;/);
   });
 });

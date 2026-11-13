@@ -54,6 +54,11 @@ export type DateRangePickerProps = {
   onChange: (range: DateRange) => void;
   min?: string;
   max?: string;
+  /**
+   * Teto só do início (ISO). Escolhendo o início, os dias depois dele ficam indisponíveis; o término
+   * continua indo até `max`. Sem ele, as duas pontas param em `max`.
+   */
+  startMax?: string;
   window?: DateWindow;
   presets?: DatePreset[];
   /** `true` marca o controle inteiro; o objeto marca só a data com erro. */
@@ -437,6 +442,8 @@ type PanelProps = {
   anchor: 'start' | 'end';
   min?: string;
   max?: string;
+  /** Teto do início no período: vale enquanto `anchor` é `start` e nos atalhos. */
+  startMax?: string;
   marked?: DateWindow;
   presets?: DatePreset[];
   onPick: (date: string) => void;
@@ -452,7 +459,8 @@ function CalendarPanel({
   end,
   anchor,
   min,
-  max,
+  max: maxAll,
+  startMax,
   marked,
   presets,
   onPick,
@@ -463,10 +471,15 @@ function CalendarPanel({
   const narrow = useSyncExternalStore(subscribeNarrow, readNarrow, () => false);
   // Dois meses só quando o período escolhível passa de um mês: uma janela de outubro não ganha um
   // novembro inteiro apagado ao lado.
-  const spanMonths = min && max ? monthIndex(max) - monthIndex(min) + 1 : 2;
+  const spanMonths = min && maxAll ? monthIndex(maxAll) - monthIndex(min) + 1 : 2;
   const count = mode === 'range' && !narrow ? Math.min(2, Math.max(1, spanMonths)) : 1;
   const [today] = useState(todayISO);
-  const isDisabled = (date: string) => Boolean((min && date < min) || (max && date > max));
+  // Teto da ponta em escolha: o do início enquanto se escolhe o início, `max` no término.
+  const startCeiling = mode === 'range' ? (startMax ?? maxAll) : maxAll;
+  const max = anchor === 'start' ? startCeiling : maxAll;
+  const outside = (date: string, ceiling?: string) =>
+    Boolean((min && date < min) || (ceiling && date > ceiling));
+  const isDisabled = (date: string) => outside(date, max);
 
   // Data em foco ao abrir: a ponta que está sendo escolhida; sem data, hoje ou o início da janela.
   const [initial] = useState(() => {
@@ -583,7 +596,9 @@ function CalendarPanel({
   if (needed > rows) setRows(needed);
   // Marcar dia a dia (e a legenda) só quando informa algo além dos limites: se todo dia escolhível já
   // está na janela, os dias apagados já a mostram.
-  const markDays = Boolean(marked && !(min && max && marked.start <= min && marked.end >= max));
+  const markDays = Boolean(
+    marked && !(min && maxAll && marked.start <= min && marked.end >= maxAll),
+  );
   const legend = markDays ? marked : undefined;
   // A janela é sempre o pontilhado sob o número (data única e período, como nos seletores
   // aprovados): a faixa azul fica só para a escolha, e as duas nunca se confundem.
@@ -599,8 +614,8 @@ function CalendarPanel({
                   isISO(preset.start) &&
                   isISO(preset.end) &&
                   preset.start <= preset.end &&
-                  !isDisabled(preset.start) &&
-                  !isDisabled(preset.end);
+                  !outside(preset.start, startCeiling) &&
+                  !outside(preset.end, maxAll);
                 return (
                   <button
                     key={preset.label}
@@ -1375,6 +1390,7 @@ export function DateRangePicker({
   onChange,
   min,
   max,
+  startMax,
   window: marked,
   presets,
   invalid,
@@ -1417,9 +1433,12 @@ export function DateRangePicker({
     typeof describedBy === 'object' ? describedBy[which] : describedBy;
 
   // Início gravado fora dos limites (herdado de outro ativo) vale como vazio: escolhe-se o início de novo.
+  const startCeiling = orNone(startMax) ?? orNone(max);
   const fromUsable = Boolean(
-    from && !(min && isISO(min) && from < min) && !(max && isISO(max) && from > max),
+    from && !(min && isISO(min) && from < min) && !(startCeiling && from > startCeiling),
   );
+  // Ponta em escolha: o término só com um início utilizável.
+  const choosing = anchor === 'end' && fromUsable ? 'end' : 'start';
   function openAt(which: 'start' | 'end') {
     const next = which === 'end' && !fromUsable ? 'start' : which;
     if (open && anchor === next) {
@@ -1435,7 +1454,7 @@ export function DateRangePicker({
     if (restore) (which === 'end' ? endRef : startRef).current?.focus({ preventScroll: true });
   }
   function pick(date: string) {
-    if (anchor === 'start' || !fromUsable) {
+    if (choosing === 'start') {
       onChange({ start: date, end: to && date <= to ? to : '' });
       setAnchor('end');
       return;
@@ -1519,9 +1538,10 @@ export function DateRangePicker({
         value=""
         start={from}
         end={to}
-        anchor={anchor}
+        anchor={choosing}
         min={orNone(min)}
         max={orNone(max)}
+        startMax={orNone(startMax)}
         marked={markedWindow}
         presets={presets}
         onPick={pick}
@@ -1541,12 +1561,15 @@ export function DateRangePicker({
     // Duas caixas com rótulo, como dois campos lado a lado, e um calendário de período só.
     // A caixa da ponta que está sendo escolhida fica com o anel de foco enquanto o painel está aberto.
     const box = (which: 'start' | 'end') => {
-      const { iso, ...props } = endProps(which);
+      // O nome vem do `<label htmlFor>` visível, sem `aria-label`: um nome que não contém o texto
+      // visível da caixa (a data) quebra o rótulo no nome (WCAG 2.5.3, axe
+      // `label-content-name-mismatch`). A data por extenso continua na descrição.
+      const { iso, 'aria-label': label, ...props } = endProps(which);
       return (
         <div className={s.splitField}>
           <div className={f.labelRow}>
             <label htmlFor={props.id} className={f.label}>
-              {props['aria-label']}
+              {label}
               {required && (
                 <span className={f.required} aria-hidden="true">
                   *

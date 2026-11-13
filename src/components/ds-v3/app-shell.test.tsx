@@ -23,11 +23,13 @@ import {
   AppShell,
   Breadcrumb,
   Sidebar,
+  SidebarAccount,
   SidebarItem,
   TopBar,
   useShell,
   type Crumb,
   NotificationsButton,
+  ProductMark,
   type NavGroup,
 } from './app-shell';
 
@@ -674,5 +676,153 @@ describe('NotificationsButton: painel de avisos', () => {
     await user.click(within(menu).getByRole('menuitem'));
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(document.activeElement).toBe(screen.getByRole('button', { name: /Notificações/ }));
+  });
+});
+
+describe('ProductMark · marca com letra', () => {
+  it('`mark` desenha a letra no quadrado e o nome ao lado', () => {
+    const { container } = render(
+      <AppShell
+        sidebar={<Sidebar product={<ProductMark mark="M" name="MEDIA.ON" />} groups={groups} />}
+      >
+        <p>Conteúdo</p>
+      </AppShell>,
+    );
+    const product = container.querySelector('[data-part="product"]') as HTMLElement;
+    expect(product).toHaveAttribute('data-mark', '');
+    expect(within(product).getByText('M').closest('[aria-hidden="true"]')).not.toBeNull();
+    expect(within(product).getByText('MEDIA.ON')).toBeInTheDocument();
+    expect(product.querySelector('svg')).toBeNull();
+  });
+
+  it('sem `mark`, o desenho de hoje: o símbolo em SVG e nenhuma letra', () => {
+    const { container } = render(
+      <AppShell sidebar={<Sidebar product={<ProductMark name="Redação" />} groups={groups} />}>
+        <p>Conteúdo</p>
+      </AppShell>,
+    );
+    const product = container.querySelector('[data-part="product"]') as HTMLElement;
+    expect(product).not.toHaveAttribute('data-mark');
+    expect(product.querySelector('svg')).not.toBeNull();
+    expect(within(product).getByText('Redação')).toBeInTheDocument();
+  });
+
+  it('o CSS: letra branca e nome em peso 600 só com `mark`; topo de 52 px com o fio do topo', () => {
+    expect(css).toMatch(/\.product\[data-mark\] \.productText strong \{[^}]*font-weight: 600;/);
+    expect(css).toMatch(/\.logoLetter \{[^}]*color: var\(--on-accent\);/);
+    expect(css).toMatch(
+      /\.identity \{[^}]*min-height: var\(--topbar-h\);[^}]*border-bottom: 1px solid var\(--line\);/,
+    );
+    expect(css).toMatch(/\.account \{[^}]*min-height: 44px;/);
+  });
+});
+
+describe('AppShell · gaveta abaixo de 900 px (`drawerBelow`)', () => {
+  it('sem a prop: nenhum atributo novo e o véu de sempre', () => {
+    const html = root(renderToString(shell()));
+    expect(html).toHaveAttribute('data-layout', 'auto');
+    expect(html).not.toHaveAttribute('data-drawer-below');
+    expect(html).not.toHaveAttribute('data-veil');
+  });
+
+  it('servidor: `drawerBelow={900}` marca o corte e sai do bloco de 1199 px', () => {
+    const html = root(renderToString(shell({ drawerBelow: 900, veil: 'dim' })));
+    expect(html).toHaveAttribute('data-drawer-below', '900');
+    expect(html).toHaveAttribute('data-veil', 'dim');
+    expect(html).not.toHaveAttribute('data-layout', 'auto');
+  });
+
+  it('o CSS desenha a gaveta fechada até 899,98 px no modo 900', () => {
+    const block = css.slice(css.indexOf('@container shell (max-width: 899.98px)'));
+    expect(block).toMatch(
+      /\.shell\[data-drawer-below='900'\] \.frame \{\s*grid-template-columns: minmax\(0, 1fr\);/,
+    );
+    expect(block).toMatch(
+      /\.shell\[data-drawer-below='900'\] \.sidebar \{[^}]*position: fixed;[^}]*visibility: hidden;/,
+    );
+    expect(block).toMatch(
+      /\.shell\[data-drawer-below='900'\] \.topbar\[data-menu='auto'\] \.menuButton \{\s*display: inline-flex;/,
+    );
+  });
+
+  it('véu `dim`: `--foreground` a 35%', () => {
+    expect(css).toMatch(
+      /\.shell\[data-veil='dim'\] \.veil \{[^}]*background: color-mix\(in srgb, var\(--foreground\) 35%, transparent\);/,
+    );
+  });
+
+  it('movimento reduzido: gaveta, véu e item ativo com transição e animação de 0,01 ms', () => {
+    const theme = readFileSync(resolve(__dirname, 'theme.module.css'), 'utf8');
+    const block = theme.slice(theme.indexOf('@media (prefers-reduced-motion: reduce)'));
+    expect(block).toMatch(/\.theme \*,\s*\.theme \*::before,\s*\.theme \*::after \{/);
+    expect(block).toMatch(/transition-duration: 0\.01ms !important;/);
+    expect(block).toMatch(/animation-duration: 0\.01ms !important;/);
+    expect(theme).toMatch(/--foreground: var\(--ink\);/);
+  });
+
+  it('o botão do menu abre a gaveta; tocar no véu fecha e devolve o foco ao botão', async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <AppShell
+        drawerBelow={900}
+        veil="dim"
+        sidebar={<Sidebar groups={groups} />}
+        topbar={<TopBar breadcrumb={[{ label: 'Produções' }]} />}
+      >
+        <p>Conteúdo</p>
+      </AppShell>,
+    );
+    const shellRoot = container.querySelector('[data-part="shell"]');
+    const menuButton = screen.getByRole('button', { name: 'Abrir menu' });
+    await user.click(menuButton);
+    expect(shellRoot).toHaveAttribute('data-nav-open');
+    await user.click(screen.getByRole('button', { name: 'Fechar menu' }));
+    expect(shellRoot).not.toHaveAttribute('data-nav-open');
+    expect(menuButton).toHaveFocus();
+  });
+});
+
+describe('Moldura do protótipo v21: rótulo do grupo e menu da conta', () => {
+  it('rótulo do grupo em 11 px, peso 500, `--muted` (UI-03)', () => {
+    const rule = css.match(/\n\.groupLabel \{([^}]*)\}/)?.[1] ?? '';
+    expect(rule).toMatch(/font: 500 11px\/16px var\(--font\);/);
+    expect(rule).toMatch(/color: var\(--muted\);/);
+  });
+
+  it('rodapé: nome em 600 12,5 px `--ink` (UI-06, RV-MA1.6)', () => {
+    const rule = css.match(/\n\.accountText strong \{([^}]*)\}/)?.[1] ?? '';
+    expect(rule).toMatch(/font: 600 12\.5px\/17px var\(--font\);/);
+    expect(rule).toMatch(/color: var\(--ink\);/);
+  });
+
+  it('separador da trilha em `--subtle` (UI-11, RV-MA2.3)', () => {
+    const rule = css.match(/\n\.crumbSep \{([^}]*)\}/)?.[1] ?? '';
+    expect(rule).toMatch(/color: var\(--subtle\);/);
+  });
+
+  it('item de menu com foco por teclado mostra o anel do DS (UI-13)', () => {
+    const menuCss = readFileSync(resolve(__dirname, 'menu.module.css'), 'utf8');
+    expect(menuCss).toMatch(
+      /\.item:is\(:focus-visible, \[data-force~='focus'\]\) \{\s*outline: 2px solid var\(--focus-color\);\s*outline-offset: -2px;/,
+    );
+  });
+
+  it('o menu da conta abre na largura do rodapé (o gatilho), não mais largo que o menu', async () => {
+    const user = userEvent.setup();
+    const width = vi
+      .spyOn(HTMLElement.prototype, 'offsetWidth', 'get')
+      .mockImplementation(function (this: HTMLElement) {
+        return this.dataset.part === 'account' ? 211 : 0;
+      });
+    render(
+      <SidebarAccount
+        name="Marina Costa"
+        detail="Naturaltech"
+        sections={[{ items: [{ label: 'Sair', onSelect: () => undefined }] }]}
+      />,
+    );
+    await user.click(screen.getByRole('button', { name: /Menu da conta/ }));
+    expect(screen.getByRole('menu', { name: 'Conta' })).toHaveStyle({ width: '211px' });
+    width.mockRestore();
   });
 });

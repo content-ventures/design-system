@@ -170,6 +170,9 @@
   min-height: 44px;
   padding: 6px 8px;
 }
+.item[data-place] {
+  min-height: 44px;
+}
 .item[data-rich] > .icon,
 .item[data-rich] > .lead {
   margin-top: 2px;
@@ -260,8 +263,8 @@
   color: var(--ink);
   background: var(--g-100);
 }
-/* No palco, o foco forçado também mostra o anel interno (§9: dentro de menu, offset −2). */
-.item[data-force~='focus'] {
+/* Foco por teclado (e o forçado do palco) mostra o anel interno (§9: dentro de menu, offset −2). */
+.item:is(:focus-visible, [data-force~='focus']) {
   outline: 2px solid var(--focus-color);
   outline-offset: -2px;
 }

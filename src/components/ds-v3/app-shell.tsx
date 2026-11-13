@@ -121,6 +121,8 @@ export function AppShell({
   onNavOpenChange,
   layout = 'auto',
   breakpoint = SHELL_BREAKPOINT,
+  drawerBelow = SHELL_BREAKPOINT,
+  veil = 'default',
   topbarFirst = false,
 }: {
   /** O menu lateral. Ignorado em `layout="immersive"` (passe `null`). */
@@ -150,6 +152,14 @@ export function AppShell({
    */
   breakpoint?: number;
   /**
+   * Corte da gaveta em `auto`, decidido no CSS como o padrão: `900` leva a gaveta para
+   * `@container shell (max-width: 899.98px)`, com item do menu, opções da conta e botão do menu de
+   * 44 px abaixo do corte. O padrão (1200) é o corte de hoje (até 1199 px).
+   */
+  drawerBelow?: 900 | 1200;
+  /** Véu da gaveta aberta: `default` (`--overlay`) ou `dim` (`--foreground` a 35%). */
+  veil?: 'default' | 'dim';
+  /**
    * A barra do topo vem antes do menu na ordem do teclado (o desenho não muda): para quando a ação
    * da barra precisa estar a poucos `Tab` do topo, como um `Sair da conta` na barra.
    */
@@ -165,6 +175,10 @@ export function AppShell({
   const restoreFocus = useRef(false);
   const focusOnOpen = useRef(false);
   const open = drawer && navOpen;
+  // Um `breakpoint` fora do padrão é medido no cliente e vence o corte do CSS.
+  const measured = layout === 'auto' && breakpoint !== SHELL_BREAKPOINT;
+  const cssCut = layout === 'auto' && !measured && drawerBelow !== SHELL_BREAKPOINT;
+  const cut = measured ? breakpoint : drawerBelow;
   // Imersivo: nenhum menu do app — nem coluna, nem gaveta, nem botão. A volta fica na página.
   const immersive = layout === 'immersive';
   const hasTopbar = topbar !== undefined && topbar !== null && topbar !== false;
@@ -184,12 +198,12 @@ export function AppShell({
       setDrawer(layout === 'drawer');
       return;
     }
-    const measure = () => setDrawer(root.clientWidth < breakpoint);
+    const measure = () => setDrawer(root.clientWidth < cut);
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(root);
     return () => observer.disconnect();
-  }, [layout, breakpoint]);
+  }, [layout, cut]);
 
   useEffect(() => {
     if (!open) {
@@ -245,7 +259,9 @@ export function AppShell({
         style={style}
         data-collapsed={(collapsed && !drawer && !immersive) || undefined}
         data-drawer={drawer || undefined}
-        data-layout={layout === 'auto' && breakpoint !== SHELL_BREAKPOINT ? 'measured' : layout}
+        data-layout={measured ? 'measured' : cssCut ? 'auto-900' : layout}
+        data-drawer-below={cssCut ? drawerBelow : undefined}
+        data-veil={veil === 'dim' ? veil : undefined}
         data-fill={fill || undefined}
         data-bleed={bleed || undefined}
         data-nav-open={open || undefined}
@@ -866,28 +882,44 @@ export function Sidebar({
   );
 }
 
-/** Marca do produto na linha de identidade. Desenho próprio, sem letras. */
-export function ProductMark({ name = 'MediaOn', caption }: { name?: string; caption?: string }) {
+/**
+ * Marca do produto na linha de identidade. Sem `mark`, o símbolo próprio, sem letras; com `mark`,
+ * a letra branca no quadrado azul e o nome em peso 600.
+ */
+export function ProductMark({
+  name = 'MediaOn',
+  caption,
+  mark,
+}: {
+  name?: string;
+  caption?: string;
+  /** Letra no lugar do símbolo (ex.: “M”). */
+  mark?: string;
+}) {
   const { collapsed } = useShell();
   return (
-    <div className={s.product} data-part="product">
+    <div className={s.product} data-part="product" data-mark={mark ? '' : undefined}>
       <span className={s.logo} aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none">
-          <circle cx="7.6" cy="12" r="3.1" fill="currentColor" />
-          <path
-            d="M13 7.4a6.6 6.6 0 0 1 0 9.2"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-          />
-          <path
-            d="M16.6 4.4a11 11 0 0 1 0 15.2"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            opacity="0.6"
-          />
-        </svg>
+        {mark ? (
+          <span className={s.logoLetter}>{mark}</span>
+        ) : (
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="7.6" cy="12" r="3.1" fill="currentColor" />
+            <path
+              d="M13 7.4a6.6 6.6 0 0 1 0 9.2"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M16.6 4.4a11 11 0 0 1 0 15.2"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              opacity="0.6"
+            />
+          </svg>
+        )}
       </span>
       {collapsed ? (
         <VisuallyHidden>{name}</VisuallyHidden>
@@ -1077,7 +1109,7 @@ export function SidebarAccount({
   const trigger = (
     <Menu
       label="Conta"
-      width={248}
+      width="trigger"
       side="top"
       sections={sections}
       trigger={(props) => (
@@ -1152,25 +1184,26 @@ function CrumbNode({ item, current }: { item: Crumb; current: boolean }) {
       </span>
     </>
   );
-  const node =
-    current || (!item.href && !item.onClick) ? (
-      <span className={s.crumbCurrent} aria-current={current ? 'page' : undefined}>
-        {body}
-      </span>
-    ) : item.href ? (
-      <NavigationLink
-        className={s.crumbLink}
-        href={item.href}
-        onClick={item.onClick}
-        data-force={item.force}
-      >
-        {body}
-      </NavigationLink>
-    ) : (
-      <button type="button" className={s.crumbLink} onClick={item.onClick} data-force={item.force}>
-        {body}
-      </button>
-    );
+  const node = current ? (
+    <span className={s.crumbCurrent} aria-current="page">
+      {body}
+    </span>
+  ) : !item.href && !item.onClick ? (
+    <span className={s.crumbStatic}>{body}</span>
+  ) : item.href ? (
+    <NavigationLink
+      className={s.crumbLink}
+      href={item.href}
+      onClick={item.onClick}
+      data-force={item.force}
+    >
+      {body}
+    </NavigationLink>
+  ) : (
+    <button type="button" className={s.crumbLink} onClick={item.onClick} data-force={item.force}>
+      {body}
+    </button>
+  );
   // O nome inteiro na dica do DS (nunca o `title` nativo), só quando o nível corta.
   return (
     <Tooltip content={item.label} bare side="bottom" describe={false} disabled={!title}>
@@ -1197,7 +1230,14 @@ function goTo(item: Crumb) {
  * Papel do nível na trilha (`data-crumb` no `li`). No topo do celular, o CSS mostra o primeiro (o
  * caminho de volta) e o atual e esconde o meio — o “…” recolhido também é meio.
  */
-type CrumbPart = 'first' | 'middle' | 'current';
+type CrumbPart = 'first' | 'middle' | 'parent' | 'current';
+
+/**
+ * Trilha abaixo do corte: `first-current` (padrão) fica com o primeiro nível e o atual em ≤640 px;
+ * `last-two` fica com o penúltimo (`data-crumb='parent'`) e o atual abaixo do corte da gaveta de
+ * um `AppShell drawerBelow={900}` (899,98 px).
+ */
+export type CompactTrail = 'first-current' | 'last-two';
 
 /**
  * Trilha de navegação. O último item é a página atual (texto, não link). Com `maxItems`, os níveis
@@ -1208,6 +1248,7 @@ export function Breadcrumb({
   label = 'Trilha de navegação',
   maxItems,
   variant = 'default',
+  compactTrail = 'first-current',
   moreOpenForce,
 }: {
   items: Crumb[];
@@ -1215,6 +1256,8 @@ export function Breadcrumb({
   /** A partir de quantos níveis o meio recolhe (mín. 3). */
   maxItems?: number;
   variant?: 'default' | 'compact';
+  /** Que níveis ficam abaixo do corte (o CSS esconde os outros). */
+  compactTrail?: CompactTrail;
   /** Prancha: força um estado no botão “…”. */
   moreOpenForce?: string;
 }) {
@@ -1262,11 +1305,25 @@ export function Breadcrumb({
   const tail = collapse ? items.slice(items.length - tailCount) : [];
   const lastIndex = items.length - 1;
   const sep = <ChevronRight className={s.crumbSep} aria-hidden="true" />;
-  // Um nível só é o atual; com dois ou mais, o primeiro é a volta e o último, o atual.
+  const lastTwo = compactTrail === 'last-two';
+  // Um nível só é o atual; com dois ou mais, o primeiro é a volta e o último, o atual. Em
+  // `last-two`, a volta é o penúltimo — no “…” quando ele está recolhido.
   const headPart = (index: number): CrumbPart =>
-    !collapse && index === lastIndex ? 'current' : index === 0 ? 'first' : 'middle';
+    !collapse && index === lastIndex
+      ? 'current'
+      : lastTwo && !collapse && index === lastIndex - 1
+        ? 'parent'
+        : index === 0
+          ? 'first'
+          : 'middle';
+  const tailPart = (index: number): CrumbPart =>
+    index === tail.length - 1
+      ? 'current'
+      : lastTwo && index === tail.length - 2
+        ? 'parent'
+        : 'middle';
   return (
-    <nav aria-label={label} className={s.crumbs}>
+    <nav aria-label={label} className={s.crumbs} data-trail={lastTwo ? compactTrail : undefined}>
       <ol>
         {head.map((item, index) => (
           <li key={`h-${item.label}-${index}`} data-crumb={headPart(index)}>
@@ -1275,7 +1332,7 @@ export function Breadcrumb({
           </li>
         ))}
         {collapse && (
-          <li data-crumb="middle">
+          <li data-crumb={lastTwo && tailCount < 2 ? 'parent' : 'middle'}>
             {sep}
             <Menu
               label="Níveis ocultos"
@@ -1306,10 +1363,7 @@ export function Breadcrumb({
           </li>
         )}
         {tail.map((item, index) => (
-          <li
-            key={`t-${item.label}-${index}`}
-            data-crumb={index === tail.length - 1 ? 'current' : 'middle'}
-          >
+          <li key={`t-${item.label}-${index}`} data-crumb={tailPart(index)}>
             {sep}
             <CrumbNode item={item} current={index === tail.length - 1} />
           </li>
@@ -1335,6 +1389,7 @@ export function TopBar({
   onOpenMenu,
   menuButton = 'auto',
   maxCrumbs,
+  compactTrail,
   sticky = true,
 }: {
   breadcrumb: Crumb[];
@@ -1348,6 +1403,8 @@ export function TopBar({
   /** `auto`: só em gaveta (até 1199 px); `always`: sempre; `never`: nunca. */
   menuButton?: 'auto' | 'always' | 'never';
   maxCrumbs?: number;
+  /** Níveis da trilha abaixo do corte: `first-current` (padrão) ou `last-two`. */
+  compactTrail?: CompactTrail;
   sticky?: boolean;
 }) {
   const shell = useShell();
@@ -1389,7 +1446,7 @@ export function TopBar({
             <span className={s.topRule} aria-hidden="true" />
           </>
         )}
-        <Breadcrumb items={breadcrumb} maxItems={maxCrumbs} />
+        <Breadcrumb items={breadcrumb} maxItems={maxCrumbs} compactTrail={compactTrail} />
         {(actions || notifications || account) && (
           <div className={s.topActions}>
             {actions}

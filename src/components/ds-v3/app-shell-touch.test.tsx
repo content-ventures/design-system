@@ -67,3 +67,21 @@ describe('AppShell no celular', () => {
     expect(Number(/min-height:\s*(\d+)px/.exec(base)?.[1])).toBeGreaterThanOrEqual(24);
   });
 });
+
+describe('AppShell com `drawerBelow={900}`: alvos de 44 px abaixo do corte', () => {
+  const shell = containerBlocks('shell', 899.98);
+
+  it('itens do menu e opções da conta medem 44 px', () => {
+    expect(rule(shell, ".shell[data-drawer-below='900'] .navItem")).toMatch(/min-height:\s*44px/);
+    const options = rule(shell, ".shell[data-drawer-below='900'] .sidebar [role='menuitem']");
+    expect(options).toContain("[role='menuitemradio']");
+    expect(options).toMatch(/min-height:\s*44px/);
+  });
+
+  it('botão do menu mede 44 × 44 px e não encolhe', () => {
+    const button = rule(shell, ".shell[data-drawer-below='900'] .topbar .menuButton");
+    expect(button).toMatch(/width:\s*44px/);
+    expect(button).toMatch(/height:\s*44px/);
+    expect(button).toMatch(/flex-shrink:\s*0/);
+  });
+});

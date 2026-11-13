@@ -92,6 +92,13 @@
   width: 17px;
   height: 17px;
 }
+.logoLetter {
+  font: 600 14px/1 var(--font);
+  color: var(--on-accent);
+}
+.product[data-mark] .productText strong {
+  font-weight: 600;
+}
 .productText {
   display: grid;
   min-width: 0;
@@ -142,9 +149,16 @@
   min-width: 0;
   display: grid;
 }
-.portalText strong,
-.accountText strong {
+.portalText strong {
   font: var(--t-small-strong);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* O nome da conta no rodapé: 600 12,5 px (RV-MA1.6 do protótipo v21). */
+.accountText strong {
+  font: 600 12.5px/17px var(--font);
   color: var(--ink);
   white-space: nowrap;
   overflow: hidden;
@@ -288,7 +302,8 @@
   gap: 4px;
   width: calc(100% - 22px);
   margin: 0 11px 6px;
-  font: var(--t-caption-strong);
+  /* 11 px/500 (RV-MA1.3 do protótipo v21): um passo abaixo de `--t-caption-strong`. */
+  font: 500 11px/16px var(--font);
   color: var(--muted);
   text-align: left;
 }
@@ -486,6 +501,7 @@ button.groupLabel[aria-expanded='false'] svg {
   gap: 9px;
   width: 100%;
   min-width: 0;
+  min-height: 44px;
   padding: 6px 4px;
   border-radius: var(--r-md);
   text-align: left;
@@ -759,6 +775,61 @@ button.groupLabel[aria-expanded='false'] svg {
     display: none;
   }
 }
+/* Véu escurecido (`veil="dim"`): `--foreground` a 35%, por cima do `--overlay`. */
+.shell[data-veil='dim'] .veil {
+  background: color-mix(in srgb, var(--foreground) 35%, transparent);
+}
+/* ——— Corte em 900 px (`drawerBelow={900}`): a gaveta fechada do CSS vem até 899,98 px, no lugar do
+   bloco de 1199 px (o shell sai com `data-layout='auto-900'`). Abaixo do corte, item do menu, opções
+   da conta e botão do menu viram alvos de 44 px, e a trilha `last-two` fica com o penúltimo e o
+   atual. ——— */
+@container shell (max-width: 899.98px) {
+  .shell[data-drawer-below='900'] .frame {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .shell[data-drawer-below='900'] .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: var(--z-drawer);
+    width: min(300px, 86vw);
+    height: 100dvh;
+    transform: translateX(-100%);
+    visibility: hidden;
+  }
+  .shell[data-drawer-below='900'][data-fill] .sidebar {
+    position: absolute;
+    width: min(300px, 86%);
+    height: 100%;
+  }
+  .shell[data-drawer-below='900'] .topbar[data-menu='auto'] .menuButton {
+    display: inline-flex;
+  }
+  .shell[data-drawer-below='900'] .topbar .toggle,
+  .shell[data-drawer-below='900'] .topbar .toggle + .topRule {
+    display: none;
+  }
+  .shell[data-drawer-below='900'] .topbar .menuButton {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+  }
+  .shell[data-drawer-below='900'] .navItem {
+    min-height: 44px;
+  }
+  .shell[data-drawer-below='900'] .sidebar [role='menuitem'],
+  .shell[data-drawer-below='900'] .sidebar [role='menuitemradio'],
+  .shell[data-drawer-below='900'] .sidebar [role='menuitemcheckbox'] {
+    min-height: 44px;
+  }
+  .shell[data-drawer-below='900']
+    .crumbs[data-trail='last-two']
+    li:not([data-crumb='parent'], [data-crumb='current']) {
+    display: none;
+  }
+  .shell[data-drawer-below='900'] .crumbs[data-trail='last-two'] li[data-crumb='parent'] .crumbSep {
+    display: none;
+  }
+}
 @container shell (max-width: 640px) {
   .content {
     --content-pt: 20px;
@@ -951,11 +1022,12 @@ button.groupLabel[aria-expanded='false'] svg {
 .crumbSep {
   width: 14px;
   height: 14px;
-  color: var(--g-300);
+  color: var(--subtle);
   flex-shrink: 0;
 }
 .crumbLink,
 .crumbCurrent,
+.crumbStatic,
 .crumbBack {
   display: inline-flex;
   align-items: center;
@@ -992,6 +1064,10 @@ button.groupLabel[aria-expanded='false'] svg {
 .crumbCurrent {
   font-weight: 500;
   color: var(--ink);
+}
+/* Nível sem destino antes do atual (o grupo do menu): texto, no tom dos níveis anteriores. */
+.crumbStatic {
+  color: var(--muted);
 }
 .crumbText {
   min-width: 0;

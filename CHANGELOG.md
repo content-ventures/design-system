@@ -4,6 +4,66 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.9.4] - 2026-11-13
+
+### Added
+
+- `DateRangePicker` accepts `startMax`: a ceiling for the start date only. While the start is being chosen (opened from the start box, or with no usable start), days after `startMax` are disabled, clicking them does nothing, and month navigation stops at its month; presets whose start is after it are disabled. The end keeps going up to `max`. A saved start after `startMax` counts as empty. Without `startMax`, both ends stop at `max`, as before.
+
+### Fixed
+
+- `DateRangePicker` with `labels`: each box now takes its name from the visible `<label>` only, without `aria-label`. The old name did not contain the visible text (the date), which axe reported as `label-content-name-mismatch` (WCAG 2.5.3). The spelled-out date stays in the description.
+
+## [0.9.3] - 2026-11-13
+
+### Fixed
+
+- The 44 px minimum height of `Button`/`IconButton` on phones now applies below 900 px (`max-width: 899.98px`), not at 900 px as well. At exactly 900 px, a 36 px desktop button (such as the board settings gear in My leads, UI-11) was coming out at 44 px.
+
+## [0.9.2] - 2026-11-12
+
+### Changed
+
+- Sidebar account name: `600 12.5px/17px` (was `--t-small-strong`, 500 12 px), per RV-MA1.6. `.portalText strong` keeps `--t-small-strong`.
+- Breadcrumb separator in `--subtle` (was `--g-300`), per RV-MA2.3.
+
+### Fixed
+
+- `Menu` items show the DS focus ring (2 px `--focus-color`, offset −2 px) on keyboard focus (`:focus-visible`), not only when forced on the stage.
+
+## [0.9.1] - 2026-11-12
+
+### Changed
+
+- `Menu` `width` also accepts `'trigger'`: the panel takes the trigger's width. `SidebarAccount` uses it, so the account menu opens as wide as the sidebar footer instead of 248 px past the 236 px sidebar (prototype v21, RV-MA1.7).
+- Sidebar group label: `500 11px/16px` (was `--t-caption-strong`, 11.5 px), per RV-MA1.3.
+
+### Fixed
+
+- `Breadcrumb`: a level without destination that is not the current one (a menu group such as «Anunciar») renders as `.crumbStatic` in `--muted`, weight 400, instead of `.crumbCurrent` (ink, 500). `aria-current="page"` stays on the last level only.
+
+## [0.9.0] - 2026-11-12
+
+### Added
+
+- `AppShell` `drawerBelow?: 900 | 1200` (default 1200, today's cut). With `900` the shell gets `data-drawer-below="900"` and `data-layout="auto-900"`: the closed drawer comes from `@container shell (max-width: 899.98px)` instead of the 1199 px block, and the client measure uses the same cut. Below the cut the menu items and the account options are 44 px tall and the menu button is 44 × 44 px. An explicit `breakpoint` still wins (measured mode).
+- `AppShell` `veil?: 'default' | 'dim'`. `dim` (`data-veil="dim"`) paints the drawer veil with `--foreground` at 35%. Tapping the veil closes the drawer and returns focus to the menu button (as before).
+- `Breadcrumb`/`TopBar` `compactTrail?: 'first-current' | 'last-two'` (default `first-current`, today's behavior). `last-two` sets `data-trail="last-two"` and marks the second-to-last level `data-crumb="parent"`; below the 900 px drawer cut only that level and the current one stay, without the leading separator. Type `CompactTrail` exported.
+- Theme token `--foreground` (alias of `--ink`, light and dark).
+
+Without the new props the `AppShell` DOM and its CSS behave as before.
+
+## [0.8.0] - 2026-11-12
+
+### Added
+
+- `ProductMark` `mark`: a letter (e.g. "M") in the 28 px blue square instead of the symbol, in white, with the name at weight 600. Without `mark`, the symbol as before.
+- `MenuItem.current`: a place item (e.g. the advertiser's portals). `true` marks where the person is, with `aria-current="true"` and the check; when defined (`true` or `false`) the item is 44 px tall. Items without `current` keep their height.
+
+### Changed
+
+- `SidebarAccount`: the trigger has a 44 px minimum height (it already measured 44 px with the `md` avatar; now it is guaranteed).
+
 ## [0.7.0] - 2026-11-10
 
 Brings back the DS V3 changes the MediaOn Vitrine branch (`feat/vitrine-v1`) made to its vendored copy after 0.5.0, so that branch can consume this package.
