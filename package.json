@@ -1,6 +1,6 @@
 {
   "name": "@content-ventures/design-system",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "Biblioteca visual, tokens e harness oficial dos produtos da Content Ventures.",
   "private": true,
   "type": "module",

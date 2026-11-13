@@ -4,6 +4,16 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.9.4] - 2026-11-13
+
+### Added
+
+- `DateRangePicker` accepts `startMax`: a ceiling for the start date only. While the start is being chosen (opened from the start box, or with no usable start), days after `startMax` are disabled, clicking them does nothing, and month navigation stops at its month; presets whose start is after it are disabled. The end keeps going up to `max`. A saved start after `startMax` counts as empty. Without `startMax`, both ends stop at `max`, as before.
+
+### Fixed
+
+- `DateRangePicker` with `labels`: each box now takes its name from the visible `<label>` only, without `aria-label`. The old name did not contain the visible text (the date), which axe reported as `label-content-name-mismatch` (WCAG 2.5.3). The spelled-out date stays in the description.
+
 ## [0.9.3] - 2026-11-13
 
 ### Fixed
