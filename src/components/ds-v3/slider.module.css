@@ -307,7 +307,7 @@
 }
 .tick > b {
   font: var(--t-caption-strong);
-  color: var(--b-600);
+  color: var(--accent-ink);
   transition: color var(--dur-1);
 }
 .tick[data-kind='recommended'] > span::before {
@@ -326,7 +326,7 @@
   background: var(--g-75);
 }
 .tick:hover:not(:disabled) > b {
-  color: var(--b-700);
+  color: var(--accent-ink);
 }
 .tick[aria-pressed='true'] {
   background: var(--b-25);
@@ -334,7 +334,7 @@
 }
 .tick[aria-pressed='true'] > span,
 .tick[aria-pressed='true'] > b {
-  color: var(--b-700);
+  color: var(--accent-ink);
 }
 .tick[aria-pressed='true']::before {
   background: var(--b-500);

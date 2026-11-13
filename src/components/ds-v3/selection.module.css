@@ -36,7 +36,7 @@
   border-radius: var(--r-xs);
   color: var(--on-accent);
   background: var(--paper);
-  border: 1px solid var(--g-300);
+  border: 1px solid var(--line-strong);
   box-shadow: var(--shadow-xs);
   transition:
     background-color var(--dur-1) var(--ease-out),
@@ -62,7 +62,7 @@
 
 /* Repouso → hover → pressionado (um degrau por estado) */
 .choice:is(:hover, :has(input[data-force~='hover'])):not([data-disabled]) .box {
-  border-color: var(--g-400);
+  border-color: var(--line-hover);
 }
 .choice:is(:active, :has(input[data-force~='active'])):not([data-disabled]) .box {
   transform: scale(0.92);
@@ -537,7 +537,7 @@
   margin-top: 1px;
   border-radius: 50%;
   background: var(--paper);
-  border: 1px solid var(--g-300);
+  border: 1px solid var(--line-strong);
   transition: border-color var(--dur-1) var(--ease-out);
 }
 .radioDot::after {
@@ -561,7 +561,7 @@
 }
 .card:not([data-disabled]):not(:has(input:checked)):is(:has(.cardMain:hover), [data-force~='hover'])
   .radioDot {
-  border-color: var(--g-400);
+  border-color: var(--line-hover);
 }
 .card:not([data-disabled]):not(:has(input:checked)):is(
     :has(.cardMain:active),
