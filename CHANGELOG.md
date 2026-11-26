@@ -4,6 +4,17 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.9.5] - 2026-11-26
+
+### Changed
+
+- `DataTable` now switches to cards at 760 px of its own width (was 680 px). At 680 px, a five-column table on a portrait tablet (768 px window with the drawer) squeezed the name and e-mail column down to ellipses ("Ferna…") while short columns kept spare width. Tables between 681 and 760 px wide now render as cards.
+- `FieldGroup` with `columns={2}` now stacks into one column below 640 px, like `columns={3}` (which used to stack only below 480 px). In a 390 px dialog, each field of a two-column pair was about 120 px wide.
+
+### Fixed
+
+- `AppShell`: while the drawer is open, the page behind it no longer scrolls. The drawer uses the same counted scroll lock as `Dialog`. It is skipped with `fill`, where the container scrolls and is already inert.
+
 ## [0.9.4] - 2026-11-13
 
 ### Added

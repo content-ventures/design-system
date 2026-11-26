@@ -3,6 +3,9 @@
  * mesmo com uma coluna de indicador antes dela; célula sem nada a mostrar fica
  * marcada para não virar uma linha só com rótulo.
  */
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -117,5 +120,13 @@ describe('DataTable — coluna presa ao fim', () => {
       'data-sticky',
       'end',
     );
+  });
+});
+
+describe('DataTable · corte dos cartões', () => {
+  it('a tabela vira cartões até 760 px da própria largura (tablet em retrato)', () => {
+    const css = readFileSync(resolve(__dirname, 'table.module.css'), 'utf8');
+    expect(css).toContain('@container table (max-width: 760px)');
+    expect(css).not.toContain('@container table (max-width: 680px)');
   });
 });

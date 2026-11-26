@@ -38,7 +38,7 @@ import { VisuallyHidden } from './a11y';
 import { Badge, Kbd, type Tone } from './badge';
 import { IconButton } from './button';
 import { Avatar, BrandMark } from './identity';
-import { Tooltip, useClipped } from './overlays';
+import { lockScroll, Tooltip, useClipped } from './overlays';
 import { floatingHost, Menu, type MenuItem, type MenuNoticeTone, type MenuSection } from './menu';
 import s from './app-shell.module.css';
 
@@ -204,6 +204,13 @@ export function AppShell({
     observer.observe(root);
     return () => observer.disconnect();
   }, [layout, cut]);
+
+  // Gaveta aberta sobre a página: o dedo no véu não rola a lista de trás (com `fill`, quem rola é o
+  // próprio contêiner, que fica inerte).
+  useEffect(() => {
+    if (!open || fill) return;
+    return lockScroll();
+  }, [open, fill]);
 
   useEffect(() => {
     if (!open) {

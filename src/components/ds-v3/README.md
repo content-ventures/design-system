@@ -326,10 +326,10 @@ Para mostrar um estado parado, todo componente interativo aceita `data-force="ho
   `aria-describedby` (toque mostra por 1,5 s); nome cortado entra na dica. Recolhido: ícone esmaecido e
   dica lateral “Rótulo · Em breve” com o motivo na linha de baixo. Nunca é o ativo, mesmo com `active`.
   Nada de `title` nativo. Nas pranchas, `force: 'tip'` abre a dica parada.
-- **Breakpoints:** 390 celular · 640 (rodapé de ações em 1 linha, diálogo vira bottom sheet) · 760 (tabela →
-  cartões, título 22) · 1024 · 1199 (menu gaveta) · 1280 · 1440 (referência) · 1600 (detalhe em 2 colunas)
+- **Breakpoints:** 390 celular · 640 (rodapé de ações em 1 linha, diálogo vira bottom sheet) · 760 (título 22;
+  tabela → cartões pela largura da própria tabela, ~840 de janela com a gaveta) · 1024 · 1199 (menu gaveta) · 1280 · 1440 (referência) · 1600 (detalhe em 2 colunas)
   · 1920/2560 (para em 1760).
-- **Grades:** principal + lateral `minmax(0,1fr) var(--aside-w)`; formulário 2 colunas gap 16; cartões
+- **Grades:** principal + lateral `minmax(0,1fr) var(--aside-w)`; formulário 2 colunas gap 16 (`FieldGroup` empilha em 1 abaixo de 640); cartões
   `repeat(auto-fill, minmax(min(196px,100%),1fr))` gap 8; faixas de números com fio de 1 px entre células
   (`MetricStrip`: a última linha reparte a largura — 5 indicadores viram 3 + 2 ou 2 + 2 + 1, sem célula
   vazia).

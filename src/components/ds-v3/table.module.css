@@ -674,9 +674,11 @@
 /* Paginação no celular: ver pagination.module.css. */
 
 /* ——— Estreito: tabela → cartões (celular, contrato §12) ———
- * Pela largura da própria tabela, como o resto do DS: até 680 px (janela de ~760) cada linha é um
- * cartão. A primeira coluna é o título; as demais, rótulo à esquerda e valor à direita. */
-@container table (max-width: 680px) {
+ * Pela largura da própria tabela, como o resto do DS: até 760 px (janela de ~840 com a gaveta)
+ * cada linha é um cartão. Abaixo disso, uma tabela de cinco colunas com nome e e-mail já espreme a
+ * coluna de identificação até as reticências (tablet em retrato, 768 px). A primeira coluna é o
+ * título; as demais, rótulo à esquerda e valor à direita. */
+@container table (max-width: 760px) {
   .frame[data-stack] .scroll {
     overflow: visible;
     padding: 0;
