@@ -91,7 +91,7 @@ export function useShell() {
 const SHELL_BREAKPOINT = 1200;
 
 /**
- * Moldura do app (igual ao /dashboardv3): menu lateral de 236 px em g-25 encostado, com fio à
+ * Moldura do app (igual ao /dashboardv3): menu lateral de 256 px em g-25 encostado, com fio à
  * direita; topo de 52 px com fio — um único fio corre do menu ao conteúdo; identidade com altura
  * mínima de 52 px e conteúdo branco direto.
  * Até 1199 px de largura o menu vira gaveta (véu, Escape, conteúdo `inert`). Quem decide gaveta ou

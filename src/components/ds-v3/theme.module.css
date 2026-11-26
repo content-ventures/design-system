@@ -237,7 +237,7 @@
   --skeleton-pulse: 1.4s;
 
   /* Moldura do app (igual ao /dashboardv3) */
-  --sidebar-w: 236px;
+  --sidebar-w: 256px;
   --sidebar-w-collapsed: 64px;
   --topbar-h: 52px;
   --page-gutter: 32px;

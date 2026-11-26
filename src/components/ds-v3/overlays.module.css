@@ -209,6 +209,16 @@ dialog.dialog[data-contained] {
 .dialog[data-compact] {
   --dialog-w: 358px;
 }
+/* Celular estreito: o diálogo de conteúdo (padrão, lg, xl) ocupa a tela inteira, com cabeçalho e
+   rodapé nas bordas e o corpo rolando no meio. Confirmação (`sm` ou `alertdialog`) continua cartão. */
+@media (max-width: 480px) {
+  dialog.dialog:not([data-size='sm'], [role='alertdialog']) {
+    width: 100vw;
+    max-height: 100dvh;
+    height: 100dvh;
+    border-radius: 0;
+  }
+}
 .dialog[data-compact] .dialogFoot > :not(.dialogFootStart) {
   flex: 1 1 0;
   min-width: max-content;

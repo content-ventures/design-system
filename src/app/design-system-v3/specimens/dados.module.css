@@ -457,7 +457,7 @@
 }
 /* O menu lateral direto no painel: sem caixa própria nem fundo de faixa, só os itens. */
 .sidebarSample {
-  width: 236px;
+  width: var(--sidebar-w);
   max-width: 100%;
   margin: 0 -12px -8px;
 }

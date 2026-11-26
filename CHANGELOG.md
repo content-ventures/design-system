@@ -4,6 +4,18 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.9.6] - 2026-11-26
+
+### Changed
+
+- `--sidebar-w` goes from 236 to 256 px. At 236 px, menu labels such as "Configuração de campanha" and the account role in the sidebar footer ("Administrador da plataforma") were cut off with ellipses.
+- `Dialog`: below 480 px of window width, a content dialog (default, `lg` and `xl` sizes) fills the screen with no corner radius. The header and footer stay at the edges and the body scrolls between them. `sm` and `alertdialog` confirmations stay cards.
+- `AppShell`: in the drawer (below the drawer cut), menu group labels use `--t-small-strong` (12 px). The fixed sidebar keeps the 11 px of the prototype.
+
+### Fixed
+
+- `Breadcrumb`: with a touch pointer, each link in the trail has a 44 px tall target. The drawing does not change. The link used to be 26 px tall at the top of the screen.
+
 ## [0.9.5] - 2026-11-26
 
 ### Changed

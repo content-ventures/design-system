@@ -583,7 +583,7 @@
   color: var(--muted);
 }
 .navBox {
-  width: 236px;
+  width: var(--sidebar-w);
   background: var(--g-25);
 }
 .nav {
