@@ -4,6 +4,12 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.9.7] - 2026-11-27
+
+### Fixed
+
+- `DataTable` in cards: the actions cell (empty header) now shares the first grid row with the title instead of being absolutely positioned in the corner. A text button ("Editar") is taller than the title and used to cover the value on the next line (the price unit in the campaign assets table, below 840 px). Icon actions keep the same place and card height.
+
 ## [0.9.6] - 2026-11-26
 
 ### Changed
