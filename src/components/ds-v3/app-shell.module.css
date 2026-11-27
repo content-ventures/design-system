@@ -816,6 +816,10 @@ button.groupLabel[aria-expanded='false'] svg {
   .shell[data-drawer-below='900'] .navItem {
     min-height: 44px;
   }
+  /* Na gaveta o rótulo do grupo é leitura do corpo do menu: 12 px, não os 11 do menu fixo. */
+  .shell[data-drawer-below='900'] .groupLabel {
+    font: var(--t-small-strong);
+  }
   .shell[data-drawer-below='900'] .sidebar [role='menuitem'],
   .shell[data-drawer-below='900'] .sidebar [role='menuitemradio'],
   .shell[data-drawer-below='900'] .sidebar [role='menuitemcheckbox'] {
@@ -851,6 +855,9 @@ button.groupLabel[aria-expanded='false'] svg {
   }
   .shell[data-drawer] .navItem {
     min-height: 44px;
+  }
+  .shell[data-drawer] .groupLabel {
+    font: var(--t-small-strong);
   }
 }
 
@@ -1045,6 +1052,19 @@ button.groupLabel[aria-expanded='false'] svg {
   border-radius: var(--r-sm);
   color: var(--muted);
   transition: color var(--dur-1) var(--ease-out);
+}
+/* Toque: o desenho não muda; o alvo do nível da trilha cresce para 44 px de altura (WCAG 2.5.5). */
+@media (pointer: coarse) {
+  .crumbLink,
+  .crumbBack {
+    position: relative;
+  }
+  .crumbLink::after,
+  .crumbBack::after {
+    content: '';
+    position: absolute;
+    inset: -10px -4px;
+  }
 }
 .crumbLink:is(:hover, [data-force~='hover']),
 .crumbBack:is(:hover, [data-force~='hover']) {

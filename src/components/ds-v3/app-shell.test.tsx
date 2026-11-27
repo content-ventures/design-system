@@ -221,6 +221,22 @@ describe('AppShell · imersivo (sem menu do app)', () => {
   });
 });
 
+describe('AppShell · gaveta aberta trava a rolagem da página', () => {
+  it('trava enquanto aberta e devolve o estilo ao fechar', () => {
+    const { rerender } = render(shell({ layout: 'drawer', navOpen: true }));
+    expect(document.documentElement.style.overflow).toBe('hidden');
+    rerender(shell({ layout: 'drawer', navOpen: false }));
+    expect(document.documentElement.style.overflow).toBe('');
+  });
+
+  it('com `fill` (o contêiner rola por dentro) e na barra fixa, a página não é travada', () => {
+    const { rerender } = render(shell({ layout: 'drawer', navOpen: true, fill: true }));
+    expect(document.documentElement.style.overflow).toBe('');
+    rerender(shell({ layout: 'desktop', navOpen: true }));
+    expect(document.documentElement.style.overflow).toBe('');
+  });
+});
+
 describe('Sidebar · item “Em breve”', () => {
   it('não é link: botão indisponível com selo, nome e motivo na descrição', () => {
     render(roadmapShell({ layout: 'desktop' }));

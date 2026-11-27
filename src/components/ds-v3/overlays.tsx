@@ -41,7 +41,7 @@ let scrollLocks = 0;
 let savedScroll: { overflow: string; paddingRight: string } | null = null;
 
 /** Trava a rolagem da página (contagem para camadas empilhadas) sem o salto da barra de rolagem. */
-function lockScroll() {
+export function lockScroll() {
   const root = document.documentElement;
   if (scrollLocks === 0) {
     const gap = window.innerWidth - root.clientWidth;

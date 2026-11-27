@@ -1435,7 +1435,7 @@ function Espacamento() {
 function frameModel(w: number) {
   const drawer = w <= 1199;
   const gutter = w <= 640 ? 16 : w <= 1024 ? 24 : 32;
-  const side = drawer ? 0 : 236;
+  const side = drawer ? 0 : 256;
   const area = w - side;
   const inner = Math.min(area - gutter * 2, 1760);
   const left = side + (area - inner) / 2;
@@ -1507,7 +1507,7 @@ function AppFrame({ w }: { w: number }) {
             {Array.from({ length: 7 }, (_, i) => (
               <i key={i} data-active={i === 2 || undefined} />
             ))}
-            {show(120) && <Dim className={f.fSideDim}>236</Dim>}
+            {show(120) && <Dim className={f.fSideDim}>256</Dim>}
           </div>
           {/* Topo */}
           <div className={f.fTop} style={{ left: x(m.side), height: top }}>

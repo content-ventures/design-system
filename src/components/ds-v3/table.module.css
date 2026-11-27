@@ -674,9 +674,11 @@
 /* Paginação no celular: ver pagination.module.css. */
 
 /* ——— Estreito: tabela → cartões (celular, contrato §12) ———
- * Pela largura da própria tabela, como o resto do DS: até 680 px (janela de ~760) cada linha é um
- * cartão. A primeira coluna é o título; as demais, rótulo à esquerda e valor à direita. */
-@container table (max-width: 680px) {
+ * Pela largura da própria tabela, como o resto do DS: até 760 px (janela de ~840 com a gaveta)
+ * cada linha é um cartão. Abaixo disso, uma tabela de cinco colunas com nome e e-mail já espreme a
+ * coluna de identificação até as reticências (tablet em retrato, 768 px). A primeira coluna é o
+ * título; as demais, rótulo à esquerda e valor à direita. */
+@container table (max-width: 760px) {
   .frame[data-stack] .scroll {
     overflow: visible;
     padding: 0;
@@ -759,20 +761,32 @@
   .frame[data-stack] .table tbody > tr:has(> td.check) > td[data-title] {
     padding-left: 28px;
   }
-  /* Ações (cabeçalho vazio): sobem para o canto do cartão. */
+  /* Ações (cabeçalho vazio): sobem para o canto do cartão, na mesma linha do título. Na grade, e
+     não por cima dela: um botão com texto ("Editar") é mais alto que o título e, solto no canto,
+     cobria o valor da linha de baixo. */
+  .frame[data-stack] .table tbody > tr:has(> td[data-actions]) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--s-3);
+  }
+  .frame[data-stack] .table tbody > tr:has(> td[data-actions]) > td {
+    grid-column: 1 / -1;
+  }
+  .frame[data-stack] .table tbody > tr:has(> td[data-actions]) > td[data-title] {
+    grid-row: 1;
+    grid-column: 1;
+    align-self: center;
+  }
   .frame[data-stack] .table tbody > tr > td[data-actions] {
-    position: absolute;
-    top: 6px;
-    right: 6px;
+    grid-row: 1;
+    grid-column: 2;
+    align-self: start;
+    justify-content: flex-end;
     width: auto;
+    margin: -6px -10px -6px 0;
   }
   /* No cartão não há coluna para alinhar: o slot vazio não guarda lugar. */
   .frame[data-stack] .table td[data-actions] [data-slot='empty'] {
     display: none;
-  }
-  .frame[data-stack] .table tbody > tr:has(td[data-actions]) > td[data-title] {
-    /* Até três ações de 32 px no canto: o título não corre por baixo delas. */
-    padding-right: 112px;
   }
   .frame[data-stack] .table td[data-truncate] {
     max-width: none;

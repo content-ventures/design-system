@@ -4,6 +4,35 @@ Todas as mudanças relevantes deste pacote serão registradas aqui.
 
 O projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.9.7] - 2026-11-27
+
+### Fixed
+
+- `DataTable` in cards: the actions cell (empty header) now shares the first grid row with the title instead of being absolutely positioned in the corner. A text button ("Editar") is taller than the title and used to cover the value on the next line (the price unit in the campaign assets table, below 840 px). Icon actions keep the same place and card height.
+
+## [0.9.6] - 2026-11-26
+
+### Changed
+
+- `--sidebar-w` goes from 236 to 256 px. At 236 px, menu labels such as "Configuração de campanha" and the account role in the sidebar footer ("Administrador da plataforma") were cut off with ellipses.
+- `Dialog`: below 480 px of window width, a content dialog (default, `lg` and `xl` sizes) fills the screen with no corner radius. The header and footer stay at the edges and the body scrolls between them. `sm` and `alertdialog` confirmations stay cards.
+- `AppShell`: in the drawer (below the drawer cut), menu group labels use `--t-small-strong` (12 px). The fixed sidebar keeps the 11 px of the prototype.
+
+### Fixed
+
+- `Breadcrumb`: with a touch pointer, each link in the trail has a 44 px tall target. The drawing does not change. The link used to be 26 px tall at the top of the screen.
+
+## [0.9.5] - 2026-11-26
+
+### Changed
+
+- `DataTable` now switches to cards at 760 px of its own width (was 680 px). At 680 px, a five-column table on a portrait tablet (768 px window with the drawer) squeezed the name and e-mail column down to ellipses ("Ferna…") while short columns kept spare width. Tables between 681 and 760 px wide now render as cards.
+- `FieldGroup` with `columns={2}` now stacks into one column below 640 px, like `columns={3}` (which used to stack only below 480 px). In a 390 px dialog, each field of a two-column pair was about 120 px wide.
+
+### Fixed
+
+- `AppShell`: while the drawer is open, the page behind it no longer scrolls. The drawer uses the same counted scroll lock as `Dialog`. It is skipped with `fill`, where the container scrolls and is already inert.
+
 ## [0.9.4] - 2026-11-13
 
 ### Added

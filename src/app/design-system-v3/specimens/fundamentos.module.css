@@ -716,7 +716,7 @@
 .navSample {
   display: grid;
   gap: 2px;
-  width: 236px;
+  width: var(--sidebar-w);
   max-width: 100%;
   padding: 8px;
   border: 1px solid var(--line);

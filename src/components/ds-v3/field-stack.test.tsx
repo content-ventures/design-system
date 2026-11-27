@@ -55,4 +55,10 @@ describe('Pilha de campos', () => {
       /:is\(\[data-part='section-body'\], \[data-part='drawer-body'\]\)\s*>\s*:is\(\.field, \.group\)\s*\+\s*:is\(\.field, \.group\) \{\s*margin-top: var\(--s-5\);/,
     );
   });
+
+  it('grupo de 2 ou 3 colunas empilha em uma abaixo de 640 px', () => {
+    expect(css).toMatch(
+      /@media \(max-width: 640px\) \{[^}]*\.groupBody:is\(\[data-columns='2'\], \[data-columns='3'\]\) \{\s*grid-template-columns: minmax\(0, 1fr\);/,
+    );
+  });
 });

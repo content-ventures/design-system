@@ -139,7 +139,7 @@ Base 4: `--s-1` 4 · `--s-2` 8 · `--s-3` 12 · `--s-4` 16 · `--s-5` 20 · `--s
 `--s-12` 48 · `--s-14` 56 · `--s-16` 64. Valor fora da escala só para alinhar óptico (±1 px).
 
 - Controles: `--h-sm` 32 (toolbar, filtros, segmentado, paginação) · `--h-md` 36 (padrão) · `--h-lg` 40.
-  Toque (`pointer: coarse`): 36/44/48 e alvo mínimo de 40 px em checkbox, switch e ícones.
+  Toque (`pointer: coarse`): 44/44/48 (o `sm` também chega a 44), nível da trilha com alvo de 44 de altura e alvo mínimo de 40 px em checkbox, switch e ícones.
 - Campo herói de dinheiro: 56. Linhas de tabela: 46 (compacta, padrão do produto) e 60 (confortável).
 - Painel: padding 16/20. Grade de campos: colunas com gap 16, linhas 20, `align-items: start`.
 - Ritmo vertical de página: título → abas 24 · seções 32 · cabeçalho de seção → conteúdo 12–16.
@@ -307,7 +307,7 @@ Para mostrar um estado parado, todo componente interativo aceita `data-force="ho
 
 ## 12. Layout
 
-- **Moldura do app:** menu lateral `--sidebar-w` 236 em `--g-25` com fio à direita,
+- **Moldura do app:** menu lateral `--sidebar-w` 256 em `--g-25` com fio à direita,
   encostado; topo `--topbar-h` 52 com fio, um único fio corre do menu ao conteúdo; identidade do menu com
   altura mínima de 52 px, crescendo com o conteúdo e com 8 px de respiro vertical; conteúdo branco direto
   com `--page-gutter` 32 (24 em ≤1024, 16 em ≤640), limite `--content-max` 1760 centralizado.
@@ -326,10 +326,10 @@ Para mostrar um estado parado, todo componente interativo aceita `data-force="ho
   `aria-describedby` (toque mostra por 1,5 s); nome cortado entra na dica. Recolhido: ícone esmaecido e
   dica lateral “Rótulo · Em breve” com o motivo na linha de baixo. Nunca é o ativo, mesmo com `active`.
   Nada de `title` nativo. Nas pranchas, `force: 'tip'` abre a dica parada.
-- **Breakpoints:** 390 celular · 640 (rodapé de ações em 1 linha, diálogo vira bottom sheet) · 760 (tabela →
-  cartões, título 22) · 1024 · 1199 (menu gaveta) · 1280 · 1440 (referência) · 1600 (detalhe em 2 colunas)
+- **Breakpoints:** 390 celular · 640 (rodapé de ações em 1 linha, diálogo vira bottom sheet) · 760 (título 22;
+  tabela → cartões pela largura da própria tabela, ~840 de janela com a gaveta) · 1024 · 1199 (menu gaveta) · 1280 · 1440 (referência) · 1600 (detalhe em 2 colunas)
   · 1920/2560 (para em 1760).
-- **Grades:** principal + lateral `minmax(0,1fr) var(--aside-w)`; formulário 2 colunas gap 16; cartões
+- **Grades:** principal + lateral `minmax(0,1fr) var(--aside-w)`; formulário 2 colunas gap 16 (`FieldGroup` empilha em 1 abaixo de 640); cartões
   `repeat(auto-fill, minmax(min(196px,100%),1fr))` gap 8; faixas de números com fio de 1 px entre células
   (`MetricStrip`: a última linha reparte a largura — 5 indicadores viram 3 + 2 ou 2 + 2 + 1, sem célula
   vazia).

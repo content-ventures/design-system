@@ -160,8 +160,9 @@
 .groupBody[data-columns='3'] {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
-@media (max-width: 480px) {
-  .groupBody[data-columns='3'] {
+/* Celular: duas ou três colunas viram uma — num diálogo de 390 px, cada campo ficaria com ~120 px. */
+@media (max-width: 640px) {
+  .groupBody:is([data-columns='2'], [data-columns='3']) {
     grid-template-columns: minmax(0, 1fr);
   }
 }
